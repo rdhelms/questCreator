@@ -3,15 +3,20 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io').listen(http);
 
-app.use('/', express.static(__dirname + '/'));
-
-app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
-});
+app.use('/', express.static(__dirname + '/public'));
 
 io.on('connection', function(socket){
   console.log('a user connected');
-  socket.emit('create character', socket.id);
+
+  socket.on('game joined', function() {
+    console.log('a user joined the game');
+    socket.emit('create character', socket.id);
+  });
+
+  socket.on('game left', function() {
+    console.log('a user left the game');
+    socket.broadcast.emit('player left', socket.id);
+  });
 
   socket.on('send new player', function(charInfo) {
     socket.broadcast.emit('new player joining', charInfo);
