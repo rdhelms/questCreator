@@ -7,15 +7,15 @@
 
           $stateProvider.state('main', {
             url: '/',
-            templateUrl: 'views/main.html',
+            templateUrl: './src/views/main.html',
             controller: 'mainCtrl as main'
           }).state('main.chat', {
             url: 'chat',
-            templateUrl: 'views/chat.html',
+            templateUrl: './src/views/chat.html',
             controller: 'chatCtrl as chat'
           }).state('main.game', {
             url: 'game',
-            templateUrl: 'views/game.html',
+            templateUrl: './src/views/game.html',
             controller: 'gameCtrl as game'
           });
         });

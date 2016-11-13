@@ -1,9 +1,15 @@
 {
-  "name": "socket-chat-example",
+  "name": "quest-creator",
   "version": "0.0.1",
-  "description": "my first socket.io app",
+  "main": "index.js",
+  "description": "quest creator app",
   "dependencies": {
     "express": "4.10.2",
-    "socket.io": "1.2.0"
+    "socket.io": "1.2.0",
+    "grunt": "^1.0.1",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-sass": "^1.0.0",
+    "grunt-contrib-uglify": "^2.0.0",
+    "grunt-contrib-watch": "^1.0.0"
   }
 }
