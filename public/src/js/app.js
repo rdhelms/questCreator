@@ -27,32 +27,32 @@
           }).state('main.game.editor.map', {
             // "/game/editor/map"
             url: 'map',
-            templateUrl: './src/views/map.html',
+            templateUrl: './src/views/editor/map.html',
             controller: 'mapCtrl as map'
           }).state('main.game.editor.scene', {
             // "/game/editor/scene"
             url: 'scene',
-            templateUrl: './src/views/scene.html',
+            templateUrl: './src/views/editor/scene.html',
             controller: 'sceneCtrl as scene'
           }).state('main.game.editor.bg', {
             // "/game/editor/bg"
             url: 'bg',
-            templateUrl: './src/views/bg.html',
+            templateUrl: './src/views/editor/bg.html',
             controller: 'bgCtrl as bg'
           }).state('main.game.editor.obj', {
             // "/game/editor/obj"
             url: 'obj',
-            templateUrl: './src/views/obj.html',
+            templateUrl: './src/views/editor/obj.html',
             controller: 'objCtrl as obj'
           }).state('main.game.editor.ent', {
             // "/game/editor/ent"
             url: 'ent',
-            templateUrl: './src/views/ent.html',
+            templateUrl: './src/views/editor/ent.html',
             controller: 'entCtrl as ent'
           }).state('main.game.editor.scripts', {
             // "/game/editor/scripts"
             url: 'scripts',
-            templateUrl: './src/views/scripts.html',
+            templateUrl: './src/views/editor/scripts.html',
             controller: 'scriptsCtrl as scripts'
           }).state('main.profile', {
             url: 'profile',
