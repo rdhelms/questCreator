@@ -1,3 +1,11 @@
+@font-face {
+  font-family: PCSenior;
+  src: url('fonts/pc_senior/pcsenior.ttf');
+}
+
+@import 'partials/bourbon/bourbon';
+@import 'partials/nav';
+
 * {
     margin: 0;
     padding: 0;
@@ -6,6 +14,16 @@
 
 body {
     font: 13px Helvetica, Arial;
+    background: black;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
 }
 
 form {
