@@ -3,3 +3,14 @@
 # Quest Creator
 
 [Link to Heroku Page](https://quest-creator.herokuapp.com/#/)
+
+
+1) Clone the repo: `git clone https://github.com/rdhelms/questCreator.git`
+
+2) Navigate into project directory: `cd questCreator`
+
+3) Run `npm install`
+
+4) To run server, run `node index.js`
+
+5) Navigate to `localhost:4000`
