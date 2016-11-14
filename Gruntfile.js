@@ -30,8 +30,18 @@ module.exports = function(grunt) {
             },
             dist: {
                 files: {
-                    './public/lib/js/app.js': ['./public/src/js/app.js', './public/src/js/services/socket.service.js', './public/src/js/controllers/main.controller.js', './public/src/js/controllers/chat.controller.js', './public/src/js/controllers/game.controller.js'],
-                    './public/lib/js/vendor.js': ['./public/src/js/vendor/socket.io.js', './public/src/js/vendor/jquery.js', './public/src/js/vendor/angular.js', './public/src/js/vendor/angular-ui-router.js', './public/src/js/vendor/angular-local-storage.js']
+                    './public/lib/js/app.js': [
+                      './public/src/js/app.js',
+                      './public/src/js/services/socket.service.js',
+                      './public/src/js/controllers/*.js'
+                    ],
+                    './public/lib/js/vendor.js': [
+                      './public/src/js/vendor/socket.io.js',
+                      './public/src/js/vendor/jquery.js',
+                      './public/src/js/vendor/angular.js',
+                      './public/src/js/vendor/angular-ui-router.js',
+                      './public/src/js/vendor/angular-local-storage.js'
+                    ]
                 }
             }
         },
