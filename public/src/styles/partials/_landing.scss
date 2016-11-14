@@ -1,0 +1,37 @@
+#landing-container {
+  display: flex;
+  justify-content: space-between;
+  #create-splash {
+    margin: 2rem;
+
+    button {
+      font-size: 3em;
+      border: none;
+      border-radius: 0;
+      padding: .1rem .3rem;
+      background: whitesmoke;
+      color: black;
+      font-family: PCSenior;
+      &:active {
+        background: black;
+        color: whitesmoke;
+      }
+    }
+  }
+
+}
+
+#results-container {
+  margin: 2rem;
+  width: 40rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+
+  .game-result {
+    margin: 2rem;
+    width: 7rem;
+    height: 5rem;
+    background: whitesmoke;
+  }
+}
