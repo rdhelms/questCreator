@@ -1,24 +1,21 @@
 angular.module('questCreator').controller('playCtrl', function(socket, $state, $scope) {
   var socketId;
   var charInfo;
+  var allPlayers = [];
+
+  var gameCanvas = document.getElementById('play-canvas');
+  var gameCtx = gameCanvas.getContext('2d');
+  var gameWidth = 700;
+  var gameHeight = 500;
+
 
   socket.emit('game joined');
 
   socket.off('old player found');
   socket.on('old player found', function(oldCharInfo) {
     console.log("Found old player");
-    $('<canvas>').attr({
-      'id': oldCharInfo.id,
-      'class': 'avatar',
-      'width': '100',
-      'height': '100'
-    }).css({
-      'position': 'absolute',
-      'left': oldCharInfo.x,
-      'top': oldCharInfo.y,
-      'border': '2px solid black',
-      'background': oldCharInfo.color
-    }).appendTo('body');
+    // Add old player to array of players
+    allPlayers.push(oldCharInfo);
   });
 
   socket.off('new player joining');
@@ -27,41 +24,33 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
       oldCharInfo: charInfo,
       id: newCharInfo.id
     };
+    // Add new player to array of players
+    allPlayers.push(newCharInfo);
+    // Send response from old player to new player
     socket.emit('send old player', response);
-    $('<canvas>').attr({
-      'id': newCharInfo.id,
-      'class': 'avatar',
-      'width': '100',
-      'height': '100'
-    }).css({
-      'position': 'absolute',
-      'left': newCharInfo.x,
-      'top': newCharInfo.y,
-      'border': '2px solid black',
-      'background': newCharInfo.color
-    }).appendTo('body');
   });
 
   socket.off('updating player');
   socket.on('updating player', function(playerUpdate) {
-    $('#' + playerUpdate.id).css({
-      'left': playerUpdate.x,
-      'top': playerUpdate.y
-    });
+    // Find the player who is being updated, and update their details
   });
 
   socket.off('player left');
   socket.on('player left', function(playerId) {
     console.log("Player left!");
-    $('#' + playerId).remove();
+    allPlayers.forEach(function(player, index) {
+      if (player.id === playerId) {
+        //Remove player from array here
+      }
+    });
   });
 
   var loopHandle;
   socket.off('create character');
   socket.on('create character', function(id) {
     socketId = id;
-    var x = Math.round( Math.random() * window.innerWidth);
-    var y = Math.round( Math.random() * window.innerHeight);
+    var x = Math.round( Math.random() * gameWidth);
+    var y = Math.round( Math.random() * gameHeight);
     var speedX = 0;
     var speedY = 0;
     var r = Math.round( Math.random() * 255 );
@@ -76,27 +65,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
       speedY: speedY,
       color: color
     };
+    allPlayers.push(newCharInfo);
     charInfo = newCharInfo;
     socket.emit('send new player', charInfo);   // Send this player to other users
-    $('<canvas>').attr({
-      'id': id,
-      'class': 'avatar',
-      'width': '100',
-      'height': '100'
-    }).css({
-      'position': 'absolute',
-      'left': x,
-      'top': y,
-      'border': '2px solid black',
-      'background': color
-    }).appendTo('body');
+    gameCtx.fillStyle = color;
+    gameCtx.fillRect(x,y,100,100);
     loopHandle = setInterval(function() {
       x += speedX;
       y += speedY;
-      $('#' + id).css({
-        'left': x,
-        'top': y
-      });
       charUpdate = {
         id: id,
         x: x,
@@ -105,7 +81,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
         speedY: speedY,
         color: color
       }
+      // Update the x and y position of the current player
+      allPlayers.forEach(function(player, index) {
+        if (player.id === id) {
+          allPlayers[index] = charUpdate;
+        }
+      });
       socket.emit('player update', charUpdate);
+      redrawGame();
     }, 20);
     $('body').off().on('keydown', function(event) {
       var keyCode = event.keyCode;
@@ -121,8 +104,15 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
     });
   });
 
+  function redrawGame() {
+    gameCtx.clearRect(0, 0, gameWidth, gameHeight);
+    allPlayers.forEach(function(player) {
+      gameCtx.fillStyle = player.color;
+      gameCtx.fillRect(player.x, player.y, 100, 100);
+    });
+  }
+
   $scope.$on("$destroy", function(){
-    $('.avatar').remove();
     socket.emit('game left');
     clearInterval(loopHandle);
   });
