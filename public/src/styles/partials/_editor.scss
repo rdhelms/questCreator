@@ -1,0 +1,32 @@
+#editor {
+  background: whitesmoke;
+  width: 700px;
+  height: 500px;
+  .wrapper {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+
+.tab-nav {
+  font-family: PCSenior;
+  display: flex;
+  justify-content: space-around;
+
+  .tab {
+    width: 100%;
+    padding: .3em 0;
+    &:nth-child(2) {
+      border-left: .3em solid black;
+    }
+    a {
+      text-align: center;
+    }
+  }
+}
+
+#editor-contents {
+  height: 20rem;
+  background: lightgrey;
+}
