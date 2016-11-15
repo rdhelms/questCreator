@@ -56,7 +56,7 @@ angular.module('questCreator').controller('mainCtrl', function($http, socket, $s
             method: 'GET'
         });
         requestUser.then(function(response) {
-            uid = auth2.currentUser.Ab.El;
+            uid = auth2.currentUser.Ab.El.toString();
             token = auth2.currentUser.Ab.Zi.access_token;
             $http({
                 method: 'PATCH',
@@ -65,26 +65,25 @@ angular.module('questCreator').controller('mainCtrl', function($http, socket, $s
                     uid: uid,
                     token: token
                 },
-                success: function(response) {
-                    username = response.result.displayName;
-                    $('#welcome').css('display', 'flex');
-                    setTimeout(function() {
-                        $('#welcome').css('display', 'none');
-                    }, 2000);
-                },
-                error: function(error) {
-                    console.log(error);
-                    if (error.status === 404) {
-                        $('#register').css('display', 'flex');
-                    } else {
-                        alert('There was a problem logging in. Please try again');
-                    }
+            }).then(function success(response) {
+                username = response.username;
+                $('#welcome').css('display', 'flex');
+                setTimeout(function() {
+                    $('#welcome').css('display', 'none');
+                }, 2000);
+            }, function error(error) {
+                if (error.status === 404) {
+                    $('#register').css('display', 'flex');
+                } else if (error.status === 0) {
+
+                } else {
+                    alert('There was a problem logging in. Please try again');
                 }
             });
         });
     }
 
-    function registerUser() {
+    this.registerUser = function() {
         username = $('.username').val();
         $http({
             method: 'POST',
@@ -94,15 +93,16 @@ angular.module('questCreator').controller('mainCtrl', function($http, socket, $s
                 uid: uid,
                 token: token
             },
-            success: function(response) {
+          }).then(function success(response) {
                 $('#register').css('display', 'none');
-            },
-            error: function(error) {
+                setTimeout(function() {
+                    $('#welcome').css('display', 'none');
+                }, 2000);
+            },function error(error) {
                 $('#register').css('display', 'none');
                 alert('There was a problem logging in. Please try again');
-            }
-        });
-    }
+            });
+    };
 
     // When the user clicks the sign in button, prompt them to sign in to their google account.
     $('#login').click(function() {
