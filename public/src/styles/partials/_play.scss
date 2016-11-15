@@ -6,6 +6,10 @@
   align-items: center;
   justify-content: center;
   font-family: PCSenior;
+  .test-buttons {
+    display: flex;
+    flex-direction: column;
+  }
   .game-window {
     position: relative;
     display: flex;

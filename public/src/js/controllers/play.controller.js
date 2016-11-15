@@ -1,4 +1,135 @@
 angular.module('questCreator').controller('playCtrl', function(socket, $state, $scope) {
+
+  // Testing creation of background
+  var backgroundTest = {
+    category: 'background',
+    name: 'Background Another Test',
+    obj: {
+      canvasElems: [{
+        x: 100,
+        y: 100,
+        width: 30,
+        height: 30,
+        color: 'blue'
+      }],
+      collisionMap: [{
+        x: 300,
+        y: 300,
+        width: 30,
+        height: 30,
+        color: 'red'
+      }]
+    },
+    user_id: 1,
+    game_id: 1,
+    tags: ['Testing Stuff', 'Fun games'],
+    public: false
+  };
+
+  // Testing creation of object
+  var objectTest = {
+    category: 'obstacle',
+    name: 'Object Test',
+    obj: {
+      canvasElems: [{
+        x: 100,
+        y: 100,
+        width: 30,
+        height: 30,
+        color: 'blue'
+      }],
+      collisionMap: [{
+        x: 300,
+        y: 300,
+        width: 30,
+        height: 30,
+        color: 'red'
+      }]
+    },
+    user_id: 1,
+    game_id: 1,
+    tags: ['Object thing', 'Really fun new object'],
+    public: false
+  };
+
+  // Testing creation of object
+  var entityTest = {
+    category: 'entity',
+    name: 'Entity Test',
+    obj: {
+      canvasElems: [{
+        x: 100,
+        y: 100,
+        width: 30,
+        height: 30,
+        color: 'blue'
+      }],
+      collisionMap: [{
+        x: 300,
+        y: 300,
+        width: 30,
+        height: 30,
+        color: 'red'
+      }]
+    },
+    user_id: 1,
+    game_id: 1,
+    tags: ['Entity thing', 'Awesome entity ftw'],
+    public: false
+  };
+
+  $('.createBackgroundBtn').click(function() {
+    $.ajax({
+      method: 'POST',
+      url: 'https://forge-api.herokuapp.com/articles/create',
+      data: backgroundTest,
+      success: function(response) {
+        console.log(response);
+        console.log(response.obj);
+        // console.log(JSON.parse(response.tags));
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  });
+
+  $('.createObjectBtn').click(function() {
+    $.ajax({
+      method: 'POST',
+      url: 'https://forge-api.herokuapp.com/articles/create',
+      data: objectTest,
+      success: function(response) {
+        console.log(response);
+        console.log(response.obj);
+        // console.log(JSON.parse(response.tags));
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  })
+
+  $('.createEntityBtn').click(function() {
+    $.ajax({
+      method: 'POST',
+      url: 'https://forge-api.herokuapp.com/articles/create',
+      data: entityTest,
+      success: function(response) {
+        console.log(response);
+        console.log(response.obj);
+        // console.log(JSON.parse(response.tags));
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  })
+
+  function loadBackground(bgSquares) {
+    // Draw the squares retrieved from the database
+  }
+
   var socketId;
   var charInfo;
   var allPlayers = [];
