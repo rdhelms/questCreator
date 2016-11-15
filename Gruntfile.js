@@ -38,6 +38,7 @@ module.exports = function(grunt) {
                     './public/lib/js/vendor.js': [
                       './public/src/js/vendor/socket.io.js',
                       './public/src/js/vendor/jquery.js',
+                      './public/src/js/vendor/jquery-ui.js',
                       './public/src/js/vendor/angular.js',
                       './public/src/js/vendor/angular-ui-router.js',
                       './public/src/js/vendor/angular-local-storage.js'
