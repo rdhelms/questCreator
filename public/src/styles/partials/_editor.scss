@@ -1,12 +1,11 @@
-#editor {
-  background: whitesmoke;
-  width: 700px;
-  height: 500px;
-  .wrapper {
-    display: flex;
-    justify-content: center;
+#editor-view {
+  display: flex;
+  justify-content: center;
+  background: white;
+
+  > * {
+    font-family: PCSenior;
   }
-}
 
 
 .tab-nav {
@@ -20,13 +19,123 @@
     &:nth-child(2) {
       border-left: .3em solid black;
     }
-    a {
-      text-align: center;
+  }
+}
+
+#editor {
+  background: whitesmoke;
+  height: 800px;
+  display: flex;
+  flex-direction: column;
+
+  #editor-contents {
+    // background: beige;
+    padding: 30px;
+    border-right: 4px solid black;
+    border-left: 4px solid black;
+
+    #edit-canvas {
+      position: relative;
+      z-index: 1;
+
+      &:before {
+        @include pseudo();
+        @include radial-gradient (
+        ellipse at center,
+        rgba(255,255,255,1) 0%,
+        rgba(231,223,199,1) 100%
+        );
+        filter: blur(10px);
+        z-index: 0;
+      }
     }
   }
 }
 
-#editor-contents {
-  height: 20rem;
-  background: lightgrey;
+#palette {
+  flex: 1;
+  border: 4px black solid;
+  display: flex;
+  flex-direction: column;
+
+  #colors-menu {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    .color {
+      height: 100px;
+      width: 100px;
+      border: 4px dashed black;
+    }
+
+    .picker {
+      width: 100px;
+      height: 100px;
+      border: none;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      vertical-align: middle;
+      font-size: 70px;
+
+      &:hover {
+        cursor: pointer;
+        background: lightgrey;
+      }
+
+      li {
+        height: 40%;
+        width: 40%;
+        margin: 5%;
+
+        &:nth-child(1){
+          background: skyblue;
+        }
+
+        &:nth-child(2){
+          background: green;
+        }
+
+        &:nth-child(3){
+          background: brown;
+        }
+
+        &:nth-child(4){
+          background: orange;
+        }
+
+      }
+    }
+  }
+}
+
+#asset-bar {
+  background: whitesmoke;
+  flex: 1;
+  border: 4px black solid;
+  border-left: none;
+}
+
+.assets {
+  font-family: PCSenior;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  height: 40%;
+
+  .asset {
+    width: 50%;
+    border-bottom: 4px black dashed;
+
+    &:nth-child(2n){
+      border-left: 2px black dashed;
+    }
+
+    &:nth-child(2n - 1){
+      border-right: 2px black dashed;
+    }
+  }
 }
