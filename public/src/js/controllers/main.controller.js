@@ -67,19 +67,24 @@ angular.module('questCreator').controller('mainCtrl', function($http, socket, $s
                 },
                 success: function(response) {
                     username = response.result.displayName;
-                    console.log("Welcome, " + user.name + "!");
+                    $('#welcome').css('display', 'flex');
+                    setTimeout(function(){
+                      $('#welcome').css('display', 'none'); }, 2000);
                 },
                 error: function(error) {
                     console.log(error);
-                    // if (error.status === ???) {
-                    //   registerUser(uid, token);
-                    // }
+                    if (error.status === 404) {
+                      $('#register').css('display', 'flex');
+                    } else {
+                      alert('There was a problem logging in. Please try again');
+                    }
                 }
             });
         });
     }
 
     function registerUser() {
+      username = $('.username').val();
         $http({
             method: 'POST',
             url: 'https://forge-api.herokuapp.com/users/create',
@@ -89,14 +94,11 @@ angular.module('questCreator').controller('mainCtrl', function($http, socket, $s
                 token: token
             },
             success: function(response) {
-                username = response.result.displayName;
-                console.log("Welcome, " + user.name + "!");
+              $('#register').css('display', 'none');
             },
-            error: function(error) {
-                console.log(error);
-                if (error.status === 404) {
-                    registerUser(uid, token);
-                }
+            error: function(error) {              
+              $('#register').css('display', 'none');
+              alert('There was a problem logging in. Please try again');
             }
         });
     }
