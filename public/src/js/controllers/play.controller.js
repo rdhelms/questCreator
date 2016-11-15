@@ -116,4 +116,15 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
     socket.emit('game left');
     clearInterval(loopHandle);
   });
+
+  // Chat messages
+  $('.chat-submit').submit(function(){
+    socket.emit('chat message', $('.message').val());
+    $('.message').val('');
+    return false;
+  });
+  socket.off('chat message');
+  socket.on('chat message', function(msg){
+    $('.chat-messages').append($('<li>').text(msg));
+  });
 });
