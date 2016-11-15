@@ -56,36 +56,43 @@ angular.module('questCreator').controller('mainCtrl', function($http, socket, $s
             method: 'GET'
         });
         requestUser.then(function(response) {
-            uid = auth2.currentUser.Ab.El.toString();
+            uid = auth2.currentUser.Ab.El;
             token = auth2.currentUser.Ab.Zi.access_token;
-            $http({
+            $.ajax({
                 method: 'PATCH',
                 url: 'https://forge-api.herokuapp.com/users/login',
                 data: {
                     uid: uid,
                     token: token
                 },
-            }).then(function success(response) {
-                username = response.username;
-                $('#welcome').css('display', 'flex');
-                setTimeout(function() {
-                    $('#welcome').css('display', 'none');
-                }, 2000);
-            }, function error(error) {
-                if (error.status === 404) {
-                    $('#register').css('display', 'flex');
-                } else if (error.status === 0) {
-
-                } else {
-                    alert('There was a problem logging in. Please try again');
+                success: function(response) {
+                    username = response.username;
+                    $('#welcome').css('display', 'flex');
+                    setTimeout(function() {
+                        $('#welcome').css('display', 'none');
+                    }, 2000);
+                },
+                error: function(error) {
+                    if (error.status === 404) {
+                        $('#register').css('display', 'flex');
+                    } else if (error.status === 0) {
+                      // Do nothing
+                    } else {
+                        alert('There was a problem logging in. Please try again');
+                    }
                 }
             });
+            // .then(function success(response) {
+            //
+            // }, function error(error) {
+            //
+            // });
         });
     }
 
     this.registerUser = function() {
         username = $('.username').val();
-        $http({
+        $.ajax({
             method: 'POST',
             url: 'https://forge-api.herokuapp.com/users/create',
             data: {
@@ -93,15 +100,22 @@ angular.module('questCreator').controller('mainCtrl', function($http, socket, $s
                 uid: uid,
                 token: token
             },
-          }).then(function success(response) {
-                $('#register').css('display', 'none');
-                setTimeout(function() {
-                    $('#welcome').css('display', 'none');
-                }, 2000);
-            },function error(error) {
-                $('#register').css('display', 'none');
-                alert('There was a problem logging in. Please try again');
-            });
+            success: function(response) {
+              $('#register').css('display', 'none');
+              setTimeout(function() {
+                  $('#welcome').css('display', 'none');
+              }, 2000);
+            },
+            error: function(error) {
+              $('#register').css('display', 'none');
+              alert('There was a problem logging in. Please try again');
+            }
+          });
+          // .then(function success(response) {
+          //
+          //   },function error(error) {
+          //
+          //   });
     };
 
     // When the user clicks the sign in button, prompt them to sign in to their google account.
