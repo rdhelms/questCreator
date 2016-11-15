@@ -26,24 +26,38 @@
 
 #register {
   z-index: 2;
-  width: 100vw;
-  height: 100vh;
-  background-color: black;
-  opacity: .5;
+  width: 100%;
+  height: 100%;
+  background:rgba(112,81,246,0.3);
   display: none;
   justify-content: center;
   align-items: center;
   form {
-    height: 200px;
-    width: 400px:
+    color: whitesmoke;
+    display: flex;
+    margin-bottom: 20%;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background:rgba(112,81,246,.9);
+    height: 250px;
+    width: 350px;
+    padding: 0;
+    margin: 0;
   }
 }
 
 #welcome {
+  width: 100%;
+  height: 100%;
+  background:rgba(112,81,246,0.3);
   z-index: 2;
   display: none;
   justify-content: center;
   align-items: center;
   height: 200px;
-  width: 400px:
+  width: 400px;
+  h1 {
+    color: rgba(112,81,246,1);
+  }
 }

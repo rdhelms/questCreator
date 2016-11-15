@@ -6,56 +6,62 @@
           $urlRouterProvider.otherwise('/');
 
           $stateProvider.state('main', {
+            abstract: true,
             url: '/',
             templateUrl: './src/views/main.html',
             controller: 'mainCtrl as main'
+          }).state('main.landing', {
+            // landing page
+            url: '',
+            templateUrl: './src/views/landing.html',
+            controller: 'landingCtrl as landing'
           }).state('main.game', {
             // url: ':name'
-            url: 'game',
+            url: 'game/',
             templateUrl: './src/views/game.html',
             controller: 'gameCtrl as game'
           }).state('main.game.play', {
-            url: 'play',
-            templateUrl: './src/views/play.html',
+            url: 'play/',
+            templateUrl: './src/views/game/play.html',
             controller: 'playCtrl as play'
           }).state('main.game.editor', {
             // Includes sidebar and nav for all editor views
             // "/game/editor"
-            url: 'editor',
-            templateUrl: './src/views/editor.html',
+            url: 'editor/',
+            templateUrl: './src/views/game/editor.html',
             controller: 'editorCtrl as editor'
           }).state('main.game.editor.map', {
             // "/game/editor/map"
-            url: 'map',
-            templateUrl: './src/views/map.html',
+            url: 'map/',
+            templateUrl: './src/views/game/editor/map.html',
             controller: 'mapCtrl as map'
           }).state('main.game.editor.scene', {
             // "/game/editor/scene"
-            url: 'scene',
-            templateUrl: './src/views/scene.html',
+            url: 'scene/',
+            templateUrl: './src/views/game/editor/scene.html',
             controller: 'sceneCtrl as scene'
           }).state('main.game.editor.bg', {
             // "/game/editor/bg"
-            url: 'bg',
-            templateUrl: './src/views/bg.html',
+            url: 'bg/',
+            templateUrl: './src/views/game/editor/bg.html',
             controller: 'bgCtrl as bg'
           }).state('main.game.editor.obj', {
             // "/game/editor/obj"
-            url: 'obj',
-            templateUrl: './src/views/obj.html',
+            url: 'obj/',
+            templateUrl: './src/views/game/editor/obj.html',
             controller: 'objCtrl as obj'
           }).state('main.game.editor.ent', {
             // "/game/editor/ent"
-            url: 'ent',
-            templateUrl: './src/views/ent.html',
+            url: 'ent/',
+            templateUrl: './src/views/game/editor/ent.html',
             controller: 'entCtrl as ent'
           }).state('main.game.editor.scripts', {
             // "/game/editor/scripts"
-            url: 'scripts',
-            templateUrl: './src/views/scripts.html',
+            url: 'scripts/',
+            templateUrl: './src/views/game/editor/scripts.html',
             controller: 'scriptsCtrl as scripts'
           }).state('main.profile', {
-            url: 'profile',
+            url: 'profile/',
             templateUrl: './src/views/profile.html',
             controller: 'profileCtrl as profile'
           });
@@ -90,6 +96,125 @@
   });
 });
 ;;;angular.module('questCreator').controller('gameCtrl', function(socket, $state, $scope) {
+});
+;angular.module('questCreator').controller('landingCtrl', function($state) {
+
+});
+;angular.module('questCreator').controller('mainCtrl', function($http, socket, $state) {
+    var apiKey = 'AIzaSyCe__2EGSmwp0DR-qKGqpYwawfmRsTLBEs';
+    var clientId = '730683845367-tjrrmvelul60250evn5i74uka4ustuln.apps.googleusercontent.com';
+
+    var auth2,
+        uid,
+        token,
+        username;
+
+    // When the api has loaded, run the init function.
+    gapi.load('client:auth2', initAuth);
+
+    // Get authorization from the user to access profile info
+    function initAuth() {
+        gapi.client.setApiKey(apiKey); // Define the apiKey for requests
+        gapi.auth2.init({ // Define the clientId and the scopes for requests
+            client_id: clientId,
+            scope: 'profile'
+        }).then(function() {
+            auth2 = gapi.auth2.getAuthInstance(); // Store authInstance for easier accessibility
+            console.log("Session authorized");
+            auth2.isSignedIn.listen(updateSignInStatus);
+            updateSignInStatus(auth2.isSignedIn.get());
+        });
+    }
+
+    function updateSignInStatus(isSignedIn) {
+        if (isSignedIn) {
+            $('#login').hide();
+            $('#logout').show();
+            console.log("Signed In!");
+            getUserInfo();
+        } else {
+            $('#login').show();
+            $('#logout').hide();
+            console.log("Signed Out!");
+        }
+    }
+
+    // Sign the user in to their google account when the sign in button is clicked
+    function signIn() {
+        auth2.signIn({
+            prompt: 'login'
+        });
+    }
+
+    // Sign the user out of their google account when the sign out button is clicked
+    function signOut() {
+        auth2.signOut();
+    }
+
+    // Get the name of the user who signed in.
+    function getUserInfo() {
+        var requestUser = gapi.client.request({
+            path: 'https://people.googleapis.com/v1/people/me',
+            method: 'GET'
+        });
+        requestUser.then(function(response) {
+            uid = auth2.currentUser.Ab.El;
+            token = auth2.currentUser.Ab.Zi.access_token;
+            $http({
+                method: 'PATCH',
+                url: 'https://forge-api.herokuapp.com/users/login',
+                data: {
+                    uid: uid,
+                    token: token
+                },
+                success: function(response) {
+                    username = response.result.displayName;
+                    console.log("Welcome, " + user.name + "!");
+                },
+                error: function(error) {
+                    console.log(error);
+                    // if (error.status === ???) {
+                    //   registerUser(uid, token);
+                    // }
+                }
+            });
+        });
+    }
+
+    function registerUser() {
+        $http({
+            method: 'POST',
+            url: 'https://forge-api.herokuapp.com/users/create',
+            data: {
+                username: username,
+                uid: uid,
+                token: token
+            },
+            success: function(response) {
+                username = response.result.displayName;
+                console.log("Welcome, " + user.name + "!");
+            },
+            error: function(error) {
+                console.log(error);
+                if (error.status === 404) {
+                    registerUser(uid, token);
+                }
+            }
+        });
+    }
+
+    // When the user clicks the sign in button, prompt them to sign in to their google account.
+    $('#login').click(function() {
+        signIn();
+    });
+
+    // When the user clicks the sign out button, sign them out of their google account
+    $('#logout').click(function() {
+        signOut();
+    });
+
+});
+;;;angular.module('questCreator').controller('playCtrl', function(socket, $state, $scope) {
   var socketId;
   var charInfo;
 
@@ -218,100 +343,7 @@
     clearInterval(loopHandle);
   });
 });
-;angular.module('questCreator').controller('mainCtrl', function(socket, $state) {
-  var apiKey = 'AIzaSyCe__2EGSmwp0DR-qKGqpYwawfmRsTLBEs';
-  var clientId = '730683845367-tjrrmvelul60250evn5i74uka4ustuln.apps.googleusercontent.com';
-
-  var auth2;
-
-  var username = 'firstUser';
-
-
-  // When the api has loaded, run the init function.
-  gapi.load('client:auth2', initAuth);
-
-  // Get authorization from the user to access profile info
-  function initAuth() {
-    gapi.client.setApiKey(apiKey);  // Define the apiKey for requests
-    gapi.auth2.init({ // Define the clientId and the scopes for requests
-        client_id: clientId,
-        scope: 'profile'
-    }).then(function() {
-      auth2 = gapi.auth2.getAuthInstance(); // Store authInstance for easier accessibility
-      console.log("Session authorized");
-      auth2.isSignedIn.listen(updateSignInStatus);
-      updateSignInStatus(auth2.isSignedIn.get());
-    });
-  }
-
-  function updateSignInStatus(isSignedIn) {
-    if (isSignedIn) {
-      $('#login').hide();
-      $('#logout').show();
-      console.log("Signed In!");
-      getUserInfo();
-    } else {
-      $('#login').show();
-      $('#logout').hide();
-      console.log("Signed Out!");
-    }
-  }
-
-  // Sign the user in to their google account when the sign in button is clicked
-  function signIn() {
-    auth2.signIn({
-      prompt: 'login'
-    });
-  }
-
-  // Sign the user out of their google account when the sign out button is clicked
-  function signOut() {
-    auth2.signOut();
-  }
-
-  // Get the name of the user who signed in.
-  function getUserInfo() {
-    var requestUser = gapi.client.request({
-      path: 'https://people.googleapis.com/v1/people/me',
-      method: 'GET'
-    });
-    requestUser.then(function(response) {
-      console.log(response);
-      console.log(auth2.currentUser.Ab.Zi.access_token);
-      var token = auth2.currentUser.Ab.Zi.access_token;
-      $.ajax({
-        method: 'POST',
-        url: 'https://forge-api.herokuapp.com/users/create',
-        data: {
-          username: username,
-          token: token
-        },
-        success: function(response) {
-          console.log(response);
-        },
-        error: function(error) {
-          console.log(error);
-        }
-      })
-      // user.name = response.result.displayName;
-      // console.log("Welcome, " + user.name + "!");
-    }, function(error) {
-      console.log(error);
-    });
-  }
-
-  // When the user clicks the sign in button, prompt them to sign in to their google account.
-  $('#login').click(function() {
-    signIn();
-  });
-
-  // When the user clicks the sign out button, sign them out of their google account
-  $('#logout').click(function() {
-    signOut();
-  });
-
-});
-;;;;angular.module('questCreator').controller('profileCtrl', function(socket, $state, $scope) {
+;angular.module('questCreator').controller('profileCtrl', function(socket, $state, $scope) {
   
 });
 ;;
