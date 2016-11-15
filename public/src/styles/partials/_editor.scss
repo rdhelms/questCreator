@@ -46,45 +46,54 @@
   }
 }
 
-#editor {
+#scene-editor {
   background: whitesmoke;
   height: 800px;
   display: flex;
   flex-direction: column;
+}
 
-  #editor-contents {
-    // background: beige;
-    padding: 30px;
+.editor-contents {
+  // background: beige;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+
+  &#scene {
     border-right: 4px solid black;
     border-left: 4px solid black;
+  }
 
-    #edit-canvas {
-      position: relative;
-      z-index: 1;
+  &#asset {
+    flex: 1;
+  }
 
-      &:before {
-        @include pseudo();
-        @include radial-gradient (
-        ellipse at center,
-        rgba(255,255,255,1) 0%,
-        rgba(231,223,199,1) 100%
-        );
-        filter: blur(10px);
-        z-index: 0;
-      }
+  .edit-canvas {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+
+    &:before {
+      @include pseudo();
+      @include radial-gradient (
+      ellipse at center,
+      rgba(255,255,255,1) 0%,
+      rgba(231,223,199,1) 100%
+      );
+      filter: blur(10px);
+      z-index: 0;
     }
+  }
+}
 
-    #editor-controls {
-      display: flex;
-      justify-content: space-between;
-      flex: 1;
-      > * {
-        flex: 1;
-        button {
-          width: 100%;
-          height: 100%;
-        }
-      }
+.editor-controls {
+  display: flex;
+  justify-content: space-between;
+  > * {
+    flex: 1;
+    button {
+      width: 100%;
+      height: 100%;
     }
   }
 }
@@ -150,10 +159,23 @@
 }
 
 #asset-bar {
-  background: whitesmoke;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   flex: 1;
+  background: whitesmoke;
   border: 4px black solid;
   border-left: none;
+}
+
+#asset-editor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+#asset-canvas {
+  flex: 1;
 }
 
 .assets {
