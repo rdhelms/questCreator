@@ -73,6 +73,19 @@
         z-index: 0;
       }
     }
+
+    #editor-controls {
+      display: flex;
+      justify-content: space-between;
+      flex: 1;
+      > * {
+        flex: 1;
+        button {
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
   }
 }
 
