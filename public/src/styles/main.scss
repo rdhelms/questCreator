@@ -4,8 +4,10 @@
 }
 
 @import 'partials/bourbon/bourbon';
+@import 'partials/mixins';
 @import 'partials/nav';
 @import 'partials/landing';
+@import 'partials/game';
 @import 'partials/editor';
 
 * {
