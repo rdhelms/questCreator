@@ -12,12 +12,30 @@
   font-family: PCSenior;
   display: flex;
   justify-content: space-around;
+  border-right: 4px solid black;
 
   .tab {
     width: 100%;
     padding: .3em 0;
+    text-align: center;
+    border-bottom: 4px solid black;
+
+    &:first-child {
+      border-right: 2px solid black;
+    }
+
     &:nth-child(2) {
-      border-left: .3em solid black;
+      border-left: 2px solid black;
+    }
+
+    &.active {
+      background: whitesmoke;
+      border-bottom: none;
+      border-top: 4px solid black;
+
+      &:first-child {
+        border-left: 4px solid black;
+      }
     }
   }
 }
