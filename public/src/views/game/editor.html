@@ -7,6 +7,12 @@
     <section id="editor-contents">
       <div id="edit-canvas"><canvas height="500" width="700"></canvas></div>
       <ui-view></ui-view>
+      <ul id="editor-controls">
+        <li><button id="clear">Clear</button></li>
+        <li><button id="save">Save <code ng-non-bindable>{{canvas}}</code></button></li>
+        <li><button id="save">Undo</button></li>
+        <li><button id="save">Redo</button></li>
+      </ul>
     </section>
     <section id="palette">
       <h4>Palette</h4>
