@@ -6,13 +6,13 @@
       <li class="tab" ng-class="{'active': !toggle}" ng-click="toggle=!toggle"><a ui-sref="main.game.editor.scene">Scene</a></li>
     </ul>
     <section class="editor-contents" id="scene">
-      <div class="edit-canvas"><canvas height="500" width="700"></canvas></div>
+      <div class="edit-canvas"><canvas id="bg-canvas" height="500" width="700"></canvas></div>
       <ui-view></ui-view>
       <ul class="editor-controls">
         <li><button id="clear">Clear</button></li>
-        <li><button id="save">Save <code ng-non-bindable>{{canvas}}</code></button></li>
-        <li><button id="save">Undo</button></li>
-        <li><button id="save">Redo</button></li>
+        <li><button id="save">Save {{editor.backgroundName}}</button></li>
+        <li><button id="undo">Undo</button></li>
+        <li><button id="redo">Redo</button></li>
       </ul>
     </section>
     <section id="palette">

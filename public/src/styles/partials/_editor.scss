@@ -73,16 +73,17 @@
     z-index: 1;
     flex: 1;
 
-    &:before {
-      @include pseudo();
-      @include radial-gradient (
-      ellipse at center,
-      rgba(255,255,255,1) 0%,
-      rgba(231,223,199,1) 100%
-      );
-      filter: blur(10px);
-      z-index: 0;
-    }
+    border: 2px solid black;
+    // &:before {
+    //   @include pseudo();
+    //   @include radial-gradient (
+    //   ellipse at center,
+    //   rgba(255,255,255,1) 0%,
+    //   rgba(231,223,199,1) 100%
+    //   );
+    //   filter: blur(10px);
+    //   z-index: 0;
+    // }
   }
 }
 
