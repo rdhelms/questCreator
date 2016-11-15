@@ -7,6 +7,11 @@
     font-family: PCSenior;
   }
 
+  h4 {
+    margin: 0 auto;
+    padding: .3rem 0 0 .3rem;
+  }
+}
 
 .tab-nav {
   font-family: PCSenior;
@@ -15,6 +20,7 @@
   border-right: 4px solid black;
 
   .tab {
+    background: darkgrey;
     width: 100%;
     padding: .3em 0;
     text-align: center;
