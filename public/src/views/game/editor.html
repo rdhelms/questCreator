@@ -1,12 +1,44 @@
-<div id="editor">
-  <section class="wrapper">
+<div id="editor-view">
+  <section id="editor">
     <ul class="tab-nav">
-      <li class="tab"><a ui-sref="main.game.editor.map">Map</a></li>
-      <li class="tab" ><a ui-sref="main.game.editor.scene">Scene</a></li>
+      <li class="tab active" ng-class="{'active': toggle}" ng-click="toggle=!toggle"><a ui-sref="main.game.editor.map">Map</a></li>
+      <li class="tab" ng-class="{'active': !toggle}" ng-click="toggle=!toggle"><a ui-sref="main.game.editor.scene">Scene</a></li>
     </ul>
     <section id="editor-contents">
+      <div id="edit-canvas"><canvas height="500" width="700"></canvas></div>
       <ui-view></ui-view>
     </section>
+    <section id="palette">
+      <h4>Palette</h4>
+      <ul id="colors-menu">
+        <li class="color">
+        </li>
+        <li class="color">
+        </li>
+        <li class="color">
+        </li>
+        <li class="color">
+        </li>
+        <ul class="picker">
+          <li></li><li></li><li></li><li></li>
+        </ul>
+      </ul>
+    </section>
   </section>
+  <aside id="asset-bar">
+    <ul class="assets">
+      <li class="asset" id="backgrounds">
+        <h4>Backgrounds</h4>
+      </li>
+      <li class="asset" id="game-objects">
+        <h4>Game Objects</h4>
+      </li>
+      <li class="asset" id="entities">
+        <h4>Entities</h4>
+      </li>
+      <li class="asset" id="scripts">
+        <h4>Scripts</h4>
+      </li>
+    </ul>
+  </aside>
 </div>
-<aside id="asset-bar"></asset>
