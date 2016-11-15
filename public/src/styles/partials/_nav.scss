@@ -25,14 +25,25 @@
 }
 
 #register {
+  z-index: 2;
   width: 100vw;
   height: 100vh;
   background-color: black;
   opacity: .5;
-  display: flex;
+  display: none;
   justify-content: center;
   align-items: center;
   form {
-
+    height: 200px;
+    width: 400px:
   }
+}
+
+#welcome {
+  z-index: 2;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  width: 400px:
 }
