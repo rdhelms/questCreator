@@ -4,8 +4,19 @@ angular.module('questCreator').service('UserService', function () {
             token: null,
             username: null,
             picture: null,
-            id: null
+            id: null,
+            games: null,
+            joined: null
     };
+
+    //Get the current values for user data
+    function getUser() {
+      return user;
+    }
+
+    function setUser(adjUser) {
+      user = adjUser;
+    }
 
     var apiKey = 'AIzaSyCe__2EGSmwp0DR-qKGqpYwawfmRsTLBEs';
     var clientId = '730683845367-tjrrmvelul60250evn5i74uka4ustuln.apps.googleusercontent.com';
@@ -33,7 +44,7 @@ angular.module('questCreator').service('UserService', function () {
             $('#login').hide();
             $('#logout').show();
             console.log("Signed In!");
-            getUserInfo();
+            getLogin();
         } else {
             $('#login').show();
             $('#logout').hide();
@@ -54,12 +65,13 @@ angular.module('questCreator').service('UserService', function () {
     }
 
     // Get the name of the user who signed in.
-    function getUserInfo() {
+    function getLogin() {
         var requestUser = gapi.client.request({
             path: 'https://people.googleapis.com/v1/people/me',
             method: 'GET'
         });
         requestUser.then(function(response) {
+            user.picture = response.result.photos[0].url;
             user.uid = auth2.currentUser.Ab.El;
             user.token = auth2.currentUser.Ab.Zi.access_token;
             $.ajax({
@@ -70,7 +82,7 @@ angular.module('questCreator').service('UserService', function () {
                     token: user.token
                 },
                 success: function(response) {
-                  console.log(response);
+                  user.joined = response.created_at;
                     user.username = response.username;
                     user.id = response.id;
                     $('#welcome').css('display', 'flex');
@@ -137,6 +149,8 @@ angular.module('questCreator').service('UserService', function () {
     }
 }
     return {
+      get: getUser,
+      set: setUser,
       games: getUserGames,
       register: registerUser,
       signOut: signOut,

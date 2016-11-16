@@ -1,3 +1,17 @@
 <div class="profile-container">
-  
+  <section class="user-info">
+    <img src="{{ profile.user.picture }}" alt="Google profile picture" />
+    <ul class="info">
+      <label  for="username">Questr Name:<li>{{ profile.user.username }}</li></label>
+      <label  for="joined">Joined the Quest:<li>{{ profile.getJoinedDate(profile.user.joined) | date:'MMM d - h:mm a' }}</li></label>
+      <label  for="joined">Another Stat:<li>Something Impressive</li></label>
+    </ul>
+  </section>
+
+  <section class="avatar-creator">
+
+  </section>
+
+  <section class="games-created"></section>
+
 </div>
