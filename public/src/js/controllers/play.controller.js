@@ -1,5 +1,28 @@
 angular.module('questCreator').controller('playCtrl', function(socket, $state, $scope) {
 
+  // Testing creation of avatar
+  var avatarTest = {
+    name: 'Avatar Test',
+    obj: {
+      canvasElems: [{
+        x: 100,
+        y: 100,
+        width: 30,
+        height: 30,
+        color: 'blue'
+      }],
+      collisionMap: [{
+        x: 300,
+        y: 300,
+        width: 30,
+        height: 30,
+        color: 'red'
+      }]
+    },
+    user_id: 1,
+    current: false
+  };
+
   // Testing creation of background
   var backgroundTest = {
     name: 'Background Another Test',
@@ -77,8 +100,6 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
 
   // Testing creation of scene
   var sceneTest = {
-    game_id: 1,
-    map_id: 1,
     name: 'Scene Test',
     description: 'This is the opening scene for my game.',
     obj: {
@@ -96,14 +117,45 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
           height: 30,
           color: 'red'
         }]
-    }
+    },
+    game_id: 1,
+    map_id: 1
     // obj: {
     //   mainChar: {
     //     action: 'walk-right',
     //     actionFrames: {
     //       walkUp: [{
-    //
-    //       }]
+    //         canvasElems: [{
+    //           x: 100,
+    //           y: 100,
+    //           width: 30,
+    //           height: 30,
+    //           color: 'blue'
+    //         }],
+    //         collisionMap: [{
+    //           x: 300,
+    //           y: 300,
+    //           width: 30,
+    //           height: 30,
+    //           color: 'red'
+    //         }, {
+    //           canvasElems: [{
+    //             x: 100,
+    //             y: 100,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'blue'
+    //           }],
+    //           collisionMap: [{
+    //             x: 300,
+    //             y: 300,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'red'
+    //           },
+    //       ]
+    //       }],
+    //       }
     //     }
     //     canvasElems: [{
     //       canvasElems: [{
@@ -175,6 +227,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
   var gameTest = {
     name: 'Game Test',
     description: 'This is my game',
+    user_id: 1,
     obj: {
       canvasElems: [{
         x: 100,
@@ -190,8 +243,23 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
         height: 30,
         color: 'red'
       }]
-    }
+    },
+    tags: ['The best game', 'fun stuff', "Everybody's favorite"]
   };
+
+  $('.createAvatarBtn').click(function() {
+    $.ajax({
+      method: 'POST',
+      url: 'https://forge-api.herokuapp.com/characters/create',
+      data: avatarTest,
+      success: function(response) {
+        console.log(response);
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  });
 
   $('.createBackgroundBtn').click(function() {
     $.ajax({
