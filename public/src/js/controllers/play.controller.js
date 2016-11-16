@@ -437,8 +437,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
       url: 'https://forge-api.herokuapp.com/characters/create',
       data: avatarTest,
       success: function(response) {
-        console.log(response);
         avatar = response.obj;
+        avatar.currentFrame = avatar.animate.walkLeft[0];
         avatarLoaded = true;
       },
       error: function(error) {
@@ -537,16 +537,34 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
     });
   })
 
-  function clearCanvas() {
-    gameCtx.clearRect(0, 0, gameWidth, gameHeight);
+  /*
+  avatar = {
+    pos: {
+      x: 0,
+      y: 0
+    },
+    animate: {
+      walkLeft: [ [squareObj, squareObj, etc...], [squareObj, squareObj, etc...], [squareObj, squareObj, etc...] ],
+      walkRight: [ [squareObj, squareObj, etc...], [squareObj, squareObj, etc...], [squareObj, squareObj, etc...] ],
+      etc...
+    },
+    currentFrame: [],
+    collisionMap: [squareObj, squareObj, etc...]
   }
+  */
 
   function drawAvatar() {
-    // Draw the squares from the avatar's current frame AND the collision map.
+    // Save the drawing context
     gameCtx.save();
-    gameCtx.translate(100,100);
-    gameCtx.fillStyle = 'lightblue';
-    gameCtx.fillRect(0,0,100,100);
+    // Translate the canvas origin to be the top left of the avatar
+    gameCtx.translate(avatar.pos.x, avatar.pos.y);
+    // Draw the squares from the avatar's current frame AND the collision map.
+    console.log(avatar);
+    console.log(avatar.currentFrame);
+    // avatar.currentFrame.forEach(function(square) {
+    //   gameCtx.fillStyle = square.color;
+    //   gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    // });
     gameCtx.restore();
     gameCtx.fillStyle = "blue";
     gameCtx.fillRect(0,0,100,100);
@@ -554,6 +572,10 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
 
   function drawBackground(bgSquares) {
     // Draw the squares from the background object.
+  }
+
+  function clearCanvas() {
+    gameCtx.clearRect(0, 0, gameWidth, gameHeight);
   }
 
   function drawGame() {
