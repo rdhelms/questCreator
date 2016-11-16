@@ -2,14 +2,16 @@
   <nav id="navigation">
     <ul>
       <li>
+        <a ng-click="main.goHome()">Home</a>
+      </li>
+      <li>
         <a ng-click="main.goToUser()">Profile</a>
       </li>
-
       <li>
-        <a id="login">Login/Signup</a>
+        <a ng-click="main.signIn()" id="login">Login/Signup</a>
       </li>
       <li>
-        <a id="logout">Logout</a>
+        <a ng-click="main.signIn()" id="logout">Logout</a>
       </li>
     </ul>
   </nav>
