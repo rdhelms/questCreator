@@ -118,7 +118,7 @@
     justify-content: space-around;
     align-items: center;
 
-    .color {
+    > * {
       height: 100px;
       width: 100px;
     }
@@ -139,8 +139,6 @@
     }
 
     .picker {
-      width: 100px;
-      height: 100px;
       border: none;
       display: flex;
       flex-wrap: wrap;
