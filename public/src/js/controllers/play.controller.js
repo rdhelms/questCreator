@@ -1,23 +1,285 @@
 angular.module('questCreator').controller('playCtrl', function(socket, $state, $scope) {
+  var gameCanvas = document.getElementById('play-canvas');
+  var gameCtx = gameCanvas.getContext('2d');
+  var gameWidth = 700;
+  var gameHeight = 500;
+
+  var avatar = null;
+  var avatarLoaded = false;
 
   // Testing creation of avatar
   var avatarTest = {
     name: 'Avatar Test',
     obj: {
-      canvasElems: [{
+      // The x and y coordinate of the top left corner of the avatar
+      pos: {
         x: 100,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'blue'
-      }],
-      collisionMap: [{
-        x: 300,
-        y: 300,
-        width: 30,
-        height: 30,
-        color: 'red'
-      }]
+        y: 100
+      },
+      // The animate object contains all the possible character actions with all of the frames to be drawn for each action.
+      animate: {
+        // Key: possible action, Value: array of frames
+        walkLeft: [
+          // Each frame array element is an array of square objects to be drawn
+          // Frame 1 - walk left
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'blue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'green'
+          }],
+          // Frame 2 - walk left
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'red'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'yellow'
+          }]
+        ],
+        walkRight: [
+          // Frame 1 - walk right
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'blue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'green'
+          }],
+          // Frame 2 - walk right
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'red'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'yellow'
+          }]
+        ],
+        walkUp: [
+          // Frame 1 - walk up
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'blue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'green'
+          }],
+          // Frame 2 - walk up
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'red'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'yellow'
+          }]
+        ],
+        walkDown: [
+          // Frame 1 - walk down
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'blue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'green'
+          }],
+          // Frame 2 - walk down
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'red'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'yellow'
+          }]
+        ],
+        swimLeft: [
+          // Frame 1 - swim left
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }],
+          // Frame 2 - swim left
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }]
+        ],
+        swimRight: [
+          // Frame 1 - swim right
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }],
+          // Frame 2 - swim right
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }]
+        ],
+        swimUp: [
+          // Frame 1 - swim up
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }],
+          // Frame 2 - swim up
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }]
+        ],
+        swimDown: [
+          // Frame 1 - swim down
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }],
+          // Frame 2 - swim down
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }]
+        ]
+        // Other actions could go here
+      },
+      // The current frame is what will be looped through to draw. Its value will be one of the frames from the animate object. It will be reset at the rate at which the action frames are being looped through.
+      currentFrame: [],
+      // The collision map is how the game can know whether the character has collided with another object or event trigger. It is an array of invisible (or gray for now) squares.
+      collisionMap: [
+        {
+          x: 100,
+          y: 180,
+          width: 80,
+          height: 30,
+          color: 'gray'
+        }, {
+          x: 100,
+          y: 210,
+          width: 80,
+          height: 30,
+          color: 'gray'
+        }
+      ]
     },
     user_id: 1,
     current: false
@@ -120,84 +382,6 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
     },
     game_id: 1,
     map_id: 1
-    // obj: {
-    //   mainChar: {
-    //     action: 'walk-right',
-    //     actionFrames: {
-    //       walkUp: [{
-    //         canvasElems: [{
-    //           x: 100,
-    //           y: 100,
-    //           width: 30,
-    //           height: 30,
-    //           color: 'blue'
-    //         }],
-    //         collisionMap: [{
-    //           x: 300,
-    //           y: 300,
-    //           width: 30,
-    //           height: 30,
-    //           color: 'red'
-    //         }, {
-    //           canvasElems: [{
-    //             x: 100,
-    //             y: 100,
-    //             width: 30,
-    //             height: 30,
-    //             color: 'blue'
-    //           }],
-    //           collisionMap: [{
-    //             x: 300,
-    //             y: 300,
-    //             width: 30,
-    //             height: 30,
-    //             color: 'red'
-    //           },
-    //       ]
-    //       }],
-    //       }
-    //     }
-    //     canvasElems: [{
-    //       canvasElems: [{
-    //         x: 100,
-    //         y: 100,
-    //         width: 30,
-    //         height: 30,
-    //         color: 'blue'
-    //       }],
-    //       collisionMap: [{
-    //         x: 300,
-    //         y: 300,
-    //         width: 30,
-    //         height: 30,
-    //         color: 'red'
-    //       }]
-    //     }]
-    //   },
-    //   background: {
-    //     canvasElems: [{
-    //       x: 100,
-    //       y: 100,
-    //       width: 30,
-    //       height: 30,
-    //       color: 'blue'
-    //     }],
-    //     collisionMap: [{
-    //       x: 300,
-    //       y: 300,
-    //       width: 30,
-    //       height: 30,
-    //       color: 'red'
-    //     }]
-    //   },
-    //   collisionMap: [{
-    //     x: 300,
-    //     y: 300,
-    //     width: 30,
-    //     height: 30,
-    //     color: 'red'
-    //   }]
-    // }
   };
 
   // Testing creation of map
@@ -254,6 +438,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
       data: avatarTest,
       success: function(response) {
         console.log(response);
+        avatar = response.obj;
+        avatarLoaded = true;
       },
       error: function(error) {
         console.log(error);
@@ -351,19 +537,40 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
     });
   })
 
-  function loadBackground(bgSquares) {
-    // Draw the squares retrieved from the database
+  function clearCanvas() {
+    gameCtx.clearRect(0, 0, gameWidth, gameHeight);
   }
 
+  function drawAvatar() {
+    // Draw the squares from the avatar's current frame AND the collision map.
+    gameCtx.save();
+    gameCtx.translate(100,100);
+    gameCtx.fillStyle = 'lightblue';
+    gameCtx.fillRect(0,0,100,100);
+    gameCtx.restore();
+    gameCtx.fillStyle = "blue";
+    gameCtx.fillRect(0,0,100,100);
+  }
+
+  function drawBackground(bgSquares) {
+    // Draw the squares from the background object.
+  }
+
+  function drawGame() {
+    clearCanvas();
+    // Draw avatar if it has been loaded
+    if (avatarLoaded) {
+      drawAvatar();
+    }
+    requestAnimationFrame(drawGame);
+  }
+  requestAnimationFrame(drawGame);
+
+  /*
+  // Socket functionality
   var socketId;
   var charInfo;
   var allPlayers = [];
-
-  var gameCanvas = document.getElementById('play-canvas');
-  var gameCtx = gameCanvas.getContext('2d');
-  var gameWidth = 700;
-  var gameHeight = 500;
-
 
   socket.emit('game joined');
 
@@ -483,4 +690,5 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
   socket.on('chat message', function(msg){
     $('.chat-messages').append($('<li>').text(msg));
   });
+  */
 });
