@@ -8,7 +8,6 @@ angular.module('questCreator').controller('mainCtrl', function(socket, $state, U
 
     };
 
-
     // When the user clicks the sign in button, prompt them to sign in to their google account.
     $('#login').click(function() {
         UserService.signIn();
