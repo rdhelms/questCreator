@@ -177,7 +177,7 @@
     }
 
     function registerUser (username) {
-        // user.username = $('.username').val();
+      user.username = username;
         $.ajax({
             method: 'POST',
             url: 'https://forge-api.herokuapp.com/users/create',
@@ -242,6 +242,23 @@
 });
 ;angular.module('questCreator').controller('editorCtrl', function($state) {
   this.backgroundName = "Testing Background";
+  $('.asset').draggable({
+    helper: 'clone',
+    start: function(event, ui) {
+      $(ui.helper).addClass('grabbed');
+    },
+    stop: function(event, ui) {
+      $(ui.helper).css({'transition': 'transform ease 100ms'}).removeClass('grabbed');
+    }
+  });
+  $('#bg-canvas').droppable({
+    drop: function(event, ui) {
+      console.log('ui', ui);
+      var clone = $(ui.draggable).clone();
+      clone.draggable();
+      $(this).append(clone);
+    }
+  });
 });
 ;;angular.module('questCreator').controller('gameCtrl', function(socket, $state, $scope) {
 });
@@ -249,28 +266,174 @@
 
 });
 ;angular.module('questCreator').controller('mainCtrl', function(socket, $state, UserService) {
+  
+    //When the user clicks "Home" on the nav bar view is changed to landing
+    this.goHome = function () {
+        $state.go('main.landing');
+    };
 
+    //When the user clicks "Profile" on the nav bar user information is loaded and view is changed to profile
     this.goToUser = function () {
         var games = UserService.games();
         games.done(function () {
           $state.go('main.profile');
         });
-
     };
 
-
     // When the user clicks the sign in button, prompt them to sign in to their google account.
-    $('#login').click(function() {
+    this.signIn = function() {
         UserService.signIn();
-    });
+    };
 
     // When the user clicks the sign out button, sign them out of their google account
-    $('#logout').click(function() {
+    this.signOut = function() {
         UserService.signOut();
-    });
+    };
 
+    //New user can register a user name
+    this.register = function (name) {
+      console.log(name);
+        UserService.register(name);
+    };
+
+    //If the user chooses not to register, they can cancel out of the process.
+    this.cancel = function () {
+        $('#register').css('display', 'none');
+        UserService.signOut();
+    };
 });
 ;;;angular.module('questCreator').controller('playCtrl', function(socket, $state, $scope) {
+
+  // Testing creation of background
+  var backgroundTest = {
+    category: 'background',
+    name: 'Background Another Test',
+    obj: {
+      canvasElems: [{
+        x: 100,
+        y: 100,
+        width: 30,
+        height: 30,
+        color: 'blue'
+      }],
+      collisionMap: [{
+        x: 300,
+        y: 300,
+        width: 30,
+        height: 30,
+        color: 'red'
+      }]
+    },
+    user_id: 1,
+    game_id: 1,
+    tags: ['Testing Stuff', 'Fun games'],
+    public: false
+  };
+
+  // Testing creation of object
+  var objectTest = {
+    category: 'obstacle',
+    name: 'Object Test',
+    obj: {
+      canvasElems: [{
+        x: 100,
+        y: 100,
+        width: 30,
+        height: 30,
+        color: 'blue'
+      }],
+      collisionMap: [{
+        x: 300,
+        y: 300,
+        width: 30,
+        height: 30,
+        color: 'red'
+      }]
+    },
+    user_id: 1,
+    game_id: 1,
+    tags: ['Object thing', 'Really fun new object'],
+    public: false
+  };
+
+  // Testing creation of object
+  var entityTest = {
+    category: 'entity',
+    name: 'Entity Test',
+    obj: {
+      canvasElems: [{
+        x: 100,
+        y: 100,
+        width: 30,
+        height: 30,
+        color: 'blue'
+      }],
+      collisionMap: [{
+        x: 300,
+        y: 300,
+        width: 30,
+        height: 30,
+        color: 'red'
+      }]
+    },
+    user_id: 1,
+    game_id: 1,
+    tags: ['Entity thing', 'Awesome entity ftw'],
+    public: false
+  };
+
+  $('.createBackgroundBtn').click(function() {
+    $.ajax({
+      method: 'POST',
+      url: 'https://forge-api.herokuapp.com/articles/create',
+      data: backgroundTest,
+      success: function(response) {
+        console.log(response);
+        console.log(response.obj);
+        // console.log(JSON.parse(response.tags));
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  });
+
+  $('.createObjectBtn').click(function() {
+    $.ajax({
+      method: 'POST',
+      url: 'https://forge-api.herokuapp.com/articles/create',
+      data: objectTest,
+      success: function(response) {
+        console.log(response);
+        console.log(response.obj);
+        // console.log(JSON.parse(response.tags));
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  })
+
+  $('.createEntityBtn').click(function() {
+    $.ajax({
+      method: 'POST',
+      url: 'https://forge-api.herokuapp.com/articles/create',
+      data: entityTest,
+      success: function(response) {
+        console.log(response);
+        console.log(response.obj);
+        // console.log(JSON.parse(response.tags));
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  })
+
+  function loadBackground(bgSquares) {
+    // Draw the squares retrieved from the database
+  }
+
   var socketId;
   var charInfo;
   var allPlayers = [];

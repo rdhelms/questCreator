@@ -92,7 +92,7 @@ angular.module('questCreator').service('UserService', function () {
     }
 
     function registerUser (username) {
-        // user.username = $('.username').val();
+      user.username = username;
         $.ajax({
             method: 'POST',
             url: 'https://forge-api.herokuapp.com/users/create',
