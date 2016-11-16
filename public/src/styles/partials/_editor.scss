@@ -69,21 +69,15 @@
   }
 
   .edit-canvas {
-    position: relative;
-    z-index: 1;
     flex: 1;
 
     border: 2px solid black;
-    // &:before {
-    //   @include pseudo();
-    //   @include radial-gradient (
-    //   ellipse at center,
-    //   rgba(255,255,255,1) 0%,
-    //   rgba(231,223,199,1) 100%
-    //   );
-    //   filter: blur(10px);
-    //   z-index: 0;
-    // }
+
+    @include radial-gradient (
+    ellipse at center,
+    rgba(255,255,255,1) 0%,
+    rgba(231,223,199,1) 100%
+    );
   }
 }
 
@@ -191,6 +185,18 @@
   flex: 1;
 }
 
+//dummy stuff:
+canvas.asset {
+  height: 50px;
+  width: 50px;
+  background: orange;
+  &:hover {
+    cursor: pointer;
+  }
+}
+//end dummy stuff
+
+
 .assets {
   font-family: PCSenior;
   display: flex;
@@ -198,9 +204,30 @@
   justify-content: space-between;
   height: 40%;
 
-  .asset {
+  .viewer {
     width: 50%;
     border-bottom: 4px black dashed;
+    display: flex;
+    flex-direction: column;
+
+    .asset {
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+//dummy stuff:
+  ul {
+    overflow-x: scroll;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex: 1;
+    li {
+      margin: 0 15px;
+    }
+  }
+//end dummy stuff
 
     &:nth-child(2n){
       border-left: 2px black dashed;
@@ -210,4 +237,10 @@
       border-right: 2px black dashed;
     }
   }
+}
+
+.grabbed {
+  transition: transform ease 100ms;
+  transform: scale(1.2);
+  opacity: .5;
 }
