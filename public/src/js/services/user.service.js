@@ -80,7 +80,7 @@ angular.module('questCreator').service('UserService', function () {
                 },
                 error: function(error) {
                     if (error.status === 404) {
-                        $('#register').css('display', 'flex');
+                        $('#register-form').css('display', 'flex');
                     } else if (error.status === 0) {
                       // Do nothing
                     } else {
@@ -103,13 +103,13 @@ angular.module('questCreator').service('UserService', function () {
             },
             success: function(response) {
               user.id = response.id;
-              $('#register').css('display', 'none');
+              $('#register-form').css('display', 'none');
               setTimeout(function() {
                   $('#welcome').css('display', 'none');
               }, 2000);
             },
             error: function(error) {
-              $('#register').css('display', 'none');
+              $('#register-form').css('display', 'none');
               alert('There was a problem logging in. Please try again');
             }
           });

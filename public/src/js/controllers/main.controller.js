@@ -31,7 +31,7 @@ angular.module('questCreator').controller('mainCtrl', function(socket, $state, U
 
     //If the user chooses not to register, they can cancel out of the process.
     this.cancel = function () {
-        $('#register').css('display', 'none');
+        $('#user-popup').css('display', 'none');
         UserService.signOut();
     };
 });
