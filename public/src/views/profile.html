@@ -1,17 +1,40 @@
 <div class="profile-container">
-  <section class="user-info">
-    <img src="{{ profile.user.picture }}" alt="Google profile picture" />
-    <ul class="info">
-      <label  for="username">Questr Name:<li>{{ profile.user.username }}</li></label>
-      <label  for="joined">Joined the Quest:<li>{{ profile.getJoinedDate(profile.user.joined) | date:'MMM d - h:mm a' }}</li></label>
-      <label  for="joined">Another Stat:<li>Something Impressive</li></label>
-    </ul>
-  </section>
+    <div class="left-screen">
+        <section class="user-info">
+            <img src="{{ user.picture }}" alt="Google profile picture" />
+            <ul class="info">
+                <label for="username">Questr Name:<li>{{ user.username }}</li></label>
+                <label for="joined">Joined the Quest:<li>{{ getJoinedDate(user.joined) | date:'MMM d - h:mm a' }}</li></label>
+                <label for="joined">Another Stat:<li>Something Impressive</li></label>
+            </ul>
+        </section>
 
-  <section class="avatar-creator">
+        <section class="avatar-creator">
+            <canvas id="canvas" width="145" height="200"></canvas>
+            <div class="frame-overview">
+              <a ng-repeat="frame in frames" href="#">
+                <canvas id="canvas" width="50" height="70"></canvas>
+              </a>
+            </div>
+            <canvas id="avatar-canvas" width="360" height="500"></canvas>
+            <div class="canvas-tools">
+            </div>
+        </section>
+    </div>
 
-  </section>
-
-  <section class="games-created"></section>
+    <aside class="games-created">
+        <div ng-if="!games.responseText" class="make-some">
+            <h1>You Should Totally Make Some Games!</h1>
+        </div>
+        <ul ng-if="games.responseText" class="user-games">
+          <li ng-repeat="game in games">
+              <img src="" alt="Game thumbnail"/>
+              <p>Game Name:</p>
+              <p>Created By:</p>
+              <p>Date Created:</p>
+              <p>Total Possible Points</p>
+          </li>
+        </ul>
+    </aside>
 
 </div>
