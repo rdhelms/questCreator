@@ -6,3 +6,39 @@
   left: 0;
   top: 0;
 }
+
+@mixin scrollbar($size, $primary, $secondary: lighten($primary, 25%)) {
+    &::-webkit-scrollbar {
+      width:  $size;
+      height: $size;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $primary;
+      width: $size;
+      height: $size;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: $secondary;
+    }
+
+    &::-webkit-scrollbar-button:end:increment,
+    &::-webkit-scrollbar-button:start:decrement {
+      height: $size * 2;
+      width: $size * 2;
+      display: block;
+      background: $secondary;
+      border: 4px solid $primary;
+      &:active {
+        background: $primary;
+        border-color: $secondary;
+      }
+    }
+
+    // For Internet Explorer
+    body {
+        scrollbar-face-color: $primary;
+        scrollbar-track-color: $secondary;
+    }
+}

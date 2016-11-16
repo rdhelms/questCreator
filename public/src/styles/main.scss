@@ -17,6 +17,7 @@
     padding: 0;
     box-sizing: border-box;
     list-style: none;
+    @include scrollbar(16px, black, whitesmoke);
 }
 
 button {
@@ -41,6 +42,7 @@ a {
   text-decoration: none;
   color: inherit;
 }
+
 
 // ul {
 //   list-style: none;
