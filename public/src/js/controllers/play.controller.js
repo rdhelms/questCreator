@@ -435,7 +435,9 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
     $.ajax({
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/characters/create',
-      data: avatarTest,
+      data: JSON.stringify(avatarTest),
+      dataType: 'json',
+      contentType: 'application/json',
       success: function(response) {
         avatar = response.obj;
         avatar.currentFrame = avatar.animate.walkLeft[0];
@@ -451,7 +453,9 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
     $.ajax({
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/backgrounds/create',
-      data: backgroundTest,
+      data: JSON.stringify(backgroundTest),
+      dataType: 'json',
+      contentType: 'application/json',
       success: function(response) {
         console.log(response);
         console.log(response.obj);
@@ -467,7 +471,9 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
     $.ajax({
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/obstacles/create',
-      data: objectTest,
+      data: JSON.stringify(objectTest),
+      dataType: 'json',
+      contentType: 'application/json',
       success: function(response) {
         console.log(response);
         console.log(response.obj);
@@ -483,7 +489,9 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
     $.ajax({
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/entities/create',
-      data: entityTest,
+      data: JSON.stringify(entityTest),
+      dataType: 'json',
+      contentType: 'application/json',
       success: function(response) {
         console.log(response);
         console.log(response.obj);
@@ -499,7 +507,9 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
     $.ajax({
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/scenes/create',
-      data: sceneTest,
+      data: JSON.stringify(sceneTest),
+      dataType: 'json',
+      contentType: 'application/json',
       success: function(response) {
         console.log(response);
       },
@@ -513,7 +523,9 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
     $.ajax({
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/maps/create',
-      data: mapTest,
+      data: JSON.stringify(mapTest),
+      dataType: 'json',
+      contentType: 'application/json',
       success: function(response) {
         console.log(response);
       },
@@ -527,7 +539,9 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
     $.ajax({
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/games/create',
-      data: gameTest,
+      data: JSON.stringify(gameTest),
+      dataType: 'json',
+      contentType: 'application/json',
       success: function(response) {
         console.log(response);
       },
@@ -536,6 +550,19 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
       }
     });
   })
+
+  $('body').off().on('keydown', function(event) {
+    var keyCode = event.keyCode;
+    if (keyCode === 37) {
+      avatar.pos.x -= 10;
+    } else if (keyCode === 38) {
+      avatar.pos.y += 10;
+    } else if (keyCode === 39) {
+      avatar.pos.x += 10;
+    } else if (keyCode === 40) {
+      avatar.pos.y -= 10;
+    }
+  });
 
   /*
   avatar = {
@@ -559,12 +586,10 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
     // Translate the canvas origin to be the top left of the avatar
     gameCtx.translate(avatar.pos.x, avatar.pos.y);
     // Draw the squares from the avatar's current frame AND the collision map.
-    console.log(avatar);
-    console.log(avatar.currentFrame);
-    // avatar.currentFrame.forEach(function(square) {
-    //   gameCtx.fillStyle = square.color;
-    //   gameCtx.fillRect(square.x, square.y, square.width, square.height);
-    // });
+    avatar.currentFrame.forEach(function(square) {
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    });
     gameCtx.restore();
     gameCtx.fillStyle = "blue";
     gameCtx.fillRect(0,0,100,100);
