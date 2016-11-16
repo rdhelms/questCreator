@@ -1,5 +1,5 @@
 angular.module('questCreator').controller('mainCtrl', function(socket, $state, UserService) {
-  
+
     //When the user clicks "Home" on the nav bar view is changed to landing
     this.goHome = function () {
         $state.go('main.landing');
