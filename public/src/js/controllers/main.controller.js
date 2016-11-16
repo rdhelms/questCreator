@@ -1,5 +1,5 @@
 angular.module('questCreator').controller('mainCtrl', function(socket, $state, UserService) {
-  
+
     //When the user clicks "Home" on the nav bar view is changed to landing
     this.goHome = function () {
         $state.go('main.landing');
@@ -21,11 +21,11 @@ angular.module('questCreator').controller('mainCtrl', function(socket, $state, U
     // When the user clicks the sign out button, sign them out of their google account
     this.signOut = function() {
         UserService.signOut();
+        $state.go('main.landing');
     };
 
     //New user can register a user name
     this.register = function (name) {
-      console.log(name);
         UserService.register(name);
     };
 
