@@ -121,6 +121,20 @@
     .color {
       height: 100px;
       width: 100px;
+    }
+
+    .tools {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      button {
+        font-size: .5em;
+        flex: 1;
+        line-height: 2;
+      }
+    }
+
+    .color {
       border: 4px dashed black;
     }
 
