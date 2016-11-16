@@ -21,6 +21,10 @@
     @include scrollbar(16px, black, whitesmoke);
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: PCSenior;
+}
+
 button {
   border: 4px solid black;
   border-radius: 0;
@@ -28,6 +32,7 @@ button {
   background: whitesmoke;
   color: black;
   font-family: PCSenior;
+
   &:active {
     background: black;
     color: whitesmoke;
