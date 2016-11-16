@@ -2,7 +2,6 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
 
   // Testing creation of background
   var backgroundTest = {
-    category: 'background',
     name: 'Background Another Test',
     obj: {
       canvasElems: [{
@@ -28,7 +27,6 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
 
   // Testing creation of object
   var objectTest = {
-    category: 'obstacle',
     name: 'Object Test',
     obj: {
       canvasElems: [{
@@ -52,9 +50,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
     public: false
   };
 
-  // Testing creation of object
+  // Testing creation of entity
   var entityTest = {
-    category: 'entity',
     name: 'Entity Test',
     obj: {
       canvasElems: [{
@@ -78,15 +75,133 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
     public: false
   };
 
+  // Testing creation of scene
+  var sceneTest = {
+    game_id: 1,
+    map_id: 1,
+    name: 'Scene Test',
+    description: 'This is the opening scene for my game.',
+    obj: {
+        canvasElems: [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'blue'
+        }],
+        collisionMap: [{
+          x: 300,
+          y: 300,
+          width: 30,
+          height: 30,
+          color: 'red'
+        }]
+    }
+    // obj: {
+    //   mainChar: {
+    //     action: 'walk-right',
+    //     actionFrames: {
+    //       walkUp: [{
+    //
+    //       }]
+    //     }
+    //     canvasElems: [{
+    //       canvasElems: [{
+    //         x: 100,
+    //         y: 100,
+    //         width: 30,
+    //         height: 30,
+    //         color: 'blue'
+    //       }],
+    //       collisionMap: [{
+    //         x: 300,
+    //         y: 300,
+    //         width: 30,
+    //         height: 30,
+    //         color: 'red'
+    //       }]
+    //     }]
+    //   },
+    //   background: {
+    //     canvasElems: [{
+    //       x: 100,
+    //       y: 100,
+    //       width: 30,
+    //       height: 30,
+    //       color: 'blue'
+    //     }],
+    //     collisionMap: [{
+    //       x: 300,
+    //       y: 300,
+    //       width: 30,
+    //       height: 30,
+    //       color: 'red'
+    //     }]
+    //   },
+    //   collisionMap: [{
+    //     x: 300,
+    //     y: 300,
+    //     width: 30,
+    //     height: 30,
+    //     color: 'red'
+    //   }]
+    // }
+  };
+
+  // Testing creation of map
+  var mapTest = {
+    game_id: 1,
+    name: 'Map Test',
+    description: 'This is the main map for my game',
+    obj: {
+      canvasElems: [{
+        x: 100,
+        y: 100,
+        width: 30,
+        height: 30,
+        color: 'blue'
+      }],
+      collisionMap: [{
+        x: 300,
+        y: 300,
+        width: 30,
+        height: 30,
+        color: 'red'
+      }]
+    }
+  };
+
+  // Testing creation of game
+  var gameTest = {
+    name: 'Game Test',
+    description: 'This is my game',
+    obj: {
+      canvasElems: [{
+        x: 100,
+        y: 100,
+        width: 30,
+        height: 30,
+        color: 'blue'
+      }],
+      collisionMap: [{
+        x: 300,
+        y: 300,
+        width: 30,
+        height: 30,
+        color: 'red'
+      }]
+    }
+  };
+
   $('.createBackgroundBtn').click(function() {
     $.ajax({
       method: 'POST',
-      url: 'https://forge-api.herokuapp.com/articles/create',
+      url: 'https://forge-api.herokuapp.com/backgrounds/create',
       data: backgroundTest,
       success: function(response) {
         console.log(response);
         console.log(response.obj);
-        // console.log(JSON.parse(response.tags));
+        console.log(JSON.parse(response.tags));
       },
       error: function(error) {
         console.log(error);
@@ -97,12 +212,12 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
   $('.createObjectBtn').click(function() {
     $.ajax({
       method: 'POST',
-      url: 'https://forge-api.herokuapp.com/articles/create',
+      url: 'https://forge-api.herokuapp.com/obstacles/create',
       data: objectTest,
       success: function(response) {
         console.log(response);
         console.log(response.obj);
-        // console.log(JSON.parse(response.tags));
+        console.log(JSON.parse(response.tags));
       },
       error: function(error) {
         console.log(error);
@@ -113,12 +228,54 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
   $('.createEntityBtn').click(function() {
     $.ajax({
       method: 'POST',
-      url: 'https://forge-api.herokuapp.com/articles/create',
+      url: 'https://forge-api.herokuapp.com/entities/create',
       data: entityTest,
       success: function(response) {
         console.log(response);
         console.log(response.obj);
-        // console.log(JSON.parse(response.tags));
+        console.log(JSON.parse(response.tags));
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  })
+
+  $('.createSceneBtn').click(function() {
+    $.ajax({
+      method: 'POST',
+      url: 'https://forge-api.herokuapp.com/scenes/create',
+      data: sceneTest,
+      success: function(response) {
+        console.log(response);
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  })
+
+  $('.createMapBtn').click(function() {
+    $.ajax({
+      method: 'POST',
+      url: 'https://forge-api.herokuapp.com/maps/create',
+      data: mapTest,
+      success: function(response) {
+        console.log(response);
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  })
+
+  $('.createGameBtn').click(function() {
+    $.ajax({
+      method: 'POST',
+      url: 'https://forge-api.herokuapp.com/games/create',
+      data: gameTest,
+      success: function(response) {
+        console.log(response);
       },
       error: function(error) {
         console.log(error);
