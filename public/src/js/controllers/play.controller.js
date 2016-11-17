@@ -1,4 +1,4 @@
-angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $state, $scope) {
+angular.module('questCreator').controller('playCtrl', function(socket, Avatar, UserService, $state, $scope) {
   var gameCanvas = document.getElementById('play-canvas');
   var gameCtx = gameCanvas.getContext('2d');
   var gameWidth = 700;
@@ -6,6 +6,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
 
   var avatar = null;
   var avatarLoaded = false;
+  var backgroundLoaded = false;
 
   var typing = {
     show: false,
@@ -32,7 +33,11 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
         y: 100
       },
       // The character's speed
-      speed: 1,
+      speed: {
+        mag: 3,
+        x: 0,
+        y: 0
+      },
       // The animate object contains all the possible character actions with all of the frames to be drawn for each action.
       animate: {
         // Key: possible action, Value: array of frames
@@ -55,13 +60,13 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
           // Frame 2 - walk left
           [{
             x: 100,
-            y: 100,
+            y: 150,
             width: 30,
             height: 30,
             color: 'red'
           }, {
             x: 150,
-            y: 150,
+            y: 100,
             width: 30,
             height: 30,
             color: 'yellow'
@@ -296,7 +301,6 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
         }
       ]
     },
-    user_id: 1,
     current: false
   };
 
@@ -319,7 +323,6 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
         color: 'red'
       }]
     },
-    user_id: 1,
     game_id: 1,
     tags: ['Testing Stuff', 'Fun games'],
     public: false
@@ -344,7 +347,6 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
         color: 'red'
       }]
     },
-    user_id: 1,
     game_id: 1,
     tags: ['Object thing', 'Really fun new object'],
     public: false
@@ -369,7 +371,6 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
         color: 'red'
       }]
     },
-    user_id: 1,
     game_id: 1,
     tags: ['Entity thing', 'Awesome entity ftw'],
     public: false
@@ -377,7 +378,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
 
   // Testing creation of scene
   var sceneTest = {
-    name: 'Scene Test',
+    name: 'Scene Test 2',
     description: 'This is the opening scene for my game.',
     obj: {
         canvasElems: [{
@@ -402,7 +403,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
   // Testing creation of map
   var mapTest = {
     game_id: 1,
-    name: 'Map Test',
+    name: 'Map Test 2',
     description: 'This is the main map for my game',
     obj: {
       canvasElems: [{
@@ -424,9 +425,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
 
   // Testing creation of game
   var gameTest = {
-    name: 'Game Test',
+    name: 'Game Test 2',
     description: 'This is my game',
-    user_id: 1,
     obj: {
       canvasElems: [{
         x: 100,
@@ -447,9 +447,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
   };
 
   $('.createAvatarBtn').click(function() {
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
     $.ajax({
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/characters/create',
+      headers: headerData,
       data: JSON.stringify(avatarTest),
       dataType: 'json',
       contentType: 'application/json',
@@ -458,6 +463,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
         avatar = new Avatar(response);
         avatar.obj.currentFrame = avatar.obj.animate.walkLeft[0];
         avatarLoaded = true;
+        setInterval(checkAvatarMotion, 75);
       },
       error: function(error) {
         console.log(error);
@@ -466,9 +472,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
   });
 
   $('.createBackgroundBtn').click(function() {
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
     $.ajax({
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/backgrounds/create',
+      headers: headerData,
       data: JSON.stringify(backgroundTest),
       dataType: 'json',
       contentType: 'application/json',
@@ -484,9 +495,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
   });
 
   $('.createObjectBtn').click(function() {
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
     $.ajax({
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/obstacles/create',
+      headers: headerData,
       data: JSON.stringify(objectTest),
       dataType: 'json',
       contentType: 'application/json',
@@ -502,9 +518,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
   })
 
   $('.createEntityBtn').click(function() {
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
     $.ajax({
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/entities/create',
+      headers: headerData,
       data: JSON.stringify(entityTest),
       dataType: 'json',
       contentType: 'application/json',
@@ -520,9 +541,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
   })
 
   $('.createSceneBtn').click(function() {
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
     $.ajax({
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/scenes/create',
+      headers: headerData,
       data: JSON.stringify(sceneTest),
       dataType: 'json',
       contentType: 'application/json',
@@ -536,9 +562,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
   })
 
   $('.createMapBtn').click(function() {
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
     $.ajax({
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/maps/create',
+      headers: headerData,
       data: JSON.stringify(mapTest),
       dataType: 'json',
       contentType: 'application/json',
@@ -552,9 +583,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
   })
 
   $('.createGameBtn').click(function() {
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
     $.ajax({
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/games/create',
+      headers: headerData,
       data: JSON.stringify(gameTest),
       dataType: 'json',
       contentType: 'application/json',
@@ -568,62 +604,124 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
   })
 
   $('body').off('keyup').on('keyup', function(event) {
-    var keyCode = event.keyCode;
+    var keyCode = event.which;
     if (keyCode === 37) {
-      console.log("Key Up");
-      avatar.obj.pos.x -= 10;
+      avatar.action = (avatar.action === 'walkLeft') ? 'stand' : 'walkLeft';
+      avatar.obj.speed.x = (avatar.obj.speed.x === -1 * avatar.obj.speed.mag) ? 0 : -1 * avatar.obj.speed.mag;
+      avatar.obj.speed.y = 0;
     } else if (keyCode === 38) {
-      avatar.obj.pos.y -= 10;
+      avatar.action = (avatar.action === 'walkUp') ? 'stand' : 'walkUp';
+      avatar.obj.speed.x = 0;
+      avatar.obj.speed.y = (avatar.obj.speed.y === -1 * avatar.obj.speed.mag) ? 0 : -1 * avatar.obj.speed.mag;
     } else if (keyCode === 39) {
-      avatar.obj.pos.x += 10;
+      avatar.action = (avatar.action === 'walkRight') ? 'stand' : 'walkRight';
+      avatar.obj.speed.x = (avatar.obj.speed.x === avatar.obj.speed.mag) ? 0 : avatar.obj.speed.mag;
+      avatar.obj.speed.y = 0;
     } else if (keyCode === 40) {
-      avatar.obj.pos.y += 10;
+      avatar.action = (avatar.action === 'walkDown') ? 'stand' : 'walkDown';
+      avatar.obj.speed.x = 0;
+      avatar.obj.speed.y = (avatar.obj.speed.y === avatar.obj.speed.mag) ? 0 : avatar.obj.speed.mag;
     }
   });
 
   $('body').off('keypress').on('keypress', function(event) {
-    if (key >= 48 && key <= 220 && !responding.show && $('.active').length === 0) {
+    var keyCode = event.which;
+    if (keyCode >= 33 && keyCode <= 220 && !responding.show && $('.active').length === 0) {
       pause = true;
       typing.show = true;
-      var char = String.fromCharCode(key);
+      var char = String.fromCharCode(keyCode);
       typing.phrase += char;
       $('.typing').text(typing.phrase).show();
+    } else if (keyCode === 13) {
+      // Enter
+        if (typing.show) { // If the user is finishing typing
+          typing.show = false;
+          $('.typing').hide();
+          // var userPhrase = this.typing.phrase;
+          typing.phrase = '';
+          // this.checkTyping(userPhrase);
+        } else if (responding.show) { // If the user is finished reading a response
+          // responding.show = false;
+          // $('.dialog').hide();
+        } else if (inventory.show) { // If the user is finished looking at inventory
+          // $('.inventoryContainer').hide();
+          // this.inventory.show = false;
+        }
+        // if (!this.responding.show && !this.inventory.show && $('.active').length === 0) { // Resume the game if all windows have been closed
+        //   this.pause = false;
+        // }
+    } else if (keyCode === 32) {
+      // Space
+      if (typing.phrase.length > 1) {
+        typing.phrase += ' ';
+        $('.typing').text(typing.phrase).show();
+      } else {
+        typing.phrase = ':';
+        $('.typing').text(typing.phrase).show();
+      }
     }
   });
 
-  /*
-  avatar = {
-    pos: {
-      x: 0,
-      y: 0
-    },
-    animate: {
-      walkLeft: [ [squareObj, squareObj, etc...], [squareObj, squareObj, etc...], [squareObj, squareObj, etc...] ],
-      walkRight: [ [squareObj, squareObj, etc...], [squareObj, squareObj, etc...], [squareObj, squareObj, etc...] ],
-      etc...
-    },
-    currentFrame: [],
-    collisionMap: [squareObj, squareObj, etc...]
+  var currentFrameIndex = 0;
+  function updateAvatar() {
+    avatar.updatePos();
   }
-  */
+
+  function checkAvatarMotion() {
+    if (avatar.action === 'walkLeft') {
+      if (currentFrameIndex > avatar.obj.animate.walkLeft.length - 1) {
+        currentFrameIndex = 0;
+      }
+      avatar.obj.currentFrame = avatar.obj.animate.walkLeft[currentFrameIndex];
+      currentFrameIndex++;
+    } else {
+      // Do nothing, or set frame to a given specific frame.
+      // avatar.obj.currentFrame = avatar.obj.animate.walkLeft[0];
+    }
+  }
 
   function drawAvatar() {
     // Save the drawing context
     gameCtx.save();
     // Translate the canvas origin to be the top left of the avatar
-    gameCtx.translate(avatar.pos.x, avatar.pos.y);
+    gameCtx.translate(avatar.obj.pos.x, avatar.obj.pos.y);
     // Draw the squares from the avatar's current frame AND the collision map.
-    avatar.currentFrame.forEach(function(square) {
+    avatar.obj.currentFrame.forEach(function(square) {
       gameCtx.fillStyle = square.color;
       gameCtx.fillRect(square.x, square.y, square.width, square.height);
     });
     gameCtx.restore();
-    gameCtx.fillStyle = "blue";
-    gameCtx.fillRect(0,0,100,100);
+  }
+
+  function drawObjects() {
+    // Save the drawing context
+    gameCtx.save();
+    // Translate the canvas origin to be the top left of the avatar
+    gameCtx.translate(avatar.obj.pos.x, avatar.obj.pos.y);
+    // Draw the squares from the avatar's current frame AND the collision map.
+    avatar.obj.currentFrame.forEach(function(square) {
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    });
+    gameCtx.restore();
+  }
+
+  function drawEntities() {
+    // Save the drawing context
+    gameCtx.save();
+    // Translate the canvas origin to be the top left of the avatar
+    gameCtx.translate(avatar.obj.pos.x, avatar.obj.pos.y);
+    // Draw the squares from the avatar's current frame AND the collision map.
+    avatar.obj.currentFrame.forEach(function(square) {
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    });
+    gameCtx.restore();
   }
 
   function drawBackground(bgSquares) {
     // Draw the squares from the background object.
+    gameCtx.globalCompositeOperation = "destination-over";
   }
 
   function clearCanvas() {
@@ -634,7 +732,11 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
     clearCanvas();
     // Draw avatar if it has been loaded
     if (avatarLoaded) {
+      updateAvatar();
       drawAvatar();
+    }
+    if (backgroundLoaded) {
+      drawBackground();
     }
     requestAnimationFrame(drawGame);
   }
