@@ -6,7 +6,8 @@ angular.module('questCreator').service('UserService', function () {
             picture: null,
             id: null,
             games: null,
-            joined: null
+            joined: null,
+            editGame: null
     };
 
     //Get the current values for user data
@@ -16,6 +17,10 @@ angular.module('questCreator').service('UserService', function () {
 
     function setUser(adjUser) {
       user = adjUser;
+    }
+
+    function setGameEdit(name) {
+      user.editGame = name;
     }
 
     var apiKey = 'AIzaSyCe__2EGSmwp0DR-qKGqpYwawfmRsTLBEs';
@@ -152,6 +157,7 @@ angular.module('questCreator').service('UserService', function () {
     return {
       get: getUser,
       set: setUser,
+      setGameEdit: setGameEdit,
       games: getUserGames,
       register: registerUser,
       signOut: signOut,

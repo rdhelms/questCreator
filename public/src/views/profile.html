@@ -20,7 +20,7 @@
             <div>
                 <h1>Avatar Editor:</h1>
                 <div class="frame-overview">
-                    <a ng-repeat="frame in avatarTest" href="#">
+                    <a ng-repeat="frame in avatarTest" href="">
                         <canvas id="canvas" width="50" height="70"></canvas>
                     </a>
                 </div>
@@ -30,17 +30,17 @@
     </div>
 
     <aside class="games-created">
-        <input ng-click="createGame()" type="button" value="Create a New Game">
+        <button ng-click="createGame()">Create a New Game</button>
         <div ng-if="!games" class="make-some">
             <h1>You Should Totally Make Some Games!</h1>
         </div>
         <h1 ng-if="games">You Did This:</h1>
-        <div ng-if="games" class="user-games" ng-repeat="game in games">
-            <img src="{{ game.thumbnail }}" alt="Game thumbnail" />
+        <div ng-if="games" class="user-games" ng-repeat="game in games"  ng-click="editGame(game.name)">
+            <img src="{{ game.thumbnail }}" alt="Game thumbnail"/>
             <ul>
                 <li>
                     <label for="game-name">Game Name:</label>
-                    <a ui-sref="#">{{ game.name }}</li>
+                    {{ game.name }}</li>
                 <li>
                     <label for="creator">Created By:</label>
                     <p>{{ game.creator }}</p>
