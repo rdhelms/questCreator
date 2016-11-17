@@ -1,4 +1,4 @@
-angular.module('questCreator').controller('playCtrl', function(socket, $state, $scope) {
+angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $state, $scope) {
   var gameCanvas = document.getElementById('play-canvas');
   var gameCtx = gameCanvas.getContext('2d');
   var gameWidth = 700;
@@ -6,6 +6,21 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
 
   var avatar = null;
   var avatarLoaded = false;
+
+  var typing = {
+    show: false,
+    phrase: ''
+  };
+  var responding = {
+    show: false,
+    phrase: ''
+  };
+  var inventory = {
+    show: false,
+    contents: ''
+  }
+  var pause = false;
+  var startTime = new Date();
 
   // Testing creation of avatar
   var avatarTest = {
@@ -16,6 +31,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
         x: 100,
         y: 100
       },
+      // The character's speed
+      speed: 1,
       // The animate object contains all the possible character actions with all of the frames to be drawn for each action.
       animate: {
         // Key: possible action, Value: array of frames
@@ -262,8 +279,6 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
         ]
         // Other actions could go here
       },
-      // The current frame is what will be looped through to draw. Its value will be one of the frames from the animate object. It will be reset at the rate at which the action frames are being looped through.
-      currentFrame: [],
       // The collision map is how the game can know whether the character has collided with another object or event trigger. It is an array of invisible (or gray for now) squares.
       collisionMap: [
         {
@@ -439,7 +454,10 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
       dataType: 'json',
       contentType: 'application/json',
       success: function(response) {
-        avatar = response.obj;
+        console.log(response);
+        mainChar = new Avatar(response);
+        // mainChar.testFunction();
+        avatar = mainChar.obj;
         avatar.currentFrame = avatar.animate.walkLeft[0];
         avatarLoaded = true;
       },
@@ -551,16 +569,27 @@ angular.module('questCreator').controller('playCtrl', function(socket, $state, $
     });
   })
 
-  $('body').off().on('keydown', function(event) {
+  $('body').off('keyup').on('keyup', function(event) {
     var keyCode = event.keyCode;
     if (keyCode === 37) {
+      console.log("Key Up");
       avatar.pos.x -= 10;
     } else if (keyCode === 38) {
-      avatar.pos.y += 10;
+      avatar.pos.y -= 10;
     } else if (keyCode === 39) {
       avatar.pos.x += 10;
     } else if (keyCode === 40) {
-      avatar.pos.y -= 10;
+      avatar.pos.y += 10;
+    }
+  });
+
+  $('body').off('keypress').on('keypress', function(event) {
+    if (key >= 48 && key <= 220 && !this.responding.show && $('.active').length === 0) {
+      this.pause = true;
+      this.typing.show = true;
+      var char = String.fromCharCode(key);
+      this.typing.phrase += char;
+      $('.typing').text(this.typing.phrase).show();
     }
   });
 
