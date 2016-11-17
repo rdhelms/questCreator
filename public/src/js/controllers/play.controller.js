@@ -455,10 +455,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
       contentType: 'application/json',
       success: function(response) {
         console.log(response);
-        mainChar = new Avatar(response);
-        // mainChar.testFunction();
-        avatar = mainChar.obj;
-        avatar.currentFrame = avatar.animate.walkLeft[0];
+        avatar = new Avatar(response);
+        avatar.obj.currentFrame = avatar.obj.animate.walkLeft[0];
         avatarLoaded = true;
       },
       error: function(error) {
@@ -573,23 +571,23 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, $
     var keyCode = event.keyCode;
     if (keyCode === 37) {
       console.log("Key Up");
-      avatar.pos.x -= 10;
+      avatar.obj.pos.x -= 10;
     } else if (keyCode === 38) {
-      avatar.pos.y -= 10;
+      avatar.obj.pos.y -= 10;
     } else if (keyCode === 39) {
-      avatar.pos.x += 10;
+      avatar.obj.pos.x += 10;
     } else if (keyCode === 40) {
-      avatar.pos.y += 10;
+      avatar.obj.pos.y += 10;
     }
   });
 
   $('body').off('keypress').on('keypress', function(event) {
-    if (key >= 48 && key <= 220 && !this.responding.show && $('.active').length === 0) {
-      this.pause = true;
-      this.typing.show = true;
+    if (key >= 48 && key <= 220 && !responding.show && $('.active').length === 0) {
+      pause = true;
+      typing.show = true;
       var char = String.fromCharCode(key);
-      this.typing.phrase += char;
-      $('.typing').text(this.typing.phrase).show();
+      typing.phrase += char;
+      $('.typing').text(typing.phrase).show();
     }
   });
 

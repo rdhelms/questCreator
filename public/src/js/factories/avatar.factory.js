@@ -6,8 +6,9 @@ angular.module('questCreator').factory('Avatar', function() {
     this.current = avatarInfo.current;
   };
 
-  Avatar.prototype.testFunction = function() {
-    console.log("This is a prototype function.");
+  Avatar.prototype.update = function() {
+    console.log("Updating");
+    this.obj.pos.x += this.obj.speed;
   }
 
   return Avatar;
