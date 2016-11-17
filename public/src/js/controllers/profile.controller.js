@@ -24,6 +24,12 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
         $state.go('main.game.editor');
     };
 
+    $scope.editGame = function (name) {
+        $scope.user.editGame = name;
+        UserService.set($scope.user);
+        $state.go('main.game.editor');
+    };
+
     setTimeout(function() {
         $scope.user = UserService.get();
         // $scope.games = UserService.games();
