@@ -1,17 +1,77 @@
 .profile-container {
+  padding-top: 1.6rem;
     display: flex;
-  .user-info {
 
-  }
+    .left-screen {
+      padding: 1rem;
+      width: 65%;
+      display: flex;
+      // flex-direction: column;
+      align-items: space-around;
+      background-color: pink;
 
-  .avatar-creator {
-    canvas {
-      background-color: red;
+        .user-info {
+          display: flex;
+          img {
+            width: 150px;
+            height: 150px;
+          }
+
+          .info {
+            padding: .5rem;
+          }
+        }
+
+        .canvas-tools {
+          background-color: blue;
+        }
+
+        .avatar-creator {
+          display: flex;
+          canvas {
+            background: red;
+          }
+            #animate-preview {
+              height: 200px;
+              width: 145px;
+            }
+
+            .frame-overview {
+              width: 217px;
+              height: 223px;
+              display: flex;
+              flex-wrap: wrap;
+
+              canvas {
+                margin: 2px;
+              }
+            }
+        }
     }
 
-  }
+    .games-created {
+      padding-top: 1.6rem;
+      width: 35%;
+      height: 100vh;
+      background: whitesmoke;
+      // display: flex;
+      // flex-direction: column;
+      overflow: scroll;
+      // justify-content: center;
+      // align-items: space-around;
 
-  .games-created {
+      input {
+        // margin: 20px;
+        height: 100px;
+        width: 250px;
+      }
 
-  }
+      ul  {
+        display: flex;
+        li {
+          display: flex;
+          flex-direction: column;
+        }
+      }
+    }
 }
