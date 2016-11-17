@@ -17,57 +17,117 @@
             controller: 'landingCtrl as landing'
           }).state('main.game', {
             // url: ':name'
-            url: 'game/',
+            url: 'game',
             templateUrl: './src/views/game.html',
             controller: 'gameCtrl as game'
           }).state('main.game.play', {
-            url: 'play/',
+            url: '/play',
             templateUrl: './src/views/game/play.html',
             controller: 'playCtrl as play'
           }).state('main.game.editor', {
             // Includes sidebar and nav for all editor views
             // "/game/editor"
-            url: 'editor/',
+            url: '/editor',
             templateUrl: './src/views/game/editor.html',
             controller: 'editorCtrl as editor'
           }).state('main.game.editor.map', {
             // "/game/editor/map"
-            url: 'map/',
+            url: '/map',
             templateUrl: './src/views/game/editor/map.html',
             controller: 'mapCtrl as map'
           }).state('main.game.editor.scene', {
             // "/game/editor/scene"
-            url: 'scene/',
+            url: '/scene',
             templateUrl: './src/views/game/editor/scene.html',
             controller: 'sceneCtrl as scene'
           }).state('main.game.editor.bg', {
             // "/game/editor/bg"
-            url: 'bg/',
+            url: '/bg',
             templateUrl: './src/views/game/editor/bg.html',
             controller: 'bgCtrl as bg'
           }).state('main.game.editor.obj', {
             // "/game/editor/obj"
-            url: 'obj/',
+            url: '/obj',
             templateUrl: './src/views/game/editor/obj.html',
             controller: 'objCtrl as obj'
           }).state('main.game.editor.ent', {
             // "/game/editor/ent"
-            url: 'ent/',
+            url: '/ent',
             templateUrl: './src/views/game/editor/ent.html',
             controller: 'entCtrl as ent'
           }).state('main.game.editor.scripts', {
             // "/game/editor/scripts"
-            url: 'scripts/',
+            url: '/scripts',
             templateUrl: './src/views/game/editor/scripts.html',
             controller: 'scriptsCtrl as scripts'
           }).state('main.profile', {
-            url: 'profile/',
+            url: 'profile',
             templateUrl: './src/views/profile.html',
             controller: 'profileCtrl as profile'
           });
         });
 
 })();
+;angular.module('questCreator').factory('Avatar', function() {
+  function Avatar(avatarInfo) {
+    this.name = avatarInfo.name;
+    this.obj = avatarInfo.obj;
+    this.user_id = avatarInfo.user_id;
+    this.current = avatarInfo.current;
+    this.action = 'stand';
+  };
+
+  Avatar.prototype.updatePos = function() {
+    this.obj.pos.x += this.obj.speed.x;
+    this.obj.pos.y += this.obj.speed.y;
+  }
+
+  return Avatar;
+});
+;angular.module('questCreator').service('EditorService', function (UserService, $state) {
+
+
+    var game = null;
+
+    function getGameAssets(name) {
+
+    }
+
+    function createNewGame(name) {
+      var header = {
+        user_id: UserService.get().id,
+        token: UserService.get().token
+      };
+      var game = {
+        name: name,
+        description: "",
+        tags: []
+      };
+      console.log(header, game);
+      $.ajax({
+        method: 'POST',
+        url: 'https://forge-api.herokuapp.com/games/create',
+        data: JSON.stringify(game),
+        headers: header,
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(response) {
+          game = response;
+          return game;
+        },
+        error: function(error) {
+          alert('There was a problem creating this game. Please try again.');
+          $state.go('main.landing');
+        }
+      });
+    }
+
+    return {
+      getGame: getGameAssets,
+      createGame: createNewGame
+
+    };
+});
 ;angular.module('questCreator').service('socket', function() {
   var socket = io();
 
@@ -89,8 +149,24 @@
             token: null,
             username: null,
             picture: null,
-            id: null
+            id: null,
+            games: null,
+            joined: null,
+            editGame: null
     };
+
+    //Get the current values for user data
+    function getUser() {
+      return user;
+    }
+
+    function setUser(adjUser) {
+      user = adjUser;
+    }
+
+    function setGameEdit(name) {
+      user.editGame = name;
+    }
 
     var apiKey = 'AIzaSyCe__2EGSmwp0DR-qKGqpYwawfmRsTLBEs';
     var clientId = '730683845367-tjrrmvelul60250evn5i74uka4ustuln.apps.googleusercontent.com';
@@ -118,7 +194,7 @@
             $('#login').hide();
             $('#logout').show();
             console.log("Signed In!");
-            getUserInfo();
+            getLogin();
         } else {
             $('#login').show();
             $('#logout').hide();
@@ -139,12 +215,13 @@
     }
 
     // Get the name of the user who signed in.
-    function getUserInfo() {
+    function getLogin() {
         var requestUser = gapi.client.request({
             path: 'https://people.googleapis.com/v1/people/me',
             method: 'GET'
         });
         requestUser.then(function(response) {
+            user.picture = response.result.photos[0].url;
             user.uid = auth2.currentUser.Ab.El;
             user.token = auth2.currentUser.Ab.Zi.access_token;
             $.ajax({
@@ -155,7 +232,7 @@
                     token: user.token
                 },
                 success: function(response) {
-                  console.log(response);
+                  user.joined = response.created_at;
                     user.username = response.username;
                     user.id = response.id;
                     $('#welcome').css('display', 'flex');
@@ -165,7 +242,7 @@
                 },
                 error: function(error) {
                     if (error.status === 404) {
-                        $('#register').css('display', 'flex');
+                        $('#register-form').css('display', 'flex');
                     } else if (error.status === 0) {
                       // Do nothing
                     } else {
@@ -188,18 +265,17 @@
             },
             success: function(response) {
               user.id = response.id;
-              $('#register').css('display', 'none');
+              $('#register-form').css('display', 'none');
               setTimeout(function() {
                   $('#welcome').css('display', 'none');
               }, 2000);
             },
             error: function(error) {
-              $('#register').css('display', 'none');
+              $('#register-form').css('display', 'none');
               alert('There was a problem logging in. Please try again');
             }
           });
     }
-
 
     function getUserGames() {
       if (!user.id) {
@@ -209,8 +285,9 @@
       return $.ajax({
           method: 'GET',
           url: 'https://forge-api.herokuapp.com/games/user-games',
-          data: {
-              id: user.id,
+          headers: {
+            user_id: user.id,
+            token: user.token
           },
           success: function(response) {
             return response;
@@ -222,6 +299,9 @@
     }
 }
     return {
+      get: getUser,
+      set: setUser,
+      setGameEdit: setGameEdit,
       games: getUserGames,
       register: registerUser,
       signOut: signOut,
@@ -240,7 +320,8 @@
     $('#messages').append($('<li>').text(msg));
   });
 });
-;angular.module('questCreator').controller('editorCtrl', function($state) {
+;angular.module('questCreator').controller('editorCtrl', function($scope, $state, EditorService, UserService) {
+
   this.backgroundName = "Testing Background";
   $('.asset').draggable({
     helper: 'clone',
@@ -259,6 +340,25 @@
       $(this).append(clone);
     }
   });
+
+  $scope.gameToEdit = UserService.get().editGame;
+
+  $scope.editGame = function () {
+      EditorService.getGame($scope.gameToEdit);
+      $('.edit-game').hide();
+  };
+
+  $scope.createNewGame = function (name) {
+      EditorService.createGame(name);
+      $('.create-game').hide();
+      $scope.gameToEdit = name;
+      UserService.setGameEdit(name);
+  };
+
+  $scope.cancel = function () {
+    $state.go('main.profile');
+  };
+
 });
 ;;angular.module('questCreator').controller('gameCtrl', function(socket, $state, $scope) {
 });
@@ -266,7 +366,7 @@
 
 });
 ;angular.module('questCreator').controller('mainCtrl', function(socket, $state, UserService) {
-  
+
     //When the user clicks "Home" on the nav bar view is changed to landing
     this.goHome = function () {
         $state.go('main.landing');
@@ -288,25 +388,328 @@
     // When the user clicks the sign out button, sign them out of their google account
     this.signOut = function() {
         UserService.signOut();
+        $state.go('main.landing');
     };
 
     //New user can register a user name
     this.register = function (name) {
-      console.log(name);
         UserService.register(name);
     };
 
     //If the user chooses not to register, they can cancel out of the process.
     this.cancel = function () {
-        $('#register').css('display', 'none');
+        $('#user-popup').css('display', 'none');
         UserService.signOut();
     };
 });
-;;;angular.module('questCreator').controller('playCtrl', function(socket, $state, $scope) {
+;;;angular.module('questCreator').controller('playCtrl', function(socket, Avatar, UserService, $state, $scope) {
+  var gameCanvas = document.getElementById('play-canvas');
+  var gameCtx = gameCanvas.getContext('2d');
+  var gameWidth = 700;
+  var gameHeight = 500;
+
+  var avatar = null;
+  var avatarLoaded = false;
+  var backgroundLoaded = false;
+
+  var typing = {
+    show: false,
+    phrase: ''
+  };
+  var responding = {
+    show: false,
+    phrase: ''
+  };
+  var inventory = {
+    show: false,
+    contents: ''
+  }
+  var pause = false;
+  var startTime = new Date();
+
+  // Testing creation of avatar
+  var avatarTest = {
+    name: 'Avatar Test',
+    obj: {
+      // The x and y coordinate of the top left corner of the avatar
+      pos: {
+        x: 100,
+        y: 100
+      },
+      // The character's speed
+      speed: {
+        mag: 3,
+        x: 0,
+        y: 0
+      },
+      // The animate object contains all the possible character actions with all of the frames to be drawn for each action.
+      animate: {
+        // Key: possible action, Value: array of frames
+        walkLeft: [
+          // Each frame array element is an array of square objects to be drawn
+          // Frame 1 - walk left
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'blue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'green'
+          }],
+          // Frame 2 - walk left
+          [{
+            x: 100,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'red'
+          }, {
+            x: 150,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'yellow'
+          }]
+        ],
+        walkRight: [
+          // Frame 1 - walk right
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'blue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'green'
+          }],
+          // Frame 2 - walk right
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'red'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'yellow'
+          }]
+        ],
+        walkUp: [
+          // Frame 1 - walk up
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'blue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'green'
+          }],
+          // Frame 2 - walk up
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'red'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'yellow'
+          }]
+        ],
+        walkDown: [
+          // Frame 1 - walk down
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'blue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'green'
+          }],
+          // Frame 2 - walk down
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'red'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'yellow'
+          }]
+        ],
+        swimLeft: [
+          // Frame 1 - swim left
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }],
+          // Frame 2 - swim left
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }]
+        ],
+        swimRight: [
+          // Frame 1 - swim right
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }],
+          // Frame 2 - swim right
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }]
+        ],
+        swimUp: [
+          // Frame 1 - swim up
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }],
+          // Frame 2 - swim up
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }]
+        ],
+        swimDown: [
+          // Frame 1 - swim down
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }],
+          // Frame 2 - swim down
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }]
+        ]
+        // Other actions could go here
+      },
+      // The collision map is how the game can know whether the character has collided with another object or event trigger. It is an array of invisible (or gray for now) squares.
+      collisionMap: [
+        {
+          x: 100,
+          y: 180,
+          width: 80,
+          height: 30,
+          color: 'gray'
+        }, {
+          x: 100,
+          y: 210,
+          width: 80,
+          height: 30,
+          color: 'gray'
+        }
+      ]
+    },
+    current: false
+  };
 
   // Testing creation of background
   var backgroundTest = {
-    category: 'background',
     name: 'Background Another Test',
     obj: {
       canvasElems: [{
@@ -324,7 +727,6 @@
         color: 'red'
       }]
     },
-    user_id: 1,
     game_id: 1,
     tags: ['Testing Stuff', 'Fun games'],
     public: false
@@ -332,7 +734,6 @@
 
   // Testing creation of object
   var objectTest = {
-    category: 'obstacle',
     name: 'Object Test',
     obj: {
       canvasElems: [{
@@ -350,15 +751,13 @@
         color: 'red'
       }]
     },
-    user_id: 1,
     game_id: 1,
     tags: ['Object thing', 'Really fun new object'],
     public: false
   };
 
-  // Testing creation of object
+  // Testing creation of entity
   var entityTest = {
-    category: 'entity',
     name: 'Entity Test',
     obj: {
       canvasElems: [{
@@ -376,21 +775,122 @@
         color: 'red'
       }]
     },
-    user_id: 1,
     game_id: 1,
     tags: ['Entity thing', 'Awesome entity ftw'],
     public: false
   };
 
-  $('.createBackgroundBtn').click(function() {
+  // Testing creation of scene
+  var sceneTest = {
+    name: 'Scene Test 2',
+    description: 'This is the opening scene for my game.',
+    obj: {
+        canvasElems: [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'blue'
+        }],
+        collisionMap: [{
+          x: 300,
+          y: 300,
+          width: 30,
+          height: 30,
+          color: 'red'
+        }]
+    },
+    game_id: 1,
+    map_id: 1
+  };
+
+  // Testing creation of map
+  var mapTest = {
+    game_id: 1,
+    name: 'Map Test 2',
+    description: 'This is the main map for my game',
+    obj: {
+      canvasElems: [{
+        x: 100,
+        y: 100,
+        width: 30,
+        height: 30,
+        color: 'blue'
+      }],
+      collisionMap: [{
+        x: 300,
+        y: 300,
+        width: 30,
+        height: 30,
+        color: 'red'
+      }]
+    }
+  };
+
+  // Testing creation of game
+  var gameTest = {
+    name: 'Game Test 2',
+    description: 'This is my game',
+    obj: {
+      canvasElems: [{
+        x: 100,
+        y: 100,
+        width: 30,
+        height: 30,
+        color: 'blue'
+      }],
+      collisionMap: [{
+        x: 300,
+        y: 300,
+        width: 30,
+        height: 30,
+        color: 'red'
+      }]
+    },
+    tags: ['The best game', 'fun stuff', "Everybody's favorite"]
+  };
+
+  $('.createAvatarBtn').click(function() {
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
     $.ajax({
       method: 'POST',
-      url: 'https://forge-api.herokuapp.com/articles/create',
-      data: backgroundTest,
+      url: 'https://forge-api.herokuapp.com/characters/create',
+      headers: headerData,
+      data: JSON.stringify(avatarTest),
+      dataType: 'json',
+      contentType: 'application/json',
+      success: function(response) {
+        console.log(response);
+        avatar = new Avatar(response);
+        avatar.obj.currentFrame = avatar.obj.animate.walkLeft[0];
+        avatarLoaded = true;
+        setInterval(checkAvatarMotion, 75);
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  });
+
+  $('.createBackgroundBtn').click(function() {
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
+    $.ajax({
+      method: 'POST',
+      url: 'https://forge-api.herokuapp.com/backgrounds/create',
+      headers: headerData,
+      data: JSON.stringify(backgroundTest),
+      dataType: 'json',
+      contentType: 'application/json',
       success: function(response) {
         console.log(response);
         console.log(response.obj);
-        // console.log(JSON.parse(response.tags));
+        console.log(JSON.parse(response.tags));
       },
       error: function(error) {
         console.log(error);
@@ -399,14 +899,21 @@
   });
 
   $('.createObjectBtn').click(function() {
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
     $.ajax({
       method: 'POST',
-      url: 'https://forge-api.herokuapp.com/articles/create',
-      data: objectTest,
+      url: 'https://forge-api.herokuapp.com/obstacles/create',
+      headers: headerData,
+      data: JSON.stringify(objectTest),
+      dataType: 'json',
+      contentType: 'application/json',
       success: function(response) {
         console.log(response);
         console.log(response.obj);
-        // console.log(JSON.parse(response.tags));
+        console.log(JSON.parse(response.tags));
       },
       error: function(error) {
         console.log(error);
@@ -415,14 +922,21 @@
   })
 
   $('.createEntityBtn').click(function() {
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
     $.ajax({
       method: 'POST',
-      url: 'https://forge-api.herokuapp.com/articles/create',
-      data: entityTest,
+      url: 'https://forge-api.herokuapp.com/entities/create',
+      headers: headerData,
+      data: JSON.stringify(entityTest),
+      dataType: 'json',
+      contentType: 'application/json',
       success: function(response) {
         console.log(response);
         console.log(response.obj);
-        // console.log(JSON.parse(response.tags));
+        console.log(JSON.parse(response.tags));
       },
       error: function(error) {
         console.log(error);
@@ -430,19 +944,219 @@
     });
   })
 
-  function loadBackground(bgSquares) {
-    // Draw the squares retrieved from the database
+  $('.createSceneBtn').click(function() {
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
+    $.ajax({
+      method: 'POST',
+      url: 'https://forge-api.herokuapp.com/scenes/create',
+      headers: headerData,
+      data: JSON.stringify(sceneTest),
+      dataType: 'json',
+      contentType: 'application/json',
+      success: function(response) {
+        console.log(response);
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  })
+
+  $('.createMapBtn').click(function() {
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
+    $.ajax({
+      method: 'POST',
+      url: 'https://forge-api.herokuapp.com/maps/create',
+      headers: headerData,
+      data: JSON.stringify(mapTest),
+      dataType: 'json',
+      contentType: 'application/json',
+      success: function(response) {
+        console.log(response);
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  })
+
+  $('.createGameBtn').click(function() {
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
+    $.ajax({
+      method: 'POST',
+      url: 'https://forge-api.herokuapp.com/games/create',
+      headers: headerData,
+      data: JSON.stringify(gameTest),
+      dataType: 'json',
+      contentType: 'application/json',
+      success: function(response) {
+        console.log(response);
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  })
+
+  $('body').off('keyup').on('keyup', function(event) {
+    var keyCode = event.which;
+    if (keyCode === 37) {
+      avatar.action = (avatar.action === 'walkLeft') ? 'stand' : 'walkLeft';
+      avatar.obj.speed.x = (avatar.obj.speed.x === -1 * avatar.obj.speed.mag) ? 0 : -1 * avatar.obj.speed.mag;
+      avatar.obj.speed.y = 0;
+    } else if (keyCode === 38) {
+      avatar.action = (avatar.action === 'walkUp') ? 'stand' : 'walkUp';
+      avatar.obj.speed.x = 0;
+      avatar.obj.speed.y = (avatar.obj.speed.y === -1 * avatar.obj.speed.mag) ? 0 : -1 * avatar.obj.speed.mag;
+    } else if (keyCode === 39) {
+      avatar.action = (avatar.action === 'walkRight') ? 'stand' : 'walkRight';
+      avatar.obj.speed.x = (avatar.obj.speed.x === avatar.obj.speed.mag) ? 0 : avatar.obj.speed.mag;
+      avatar.obj.speed.y = 0;
+    } else if (keyCode === 40) {
+      avatar.action = (avatar.action === 'walkDown') ? 'stand' : 'walkDown';
+      avatar.obj.speed.x = 0;
+      avatar.obj.speed.y = (avatar.obj.speed.y === avatar.obj.speed.mag) ? 0 : avatar.obj.speed.mag;
+    }
+  });
+
+  $('body').off('keypress').on('keypress', function(event) {
+    var keyCode = event.which;
+    if (typing.show && keyCode >= 32 && keyCode <= 220 && !responding.show && $('.active').length === 0) {
+      pause = true;
+      var char = String.fromCharCode(keyCode);
+      typing.phrase += char;
+      $('.typing').text(typing.phrase);
+    } else if (keyCode === 13) {
+      // Enter
+        if (typing.show) { // If the user is finishing typing
+          typing.show = false;
+          $('.typing').hide();
+          var userPhrase = typing.phrase;
+          typing.phrase = '';
+          checkTyping(userPhrase);
+        } else if (responding.show) { // If the user is finished reading a response
+          responding.show = false;
+          $('.dialog').hide();
+        } else if (inventory.show) { // If the user is finished looking at inventory
+          // $('.inventoryContainer').hide();
+          // this.inventory.show = false;
+        }
+        if (!responding.show && !inventory.show && $('.active').length === 0) { // Resume the game if all windows have been closed
+          pause = false;
+        }
+    } else if (keyCode === 32) {
+      // Space
+      if (!typing.show) {
+        typing.phrase = ':';
+        typing.show = true;
+        $('.typing').text(typing.phrase).show();
+      }
+    }
+  });
+
+  function checkTyping(phrase) {
+    if (phrase.includes('look')) {
+      responding.phrase = "This is a description of your current scene. I hope it's helpful.";
+    }
+    $('.dialog').text(responding.phrase).show();
+    responding.show = true;
+    pause = true;
   }
 
+  var currentFrameIndex = 0;
+  function updateAvatar() {
+    avatar.updatePos();
+  }
+
+  function checkAvatarMotion() {
+    if (avatar.action === 'walkLeft') {
+      if (currentFrameIndex > avatar.obj.animate.walkLeft.length - 1) {
+        currentFrameIndex = 0;
+      }
+      avatar.obj.currentFrame = avatar.obj.animate.walkLeft[currentFrameIndex];
+      currentFrameIndex++;
+    } else {
+      // Do nothing, or set frame to a given specific frame.
+      // avatar.obj.currentFrame = avatar.obj.animate.walkLeft[0];
+    }
+  }
+
+  function drawAvatar() {
+    // Save the drawing context
+    gameCtx.save();
+    // Translate the canvas origin to be the top left of the avatar
+    gameCtx.translate(avatar.obj.pos.x, avatar.obj.pos.y);
+    // Draw the squares from the avatar's current frame AND the collision map.
+    avatar.obj.currentFrame.forEach(function(square) {
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    });
+    gameCtx.restore();
+  }
+
+  function drawObjects() {
+    // Save the drawing context
+    gameCtx.save();
+    // Translate the canvas origin to be the top left of the avatar
+    gameCtx.translate(avatar.obj.pos.x, avatar.obj.pos.y);
+    // Draw the squares from the avatar's current frame AND the collision map.
+    avatar.obj.currentFrame.forEach(function(square) {
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    });
+    gameCtx.restore();
+  }
+
+  function drawEntities() {
+    // Save the drawing context
+    gameCtx.save();
+    // Translate the canvas origin to be the top left of the avatar
+    gameCtx.translate(avatar.obj.pos.x, avatar.obj.pos.y);
+    // Draw the squares from the avatar's current frame AND the collision map.
+    avatar.obj.currentFrame.forEach(function(square) {
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    });
+    gameCtx.restore();
+  }
+
+  function drawBackground(bgSquares) {
+    // Draw the squares from the background object.
+    gameCtx.globalCompositeOperation = "destination-over";
+  }
+
+  function clearCanvas() {
+    gameCtx.clearRect(0, 0, gameWidth, gameHeight);
+  }
+
+  function drawGame() {
+    clearCanvas();
+    // Draw avatar if it has been loaded
+    if (avatarLoaded) {
+      updateAvatar();
+      drawAvatar();
+    }
+    if (backgroundLoaded) {
+      drawBackground();
+    }
+    requestAnimationFrame(drawGame);
+  }
+  requestAnimationFrame(drawGame);
+
+  /*
+  // Socket functionality
   var socketId;
   var charInfo;
   var allPlayers = [];
-
-  var gameCanvas = document.getElementById('play-canvas');
-  var gameCtx = gameCanvas.getContext('2d');
-  var gameWidth = 700;
-  var gameHeight = 500;
-
 
   socket.emit('game joined');
 
@@ -562,9 +1276,330 @@
   socket.on('chat message', function(msg){
     $('.chat-messages').append($('<li>').text(msg));
   });
+  */
 });
-;angular.module('questCreator').controller('profileCtrl', function(socket, $state, $scope) {
-  
+;angular.module('questCreator').controller('profileCtrl', function(socket, $state, $scope, UserService) {
+
+  // var gameCanvas = document.getElementById('play-canvas');
+  // var gameCtx = gameCanvas.getContext('2d');
+  // var gameWidth = 500;
+  // var gameHeight = 700;
+  //
+  // function drawAvatar() {
+  //   // Save the drawing context
+  //   gameCtx.save();
+  //   // Translate the canvas origin to be the top left of the avatar
+  //   gameCtx.translate(avatar.pos.x, avatar.pos.y);
+  //   // Draw the squares from the avatar's current frame AND the collision map.
+  //   avatar.currentFrame.forEach(function(square) {
+  //     gameCtx.fillStyle = square.color;
+  //     gameCtx.fillRect(square.x, square.y, square.width, square.height);
+  //   });
+  //   gameCtx.restore();
+  //   gameCtx.fillStyle = "blue";
+  //   gameCtx.fillRect(0,0,100,100);
+  // }
+  //
+    $scope.createGame = function() {
+        $state.go('main.game.editor');
+    };
+
+    $scope.editGame = function (name) {
+        $scope.user.editGame = name;
+        UserService.set($scope.user);
+        $state.go('main.game.editor');
+    };
+
+    setTimeout(function() {
+        $scope.user = UserService.get();
+        // $scope.games = UserService.games();
+
+        $scope.getJoinedDate = function(date) {
+            return new Date(date);
+        };
+        $scope.$apply();
+    }, 1000);
+
+    //This is for testing only
+    $scope.games = [{
+        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+        name: "King's Quest Collection",
+        creator: "billy badass",
+        players: 6,
+        created_at: new Date(),
+        responseText: "something"
+    }, {
+        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+        name: "King's Quest Collection",
+        creator: "billy badass",
+        players: 6,
+        created_at: new Date(),
+        responseText: "something"
+    }, {
+        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+        name: "King's Quest Collection",
+        creator: "billy badass",
+        players: 6,
+        created_at: new Date(),
+        responseText: "something"
+    }, {
+        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+        name: "King's Quest Collection",
+        creator: "billy badass",
+        players: 6,
+        created_at: new Date(),
+        responseText: "something"
+    }, {
+        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+        name: "King's Quest Collection",
+        creator: "billy badass",
+        players: 6,
+        created_at: new Date(),
+        responseText: "something"
+    }];
+
+    $scope.avatarTest = {
+        walkLeft: [
+            // Frame 1 - walk left
+            [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'blue'
+            }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'green'
+            }],
+            // Frame 2 - walk left
+            [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'red'
+            }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'yellow'
+            }]
+        ],
+        walkRight: [
+            // Frame 1 - walk right
+            [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'blue'
+            }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'green'
+            }],
+            // Frame 2 - walk right
+            [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'red'
+            }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'yellow'
+            }]
+        ],
+        walkUp: [
+            // Frame 1 - walk up
+            [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'blue'
+            }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'green'
+            }],
+            // Frame 2 - walk up
+            [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'red'
+            }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'yellow'
+            }]
+        ],
+        walkDown: [
+            // Frame 1 - walk down
+            [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'blue'
+            }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'green'
+            }],
+            // Frame 2 - walk down
+            [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'red'
+            }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'yellow'
+            }]
+        ],
+        swimLeft: [
+            // Frame 1 - swim left
+            [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+            }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+            }],
+            // Frame 2 - swim left
+            [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'gray'
+            }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'gray'
+            }]
+        ],
+        swimRight: [
+            // Frame 1 - swim right
+            [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+            }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+            }],
+            // Frame 2 - swim right
+            [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'gray'
+            }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'gray'
+            }]
+        ],
+        swimUp: [
+            // Frame 1 - swim up
+            [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+            }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+            }],
+            // Frame 2 - swim up
+            [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'gray'
+            }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'gray'
+            }]
+        ],
+        swimDown: [
+            // Frame 1 - swim down
+            [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+            }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+            }],
+            // Frame 2 - swim down
+            [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'gray'
+            }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'gray'
+            }]
+        ]
+    };
 });
 ;angular.module('questCreator').controller('sceneCtrl', function(socket, $state, $scope) {
     var self = this;      // To help with scope issues
@@ -1197,4 +2232,4 @@
       moved = true;
     });
 });
-;
+;;
