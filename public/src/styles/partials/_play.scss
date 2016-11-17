@@ -19,7 +19,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      .typing {
+      .typing, .dialog {
         display: none;
         min-width: 150px;
         z-index: 2;

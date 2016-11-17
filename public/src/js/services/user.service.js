@@ -136,8 +136,9 @@ angular.module('questCreator').service('UserService', function () {
       return $.ajax({
           method: 'GET',
           url: 'https://forge-api.herokuapp.com/games/user-games',
-          data: {
-              id: user.id,
+          headers: {
+            user_id: user.id,
+            token: user.token
           },
           success: function(response) {
             return response;

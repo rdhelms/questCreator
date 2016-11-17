@@ -626,41 +626,47 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, U
 
   $('body').off('keypress').on('keypress', function(event) {
     var keyCode = event.which;
-    if (keyCode >= 33 && keyCode <= 220 && !responding.show && $('.active').length === 0) {
+    if (typing.show && keyCode >= 32 && keyCode <= 220 && !responding.show && $('.active').length === 0) {
       pause = true;
-      typing.show = true;
       var char = String.fromCharCode(keyCode);
       typing.phrase += char;
-      $('.typing').text(typing.phrase).show();
+      $('.typing').text(typing.phrase);
     } else if (keyCode === 13) {
       // Enter
         if (typing.show) { // If the user is finishing typing
           typing.show = false;
           $('.typing').hide();
-          // var userPhrase = this.typing.phrase;
+          var userPhrase = typing.phrase;
           typing.phrase = '';
-          // this.checkTyping(userPhrase);
+          checkTyping(userPhrase);
         } else if (responding.show) { // If the user is finished reading a response
-          // responding.show = false;
-          // $('.dialog').hide();
+          responding.show = false;
+          $('.dialog').hide();
         } else if (inventory.show) { // If the user is finished looking at inventory
           // $('.inventoryContainer').hide();
           // this.inventory.show = false;
         }
-        // if (!this.responding.show && !this.inventory.show && $('.active').length === 0) { // Resume the game if all windows have been closed
-        //   this.pause = false;
-        // }
+        if (!responding.show && !inventory.show && $('.active').length === 0) { // Resume the game if all windows have been closed
+          pause = false;
+        }
     } else if (keyCode === 32) {
       // Space
-      if (typing.phrase.length > 1) {
-        typing.phrase += ' ';
-        $('.typing').text(typing.phrase).show();
-      } else {
+      if (!typing.show) {
         typing.phrase = ':';
+        typing.show = true;
         $('.typing').text(typing.phrase).show();
       }
     }
   });
+
+  function checkTyping(phrase) {
+    if (phrase.includes('look')) {
+      responding.phrase = "This is a description of your current scene. I hope it's helpful.";
+    }
+    $('.dialog').text(responding.phrase).show();
+    responding.show = true;
+    pause = true;
+  }
 
   var currentFrameIndex = 0;
   function updateAvatar() {
