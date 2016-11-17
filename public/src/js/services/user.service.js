@@ -132,7 +132,6 @@ angular.module('questCreator').service('UserService', function () {
           });
     }
 
-
     function getUserGames() {
       if (!user.id) {
         alert('Please Login or Register');
