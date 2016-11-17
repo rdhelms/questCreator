@@ -1003,6 +1003,7 @@
         } else if (responding.show) { // If the user is finished reading a response
           responding.show = false;
           $('.dialog').hide();
+          responding.phrase = '';
         } else if (inventory.show) { // If the user is finished looking at inventory
           // $('.inventoryContainer').hide();
           // this.inventory.show = false;
@@ -1023,6 +1024,8 @@
   function checkTyping(phrase) {
     if (phrase.includes('look')) {
       responding.phrase = "This is a description of your current scene. I hope it's helpful.";
+    } else {
+      responding.phrase = "I don't understand that.";
     }
     $('.dialog').text(responding.phrase).show();
     responding.show = true;
@@ -1036,10 +1039,10 @@
 
   function checkAvatarMotion() {
     if (avatar.action === 'walkLeft' || avatar.action === 'walkUp' || avatar.action === 'walkRight' || avatar.action === 'walkDown') {
-      if (currentFrameIndex > avatar.obj.animate.walkLeft.length - 1) {
+      if (currentFrameIndex > avatar.obj.animate[avatar.action].length - 1) {
         currentFrameIndex = 0;
       }
-      avatar.obj.currentFrame = avatar.obj.animate.walkLeft[currentFrameIndex];
+      avatar.obj.currentFrame = avatar.obj.animate[avatar.action][currentFrameIndex];
       currentFrameIndex++;
     } else {
       // Do nothing, or set frame to a given specific frame.
