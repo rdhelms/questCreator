@@ -54,16 +54,20 @@
       width: 35%;
       height: 100vh;
       background: whitesmoke;
+      overflow: scroll;
       // display: flex;
       // flex-direction: column;
-      overflow: scroll;
       // justify-content: center;
       // align-items: space-around;
 
-      input {
-        // margin: 20px;
-        height: 100px;
+      button {
+        margin: 7px;
+        height: 70px;
         width: 250px;
+        &:hover {
+          background: black;
+          color: whitesmoke;
+        }
       }
 
       ul  {

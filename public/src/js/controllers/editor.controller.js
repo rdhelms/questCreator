@@ -1,4 +1,5 @@
-angular.module('questCreator').controller('editorCtrl', function($state) {
+angular.module('questCreator').controller('editorCtrl', function($scope, $state, EditorService, UserService) {
+
   this.backgroundName = "Testing Background";
   $('.asset').draggable({
     helper: 'clone',
@@ -17,4 +18,23 @@ angular.module('questCreator').controller('editorCtrl', function($state) {
       $(this).append(clone);
     }
   });
+
+  $scope.gameToEdit = UserService.get().editGame;
+
+  $scope.editGame = function () {
+      EditorService.getGame($scope.gameToEdit);
+      $('.edit-game').hide();
+  };
+
+  $scope.createNewGame = function (name) {
+      EditorService.createGame(name);
+      $('.create-game').hide();
+      $scope.gameToEdit = name;
+      UserService.setGameEdit(name);
+  };
+
+  $scope.cancel = function () {
+    $state.go('main.profile');
+  };
+
 });
