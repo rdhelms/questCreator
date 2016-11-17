@@ -90,13 +90,13 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, U
           // Frame 2 - walk right
           [{
             x: 100,
-            y: 100,
+            y: 150,
             width: 30,
             height: 30,
             color: 'red'
           }, {
             x: 150,
-            y: 150,
+            y: 100,
             width: 30,
             height: 30,
             color: 'yellow'
@@ -120,13 +120,13 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, U
           // Frame 2 - walk up
           [{
             x: 100,
-            y: 100,
+            y: 150,
             width: 30,
             height: 30,
             color: 'red'
           }, {
             x: 150,
-            y: 150,
+            y: 100,
             width: 30,
             height: 30,
             color: 'yellow'
@@ -150,13 +150,13 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, U
           // Frame 2 - walk down
           [{
             x: 100,
-            y: 100,
+            y: 150,
             width: 30,
             height: 30,
             color: 'red'
           }, {
             x: 150,
-            y: 150,
+            y: 100,
             width: 30,
             height: 30,
             color: 'yellow'
@@ -674,7 +674,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, U
   }
 
   function checkAvatarMotion() {
-    if (avatar.action === 'walkLeft') {
+    if (avatar.action === 'walkLeft' || avatar.action === 'walkUp' || avatar.action === 'walkRight' || avatar.action === 'walkDown') {
       if (currentFrameIndex > avatar.obj.animate.walkLeft.length - 1) {
         currentFrameIndex = 0;
       }
