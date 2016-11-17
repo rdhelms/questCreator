@@ -9,32 +9,52 @@
             </ul>
         </section>
 
+        <section class="canvas-tools">
+          <p>
+            Canvas Tools:
+          </p>
+        </section>
+
         <section class="avatar-creator">
-            <canvas id="canvas" width="145" height="200"></canvas>
-            <div class="frame-overview">
-              <a ng-repeat="frame in frames" href="#">
-                <canvas id="canvas" width="50" height="70"></canvas>
-              </a>
-            </div>
-            <canvas id="avatar-canvas" width="360" height="500"></canvas>
-            <div class="canvas-tools">
+            <canvas id="animate-preview" width="145" height="200"></canvas>
+            <div>
+                <h1>Avatar Editor:</h1>
+                <div class="frame-overview">
+                    <a ng-repeat="frame in avatarTest" href="#">
+                        <canvas id="canvas" width="50" height="70"></canvas>
+                    </a>
+                </div>
+                <canvas id="avatar-canvas" width="500" height="700"></canvas>
             </div>
         </section>
     </div>
 
     <aside class="games-created">
-        <div ng-if="!games.responseText" class="make-some">
+        <input ng-click="createGame()" type="button" value="Create a New Game">
+        <div ng-if="!games" class="make-some">
             <h1>You Should Totally Make Some Games!</h1>
         </div>
-        <ul ng-if="games.responseText" class="user-games">
-          <li ng-repeat="game in games">
-              <img src="" alt="Game thumbnail"/>
-              <p>Game Name:</p>
-              <p>Created By:</p>
-              <p>Date Created:</p>
-              <p>Total Possible Points</p>
-          </li>
-        </ul>
+        <h1 ng-if="games">You Did This:</h1>
+        <div ng-if="games" class="user-games" ng-repeat="game in games">
+            <img src="{{ game.thumbnail }}" alt="Game thumbnail" />
+            <ul>
+                <li>
+                    <label for="game-name">Game Name:</label>
+                    <a ui-sref="#">{{ game.name }}</li>
+                <li>
+                    <label for="creator">Created By:</label>
+                    <p>{{ game.creator }}</p>
+                </li>
+                <li>
+                    <label for="created">Date Created:</label>
+                    <p>{{ game.created_at }}</p>
+                </li>
+                <li>
+                    <label for="players">Players:</label>
+                    <p>{{ game.players }}</p>
+                </li>
+            </ul>
+        </div>
     </aside>
 
 </div>
