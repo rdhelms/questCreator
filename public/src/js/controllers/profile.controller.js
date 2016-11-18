@@ -21,13 +21,13 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
   // }
   //
     $scope.createGame = function() {
-        $state.go('main.game.editor');
+        $state.go('main.game.editor.views');
     };
 
     $scope.editGame = function (name) {
         $scope.user.editGame = name;
         UserService.set($scope.user);
-        $state.go('main.game.editor');
+        $state.go('main.game.editor.views');
     };
 
     setTimeout(function() {
