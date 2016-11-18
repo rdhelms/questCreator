@@ -1,10 +1,11 @@
-angular.module('questCreator').controller('playCtrl', function(socket, Avatar, UserService, $state, $scope) {
+angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, UserService, $state, $scope) {
   var gameCanvas = document.getElementById('play-canvas');
   var gameCtx = gameCanvas.getContext('2d');
   var gameWidth = 700;
   var gameHeight = 500;
 
   var avatar = null;
+  var background = null;
   var avatarLoaded = false;
   var backgroundLoaded = false;
 
@@ -51,7 +52,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, U
             height: 30,
             color: 'blue'
           }, {
-            x: 150,
+            x: 110,
             y: 150,
             width: 30,
             height: 30,
@@ -59,29 +60,29 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, U
           }],
           // Frame 2 - walk left
           [{
-            x: 100,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'red'
-          }, {
-            x: 150,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'yellow'
-          }]
-        ],
-        walkRight: [
-          // Frame 1 - walk right
-          [{
-            x: 100,
+            x: 110,
             y: 100,
             width: 30,
             height: 30,
             color: 'blue'
           }, {
+            x: 100,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'green'
+          }]
+        ],
+        walkRight: [
+          // Frame 1 - walk right
+          [{
             x: 150,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'blue'
+          }, {
+            x: 140,
             y: 150,
             width: 30,
             height: 30,
@@ -89,23 +90,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, U
           }],
           // Frame 2 - walk right
           [{
-            x: 100,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'red'
-          }, {
-            x: 150,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'yellow'
-          }]
-        ],
-        walkUp: [
-          // Frame 1 - walk up
-          [{
-            x: 100,
+            x: 140,
             y: 100,
             width: 30,
             height: 30,
@@ -116,17 +101,33 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, U
             width: 30,
             height: 30,
             color: 'green'
-          }],
-          // Frame 2 - walk up
+          }]
+        ],
+        walkUp: [
+          // Frame 1 - walk up
           [{
             x: 100,
-            y: 150,
+            y: 110,
             width: 30,
             height: 30,
             color: 'red'
           }, {
             x: 150,
             y: 100,
+            width: 30,
+            height: 30,
+            color: 'yellow'
+          }],
+          // Frame 2 - walk up
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'red'
+          }, {
+            x: 150,
+            y: 110,
             width: 30,
             height: 30,
             color: 'yellow'
@@ -136,16 +137,16 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, U
           // Frame 1 - walk down
           [{
             x: 100,
-            y: 100,
+            y: 140,
             width: 30,
             height: 30,
-            color: 'blue'
+            color: 'red'
           }, {
             x: 150,
             y: 150,
             width: 30,
             height: 30,
-            color: 'green'
+            color: 'yellow'
           }],
           // Frame 2 - walk down
           [{
@@ -156,7 +157,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, U
             color: 'red'
           }, {
             x: 150,
-            y: 100,
+            y: 140,
             width: 30,
             height: 30,
             color: 'yellow'
@@ -290,13 +291,13 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, U
           x: 100,
           y: 180,
           width: 80,
-          height: 30,
+          height: 10,
           color: 'gray'
         }, {
           x: 100,
-          y: 210,
+          y: 185,
           width: 80,
-          height: 30,
+          height: 10,
           color: 'gray'
         }
       ]
@@ -306,26 +307,33 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, U
 
   // Testing creation of background
   var backgroundTest = {
-    name: 'Background Another Test',
+    name: 'Beige Background',
     obj: {
-      canvasElems: [{
-        x: 100,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'blue'
+      image: [{
+        x: 0,
+        y: 0,
+        width: gameWidth,
+        height: gameHeight,
+        color: 'beige'
+      }, {
+        x: 150,
+        y: 150,
+        width: 50,
+        height: 50,
+        color: 'yellow'
       }],
       collisionMap: [{
-        x: 300,
-        y: 300,
-        width: 30,
-        height: 30,
-        color: 'red'
+        type: 'wall',
+        x: 150,
+        y: 200,
+        width: 50,
+        height: 20,
+        color: 'gray'
       }]
     },
     game_id: 1,
-    tags: ['Testing Stuff', 'Fun games'],
-    public: false
+    tags: ['Testing Stuff', 'Plain beige'],
+    public: true
   };
 
   // Testing creation of object
@@ -446,7 +454,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, U
     tags: ['The best game', 'fun stuff', "Everybody's favorite"]
   };
 
-  $('.createAvatarBtn').click(function() {
+  $('.createAvatarBgBtn').click(function() {
     var headerData = {
       user_id: UserService.get().id,
       token: UserService.get().token
@@ -459,23 +467,15 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, U
       dataType: 'json',
       contentType: 'application/json',
       success: function(response) {
-        console.log(response);
         avatar = new Avatar(response);
         avatar.obj.currentFrame = avatar.obj.animate.walkLeft[0];
         avatarLoaded = true;
-        setInterval(checkAvatarMotion, 75);
+        setInterval(checkAvatarAction, 75);
       },
       error: function(error) {
         console.log(error);
       }
     });
-  });
-
-  $('.createBackgroundBtn').click(function() {
-    var headerData = {
-      user_id: UserService.get().id,
-      token: UserService.get().token
-    };
     $.ajax({
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/backgrounds/create',
@@ -484,9 +484,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, U
       dataType: 'json',
       contentType: 'application/json',
       success: function(response) {
-        console.log(response);
-        console.log(response.obj);
-        console.log(JSON.parse(response.tags));
+        background = new Background(response);
+        backgroundLoaded = true;
       },
       error: function(error) {
         console.log(error);
@@ -653,7 +652,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, U
     } else if (keyCode === 32) {
       // Space
       if (!typing.show) {
-        typing.phrase = ':';
+        typing.phrase = '>';
         typing.show = true;
         $('.typing').text(typing.phrase).show();
       }
@@ -671,12 +670,58 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, U
     pause = true;
   }
 
+  function checkCollisions() {
+    var collision = {
+      found: false,
+      direction: 'none',
+      type: 'none'
+    };
+    avatar.obj.collisionMap.forEach(function(avatarSquare) {  // Loop through all the avatar squares
+      var avatarLeft = avatarSquare.x + avatar.obj.pos.x;
+      var avatarRight = avatarSquare.x + avatarSquare.width + avatar.obj.pos.x;
+      var avatarTop = avatarSquare.y + avatar.obj.pos.y;
+      var avatarBottom = avatarSquare.y + avatarSquare.height + avatar.obj.pos.y;
+      background.obj.collisionMap.forEach(function(bgSquare) {  // Loop through all the background squares
+        var bgLeft = bgSquare.x;
+        var bgRight = bgSquare.x + bgSquare.width;
+        var bgTop = bgSquare.y;
+        var bgBottom = bgSquare.y + bgSquare.height;
+        // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current bg square (in those exact orders).
+        if (avatarLeft <= bgRight && avatarRight >= bgLeft && avatarTop <= bgBottom && avatarBottom >= bgTop) {
+          collision.found = true;
+          collision.type = 'wall';
+          if (avatar.obj.speed.x > 0) {
+            collision.direction = 'right';
+          } else if (avatar.obj.speed.x < 0) {
+            collision.direction = 'left';
+          } else if (avatar.obj.speed.y < 0) {
+            collision.direction = 'up';
+          } else if (avatar.obj.speed.y > 0) {
+            collision.direction = 'down';
+          }
+        }
+      });
+    });
+    if (collision.found) {
+      switch (collision.type) {
+        case 'wall':
+          avatar.collide(collision.direction);
+          break;
+      }
+      collision = {
+        found: false,
+        direction: 'none',
+        type: 'none'
+      };
+    }
+  }
+
   var currentFrameIndex = 0;
   function updateAvatar() {
     avatar.updatePos();
   }
 
-  function checkAvatarMotion() {
+  function checkAvatarAction() {
     if (avatar.action === 'walkLeft' || avatar.action === 'walkUp' || avatar.action === 'walkRight' || avatar.action === 'walkDown') {
       if (currentFrameIndex > avatar.obj.animate[avatar.action].length - 1) {
         currentFrameIndex = 0;
@@ -694,8 +739,33 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, U
     gameCtx.save();
     // Translate the canvas origin to be the top left of the avatar
     gameCtx.translate(avatar.obj.pos.x, avatar.obj.pos.y);
-    // Draw the squares from the avatar's current frame AND the collision map.
+    // Draw the squares from the avatar's current frame
     avatar.obj.currentFrame.forEach(function(square) {
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    });
+    gameCtx.globalAlpha = 0.2;
+    // Draw the avatar's collision map (purely for testing)
+    avatar.obj.collisionMap.forEach(function(square) {
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    });
+    gameCtx.restore();
+  }
+
+  function drawBackground() {
+    // Save the drawing context
+    gameCtx.save();
+    // Draw the squares from the background object.
+    gameCtx.globalCompositeOperation = "destination-over";
+    background.obj.image.reverse().forEach(function(square) {
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    });
+    gameCtx.globalCompositeOperation = "source-over";
+    gameCtx.globalAlpha = 0.2;
+    // Draw the background's collision map (purely for testing)
+    background.obj.collisionMap.forEach(function(square) {
       gameCtx.fillStyle = square.color;
       gameCtx.fillRect(square.x, square.y, square.width, square.height);
     });
@@ -728,28 +798,22 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, U
     gameCtx.restore();
   }
 
-  function drawBackground(bgSquares) {
-    // Draw the squares from the background object.
-    gameCtx.globalCompositeOperation = "destination-over";
-  }
-
   function clearCanvas() {
     gameCtx.clearRect(0, 0, gameWidth, gameHeight);
   }
 
-  function drawGame() {
+  function runGame() {
     clearCanvas();
     // Draw avatar if it has been loaded
-    if (avatarLoaded) {
+    if (avatarLoaded && backgroundLoaded) {
+      checkCollisions();
       updateAvatar();
       drawAvatar();
-    }
-    if (backgroundLoaded) {
       drawBackground();
     }
-    requestAnimationFrame(drawGame);
+    requestAnimationFrame(runGame);
   }
-  requestAnimationFrame(drawGame);
+  requestAnimationFrame(runGame);
 
   /*
   // Socket functionality
