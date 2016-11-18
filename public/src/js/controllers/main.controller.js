@@ -1,4 +1,4 @@
-angular.module('questCreator').controller('mainCtrl', function(socket, $state, UserService) {
+angular.module('questCreator').controller('mainCtrl', function(socket, $state, $scope, UserService) {
 
     //When the user clicks "Home" on the nav bar view is changed to landing
     this.goHome = function () {
@@ -14,13 +14,24 @@ angular.module('questCreator').controller('mainCtrl', function(socket, $state, U
     };
 
     // When the user clicks the sign in button, prompt them to sign in to their google account.
-    this.signIn = function() {
+    $scope.signIn = function() {
         UserService.signIn();
     };
 
     // When the user clicks the sign out button, sign them out of their google account
     this.signOut = function() {
         UserService.signOut();
+        var user = {
+                uid: null,
+                token: null,
+                username: null,
+                picture: null,
+                id: null,
+                games: null,
+                joined: null,
+                editGame: null
+        };
+        UserService.set(user);
         $state.go('main.landing');
     };
 
