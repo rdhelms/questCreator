@@ -18,18 +18,14 @@
     <!-- SCENE EDITOR -->
     <section id="scene-editor">
         <ul class="tab-nav">
-            <li class="tab active" ng-class="{'active': toggle}" ng-click="toggle=!toggle"><a ui-sref="main.game.editor.map">Map</a></li>
-            <li class="tab" ng-class="{'active': !toggle}" ng-click="toggle=!toggle"><a ui-sref="main.game.editor.scene">Scene</a></li>
+            <li class="tab active" ng-class="{'active': toggle}" ng-click="toggle=!toggle"><a ng-click="editor.currentLargeView = 'maps'">Map</a></li>
+            <li class="tab" ng-class="{'active': !toggle}" ng-click="toggle=!toggle"><a ng-click="editor.currentLargeView = 'scenes'">Scene</a></li>
+            <li class="tab" ng-class="{'active': !toggle}" ng-click="toggle=!toggle"><a ng-click="editor.currentLargeView = 'backgrounds'">Backgrounds</a></li>
         </ul>
         <section class="editor-contents" id="scene">
-            <div class="edit-canvas"><canvas id="bg-canvas" height="500" width="700"></canvas></div>
-            <ui-view></ui-view>
-            <ul class="editor-controls">
-                <li><button id="clear">Clear</button></li>
-                <li><button id="save">Save {{editor.backgroundName}}</button></li>
-                <li><button id="undo">Undo</button></li>
-                <li><button id="redo">Redo</button></li>
-            </ul>
+            <ui-view ng-show="editor.currentLargeView === 'maps'" name="maps"></ui-view>
+            <ui-view ng-show="editor.currentLargeView === 'scenes'" name="scenes"></ui-view>
+            <ui-view ng-show="editor.currentLargeView === 'backgrounds'" name="backgrounds"></ui-view>
         </section>
         <section id="palette">
             <h4>Palette</h4>
@@ -99,7 +95,9 @@
         </ul>
         <section class="editor-contents" id="asset">
             <div class="edit-canvas"><canvas height="200" width="200"></canvas></div>
-            <ui-view></ui-view>
+            <ui-view name="objects"></ui-view>
+            <ui-view name="entities"></ui-view>
+            <ui-view name="scripts"></ui-view>
             <ul class="editor-controls">
                 <li><button id="clear">Clear</button></li>
                 <li><button id="save">Save <code ng-non-bindable>{{canvas}}</code></button></li>

@@ -514,7 +514,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
         color: 'red'
       }]
     },
-    tags: ['The best game', 'fun stuff', "Everybody's favorite"]
+    tags: ['The best game', 'fun stuff', "Everybody's favorite"],
+    public: false,
   };
 
   $('.createAvatarBgObjBtn').click(function() {

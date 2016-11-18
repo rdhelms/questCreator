@@ -1,5 +1,8 @@
 angular.module('questCreator').controller('editorCtrl', function($scope, $state, EditorService, UserService) {
 
+  this.currentLargeView = 'maps';
+  this.currentSmallView = 'objects';
+
   this.backgroundName = "Testing Background";
   $('.asset').draggable({
     helper: 'clone',
