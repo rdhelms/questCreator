@@ -1,27 +1,71 @@
 #landing-container {
-  display: flex;
-  justify-content: space-between;
-  #create-splash {
-    margin: 2rem;
+    display: flex;
+    justify-content: space-between;
+    height: 100vh;
 
-    button {
-      font-size: 3em;
+    #game-results {
+        margin: 2rem;
+        width: 60%;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        overflow-y: scroll;
+
+        .game {
+          margin: 15px;
+          width: 300px;
+          height: 250px;
+
+          img {
+            width: 300px;
+            height: 200px;
+          }
+
+          ul {
+            display: flex;
+            font-size: .75em;
+          }
+        }
     }
-  }
 
-}
+    #create-splash {
+        margin: 2rem;
+        width: 40%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
 
-#results-container {
-  margin: 2rem;
-  width: 40rem;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
+        h1 {
+          font-size: 3em;
+          color: pink;
+          -webkit-text-stroke: 2px red;
+          font-style: italic;
+        }
 
-  .game-result {
-    margin: 2rem;
-    width: 7rem;
-    height: 5rem;
-    background: whitesmoke;
-  }
+        button {
+            font-size: 1.8em;
+            height: 2em;
+        }
+
+        .assets-results {
+          display: flex;
+          justify-content: space-around;
+          align-content: space-around;
+          flex-wrap: wrap;
+          width: 100%;
+          overflow-y: scroll;
+
+          .asset {
+            border: black 2px solid;
+            width: 132px;
+            height: 200px;
+            margin: 10px 0;
+
+            .asset-canvas {
+              background-color: pink;
+            }
+          }
+        }
+    }
 }
