@@ -7,6 +7,27 @@
   top: 0;
 }
 
+@mixin checkerboard($unscaled-size, $opacity:1) {
+  // Cribbed from Lea Verou's design at http://lea.verou.me/2011/02/checkerboard-pattern-with-css3/
+  $size: $unscaled-size*2;
+      background-image:
+      -moz-linear-gradient(45deg, rgba(0, 0, 0, $opacity) 25%, transparent 25%),
+      -moz-linear-gradient(-45deg, rgba(0, 0, 0, $opacity) 25%, transparent 25%),
+      -moz-linear-gradient(45deg, transparent 75%, #000 75%),
+      -moz-linear-gradient(-45deg, transparent 75%, #000 75%);
+    background-image:
+      -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, rgba(0, 0, 0, $opacity)), color-stop(.25, transparent)),
+      -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, rgba(0, 0, 0, $opacity)), color-stop(.25, transparent)),
+      -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.75, transparent), color-stop(.75, rgba(0, 0, 0, $opacity))),
+      -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.75, transparent), color-stop(.75, rgba(0, 0, 0, $opacity)));
+
+    -moz-background-size:$size $size;
+    background-size:$size $size;
+    -webkit-background-size:$size $size; /* override value for webkit */
+
+    background-position:0 0, $size/2 0, $size/2 -#{$size/2}, 0px $size/2;
+}
+
 @mixin scrollbar($size, $primary, $secondary: lighten($primary, 25%)) {
   &::-webkit-scrollbar {
     width:  $size;
