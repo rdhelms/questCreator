@@ -33,6 +33,7 @@ module.exports = function(grunt) {
                     './public/lib/js/app.js': [
                       './public/src/js/app.js',
                       './public/src/js/factories/*.js',
+                      './public/src/js/directives/*.js',
                       './public/src/js/services/*.js',
                       './public/src/js/controllers/*.js'
                     ],
