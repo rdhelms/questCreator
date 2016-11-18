@@ -1,4 +1,4 @@
-angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, UserService, $state, $scope) {
+angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, $state, $scope) {
   var gameCanvas = document.getElementById('play-canvas');
   var gameCtx = gameCanvas.getContext('2d');
   var gameWidth = 700;
@@ -7,9 +7,12 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
   var avatar = null;
   var background = null;
   var sceneObject = null;
+  var entity = null;
+
   var avatarLoaded = false;
   var backgroundLoaded = false;
   var sceneObjectLoaded = false;
+  var entityLoaded = false;
 
   var typing = {
     show: false,
@@ -425,22 +428,312 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
   // Testing creation of entity
   var entityTest = {
-    name: 'Entity Test',
+    name: 'AI Entity Test',
     obj: {
-      canvasElems: [{
-        x: 100,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'blue'
-      }],
-      collisionMap: [{
-        x: 300,
-        y: 300,
-        width: 30,
-        height: 30,
-        color: 'red'
-      }]
+      // The x and y coordinate of the top left corner of the avatar
+      pos: {
+        x: 50,
+        y: 220
+      },
+      // The character's speed
+      speed: {
+        mag: 3,
+        x: 0,
+        y: 0
+      },
+      // The animate object contains all the possible character actions with all of the frames to be drawn for each action.
+      animate: {
+        // Key: possible action, Value: array of frames
+        stand: [
+          // Each frame array element is an array of square objects to be drawn
+          // Frame 1 - walk left
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'orange'
+          }, {
+            x: 150,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'purple'
+          }],
+          // Frame 2 - walk left
+          [{
+            x: 110,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'orange'
+          }, {
+            x: 140,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'purple'
+          }]
+        ],
+        walkLeft: [
+          // Each frame array element is an array of square objects to be drawn
+          // Frame 1 - walk left
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'purple'
+          }, {
+            x: 110,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'orange'
+          }],
+          // Frame 2 - walk left
+          [{
+            x: 110,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'purple'
+          }, {
+            x: 100,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'orange'
+          }]
+        ],
+        walkRight: [
+          // Frame 1 - walk right
+          [{
+            x: 150,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'purple'
+          }, {
+            x: 140,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'orange'
+          }],
+          // Frame 2 - walk right
+          [{
+            x: 140,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'purple'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'orange'
+          }]
+        ],
+        walkUp: [
+          // Frame 1 - walk up
+          [{
+            x: 100,
+            y: 110,
+            width: 30,
+            height: 30,
+            color: 'purple'
+          }, {
+            x: 150,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'orange'
+          }],
+          // Frame 2 - walk up
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'purple'
+          }, {
+            x: 150,
+            y: 110,
+            width: 30,
+            height: 30,
+            color: 'orange'
+          }]
+        ],
+        walkDown: [
+          // Frame 1 - walk down
+          [{
+            x: 100,
+            y: 140,
+            width: 30,
+            height: 30,
+            color: 'purple'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'orange'
+          }],
+          // Frame 2 - walk down
+          [{
+            x: 100,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'purple'
+          }, {
+            x: 150,
+            y: 140,
+            width: 30,
+            height: 30,
+            color: 'orange'
+          }]
+        ],
+        swimLeft: [
+          // Frame 1 - swim left
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }],
+          // Frame 2 - swim left
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }]
+        ],
+        swimRight: [
+          // Frame 1 - swim right
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }],
+          // Frame 2 - swim right
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }]
+        ],
+        swimUp: [
+          // Frame 1 - swim up
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }],
+          // Frame 2 - swim up
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }]
+        ],
+        swimDown: [
+          // Frame 1 - swim down
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }],
+          // Frame 2 - swim down
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }]
+        ]
+        // Other actions could go here
+      },
+      // The collision map is how the game can know whether the character has collided with another object or event trigger. It is an array of invisible (or gray for now) squares.
+      collisionMap: [
+        {
+          x: 100,
+          y: 180,
+          width: 80,
+          height: 10,
+          color: 'gray'
+        }, {
+          x: 100,
+          y: 185,
+          width: 80,
+          height: 10,
+          color: 'gray'
+        }
+      ]
     },
     game_id: 1,
     tags: ['Entity thing', 'Awesome entity ftw'],
@@ -449,24 +742,9 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
   // Testing creation of scene
   var sceneTest = {
-    name: 'Scene Test 2',
+    name: 'Scene Test 3',
     description: 'This is the opening scene for my game.',
-    obj: {
-        canvasElems: [{
-          x: 100,
-          y: 100,
-          width: 30,
-          height: 30,
-          color: 'blue'
-        }],
-        collisionMap: [{
-          x: 300,
-          y: 300,
-          width: 30,
-          height: 30,
-          color: 'red'
-        }]
-    },
+    obj: {},
     game_id: 1,
     map_id: 1
   };
@@ -518,7 +796,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     public: false,
   };
 
-  $('.createAvatarBgObjBtn').click(function() {
+  $('.createAvatarBgObjEntityBtn').click(function() {
     var headerData = {
       user_id: UserService.get().id,
       token: UserService.get().token
@@ -574,13 +852,6 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
         console.log(error);
       }
     });
-  });
-
-  $('.createEntityBtn').click(function() {
-    var headerData = {
-      user_id: UserService.get().id,
-      token: UserService.get().token
-    };
     $.ajax({
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/entities/create',
@@ -589,15 +860,17 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       dataType: 'json',
       contentType: 'application/json',
       success: function(response) {
-        console.log(response);
-        console.log(response.obj);
-        console.log(JSON.parse(response.tags));
+        entity = new Entity(response);
+        console.log(entity);
+        entity.obj.currentFrame = entity.obj.animate[entity.action][0];
+        entityLoaded = true;
+        setInterval(checkEntityAction, 75);
       },
       error: function(error) {
         console.log(error);
       }
     });
-  })
+  });
 
   $('.createSceneBtn').click(function() {
     var headerData = {
@@ -730,7 +1003,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     pause = true;
   }
 
-  function checkCollisions() {
+  function checkAvatarCollisions() {
     var collision = {
       found: false,
       direction: 'none',
@@ -781,7 +1054,28 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
           }
         }
       });
+      entity.obj.collisionMap.forEach(function(entitySquare) {  // Loop through all the scene object's squares
+        var entityLeft = entitySquare.x + entity.obj.pos.x;
+        var entityRight = entitySquare.x + entitySquare.width + entity.obj.pos.x;
+        var entityTop = entitySquare.y + entity.obj.pos.y;
+        var entityBottom = entitySquare.y + entitySquare.height + entity.obj.pos.y;
+        // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current scene object square (in those exact orders).
+        if (avatarLeft <= entityRight && avatarRight >= entityLeft && avatarTop <= entityBottom && avatarBottom >= entityTop) {
+          collision.found = true;
+          collision.type = 'wall';
+          if (avatar.obj.speed.x > 0) {
+            collision.direction = 'right';
+          } else if (avatar.obj.speed.x < 0) {
+            collision.direction = 'left';
+          } else if (avatar.obj.speed.y < 0) {
+            collision.direction = 'up';
+          } else if (avatar.obj.speed.y > 0) {
+            collision.direction = 'down';
+          }
+        }
+      });
     });
+
     if (collision.found) {
       switch (collision.type) {
         case 'wall':
@@ -796,10 +1090,102 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     }
   }
 
+  function checkEntityCollisions() {
+    var collision = {
+      found: false,
+      direction: 'none',
+      type: 'none'
+    };
+    entity.obj.collisionMap.forEach(function(entitySquare) {  // Loop through all the entity squares
+      var entityLeft = entitySquare.x + entity.obj.pos.x;
+      var entityRight = entitySquare.x + entitySquare.width + entity.obj.pos.x;
+      var entityTop = entitySquare.y + entity.obj.pos.y;
+      var entityBottom = entitySquare.y + entitySquare.height + entity.obj.pos.y;
+      background.obj.collisionMap.forEach(function(bgSquare) {  // Loop through all the background's squares
+        var bgLeft = bgSquare.x;
+        var bgRight = bgSquare.x + bgSquare.width;
+        var bgTop = bgSquare.y;
+        var bgBottom = bgSquare.y + bgSquare.height;
+        // Pattern: check the left, right, top, and bottom edges of the current entity square against the right, left, bottom, and top edges of the current bg square (in those exact orders).
+        if (entityLeft <= bgRight && entityRight >= bgLeft && entityTop <= bgBottom && entityBottom >= bgTop) {
+          collision.found = true;
+          collision.type = 'wall';
+          if (entity.obj.speed.x > 0) {
+            collision.direction = 'right';
+          } else if (entity.obj.speed.x < 0) {
+            collision.direction = 'left';
+          } else if (entity.obj.speed.y < 0) {
+            collision.direction = 'up';
+          } else if (entity.obj.speed.y > 0) {
+            collision.direction = 'down';
+          }
+        }
+      });
+      sceneObject.obj.collisionMap.forEach(function(objSquare) {  // Loop through all the scene object's squares
+        var objLeft = objSquare.x + sceneObject.obj.pos.x;
+        var objRight = objSquare.x + objSquare.width + sceneObject.obj.pos.x;
+        var objTop = objSquare.y + sceneObject.obj.pos.y;
+        var objBottom = objSquare.y + objSquare.height + sceneObject.obj.pos.y;
+        // Pattern: check the left, right, top, and bottom edges of the current entity square against the right, left, bottom, and top edges of the current scene object square (in those exact orders).
+        if (entityLeft <= objRight && entityRight >= objLeft && entityTop <= objBottom && entityBottom >= objTop) {
+          collision.found = true;
+          collision.type = 'wall';
+          if (entity.obj.speed.x > 0) {
+            collision.direction = 'right';
+          } else if (entity.obj.speed.x < 0) {
+            collision.direction = 'left';
+          } else if (entity.obj.speed.y < 0) {
+            collision.direction = 'up';
+          } else if (entity.obj.speed.y > 0) {
+            collision.direction = 'down';
+          }
+        }
+      });
+      avatar.obj.collisionMap.forEach(function(avatarSquare) {  // Loop through all the scene object's squares
+        var avatarLeft = avatarSquare.x + avatar.obj.pos.x;
+        var avatarRight = avatarSquare.x + avatarSquare.width + avatar.obj.pos.x;
+        var avatarTop = avatarSquare.y + avatar.obj.pos.y;
+        var avatarBottom = avatarSquare.y + avatarSquare.height + avatar.obj.pos.y;
+        // Pattern: check the left, right, top, and bottom edges of the current entity square against the right, left, bottom, and top edges of the current scene object square (in those exact orders).
+        if (entityLeft <= avatarRight && entityRight >= avatarLeft && entityTop <= avatarBottom && entityBottom >= avatarTop) {
+          collision.found = true;
+          collision.type = 'wall';
+          if (entity.obj.speed.x > 0) {
+            collision.direction = 'right';
+          } else if (entity.obj.speed.x < 0) {
+            collision.direction = 'left';
+          } else if (entity.obj.speed.y < 0) {
+            collision.direction = 'up';
+          } else if (entity.obj.speed.y > 0) {
+            collision.direction = 'down';
+          }
+        }
+      });
+    });
+
+    if (collision.found) {
+      switch (collision.type) {
+        case 'wall':
+          entity.collide(collision.direction);
+          break;
+      }
+      collision = {
+        found: false,
+        direction: 'none',
+        type: 'none'
+      };
+    }
+  }
+
   function updateAvatar() {
     avatar.updatePos();
   }
 
+  function updateEntity() {
+    entity.updatePos();
+  }
+
+  // NOTE: these frame index variables should probably belong to the individual avatar, object, or entity in the factory
   var currentAvatarFrameIndex = 0;
   function checkAvatarAction() {
     if (avatar.action === 'walkLeft' || avatar.action === 'walkUp' || avatar.action === 'walkRight' || avatar.action === 'walkDown') {
@@ -822,6 +1208,36 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     }
     sceneObject.obj.currentFrame = sceneObject.obj.animate[sceneObject.allActions[0]][currentSceneObjFrameIndex];
     currentSceneObjFrameIndex++;
+  }
+
+  var currentEntityFrameIndex = 0;
+  function checkEntityAction() {
+    if (entity.action === 'stand' || entity.action === 'walkLeft' || entity.action === 'walkUp' || entity.action === 'walkRight' || entity.action === 'walkDown') {
+      switch (entity.action) {
+        case 'walkLeft':
+          entity.obj.speed.x = -1;
+          entity.obj.speed.y = 0;
+          break;
+        case 'walkUp':
+          entity.obj.speed.x = 0;
+          entity.obj.speed.y = -1;
+          break;
+        case 'walkRight':
+          entity.obj.speed.x = 1;
+          entity.obj.speed.y = 0;
+          break;
+        case 'walkDown':
+          entity.obj.speed.x = 0;
+          entity.obj.speed.y = 1;
+          break;
+      }
+      // Animate the entity.
+      if (currentEntityFrameIndex > entity.obj.animate[entity.action].length - 1) {
+        currentEntityFrameIndex = 0;
+      }
+      entity.obj.currentFrame = entity.obj.animate[entity.action][currentEntityFrameIndex];
+      currentEntityFrameIndex++;
+    }
   }
 
   function drawAvatar() {
@@ -887,10 +1303,18 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
   function drawEntities() {
     // Save the drawing context
     gameCtx.save();
-    // Translate the canvas origin to be the top left of the avatar
-    gameCtx.translate(avatar.obj.pos.x, avatar.obj.pos.y);
-    // Draw the squares from the avatar's current frame AND the collision map.
-    avatar.obj.currentFrame.forEach(function(square) {
+    // Translate the canvas origin to be the top left of the entity
+    gameCtx.translate(entity.obj.pos.x, entity.obj.pos.y);
+    // Draw the squares from the entity's current frame
+    gameCtx.globalCompositeOperation = "destination-over";  // If object is behind character.
+    // gameCtx.globalCompositeOperation = "source-over";    // If object is in front of character.
+    entity.obj.currentFrame.forEach(function(square) {
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    });
+    gameCtx.globalAlpha = 0.2;
+    // Draw the entity's collision map (purely for testing)
+    entity.obj.collisionMap.forEach(function(square) {
       gameCtx.fillStyle = square.color;
       gameCtx.fillRect(square.x, square.y, square.width, square.height);
     });
@@ -901,13 +1325,32 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     gameCtx.clearRect(0, 0, gameWidth, gameHeight);
   }
 
+  var initialized = false;
   function runGame() {
     clearCanvas();
     // Draw avatar if it has been loaded
-    if (avatarLoaded && backgroundLoaded && sceneObjectLoaded) {
-      checkCollisions();
+    if (avatarLoaded && backgroundLoaded && sceneObjectLoaded && entityLoaded && !initialized) {
+      sceneTest.obj = {
+        avatar: avatar,
+        background: background,
+        objects: [sceneObject],
+        entities: [entity]
+      };
+      avatar = sceneTest.obj.avatar;
+      background = sceneTest.obj.background;
+      sceneObject = sceneTest.obj.objects[0];
+      entity = sceneTest.obj.entities[0];
+      initialized = true;
+      console.log(sceneTest);
+      console.log(JSON.stringify(sceneTest.obj));
+    }
+    if (initialized) {
+      checkAvatarCollisions();
+      checkEntityCollisions();
       updateAvatar();
+      updateEntity();
       drawAvatar();
+      drawEntities();
       drawObjects();
       drawBackground();
     }
