@@ -7,7 +7,7 @@ header {
   width: 100%;
 }
 
-#navigation {
+.nav {
   width: 100%;
   display: flex;
   justify-content: flex-end;
@@ -16,7 +16,7 @@ header {
   border-bottom: 4px solid black;
 }
 
-#navigation ul {
+.nav ul {
   height: 1.5rem;
   align-items: center;
   display: flex;
