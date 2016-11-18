@@ -1,4 +1,4 @@
-angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, UserService, $state, $scope) {
+angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, UserService, $state, $scope) {
   var gameCanvas = document.getElementById('play-canvas');
   var gameCtx = gameCanvas.getContext('2d');
   var gameWidth = 700;
@@ -6,8 +6,10 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
   var avatar = null;
   var background = null;
+  var sceneObject = null;
   var avatarLoaded = false;
   var backgroundLoaded = false;
+  var sceneObjectLoaded = false;
 
   var typing = {
     show: false,
@@ -337,23 +339,84 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
   };
 
   // Testing creation of object
-  var objectTest = {
+  var sceneObjectTest = {
     name: 'Object Test',
     obj: {
-      canvasElems: [{
-        x: 100,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'blue'
-      }],
-      collisionMap: [{
-        x: 300,
-        y: 300,
-        width: 30,
-        height: 30,
-        color: 'red'
-      }]
+      // The x and y coordinate of the top left corner of the object
+      pos: {
+        x: 400,
+        y: 300
+      },
+      // The animate object contains all the possible object actions with all of the frames to be drawn for each action.
+      animate: {
+        // Key: possible action, Value: array of frames
+        wave: [
+          // Each frame array element is an array of square objects to be drawn
+          // Frame 1 - wave
+          [{
+            x: 0,
+            y: 0,
+            width: 10,
+            height: 100,
+            color: 'brown'
+          }, {
+            x: 0,
+            y: 0,
+            width: 50,
+            height: 10,
+            color: 'red'
+          }, {
+            x: 50,
+            y: 10,
+            width: 50,
+            height: 10,
+            color: 'red'
+          }],
+          // Frame 2 - wave
+          [{
+            x: 0,
+            y: 0,
+            width: 10,
+            height: 100,
+            color: 'brown'
+          }, {
+            x: 0,
+            y: 10,
+            width: 50,
+            height: 10,
+            color: 'red'
+          }, {
+            x: 50,
+            y: 0,
+            width: 50,
+            height: 10,
+            color: 'red'
+          }]
+        ],
+        // Other actions could go here
+      },
+      // The collision map is how the game can know whether the character has collided with another object or event trigger. It is an array of invisible (or gray for now) squares.
+      collisionMap: [
+        {
+          x: -10,
+          y: 100,
+          width: 10,
+          height: 10,
+          color: 'gray'
+        }, {
+          x: 0,
+          y: 100,
+          width: 10,
+          height: 10,
+          color: 'gray'
+        }, {
+          x: 0,
+          y: 100,
+          width: 10,
+          height: 10,
+          color: 'gray'
+        }
+      ]
     },
     game_id: 1,
     tags: ['Object thing', 'Really fun new object'],
@@ -454,7 +517,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     tags: ['The best game', 'fun stuff', "Everybody's favorite"]
   };
 
-  $('.createAvatarBgBtn').click(function() {
+  $('.createAvatarBgObjBtn').click(function() {
     var headerData = {
       user_id: UserService.get().id,
       token: UserService.get().token
@@ -491,30 +554,26 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
         console.log(error);
       }
     });
-  });
-
-  $('.createObjectBtn').click(function() {
-    var headerData = {
-      user_id: UserService.get().id,
-      token: UserService.get().token
-    };
     $.ajax({
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/obstacles/create',
       headers: headerData,
-      data: JSON.stringify(objectTest),
+      data: JSON.stringify(sceneObjectTest),
       dataType: 'json',
       contentType: 'application/json',
       success: function(response) {
-        console.log(response);
-        console.log(response.obj);
-        console.log(JSON.parse(response.tags));
+        sceneObject = new SceneObject(response);
+        sceneObject.allActions = Object.keys(sceneObject.obj.animate);
+        sceneObject.action = sceneObject.allActions[0]; // The first action
+        sceneObject.obj.currentFrame = sceneObject.obj.animate[sceneObject.action][0]; // The first frame of the first action, whatever it is.
+        sceneObjectLoaded = true;
+        setInterval(checkSceneObjectAction, 75);
       },
       error: function(error) {
         console.log(error);
       }
     });
-  })
+  });
 
   $('.createEntityBtn').click(function() {
     var headerData = {
@@ -681,13 +740,33 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       var avatarRight = avatarSquare.x + avatarSquare.width + avatar.obj.pos.x;
       var avatarTop = avatarSquare.y + avatar.obj.pos.y;
       var avatarBottom = avatarSquare.y + avatarSquare.height + avatar.obj.pos.y;
-      background.obj.collisionMap.forEach(function(bgSquare) {  // Loop through all the background squares
+      background.obj.collisionMap.forEach(function(bgSquare) {  // Loop through all the background's squares
         var bgLeft = bgSquare.x;
         var bgRight = bgSquare.x + bgSquare.width;
         var bgTop = bgSquare.y;
         var bgBottom = bgSquare.y + bgSquare.height;
         // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current bg square (in those exact orders).
         if (avatarLeft <= bgRight && avatarRight >= bgLeft && avatarTop <= bgBottom && avatarBottom >= bgTop) {
+          collision.found = true;
+          collision.type = 'wall';
+          if (avatar.obj.speed.x > 0) {
+            collision.direction = 'right';
+          } else if (avatar.obj.speed.x < 0) {
+            collision.direction = 'left';
+          } else if (avatar.obj.speed.y < 0) {
+            collision.direction = 'up';
+          } else if (avatar.obj.speed.y > 0) {
+            collision.direction = 'down';
+          }
+        }
+      });
+      sceneObject.obj.collisionMap.forEach(function(objSquare) {  // Loop through all the scene object's squares
+        var objLeft = objSquare.x + sceneObject.obj.pos.x;
+        var objRight = objSquare.x + objSquare.width + sceneObject.obj.pos.x;
+        var objTop = objSquare.y + sceneObject.obj.pos.y;
+        var objBottom = objSquare.y + objSquare.height + sceneObject.obj.pos.y;
+        // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current scene object square (in those exact orders).
+        if (avatarLeft <= objRight && avatarRight >= objLeft && avatarTop <= objBottom && avatarBottom >= objTop) {
           collision.found = true;
           collision.type = 'wall';
           if (avatar.obj.speed.x > 0) {
@@ -716,22 +795,32 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     }
   }
 
-  var currentFrameIndex = 0;
   function updateAvatar() {
     avatar.updatePos();
   }
 
+  var currentAvatarFrameIndex = 0;
   function checkAvatarAction() {
     if (avatar.action === 'walkLeft' || avatar.action === 'walkUp' || avatar.action === 'walkRight' || avatar.action === 'walkDown') {
-      if (currentFrameIndex > avatar.obj.animate[avatar.action].length - 1) {
-        currentFrameIndex = 0;
+      if (currentAvatarFrameIndex > avatar.obj.animate[avatar.action].length - 1) {
+        currentAvatarFrameIndex = 0;
       }
-      avatar.obj.currentFrame = avatar.obj.animate[avatar.action][currentFrameIndex];
-      currentFrameIndex++;
+      avatar.obj.currentFrame = avatar.obj.animate[avatar.action][currentAvatarFrameIndex];
+      currentAvatarFrameIndex++;
     } else {
       // Do nothing, or set frame to a given specific frame.
       // avatar.obj.currentFrame = avatar.obj.animate.walkLeft[0];
     }
+  }
+
+  var currentSceneObjFrameIndex = 0;
+  function checkSceneObjectAction() {
+    // Animate the object.
+    if (currentSceneObjFrameIndex > sceneObject.obj.animate[sceneObject.allActions[0]].length - 1) {
+      currentSceneObjFrameIndex = 0;
+    }
+    sceneObject.obj.currentFrame = sceneObject.obj.animate[sceneObject.allActions[0]][currentSceneObjFrameIndex];
+    currentSceneObjFrameIndex++;
   }
 
   function drawAvatar() {
@@ -758,10 +847,11 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     gameCtx.save();
     // Draw the squares from the background object.
     gameCtx.globalCompositeOperation = "destination-over";
-    background.obj.image.reverse().forEach(function(square) {
+    for (var index = background.obj.image.length - 1; index >= 0; index--) {
+      var square = background.obj.image[index];
       gameCtx.fillStyle = square.color;
       gameCtx.fillRect(square.x, square.y, square.width, square.height);
-    });
+    }
     gameCtx.globalCompositeOperation = "source-over";
     gameCtx.globalAlpha = 0.2;
     // Draw the background's collision map (purely for testing)
@@ -775,10 +865,18 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
   function drawObjects() {
     // Save the drawing context
     gameCtx.save();
-    // Translate the canvas origin to be the top left of the avatar
-    gameCtx.translate(avatar.obj.pos.x, avatar.obj.pos.y);
-    // Draw the squares from the avatar's current frame AND the collision map.
-    avatar.obj.currentFrame.forEach(function(square) {
+    // Translate the canvas origin to be the top left of the sceneObject
+    gameCtx.translate(sceneObject.obj.pos.x, sceneObject.obj.pos.y);
+    // Draw the squares from the sceneObject's current frame
+    gameCtx.globalCompositeOperation = "destination-over";  // If object is behind character.
+    // gameCtx.globalCompositeOperation = "source-over";    // If object is in front of character.
+    sceneObject.obj.currentFrame.forEach(function(square) {
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    });
+    gameCtx.globalAlpha = 0.2;
+    // Draw the sceneObject's collision map (purely for testing)
+    sceneObject.obj.collisionMap.forEach(function(square) {
       gameCtx.fillStyle = square.color;
       gameCtx.fillRect(square.x, square.y, square.width, square.height);
     });
@@ -805,10 +903,11 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
   function runGame() {
     clearCanvas();
     // Draw avatar if it has been loaded
-    if (avatarLoaded && backgroundLoaded) {
+    if (avatarLoaded && backgroundLoaded && sceneObjectLoaded) {
       checkCollisions();
       updateAvatar();
       drawAvatar();
+      drawObjects();
       drawBackground();
     }
     requestAnimationFrame(runGame);
