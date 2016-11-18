@@ -145,7 +145,7 @@ angular.module('questCreator').service('UserService', function () {
             token: user.token
           },
           success: function(response) {
-            return response;
+            
           },
           error: function(error) {
             alert('There was a problem loading the profile. Please try again.');
