@@ -628,4 +628,6 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
       touchMoveEvent = event.touches[0];
       moved = true;
     });
+
+    console.log("here");
 });
