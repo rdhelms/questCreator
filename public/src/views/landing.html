@@ -1,7 +1,7 @@
 <div id="landing-container">
   <section id="game-results">
     <h1>Games You Can Play Now:</h1>
-    <div ng-repeat="game in games" class="game" ng-click="" ui-sref="main.game.play">
+    <div ng-repeat="game in games" class="game" ng-click="goToGameDetail(game)">
           <img src="{{ game.thumbnail }}" alt="Game thumbnail"/>
           <ul>
               <li>
@@ -18,6 +18,10 @@
               <li>
                   <label for="players">Players:</label>
                   <p>{{ game.players }}</p>
+              </li>
+              <li>
+                  <label for="players">Total Number of Points:</label>
+                  <p>{{ game.totalPoints }}</p>
               </li>
           </ul>
       </div>
