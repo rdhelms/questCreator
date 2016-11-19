@@ -1,16 +1,12 @@
-<div id="overlay">
-  <div id="popup">
+<div id="overlay" ng-click="kill()">
+  <div id="popup" ng-click="$event.stopPropagation()">
     <div class="nav">
       <ul>
-        <li><h4 id="title">Siiiiick<h4></li>
-        <li><a href="#" id="close">X</a></li>
+        <li><h4 id="title" popup-title="{{title}}">{{title}}<h4></li>
+        <li><a href="#" ng-click="kill()" id="close">X</a></li>
       </ul>
     </div>
-    <div id="content">
-      <p>Test Message</p>
-      <p>Test Message</p>
-      <p>Test Message</p>
-      <p>Test Message</p>
-    </div id="content">
+    <div id="content" ng-transclude>
+    </div>
   </div>
 </div>
