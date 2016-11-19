@@ -13,19 +13,19 @@
         overflow-y: scroll;
 
         .game {
-          margin: 15px;
-          width: 300px;
-          height: 250px;
-
-          img {
+            margin: 15px;
             width: 300px;
-            height: 200px;
-          }
+            height: 250px;
 
-          ul {
-            display: flex;
-            font-size: .75em;
-          }
+            img {
+                width: 300px;
+                height: 200px;
+            }
+
+            ul {
+                display: flex;
+                font-size: 0.75em;
+            }
         }
     }
 
@@ -37,10 +37,10 @@
         align-items: flex-end;
 
         h1 {
-          font-size: 3em;
-          color: pink;
-          -webkit-text-stroke: 2px red;
-          font-style: italic;
+            font-size: 3em;
+            color: pink;
+            -webkit-text-stroke: 2px red;
+            font-style: italic;
         }
 
         button {
@@ -49,24 +49,24 @@
         }
 
         .assets-results {
-          padding-top: 500px;
-          display: flex;
-          justify-content: space-around;
-          align-content: space-around;
-          flex-wrap: wrap;
-          width: 100%;
-          overflow-y: scroll;
+            padding-top: 500px;
+            display: flex;
+            justify-content: space-around;
+            align-content: space-around;
+            flex-wrap: wrap;
+            width: 100%;
+            overflow-y: scroll;
 
-          .asset {
-            border: black 2px solid;
-            width: 132px;
-            height: 200px;
-            margin: 10px 0;
+            .asset {
+                border: black 2px solid;
+                width: 132px;
+                height: 200px;
+                margin: 10px 0;
 
-            .asset-canvas {
-              background-color: pink;
+                .asset-canvas {
+                    background-color: pink;
+                }
             }
-          }
         }
     }
 }
