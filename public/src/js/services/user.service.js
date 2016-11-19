@@ -102,6 +102,7 @@ angular.module('questCreator').service('UserService', function () {
                       // Do nothing
                     } else {
                         alert('There was a problem logging in. Please try again');
+                        signOut();
                     }
                 }
             });
@@ -128,6 +129,7 @@ angular.module('questCreator').service('UserService', function () {
             error: function(error) {
               $('#register-form').css('display', 'none');
               alert('There was a problem logging in. Please try again');
+              signOut();
             }
           });
     }
@@ -145,7 +147,7 @@ angular.module('questCreator').service('UserService', function () {
             token: user.token
           },
           success: function(response) {
-            
+
           },
           error: function(error) {
             alert('There was a problem loading the profile. Please try again.');
