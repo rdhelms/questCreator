@@ -43,14 +43,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
   //   }
   // });
 
-  // Step 1: Create Game (POST request to database)
+  // Step 1: Create Game (POST request to database) //NOTE: Need to re-check this
   var gameObj = {};
   var gameTest = {
     name: 'Potter Quest', // Game ID in database is 16
     description: '',
     obj: gameObj,
     tags: [],
-    public: false,
+    public: false
   };
   // POST empty Game to database
   $('.createGameBtn').click(function() {
@@ -67,6 +67,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       contentType: 'application/json',
       success: function(response) {
         console.log(response);
+        gameTest.id = response.id;
       },
       error: function(error) {
         console.log(error);
@@ -101,6 +102,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       contentType: 'application/json',
       success: function(response) {
         console.log(response);
+        backgroundTest.id = response.id;
         // background = new Background(response);
         // backgroundLoaded = true;
       },
@@ -111,31 +113,35 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
   });
 
   // Step 3: Draw Background picture (stored in front end)
-  backgroundObj.image = [{
-          x: 0,
-          y: 0,
-          width: gameWidth,
-          height: gameHeight,
-          color: 'beige'
-        }, {
-          x: 150,
-          y: 150,
-          width: 50,
-          height: 50,
-          color: 'yellow'
-        }];
+  $('.drawImgBgBtn').click(function() {
+    backgroundObj.image = [{
+            x: 0,
+            y: 0,
+            width: gameWidth,
+            height: gameHeight,
+            color: 'beige'
+          }, {
+            x: 150,
+            y: 150,
+            width: 50,
+            height: 50,
+            color: 'yellow'
+          }];
+  })
 
   // Step 4: Draw Background collision map (stored in front end)
-  backgroundObj.collisionMap = [{
-          type: 'wall',
-          x: 150,
-          y: 200,
-          width: 50,
-          height: 20,
-          color: 'gray'
-        }];
+  $('.drawColBgBtn').click(function() {
+    backgroundObj.collisionMap = [{
+            type: 'wall',
+            x: 150,
+            y: 200,
+            width: 50,
+            height: 20,
+            color: 'gray'
+          }];
+  });
 
-  // Step 5: Save Background (PATCH request to database)
+  // Step 5: Save Background (PUT request to database)
   $('.saveBgBtn').click(function() {
     backgroundTest.obj = backgroundObj;
     var headerData = {
@@ -144,8 +150,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     };
     // Background
     $.ajax({
-      method: 'PATCH',
-      url: 'https://forge-api.herokuapp.com/backgrounds/create',  //NOTE: Wrong url, needs to be updated
+      method: 'PUT',
+      url: 'https://forge-api.herokuapp.com/backgrounds/update',
       headers: headerData,
       data: JSON.stringify(backgroundTest),
       dataType: 'json',
@@ -167,11 +173,11 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       x: 350,
       y: 250
     },
-    animate: {},
+    image: [],
     collisionMap: []
   };
   var sceneObjectTest = {
-    name: 'Light Bulb',   // ID in database is 91
+    name: 'Light Bulb',
     obj: sceneObjectObj,
     game_id: 16,
     tags: [],
@@ -192,6 +198,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       contentType: 'application/json',
       success: function(response) {
         console.log(response);
+        sceneObjectTest.id = response.id;
         // sceneObject = new SceneObject(response);
         // sceneObject.allActions = Object.keys(sceneObject.obj.animate);
         // sceneObject.action = sceneObject.allActions[0]; // The first action
@@ -205,53 +212,37 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     });
   });
 
-  // Step 7: Create Object Action
-  sceneObjectObj.animate.wave = [];
+  // Not currently animating objects
+  // // Step X: Create Object Action
+  // sceneObjectObj.animate.wave = [];
 
-  // Step 8: Draw Object picture frames per Action
-  sceneObjectObj.animate.wave = [
-        [{
-          x: 0,
-          y: 0,
-          width: 10,
-          height: 100,
-          color: 'brown'
-        }, {
-          x: 0,
-          y: 0,
-          width: 50,
-          height: 10,
-          color: 'red'
-        }, {
-          x: 50,
-          y: 10,
-          width: 50,
-          height: 10,
-          color: 'red'
-        }],
-        [{
-          x: 0,
-          y: 0,
-          width: 10,
-          height: 100,
-          color: 'brown'
-        }, {
-          x: 0,
-          y: 10,
-          width: 50,
-          height: 10,
-          color: 'red'
-        }, {
-          x: 50,
-          y: 0,
-          width: 50,
-          height: 10,
-          color: 'red'
-        }]
-      ];
+  // Step 7: Draw Object picture
+  $('.drawImgObjBtn').click(function() {
+    sceneObjectObj.image = [
+          {
+            x: 0,
+            y: 0,
+            width: 10,
+            height: 100,
+            color: 'brown'
+          }, {
+            x: 0,
+            y: 0,
+            width: 50,
+            height: 10,
+            color: 'red'
+          }, {
+            x: 50,
+            y: 10,
+            width: 50,
+            height: 10,
+            color: 'red'
+          }];
+  });
 
   // Step 9: Draw Object collision map
-  sceneObjectObj.collisionMap = [
+  $('.drawColObjBtn').click(function() {
+    sceneObjectObj.collisionMap = [
       {
         x: -10,
         y: 100,
@@ -272,8 +263,9 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
         color: 'gray'
       }
     ];
+  });
 
-  // Step 10: Save Object (PATCH Request)
+  // Step 10: Save Object (PUT Request)
   $('.saveObjBtn').click(function() {
     sceneObjectTest.obj = sceneObjectObj;
     var headerData = {
@@ -282,8 +274,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     };
     // Object
     $.ajax({
-      method: 'PATCH',
-      url: 'https://forge-api.herokuapp.com/obstacles/create',    // NOTE: Wrong url
+      method: 'PUT',
+      url: 'https://forge-api.herokuapp.com/obstacles/update',
       headers: headerData,
       data: JSON.stringify(sceneObjectTest),
       dataType: 'json',
