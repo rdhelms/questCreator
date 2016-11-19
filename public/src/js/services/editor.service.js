@@ -4,12 +4,13 @@ angular.module('questCreator').service('EditorService', function (UserService, $
     var game = null;
 
     function getGame(name) {
-      $.ajax({
+      var nameWrapper = {
+        name: name.toLowerCase()
+      }
+      return $.ajax({
         method: 'GET',
         url: 'https://forge-api.herokuapp.com/games/load',
-        data: JSON.stringify(name),
-        dataType: 'json',
-        contentType: 'application/json',
+        data: nameWrapper,
         success: function(response) {
           return response;
         },

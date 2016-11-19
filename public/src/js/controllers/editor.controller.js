@@ -13,7 +13,9 @@ angular.module('questCreator').controller('editorCtrl', function($scope, $state,
   this.currentSmallView = 'object';
 
   this.editGame = function () {
-      EditorService.getGame(this.currentEditingGame);
+      EditorService.getGame(this.currentEditingGame.name).done(function(game) {
+        console.log(game);
+      });
       $('.edit-game').hide();
   };
 
@@ -22,9 +24,8 @@ angular.module('questCreator').controller('editorCtrl', function($scope, $state,
         console.log(game);
       });
       $('.create-game').hide();
-      $scope.currentEditingGame = name;
+      this.currentEditingGame.name = name;
       UserService.setGameEdit(name);
-
   };
 
   $scope.cancel = function () {
@@ -48,5 +49,4 @@ angular.module('questCreator').controller('editorCtrl', function($scope, $state,
       $(this).append(clone);
     }
   });
-
 });
