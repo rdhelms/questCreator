@@ -60,6 +60,15 @@
       // justify-content: center;
       // align-items: space-around;
 
+      .user-games {
+        border: 5px solid black;
+        padding: 5px;
+
+        img {
+          width: 100%;
+        }
+      }
+
       button {
         margin: 7px;
         height: 70px;
