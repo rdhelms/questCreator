@@ -3,12 +3,24 @@ angular.module('questCreator').service('EditorService', function (UserService, $
 
     var game = null;
 
-    function getGameAssets(name) {
-
+    function getGame(name) {
+      $.ajax({
+        method: 'GET',
+        url: 'https://forge-api.herokuapp.com/games/load',
+        data: JSON.stringify(name),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(response) {
+          return response;
+        },
+        error: function(error) {
+          alert('There was a problem loading this game');
+        }
+      });
     }
 
     function createNewGame(name) {
-      var header = {
+      var headerData = {
         user_id: UserService.get().id,
         token: UserService.get().token
       };
@@ -17,12 +29,12 @@ angular.module('questCreator').service('EditorService', function (UserService, $
         description: "",
         tags: []
       };
-      console.log(header, game);
-      $.ajax({
+
+      return $.ajax({
         method: 'POST',
         url: 'https://forge-api.herokuapp.com/games/create',
         data: JSON.stringify(game),
-        headers: header,
+        headers: headerData,
         dataType: 'json',
         contentType: 'application/json',
         success: function(response) {
@@ -37,7 +49,7 @@ angular.module('questCreator').service('EditorService', function (UserService, $
     }
 
     return {
-      getGame: getGameAssets,
+      getGame: getGame,
       createGame: createNewGame
 
     };

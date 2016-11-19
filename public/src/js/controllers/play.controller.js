@@ -43,6 +43,22 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
   //   }
   // });
 
+  // // Gets a specific game by name
+  // var gameToGetInfo = {
+  //   name: 'potter quest'
+  // };
+  // $.ajax({
+  //   method: 'GET',
+  //   url: 'https://forge-api.herokuapp.com/games/load',
+  //   data: gameToGetInfo,
+  //   success: function(response) {
+  //     console.log(response);
+  //   },
+  //   error: function(error) {
+  //     console.log(error);
+  //   }
+  // });
+
   // Step 1: Create Game (POST request to database)
   var gameInfo = {};
   var currentEditingGame = {

@@ -1,14 +1,22 @@
 <div id="editor-view">
 
+<<<<<<< cd26bb6e8eef61e193729ff909e29ac46a68b0ee
     <section class="pop-up edit-game" ng-if="gameToEdit">
         <label for="game-edit">Awesome! You're Now Editing:</label>
         <p>{{ gameToEdit }}</p>
         <button ng-click="editGame()" type="button" name="cool">COOL!</button>
         <button ng-click="cancel()" type="button" name="cool">nah!</button>
+=======
+    <section class="pop-up edit-game" ng-if="editor.currentEditingGame.name !== ''">
+        <label for="game-edit">Awesome! You're Now Editing:</label>
+        <p>{{ editor.currentEditingGame.name }}</p>
+        <button ng-click="editor.editGame()" type="button" name="cool">COOL!</button>
+        <button ng-click="editor.cancel()" type="button" name="cool">nah!</button>
+>>>>>>> Adding in editor functionality with database
     </section>
 
-    <section class="pop-up create-game" ng-if="!gameToEdit">
-        <form ng-submit="createNewGame(newGameName)">
+    <section class="pop-up create-game" ng-if="editor.currentEditingGame.name === ''">
+        <form ng-submit="editor.createNewGame(newGameName)">
             <label for="game-create">Start by Giving Your New Game a Name:</label>
             <input ng-required="true" type="text" ng-model="newGameName" placeholder="Game Name">
             <input type="submit" value="Start Imagining">
@@ -18,14 +26,14 @@
     <!-- SCENE EDITOR -->
     <section id="scene-editor">
         <ul class="tab-nav">
-            <li class="tab active" ng-class="{'active': toggle}" ng-click="toggle=!toggle"><a ng-click="editor.currentLargeView = 'maps'">Map</a></li>
-            <li class="tab" ng-class="{'active': !toggle}" ng-click="toggle=!toggle"><a ng-click="editor.currentLargeView = 'scenes'">Scene</a></li>
-            <li class="tab" ng-class="{'active': !toggle}" ng-click="toggle=!toggle"><a ng-click="editor.currentLargeView = 'backgrounds'">Backgrounds</a></li>
+            <li class="tab active" ng-class="{'active': toggle}" ng-click="toggle=!toggle"><a ng-click="editor.currentLargeView = 'map'">Map</a></li>
+            <li class="tab" ng-class="{'active': !toggle}" ng-click="toggle=!toggle"><a ng-click="editor.currentLargeView = 'scene'">Scene</a></li>
+            <li class="tab" ng-class="{'active': !toggle}" ng-click="toggle=!toggle"><a ng-click="editor.currentLargeView = 'background'">Backgrounds</a></li>
         </ul>
         <section class="editor-contents" id="scene">
-            <ui-view ng-show="editor.currentLargeView === 'maps'" name="maps"></ui-view>
-            <ui-view ng-show="editor.currentLargeView === 'scenes'" name="scenes"></ui-view>
-            <ui-view ng-show="editor.currentLargeView === 'backgrounds'" name="backgrounds"></ui-view>
+            <ui-view ng-show="editor.currentLargeView === 'map'" name="maps"></ui-view>
+            <ui-view ng-show="editor.currentLargeView === 'scene'" name="scenes"></ui-view>
+            <ui-view ng-show="editor.currentLargeView === 'background'" name="backgrounds"></ui-view>
         </section>
         <section id="palette">
             <h4>Palette</h4>
@@ -95,9 +103,9 @@
         </ul>
         <section class="editor-contents" id="asset">
             <div class="edit-canvas"><canvas height="200" width="200"></canvas></div>
-            <ui-view name="objects"></ui-view>
-            <ui-view name="entities"></ui-view>
-            <ui-view name="scripts"></ui-view>
+            <ui-view name="objects" ng-show="editor.currentSmallView === 'object'"></ui-view>
+            <ui-view name="entities" ng-show="editor.currentSmallView === 'entity'"></ui-view>
+            <ui-view name="scripts" ng-show="editor.currentSmallView === 'script'"></ui-view>
             <ul class="editor-controls">
                 <li><button id="clear">Clear</button></li>
                 <li><button id="save">Save <code ng-non-bindable>{{canvas}}</code></button></li>
@@ -106,6 +114,5 @@
             </ul>
         </section>
     </aside>
-
 
 </div>

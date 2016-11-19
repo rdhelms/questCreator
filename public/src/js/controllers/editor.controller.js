@@ -1,9 +1,36 @@
 angular.module('questCreator').controller('editorCtrl', function($scope, $state, EditorService, UserService) {
 
-  this.currentLargeView = 'maps';
-  this.currentSmallView = 'objects';
+  // $scope.currentEditingGame = UserService.get().editGame;
+  this.gameInfo = {};
+  this.currentEditingGame = {
+    name: 'Potter Quest',
+    description: '',
+    info: this.gameInfo,
+    tags: [],
+    published: false
+  };
+  this.currentLargeView = 'background';
+  this.currentSmallView = 'object';
 
-  this.backgroundName = "Testing Background";
+  this.editGame = function () {
+      EditorService.getGame(this.currentEditingGame);
+      $('.edit-game').hide();
+  };
+
+  this.createNewGame = function (name) {
+      EditorService.createGame(name).done(function(game) {
+        console.log(game);
+      });
+      $('.create-game').hide();
+      $scope.currentEditingGame = name;
+      UserService.setGameEdit(name);
+
+  };
+
+  $scope.cancel = function () {
+    $state.go('main.profile');
+  };
+
   $('.asset').draggable({
     helper: 'clone',
     start: function(event, ui) {
@@ -21,23 +48,5 @@ angular.module('questCreator').controller('editorCtrl', function($scope, $state,
       $(this).append(clone);
     }
   });
-
-  $scope.gameToEdit = UserService.get().editGame;
-
-  $scope.editGame = function () {
-      EditorService.getGame($scope.gameToEdit);
-      $('.edit-game').hide();
-  };
-
-  $scope.createNewGame = function (name) {
-      EditorService.createGame(name);
-      $('.create-game').hide();
-      $scope.gameToEdit = name;
-      UserService.setGameEdit(name);
-  };
-
-  $scope.cancel = function () {
-    $state.go('main.profile');
-  };
 
 });

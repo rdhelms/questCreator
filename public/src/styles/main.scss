@@ -53,7 +53,15 @@ a {
   color: inherit;
 }
 
-
+.pop-up {
+  position: absolute;
+  border: 4px solid black;
+  border-radius: 0;
+  padding: .1rem .3rem;
+  background: whitesmoke;
+  color: black;
+  font-family: PCSenior;
+}
 // ul {
 //   list-style: none;
 // }
