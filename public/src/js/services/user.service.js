@@ -23,6 +23,27 @@ angular.module('questCreator').service('UserService', function () {
       user.editGame = name;
     }
 
+    function archiveGame(name) {
+      $.ajax({
+        method: 'DELETE',
+        url: 'https://forge-api.herokuapp.com/games/archive',
+        data: JSON.stringify(name),
+        headers: {
+          user_id: user.id,
+          token: user.token
+        },
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(response) {
+          alert('Your game has been archived. If you ever want to see it again, click "Archived Games" below the list of your games. Carry on.');
+        },
+        error: function(error) {
+          alert('There was a problem archiving this game. Please try again.');
+          $state.go('main.landing');
+        }
+      });
+    }
+
     var apiKey = 'AIzaSyCe__2EGSmwp0DR-qKGqpYwawfmRsTLBEs';
     var clientId = '730683845367-tjrrmvelul60250evn5i74uka4ustuln.apps.googleusercontent.com';
 
@@ -160,6 +181,7 @@ angular.module('questCreator').service('UserService', function () {
       set: setUser,
       setGameEdit: setGameEdit,
       games: getUserGames,
+      archive: archiveGame,
       register: registerUser,
       signOut: signOut,
       signIn: signIn
