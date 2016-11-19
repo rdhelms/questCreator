@@ -1,4 +1,5 @@
-angular.module('questCreator').controller('mainCtrl', function(socket, $state, $scope, UserService) {
+angular.module('questCreator')
+    .controller('mainCtrl', function(socket, $state, UserService, PopupService, $scope) {
 
     //When the user clicks "Home" on the nav bar view is changed to landing
     this.goHome = function () {
@@ -45,4 +46,10 @@ angular.module('questCreator').controller('mainCtrl', function(socket, $state, $
         $('#user-popup').css('display', 'none');
         UserService.signOut();
     };
+
+////Debug button: this is how you call a new popup:
+    this.popup = function(){
+      PopupService.type('newUser', $scope);
+    };
+
 });
