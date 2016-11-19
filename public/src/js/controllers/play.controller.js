@@ -43,14 +43,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
   //   }
   // });
 
-  // Step 1: Create Game (POST request to database) //NOTE: Need to re-check this
-  var gameObj = {};
-  var gameTest = {
-    name: 'Potter Quest', // Game ID in database is 16
+  // Step 1: Create Game (POST request to database)
+  var gameInfo = {};
+  var currentEditingGame = {
+    name: 'Potter Quest 9', // Game ID in database is 16
     description: '',
-    obj: gameObj,
+    info: gameInfo,
     tags: [],
-    public: false
+    published: false
   };
   // POST empty Game to database
   $('.createGameBtn').click(function() {
@@ -62,12 +62,12 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/games/create',
       headers: headerData,
-      data: JSON.stringify(gameTest),
+      data: JSON.stringify(currentEditingGame),
       dataType: 'json',
       contentType: 'application/json',
       success: function(response) {
         console.log(response);
-        gameTest.id = response.id;
+        currentEditingGame.id = response.id;
       },
       error: function(error) {
         console.log(error);
@@ -76,18 +76,18 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
   })
 
   // Step 2: Create Background (POST request)
-  var backgroundObj = {
+  var backgroundInfo = {
     image: [],
     collisionMap: []
   };
-  var backgroundTest = {
+  var currentBackground = {
     name: 'Cupboard',   // ID in database is 123
-    obj: backgroundObj,
-    game_id: 16,
+    info: backgroundInfo,
     tags: [],
-    public: true
+    published: true
   };
   $('.createBgBtn').click(function() {
+    currentBackground.game_id = currentEditingGame.id;
     var headerData = {
       user_id: UserService.get().id,
       token: UserService.get().token
@@ -97,12 +97,12 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/backgrounds/create',
       headers: headerData,
-      data: JSON.stringify(backgroundTest),
+      data: JSON.stringify(currentBackground),
       dataType: 'json',
       contentType: 'application/json',
       success: function(response) {
         console.log(response);
-        backgroundTest.id = response.id;
+        currentBackground.id = response.id;
         // background = new Background(response);
         // backgroundLoaded = true;
       },
@@ -114,11 +114,12 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
   // Step 3: Draw Background picture (stored in front end)
   $('.drawImgBgBtn').click(function() {
-    backgroundObj.image = [{
+    console.log("Drawing Background Image");
+    backgroundInfo.image = [{
             x: 0,
             y: 0,
-            width: gameWidth,
-            height: gameHeight,
+            width: 700,
+            height: 500,
             color: 'beige'
           }, {
             x: 150,
@@ -131,7 +132,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
   // Step 4: Draw Background collision map (stored in front end)
   $('.drawColBgBtn').click(function() {
-    backgroundObj.collisionMap = [{
+    console.log("Drawing Background Collision Map");
+    backgroundInfo.collisionMap = [{
             type: 'wall',
             x: 150,
             y: 200,
@@ -143,7 +145,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
   // Step 5: Save Background (PUT request to database)
   $('.saveBgBtn').click(function() {
-    backgroundTest.obj = backgroundObj;
+    currentBackground.info = backgroundInfo;
     var headerData = {
       user_id: UserService.get().id,
       token: UserService.get().token
@@ -153,7 +155,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       method: 'PUT',
       url: 'https://forge-api.herokuapp.com/backgrounds/update',
       headers: headerData,
-      data: JSON.stringify(backgroundTest),
+      data: JSON.stringify(currentBackground),
       dataType: 'json',
       contentType: 'application/json',
       success: function(response) {
@@ -168,7 +170,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
   });
 
   // Step 6: Create Object
-  var sceneObjectObj = {
+  var sceneObjectInfo = {
     pos: {
       x: 350,
       y: 250
@@ -176,14 +178,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     image: [],
     collisionMap: []
   };
-  var sceneObjectTest = {
+  var currentSceneObject = {
     name: 'Light Bulb',
-    obj: sceneObjectObj,
-    game_id: 16,
+    info: sceneObjectInfo,
     tags: [],
-    public: false
+    published: false
   };
   $('.createObjBtn').click(function() {
+    currentSceneObject.game_id = currentEditingGame.id;
     var headerData = {
       user_id: UserService.get().id,
       token: UserService.get().token
@@ -193,12 +195,12 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/obstacles/create',
       headers: headerData,
-      data: JSON.stringify(sceneObjectTest),
+      data: JSON.stringify(currentSceneObject),
       dataType: 'json',
       contentType: 'application/json',
       success: function(response) {
         console.log(response);
-        sceneObjectTest.id = response.id;
+        currentSceneObject.id = response.id;
         // sceneObject = new SceneObject(response);
         // sceneObject.allActions = Object.keys(sceneObject.obj.animate);
         // sceneObject.action = sceneObject.allActions[0]; // The first action
@@ -218,7 +220,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
   // Step 7: Draw Object picture
   $('.drawImgObjBtn').click(function() {
-    sceneObjectObj.image = [
+    console.log("Drawing Object Image");
+    sceneObjectInfo.image = [
           {
             x: 0,
             y: 0,
@@ -242,7 +245,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
   // Step 9: Draw Object collision map
   $('.drawColObjBtn').click(function() {
-    sceneObjectObj.collisionMap = [
+    console.log("Drawing Object Collision Map");
+    sceneObjectInfo.collisionMap = [
       {
         x: -10,
         y: 100,
@@ -267,7 +271,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
   // Step 10: Save Object (PUT Request)
   $('.saveObjBtn').click(function() {
-    sceneObjectTest.obj = sceneObjectObj;
+    currentSceneObject.info = sceneObjectInfo;
     var headerData = {
       user_id: UserService.get().id,
       token: UserService.get().token
@@ -277,7 +281,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       method: 'PUT',
       url: 'https://forge-api.herokuapp.com/obstacles/update',
       headers: headerData,
-      data: JSON.stringify(sceneObjectTest),
+      data: JSON.stringify(currentSceneObject),
       dataType: 'json',
       contentType: 'application/json',
       success: function(response) {
@@ -296,7 +300,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
   });
 
   // Step 11: Create Entity
-  var entityObj = {
+  var entityInfo = {
     pos: {
       x: 350,
       y: 250
@@ -309,14 +313,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     animate: {},
     collisionMap: []
   };
-  var entityTest = {
+  var currentEntity = {
     name: 'Rat',
-    obj: entityObj,
-    game_id: 16,
+    info: entityInfo,
     tags: [],
-    public: false
+    published: false
   };
   $('.createEntityBtn').click(function() {
+    currentEntity.game_id = currentEditingGame.id;
     var headerData = {
       user_id: UserService.get().id,
       token: UserService.get().token
@@ -326,11 +330,12 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/entities/create',
       headers: headerData,
-      data: JSON.stringify(entityTest),
+      data: JSON.stringify(currentEntity),
       dataType: 'json',
       contentType: 'application/json',
       success: function(response) {
         console.log(response);
+        currentEntity.id = response.id;
         // entity = new Entity(response);
         // console.log(entity);
         // entity.obj.currentFrame = entity.obj.animate[entity.action][0];
@@ -344,290 +349,297 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
   });
 
   // Step 12: Draw Entity picture frames per Action
-  entityObj.animate = {
-    stand: [
-      [{
-        x: 100,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'orange'
-      }, {
-        x: 150,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'purple'
-      }],
-      [{
-        x: 110,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'orange'
-      }, {
-        x: 140,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'purple'
-      }]
-    ],
-    walkLeft: [
-      [{
-        x: 100,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'purple'
-      }, {
-        x: 110,
-        y: 150,
-        width: 30,
-        height: 30,
-        color: 'orange'
-      }],
-      [{
-        x: 110,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'purple'
-      }, {
-        x: 100,
-        y: 150,
-        width: 30,
-        height: 30,
-        color: 'orange'
-      }]
-    ],
-    walkRight: [
-      [{
-        x: 150,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'purple'
-      }, {
-        x: 140,
-        y: 150,
-        width: 30,
-        height: 30,
-        color: 'orange'
-      }],
-      [{
-        x: 140,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'purple'
-      }, {
-        x: 150,
-        y: 150,
-        width: 30,
-        height: 30,
-        color: 'orange'
-      }]
-    ],
-    walkUp: [
-      [{
-        x: 100,
-        y: 110,
-        width: 30,
-        height: 30,
-        color: 'purple'
-      }, {
-        x: 150,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'orange'
-      }],
-      [{
-        x: 100,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'purple'
-      }, {
-        x: 150,
-        y: 110,
-        width: 30,
-        height: 30,
-        color: 'orange'
-      }]
-    ],
-    walkDown: [
-      [{
-        x: 100,
-        y: 140,
-        width: 30,
-        height: 30,
-        color: 'purple'
-      }, {
-        x: 150,
-        y: 150,
-        width: 30,
-        height: 30,
-        color: 'orange'
-      }],
-      [{
-        x: 100,
-        y: 150,
-        width: 30,
-        height: 30,
-        color: 'purple'
-      }, {
-        x: 150,
-        y: 140,
-        width: 30,
-        height: 30,
-        color: 'orange'
-      }]
-    ],
-    swimLeft: [
-      [{
-        x: 100,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'lightblue'
-      }, {
-        x: 150,
-        y: 150,
-        width: 30,
-        height: 30,
-        color: 'lightblue'
-      }],
-      [{
-        x: 100,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'gray'
-      }, {
-        x: 150,
-        y: 150,
-        width: 30,
-        height: 30,
-        color: 'gray'
-      }]
-    ],
-    swimRight: [
-      [{
-        x: 100,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'lightblue'
-      }, {
-        x: 150,
-        y: 150,
-        width: 30,
-        height: 30,
-        color: 'lightblue'
-      }],
-      [{
-        x: 100,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'gray'
-      }, {
-        x: 150,
-        y: 150,
-        width: 30,
-        height: 30,
-        color: 'gray'
-      }]
-    ],
-    swimUp: [
-      [{
-        x: 100,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'lightblue'
-      }, {
-        x: 150,
-        y: 150,
-        width: 30,
-        height: 30,
-        color: 'lightblue'
-      }],
-      [{
-        x: 100,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'gray'
-      }, {
-        x: 150,
-        y: 150,
-        width: 30,
-        height: 30,
-        color: 'gray'
-      }]
-    ],
-    swimDown: [
-      [{
-        x: 100,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'lightblue'
-      }, {
-        x: 150,
-        y: 150,
-        width: 30,
-        height: 30,
-        color: 'lightblue'
-      }],
-      [{
-        x: 100,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'gray'
-      }, {
-        x: 150,
-        y: 150,
-        width: 30,
-        height: 30,
-        color: 'gray'
-      }]
-    ]
-  };
+  $('.drawImgEntityBtn').click(function() {
+    console.log("Drawing Entity Image Frames");
+    entityInfo.animate = {
+      stand: [
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'orange'
+        }, {
+          x: 150,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'purple'
+        }],
+        [{
+          x: 110,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'orange'
+        }, {
+          x: 140,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'purple'
+        }]
+      ],
+      walkLeft: [
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'purple'
+        }, {
+          x: 110,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'orange'
+        }],
+        [{
+          x: 110,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'purple'
+        }, {
+          x: 100,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'orange'
+        }]
+      ],
+      walkRight: [
+        [{
+          x: 150,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'purple'
+        }, {
+          x: 140,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'orange'
+        }],
+        [{
+          x: 140,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'purple'
+        }, {
+          x: 150,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'orange'
+        }]
+      ],
+      walkUp: [
+        [{
+          x: 100,
+          y: 110,
+          width: 30,
+          height: 30,
+          color: 'purple'
+        }, {
+          x: 150,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'orange'
+        }],
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'purple'
+        }, {
+          x: 150,
+          y: 110,
+          width: 30,
+          height: 30,
+          color: 'orange'
+        }]
+      ],
+      walkDown: [
+        [{
+          x: 100,
+          y: 140,
+          width: 30,
+          height: 30,
+          color: 'purple'
+        }, {
+          x: 150,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'orange'
+        }],
+        [{
+          x: 100,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'purple'
+        }, {
+          x: 150,
+          y: 140,
+          width: 30,
+          height: 30,
+          color: 'orange'
+        }]
+      ],
+      swimLeft: [
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'lightblue'
+        }, {
+          x: 150,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'lightblue'
+        }],
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'gray'
+        }, {
+          x: 150,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'gray'
+        }]
+      ],
+      swimRight: [
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'lightblue'
+        }, {
+          x: 150,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'lightblue'
+        }],
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'gray'
+        }, {
+          x: 150,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'gray'
+        }]
+      ],
+      swimUp: [
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'lightblue'
+        }, {
+          x: 150,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'lightblue'
+        }],
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'gray'
+        }, {
+          x: 150,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'gray'
+        }]
+      ],
+      swimDown: [
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'lightblue'
+        }, {
+          x: 150,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'lightblue'
+        }],
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'gray'
+        }, {
+          x: 150,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'gray'
+        }]
+      ]
+    };
+  });
 
   // Step 13: Draw Entity collision map per Action
-  entityObj.animate.collisionMap = [
-    {
-      x: 100,
-      y: 180,
-      width: 80,
-      height: 10,
-      color: 'gray'
-    }, {
-      x: 100,
-      y: 185,
-      width: 80,
-      height: 10,
-      color: 'gray'
-    }
-  ];
+  $('.drawColEntityBtn').click(function() {
+    console.log("Drawing Entity Collision Map");
+    entityInfo.collisionMap = [
+      {
+        x: 100,
+        y: 180,
+        width: 80,
+        height: 10,
+        color: 'gray'
+      }, {
+        x: 100,
+        y: 185,
+        width: 80,
+        height: 10,
+        color: 'gray'
+      }
+    ];
+  });
+
   // Step 14: Save Entity
   $('.saveEntityBtn').click(function() {
-    entityTest.obj = entityObj;
+    currentEntity.info = entityInfo;
     var headerData = {
       user_id: UserService.get().id,
       token: UserService.get().token
     };
     // Entity
     $.ajax({
-      method: 'PATCH',
-      url: 'https://forge-api.herokuapp.com/entities/create',   // NOTE: Wrong url
+      method: 'PUT',
+      url: 'https://forge-api.herokuapp.com/entities/update',
       headers: headerData,
-      data: JSON.stringify(entityTest),
+      data: JSON.stringify(currentEntity),
       dataType: 'json',
       contentType: 'application/json',
       success: function(response) {
@@ -643,21 +655,23 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       }
     });
   });
+
   // Step 15: Create Event
   // Step 16: Specify Event trigger and response
   // Step 17: Save Event
+
   // Step 18: Create Scene
   // Step 19: Add Background to Scene
   // Step 20: Add Objects and Entities to Scene
   // Step 21: Set coordinates of Objects and Entities
-  sceneObjectObj = {
-    x: 150,
-    y: 100
-  },
-  entityObj.pos = {
-    x: 50,
-    y: 220
-  };
+  // sceneObjectObj = {
+  //   x: 150,
+  //   y: 100
+  // },
+  // entityObj.pos = {
+  //   x: 50,
+  //   y: 220
+  // };
 
   // Step 22: Add events to Scene
   // Step 23: Save Scene
