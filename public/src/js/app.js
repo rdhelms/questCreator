@@ -20,6 +20,10 @@
             url: 'game',
             templateUrl: './src/views/game.html',
             controller: 'gameCtrl as game'
+          }).state('main.game.detail', {
+            url: '/detail',
+            templateUrl: './src/views/game/detail.html',
+            controller: 'detailCtrl as detail'
           }).state('main.game.play', {
             url: '/play',
             templateUrl: './src/views/game/play.html',
