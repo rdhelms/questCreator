@@ -31,13 +31,13 @@
     <h1>Yazua DPS</h1>
     <button ng-click="createGame()">Create New Game</button>
     <label for="asset-type">Available Assets for Game Creation</label>
-    <select ng-model="asset-type" class="asset-type">
+    <select ng-model="assetType" class="asset-type">
       <option value="backgrounds">Backgrounds</option>
       <option value="objects" selected="selected">Objects</option>
       <option value="entities">Characters</option>
     </select>
     <label for="asset-search">Search Assets By Keyword:</label>
-    <input type="text" ng-model="search-text" placeholder="{{ asset-type }}">
+    <input type="text" ng-model="searchText" placeholder="{{ assetType }}">
 
     <section class="assets-results">
       <div ng-repeat="asset in assets" class="asset">
