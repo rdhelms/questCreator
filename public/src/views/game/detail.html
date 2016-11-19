@@ -1,22 +1,48 @@
-<div ng-model="detail.game" class="detail-container">
-    <h1>{{ detail.game.name }}</h1>
-    <img src="{{ detail.game.thumbnail }}" alt="Game thumbnail" />
-    <ul>
-        <li>{{ detail.game.description }}</li>
-        <li>
-            <label for="creator">Created By:</label>
-            <p>{{ detail.game.creator }}</p>
-        </li>
-        <li>
-            <label for="created">Date Created:</label>
-            <a ng-click="detail.userGames">{{ detail.game.created_at }}</a>
-        </li>
-        <li>
-            <label for="players">Players:</label>
-            <p>{{ detail.game.players }}</p>
-        </li>
-    </ul>
-    <aside id="create-splash">
-      <h1>Yazua DPS</h1>
-      <button ng-click="detail.playGame(detail.game.name)">Play This Game</button>
+<div ng-model="detail.game" id="detail-container">
+    <section class="game-detail">
+        <!-- <h1>{{ detail.game.name }}</h1> -->
+        <img src="{{ detail.game.thumbnail }}" alt="Game thumbnail" />
+        <ul>
+            <li>{{ detail.game.description }}</li>
+            <li>
+                <label for="creator">Created By:</label>
+                <p>{{ detail.game.creator }}</p>
+            </li>
+            <li>
+                <label for="created">Date Created:</label>
+                <a ng-click="detail.userGames">{{ detail.game.created_at }}</a>
+            </li>
+            <li>
+                <label for="players">Players:</label>
+                <p>{{ detail.game.players }}</p>
+            </li>
+        </ul>
+    </section>
+    <aside id="play-splash">
+        <h1>Yazua DPS</h1>
+        <button ng-click="detail.playGame(detail.game.name)">Play <span>{{ detail.game.name }}</span></button>
+
+        <table id="leaderboard">
+          <tr>
+            <th>Rank:</th>
+            <th>Player Name:</th>
+            <th>Score:</th>
+            <th>Time to Complete:</th>
+          </tr>
+          <tr ng-repeat="player in detail.players | orderBy: 'score' : -1">
+            <td>
+              {{ $index + 1 }}
+            </td>
+            <td>
+              {{ player.name }}
+            </td>
+            <td>
+              {{ player.score }} out of {{ detail.game.totalPoints }}
+            </td>
+            <td>
+              {{ player.timeToComplete }}
+            </td>
+          </tr>
+        </table>
+    </aside>
 </div>
