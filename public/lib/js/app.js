@@ -20,46 +20,48 @@
             url: 'game',
             templateUrl: './src/views/game.html',
             controller: 'gameCtrl as game'
+          }).state('main.game.detail', {
+            url: '/detail',
+            templateUrl: './src/views/game/detail.html',
+            controller: 'detailCtrl as detail'
           }).state('main.game.play', {
             url: '/play',
             templateUrl: './src/views/game/play.html',
             controller: 'playCtrl as play'
           }).state('main.game.editor', {
-            // Includes sidebar and nav for all editor views
             // "/game/editor"
+            abstract: true,
             url: '/editor',
             templateUrl: './src/views/game/editor.html',
-            controller: 'editorCtrl as editor'
-          }).state('main.game.editor.map', {
-            // "/game/editor/map"
-            url: '/map',
-            templateUrl: './src/views/game/editor/map.html',
-            controller: 'mapCtrl as map'
-          }).state('main.game.editor.scene', {
-            // "/game/editor/scene"
-            url: '/scene',
-            templateUrl: './src/views/game/editor/scene.html',
-            controller: 'sceneCtrl as scene'
-          }).state('main.game.editor.bg', {
-            // "/game/editor/bg"
-            url: '/bg',
-            templateUrl: './src/views/game/editor/bg.html',
-            controller: 'bgCtrl as bg'
-          }).state('main.game.editor.obj', {
-            // "/game/editor/obj"
-            url: '/obj',
-            templateUrl: './src/views/game/editor/obj.html',
-            controller: 'objCtrl as obj'
-          }).state('main.game.editor.ent', {
-            // "/game/editor/ent"
-            url: '/ent',
-            templateUrl: './src/views/game/editor/ent.html',
-            controller: 'entCtrl as ent'
-          }).state('main.game.editor.scripts', {
-            // "/game/editor/scripts"
-            url: '/scripts',
-            templateUrl: './src/views/game/editor/scripts.html',
-            controller: 'scriptsCtrl as scripts'
+            controller: 'editorCtrl as editor',
+          }).state('main.game.editor.views', {
+            url: '/',
+            views: {
+              'maps': {
+                templateUrl: './src/views/game/editor/map.html',
+                controller: 'mapCtrl as map'
+              },
+              'scenes': {
+                templateUrl: './src/views/game/editor/scene.html',
+                controller: 'sceneCtrl as scene'
+              },
+              'backgrounds': {
+                templateUrl: './src/views/game/editor/bg.html',
+                controller: 'bgCtrl as bg'
+              },
+              'objects': {
+                templateUrl: './src/views/game/editor/obj.html',
+                controller: 'objCtrl as obj'
+              },
+              'entities': {
+                templateUrl: './src/views/game/editor/ent.html',
+                controller: 'entCtrl as ent'
+              },
+              'scripts': {
+                templateUrl: './src/views/game/editor/scripts.html',
+                controller: 'scriptsCtrl as scripts'
+              }
+            }
           }).state('main.profile', {
             url: 'profile',
             templateUrl: './src/views/profile.html',
@@ -82,7 +84,90 @@
     this.obj.pos.y += this.obj.speed.y;
   }
 
+  Avatar.prototype.stop = function() {
+    this.action = 'stand';
+    this.obj.speed.x = 0;
+    this.obj.speed.y = 0;
+  }
+
+  Avatar.prototype.collide = function(direction) {
+    this.stop();
+    switch (direction) {
+      case 'left':
+        this.obj.pos.x += this.obj.speed.mag;
+        break;
+      case 'right':
+        this.obj.pos.x -= this.obj.speed.mag;
+        break;
+      case 'up':
+        this.obj.pos.y += this.obj.speed.mag;
+        break;
+      case 'down':
+        this.obj.pos.y -= this.obj.speed.mag;
+        break;
+    }
+  }
+
   return Avatar;
+});
+;angular.module('questCreator').factory('Background', function() {
+  function Background(backgroundInfo) {
+    this.name = backgroundInfo.name;
+    this.obj = backgroundInfo.obj;
+    this.game_id = backgroundInfo.game_id;
+  };
+
+  return Background;
+});
+;angular.module('questCreator').factory('Entity', function() {
+  function Entity(entityInfo) {
+    this.name = entityInfo.name;
+    this.obj = entityInfo.obj;
+    this.game_id = entityInfo.game_id;
+    this.action = 'walkRight';
+  };
+
+  Entity.prototype.updatePos = function() {
+    this.obj.pos.x += this.obj.speed.x;
+    this.obj.pos.y += this.obj.speed.y;
+  }
+
+  Entity.prototype.stop = function() {
+    this.action = 'stand';
+    this.obj.speed.x = 0;
+    this.obj.speed.y = 0;
+  }
+
+  Entity.prototype.collide = function(direction) {
+    this.stop();
+    switch (direction) {
+      case 'left':
+        this.obj.pos.x += this.obj.speed.mag;
+        break;
+      case 'right':
+        this.obj.pos.x -= this.obj.speed.mag;
+        break;
+      case 'up':
+        this.obj.pos.y += this.obj.speed.mag;
+        break;
+      case 'down':
+        this.obj.pos.y -= this.obj.speed.mag;
+        break;
+    }
+  }
+
+  return Entity;
+});
+;angular.module('questCreator').factory('SceneObject', function() {
+  function SceneObject(sceneObjectInfo) {
+    this.name = sceneObjectInfo.name;
+    this.obj = sceneObjectInfo.obj;
+    this.game_id = sceneObjectInfo.game_id;
+    this.action = 'none';
+    this.allActions = [];
+  };
+
+  return SceneObject;
 });
 ;angular.module('questCreator').service('EditorService', function (UserService, $state) {
 
@@ -127,6 +212,28 @@
       createGame: createNewGame
 
     };
+});
+;angular.module('questCreator').service('GameService', function () {
+
+    function loadGame(name) {
+      $.ajax({
+        method: 'GET',
+        url: 'https://forge-api.herokuapp.com/games/load',
+        data: JSON.stringify(name),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(response) {
+          return response;
+        },
+        error: function(error) {
+          alert('There was a problem loading this game');
+        }
+      });
+}
+
+return {
+  loadGame: loadGame
+};
 });
 ;angular.module('questCreator').service('socket', function() {
   var socket = io();
@@ -247,6 +354,7 @@
                       // Do nothing
                     } else {
                         alert('There was a problem logging in. Please try again');
+                        signOut();
                     }
                 }
             });
@@ -273,6 +381,7 @@
             error: function(error) {
               $('#register-form').css('display', 'none');
               alert('There was a problem logging in. Please try again');
+              signOut();
             }
           });
     }
@@ -290,7 +399,7 @@
             token: user.token
           },
           success: function(response) {
-            return response;
+
           },
           error: function(error) {
             alert('There was a problem loading the profile. Please try again.');
@@ -308,7 +417,10 @@
       signIn: signIn
     };
 });
-;;angular.module('questCreator').controller('chatCtrl', function(socket, $state) {
+;angular.module('questCreator').controller('bgCtrl', function($state) {
+
+});
+;angular.module('questCreator').controller('chatCtrl', function(socket, $state) {
   $('form').submit(function(){
     console.log("Submitted!");
     socket.emit('chat message', $('#m').val());
@@ -320,7 +432,29 @@
     $('#messages').append($('<li>').text(msg));
   });
 });
+;angular.module('questCreator').controller('detailCtrl', function ($state, GameService) {
+
+
+    this.playGame = function (name) {
+        var gameToPlay = GameService.loadGame(name);
+        $state.go('main.game.play');
+    };
+
+    //This is for testing only
+    this.game = {
+      thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+      name: "King's Quest Collection",
+      creator: "billy badass",
+      players: 6,
+      created_at: new Date(),
+      responseText: "something"
+    };
+
+});
 ;angular.module('questCreator').controller('editorCtrl', function($scope, $state, EditorService, UserService) {
+
+  this.currentLargeView = 'maps';
+  this.currentSmallView = 'objects';
 
   this.backgroundName = "Testing Background";
   $('.asset').draggable({
@@ -360,12 +494,137 @@
   };
 
 });
-;;angular.module('questCreator').controller('gameCtrl', function(socket, $state, $scope) {
-});
-;angular.module('questCreator').controller('landingCtrl', function($state) {
+;angular.module('questCreator').controller('entCtrl', function($state) {
 
 });
-;angular.module('questCreator').controller('mainCtrl', function(socket, $state, UserService) {
+;angular.module('questCreator').controller('gameCtrl', function(socket, $state, $scope) {
+});
+;angular.module('questCreator').controller('landingCtrl', function($state, $scope, UserService) {
+
+  $scope.createGame = function () {
+      var user = UserService.get();
+      if (user.id) {
+        user.editGame = null;
+        UserService.set(user);
+        $state.go('main.game.editor.views');
+      } else {
+        alert('Please Sign In or Register.');
+        $scope.signIn();
+      }
+  };
+
+  //This is for testing only
+  $scope.games = [{
+      thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+      name: "King's Quest Collection",
+      creator: "billy badass",
+      players: 6,
+      created_at: new Date(),
+      responseText: "something"
+  }, {
+      thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+      name: "King's Quest Collection",
+      creator: "billy badass",
+      players: 6,
+      created_at: new Date(),
+      responseText: "something"
+  }, {
+      thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+      name: "King's Quest Collection",
+      creator: "billy badass",
+      players: 6,
+      created_at: new Date(),
+      responseText: "something"
+  }, {
+      thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+      name: "King's Quest Collection",
+      creator: "billy badass",
+      players: 6,
+      created_at: new Date(),
+      responseText: "something"
+  }, {
+      thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+      name: "King's Quest Collection",
+      creator: "billy badass",
+      players: 6,
+      created_at: new Date(),
+      responseText: "something"
+  }, {
+      thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+      name: "King's Quest Collection",
+      creator: "billy badass",
+      players: 6,
+      created_at: new Date(),
+      responseText: "something"
+  }, {
+      thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+      name: "King's Quest Collection",
+      creator: "billy badass",
+      players: 6,
+      created_at: new Date(),
+      responseText: "something"
+  }, {
+      thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+      name: "King's Quest Collection",
+      creator: "billy badass",
+      players: 6,
+      created_at: new Date(),
+      responseText: "something"
+  }, {
+      thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+      name: "King's Quest Collection",
+      creator: "billy badass",
+      players: 6,
+      created_at: new Date(),
+      responseText: "something"
+  }];
+
+  $scope.assets = [
+    {
+      name: 'asset'
+    }, {
+      name: 'asset2'
+    }, {
+      name: 'asset3'
+    }, {
+      name: 'asset4'
+    }, {
+      name: 'asset5'
+    }, {
+      name: 'asset6'
+    }, {
+      name: 'asset7'
+    }, {
+      name: 'asset8'
+    }, {
+      name: 'asset9'
+    }, {
+      name: 'asset10'
+    }, {
+      name: 'asset11'
+    }, {
+      name: 'asset12'
+    }, {
+      name: 'asset13'
+    }, {
+      name: 'asset14'
+    }, {
+      name: 'asset15'
+    }, {
+      name: 'asset16'
+    }, {
+      name: 'asset17'
+    }, {
+      name: 'asset18'
+    }, {
+      name: 'asset19'
+    }, {
+      name: 'asset20'
+    }
+  ];
+
+});
+;angular.module('questCreator').controller('mainCtrl', function(socket, $state, $scope, UserService) {
 
     //When the user clicks "Home" on the nav bar view is changed to landing
     this.goHome = function () {
@@ -381,13 +640,24 @@
     };
 
     // When the user clicks the sign in button, prompt them to sign in to their google account.
-    this.signIn = function() {
+    $scope.signIn = function() {
         UserService.signIn();
     };
 
     // When the user clicks the sign out button, sign them out of their google account
     this.signOut = function() {
         UserService.signOut();
+        var user = {
+                uid: null,
+                token: null,
+                username: null,
+                picture: null,
+                id: null,
+                games: null,
+                joined: null,
+                editGame: null
+        };
+        UserService.set(user);
         $state.go('main.landing');
     };
 
@@ -402,15 +672,27 @@
         UserService.signOut();
     };
 });
-;;;angular.module('questCreator').controller('playCtrl', function(socket, Avatar, UserService, $state, $scope) {
+;angular.module('questCreator').controller('mapCtrl', function($state) {
+
+});
+;angular.module('questCreator').controller('objCtrl', function($state) {
+
+});
+;angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, $state, $scope) {
   var gameCanvas = document.getElementById('play-canvas');
   var gameCtx = gameCanvas.getContext('2d');
   var gameWidth = 700;
   var gameHeight = 500;
 
   var avatar = null;
+  var background = null;
+  var sceneObject = null;
+  var entity = null;
+
   var avatarLoaded = false;
   var backgroundLoaded = false;
+  var sceneObjectLoaded = false;
+  var entityLoaded = false;
 
   var typing = {
     show: false,
@@ -455,7 +737,7 @@
             height: 30,
             color: 'blue'
           }, {
-            x: 150,
+            x: 110,
             y: 150,
             width: 30,
             height: 30,
@@ -463,29 +745,29 @@
           }],
           // Frame 2 - walk left
           [{
-            x: 100,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'red'
-          }, {
-            x: 150,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'yellow'
-          }]
-        ],
-        walkRight: [
-          // Frame 1 - walk right
-          [{
-            x: 100,
+            x: 110,
             y: 100,
             width: 30,
             height: 30,
             color: 'blue'
           }, {
+            x: 100,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'green'
+          }]
+        ],
+        walkRight: [
+          // Frame 1 - walk right
+          [{
             x: 150,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'blue'
+          }, {
+            x: 140,
             y: 150,
             width: 30,
             height: 30,
@@ -493,23 +775,7 @@
           }],
           // Frame 2 - walk right
           [{
-            x: 100,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'red'
-          }, {
-            x: 150,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'yellow'
-          }]
-        ],
-        walkUp: [
-          // Frame 1 - walk up
-          [{
-            x: 100,
+            x: 140,
             y: 100,
             width: 30,
             height: 30,
@@ -520,17 +786,33 @@
             width: 30,
             height: 30,
             color: 'green'
-          }],
-          // Frame 2 - walk up
+          }]
+        ],
+        walkUp: [
+          // Frame 1 - walk up
           [{
             x: 100,
-            y: 150,
+            y: 110,
             width: 30,
             height: 30,
             color: 'red'
           }, {
             x: 150,
             y: 100,
+            width: 30,
+            height: 30,
+            color: 'yellow'
+          }],
+          // Frame 2 - walk up
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'red'
+          }, {
+            x: 150,
+            y: 110,
             width: 30,
             height: 30,
             color: 'yellow'
@@ -540,16 +822,16 @@
           // Frame 1 - walk down
           [{
             x: 100,
-            y: 100,
+            y: 140,
             width: 30,
             height: 30,
-            color: 'blue'
+            color: 'red'
           }, {
             x: 150,
             y: 150,
             width: 30,
             height: 30,
-            color: 'green'
+            color: 'yellow'
           }],
           // Frame 2 - walk down
           [{
@@ -560,7 +842,7 @@
             color: 'red'
           }, {
             x: 150,
-            y: 100,
+            y: 140,
             width: 30,
             height: 30,
             color: 'yellow'
@@ -694,13 +976,13 @@
           x: 100,
           y: 180,
           width: 80,
-          height: 30,
+          height: 10,
           color: 'gray'
         }, {
           x: 100,
-          y: 210,
+          y: 185,
           width: 80,
-          height: 30,
+          height: 10,
           color: 'gray'
         }
       ]
@@ -710,46 +992,114 @@
 
   // Testing creation of background
   var backgroundTest = {
-    name: 'Background Another Test',
+    name: 'Beige Background',
     obj: {
-      canvasElems: [{
-        x: 100,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'blue'
+      image: [{
+        x: 0,
+        y: 0,
+        width: gameWidth,
+        height: gameHeight,
+        color: 'beige'
+      }, {
+        x: 150,
+        y: 150,
+        width: 50,
+        height: 50,
+        color: 'yellow'
       }],
       collisionMap: [{
-        x: 300,
-        y: 300,
-        width: 30,
-        height: 30,
-        color: 'red'
+        type: 'wall',
+        x: 150,
+        y: 200,
+        width: 50,
+        height: 20,
+        color: 'gray'
       }]
     },
     game_id: 1,
-    tags: ['Testing Stuff', 'Fun games'],
-    public: false
+    tags: ['Testing Stuff', 'Plain beige'],
+    public: true
   };
 
   // Testing creation of object
-  var objectTest = {
+  var sceneObjectTest = {
     name: 'Object Test',
     obj: {
-      canvasElems: [{
-        x: 100,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'blue'
-      }],
-      collisionMap: [{
-        x: 300,
-        y: 300,
-        width: 30,
-        height: 30,
-        color: 'red'
-      }]
+      // The x and y coordinate of the top left corner of the object
+      pos: {
+        x: 400,
+        y: 300
+      },
+      // The animate object contains all the possible object actions with all of the frames to be drawn for each action.
+      animate: {
+        // Key: possible action, Value: array of frames
+        wave: [
+          // Each frame array element is an array of square objects to be drawn
+          // Frame 1 - wave
+          [{
+            x: 0,
+            y: 0,
+            width: 10,
+            height: 100,
+            color: 'brown'
+          }, {
+            x: 0,
+            y: 0,
+            width: 50,
+            height: 10,
+            color: 'red'
+          }, {
+            x: 50,
+            y: 10,
+            width: 50,
+            height: 10,
+            color: 'red'
+          }],
+          // Frame 2 - wave
+          [{
+            x: 0,
+            y: 0,
+            width: 10,
+            height: 100,
+            color: 'brown'
+          }, {
+            x: 0,
+            y: 10,
+            width: 50,
+            height: 10,
+            color: 'red'
+          }, {
+            x: 50,
+            y: 0,
+            width: 50,
+            height: 10,
+            color: 'red'
+          }]
+        ],
+        // Other actions could go here
+      },
+      // The collision map is how the game can know whether the character has collided with another object or event trigger. It is an array of invisible (or gray for now) squares.
+      collisionMap: [
+        {
+          x: -10,
+          y: 100,
+          width: 10,
+          height: 10,
+          color: 'gray'
+        }, {
+          x: 0,
+          y: 100,
+          width: 10,
+          height: 10,
+          color: 'gray'
+        }, {
+          x: 0,
+          y: 100,
+          width: 10,
+          height: 10,
+          color: 'gray'
+        }
+      ]
     },
     game_id: 1,
     tags: ['Object thing', 'Really fun new object'],
@@ -758,22 +1108,312 @@
 
   // Testing creation of entity
   var entityTest = {
-    name: 'Entity Test',
+    name: 'AI Entity Test',
     obj: {
-      canvasElems: [{
-        x: 100,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'blue'
-      }],
-      collisionMap: [{
-        x: 300,
-        y: 300,
-        width: 30,
-        height: 30,
-        color: 'red'
-      }]
+      // The x and y coordinate of the top left corner of the avatar
+      pos: {
+        x: 50,
+        y: 220
+      },
+      // The character's speed
+      speed: {
+        mag: 3,
+        x: 0,
+        y: 0
+      },
+      // The animate object contains all the possible character actions with all of the frames to be drawn for each action.
+      animate: {
+        // Key: possible action, Value: array of frames
+        stand: [
+          // Each frame array element is an array of square objects to be drawn
+          // Frame 1 - walk left
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'orange'
+          }, {
+            x: 150,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'purple'
+          }],
+          // Frame 2 - walk left
+          [{
+            x: 110,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'orange'
+          }, {
+            x: 140,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'purple'
+          }]
+        ],
+        walkLeft: [
+          // Each frame array element is an array of square objects to be drawn
+          // Frame 1 - walk left
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'purple'
+          }, {
+            x: 110,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'orange'
+          }],
+          // Frame 2 - walk left
+          [{
+            x: 110,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'purple'
+          }, {
+            x: 100,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'orange'
+          }]
+        ],
+        walkRight: [
+          // Frame 1 - walk right
+          [{
+            x: 150,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'purple'
+          }, {
+            x: 140,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'orange'
+          }],
+          // Frame 2 - walk right
+          [{
+            x: 140,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'purple'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'orange'
+          }]
+        ],
+        walkUp: [
+          // Frame 1 - walk up
+          [{
+            x: 100,
+            y: 110,
+            width: 30,
+            height: 30,
+            color: 'purple'
+          }, {
+            x: 150,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'orange'
+          }],
+          // Frame 2 - walk up
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'purple'
+          }, {
+            x: 150,
+            y: 110,
+            width: 30,
+            height: 30,
+            color: 'orange'
+          }]
+        ],
+        walkDown: [
+          // Frame 1 - walk down
+          [{
+            x: 100,
+            y: 140,
+            width: 30,
+            height: 30,
+            color: 'purple'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'orange'
+          }],
+          // Frame 2 - walk down
+          [{
+            x: 100,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'purple'
+          }, {
+            x: 150,
+            y: 140,
+            width: 30,
+            height: 30,
+            color: 'orange'
+          }]
+        ],
+        swimLeft: [
+          // Frame 1 - swim left
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }],
+          // Frame 2 - swim left
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }]
+        ],
+        swimRight: [
+          // Frame 1 - swim right
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }],
+          // Frame 2 - swim right
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }]
+        ],
+        swimUp: [
+          // Frame 1 - swim up
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }],
+          // Frame 2 - swim up
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }]
+        ],
+        swimDown: [
+          // Frame 1 - swim down
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'lightblue'
+          }],
+          // Frame 2 - swim down
+          [{
+            x: 100,
+            y: 100,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }, {
+            x: 150,
+            y: 150,
+            width: 30,
+            height: 30,
+            color: 'gray'
+          }]
+        ]
+        // Other actions could go here
+      },
+      // The collision map is how the game can know whether the character has collided with another object or event trigger. It is an array of invisible (or gray for now) squares.
+      collisionMap: [
+        {
+          x: 100,
+          y: 180,
+          width: 80,
+          height: 10,
+          color: 'gray'
+        }, {
+          x: 100,
+          y: 185,
+          width: 80,
+          height: 10,
+          color: 'gray'
+        }
+      ]
     },
     game_id: 1,
     tags: ['Entity thing', 'Awesome entity ftw'],
@@ -782,24 +1422,9 @@
 
   // Testing creation of scene
   var sceneTest = {
-    name: 'Scene Test 2',
+    name: 'Scene Test 3',
     description: 'This is the opening scene for my game.',
-    obj: {
-        canvasElems: [{
-          x: 100,
-          y: 100,
-          width: 30,
-          height: 30,
-          color: 'blue'
-        }],
-        collisionMap: [{
-          x: 300,
-          y: 300,
-          width: 30,
-          height: 30,
-          color: 'red'
-        }]
-    },
+    obj: {},
     game_id: 1,
     map_id: 1
   };
@@ -847,10 +1472,11 @@
         color: 'red'
       }]
     },
-    tags: ['The best game', 'fun stuff', "Everybody's favorite"]
+    tags: ['The best game', 'fun stuff', "Everybody's favorite"],
+    public: false,
   };
 
-  $('.createAvatarBtn').click(function() {
+  $('.createAvatarBgObjEntityBtn').click(function() {
     var headerData = {
       user_id: UserService.get().id,
       token: UserService.get().token
@@ -863,23 +1489,15 @@
       dataType: 'json',
       contentType: 'application/json',
       success: function(response) {
-        console.log(response);
         avatar = new Avatar(response);
         avatar.obj.currentFrame = avatar.obj.animate.walkLeft[0];
         avatarLoaded = true;
-        setInterval(checkAvatarMotion, 75);
+        setInterval(checkAvatarAction, 75);
       },
       error: function(error) {
         console.log(error);
       }
     });
-  });
-
-  $('.createBackgroundBtn').click(function() {
-    var headerData = {
-      user_id: UserService.get().id,
-      token: UserService.get().token
-    };
     $.ajax({
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/backgrounds/create',
@@ -888,44 +1506,32 @@
       dataType: 'json',
       contentType: 'application/json',
       success: function(response) {
-        console.log(response);
-        console.log(response.obj);
-        console.log(JSON.parse(response.tags));
+        background = new Background(response);
+        backgroundLoaded = true;
       },
       error: function(error) {
         console.log(error);
       }
     });
-  });
-
-  $('.createObjectBtn').click(function() {
-    var headerData = {
-      user_id: UserService.get().id,
-      token: UserService.get().token
-    };
     $.ajax({
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/obstacles/create',
       headers: headerData,
-      data: JSON.stringify(objectTest),
+      data: JSON.stringify(sceneObjectTest),
       dataType: 'json',
       contentType: 'application/json',
       success: function(response) {
-        console.log(response);
-        console.log(response.obj);
-        console.log(JSON.parse(response.tags));
+        sceneObject = new SceneObject(response);
+        sceneObject.allActions = Object.keys(sceneObject.obj.animate);
+        sceneObject.action = sceneObject.allActions[0]; // The first action
+        sceneObject.obj.currentFrame = sceneObject.obj.animate[sceneObject.action][0]; // The first frame of the first action, whatever it is.
+        sceneObjectLoaded = true;
+        setInterval(checkSceneObjectAction, 75);
       },
       error: function(error) {
         console.log(error);
       }
     });
-  })
-
-  $('.createEntityBtn').click(function() {
-    var headerData = {
-      user_id: UserService.get().id,
-      token: UserService.get().token
-    };
     $.ajax({
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/entities/create',
@@ -934,15 +1540,17 @@
       dataType: 'json',
       contentType: 'application/json',
       success: function(response) {
-        console.log(response);
-        console.log(response.obj);
-        console.log(JSON.parse(response.tags));
+        entity = new Entity(response);
+        console.log(entity);
+        entity.obj.currentFrame = entity.obj.animate[entity.action][0];
+        entityLoaded = true;
+        setInterval(checkEntityAction, 75);
       },
       error: function(error) {
         console.log(error);
       }
     });
-  })
+  });
 
   $('.createSceneBtn').click(function() {
     var headerData = {
@@ -1057,7 +1665,7 @@
     } else if (keyCode === 32) {
       // Space
       if (!typing.show) {
-        typing.phrase = ':';
+        typing.phrase = '>';
         typing.show = true;
         $('.typing').text(typing.phrase).show();
       }
@@ -1075,21 +1683,240 @@
     pause = true;
   }
 
-  var currentFrameIndex = 0;
+  function checkAvatarCollisions() {
+    var collision = {
+      found: false,
+      direction: 'none',
+      type: 'none'
+    };
+    avatar.obj.collisionMap.forEach(function(avatarSquare) {  // Loop through all the avatar squares
+      var avatarLeft = avatarSquare.x + avatar.obj.pos.x;
+      var avatarRight = avatarSquare.x + avatarSquare.width + avatar.obj.pos.x;
+      var avatarTop = avatarSquare.y + avatar.obj.pos.y;
+      var avatarBottom = avatarSquare.y + avatarSquare.height + avatar.obj.pos.y;
+      background.obj.collisionMap.forEach(function(bgSquare) {  // Loop through all the background's squares
+        var bgLeft = bgSquare.x;
+        var bgRight = bgSquare.x + bgSquare.width;
+        var bgTop = bgSquare.y;
+        var bgBottom = bgSquare.y + bgSquare.height;
+        // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current bg square (in those exact orders).
+        if (avatarLeft <= bgRight && avatarRight >= bgLeft && avatarTop <= bgBottom && avatarBottom >= bgTop) {
+          collision.found = true;
+          collision.type = 'wall';
+          if (avatar.obj.speed.x > 0) {
+            collision.direction = 'right';
+          } else if (avatar.obj.speed.x < 0) {
+            collision.direction = 'left';
+          } else if (avatar.obj.speed.y < 0) {
+            collision.direction = 'up';
+          } else if (avatar.obj.speed.y > 0) {
+            collision.direction = 'down';
+          }
+        }
+      });
+      sceneObject.obj.collisionMap.forEach(function(objSquare) {  // Loop through all the scene object's squares
+        var objLeft = objSquare.x + sceneObject.obj.pos.x;
+        var objRight = objSquare.x + objSquare.width + sceneObject.obj.pos.x;
+        var objTop = objSquare.y + sceneObject.obj.pos.y;
+        var objBottom = objSquare.y + objSquare.height + sceneObject.obj.pos.y;
+        // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current scene object square (in those exact orders).
+        if (avatarLeft <= objRight && avatarRight >= objLeft && avatarTop <= objBottom && avatarBottom >= objTop) {
+          collision.found = true;
+          collision.type = 'wall';
+          if (avatar.obj.speed.x > 0) {
+            collision.direction = 'right';
+          } else if (avatar.obj.speed.x < 0) {
+            collision.direction = 'left';
+          } else if (avatar.obj.speed.y < 0) {
+            collision.direction = 'up';
+          } else if (avatar.obj.speed.y > 0) {
+            collision.direction = 'down';
+          }
+        }
+      });
+      entity.obj.collisionMap.forEach(function(entitySquare) {  // Loop through all the scene object's squares
+        var entityLeft = entitySquare.x + entity.obj.pos.x;
+        var entityRight = entitySquare.x + entitySquare.width + entity.obj.pos.x;
+        var entityTop = entitySquare.y + entity.obj.pos.y;
+        var entityBottom = entitySquare.y + entitySquare.height + entity.obj.pos.y;
+        // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current scene object square (in those exact orders).
+        if (avatarLeft <= entityRight && avatarRight >= entityLeft && avatarTop <= entityBottom && avatarBottom >= entityTop) {
+          collision.found = true;
+          collision.type = 'wall';
+          if (avatar.obj.speed.x > 0) {
+            collision.direction = 'right';
+          } else if (avatar.obj.speed.x < 0) {
+            collision.direction = 'left';
+          } else if (avatar.obj.speed.y < 0) {
+            collision.direction = 'up';
+          } else if (avatar.obj.speed.y > 0) {
+            collision.direction = 'down';
+          }
+        }
+      });
+    });
+
+    if (collision.found) {
+      switch (collision.type) {
+        case 'wall':
+          avatar.collide(collision.direction);
+          break;
+      }
+      collision = {
+        found: false,
+        direction: 'none',
+        type: 'none'
+      };
+    }
+  }
+
+  function checkEntityCollisions() {
+    var collision = {
+      found: false,
+      direction: 'none',
+      type: 'none'
+    };
+    entity.obj.collisionMap.forEach(function(entitySquare) {  // Loop through all the entity squares
+      var entityLeft = entitySquare.x + entity.obj.pos.x;
+      var entityRight = entitySquare.x + entitySquare.width + entity.obj.pos.x;
+      var entityTop = entitySquare.y + entity.obj.pos.y;
+      var entityBottom = entitySquare.y + entitySquare.height + entity.obj.pos.y;
+      background.obj.collisionMap.forEach(function(bgSquare) {  // Loop through all the background's squares
+        var bgLeft = bgSquare.x;
+        var bgRight = bgSquare.x + bgSquare.width;
+        var bgTop = bgSquare.y;
+        var bgBottom = bgSquare.y + bgSquare.height;
+        // Pattern: check the left, right, top, and bottom edges of the current entity square against the right, left, bottom, and top edges of the current bg square (in those exact orders).
+        if (entityLeft <= bgRight && entityRight >= bgLeft && entityTop <= bgBottom && entityBottom >= bgTop) {
+          collision.found = true;
+          collision.type = 'wall';
+          if (entity.obj.speed.x > 0) {
+            collision.direction = 'right';
+          } else if (entity.obj.speed.x < 0) {
+            collision.direction = 'left';
+          } else if (entity.obj.speed.y < 0) {
+            collision.direction = 'up';
+          } else if (entity.obj.speed.y > 0) {
+            collision.direction = 'down';
+          }
+        }
+      });
+      sceneObject.obj.collisionMap.forEach(function(objSquare) {  // Loop through all the scene object's squares
+        var objLeft = objSquare.x + sceneObject.obj.pos.x;
+        var objRight = objSquare.x + objSquare.width + sceneObject.obj.pos.x;
+        var objTop = objSquare.y + sceneObject.obj.pos.y;
+        var objBottom = objSquare.y + objSquare.height + sceneObject.obj.pos.y;
+        // Pattern: check the left, right, top, and bottom edges of the current entity square against the right, left, bottom, and top edges of the current scene object square (in those exact orders).
+        if (entityLeft <= objRight && entityRight >= objLeft && entityTop <= objBottom && entityBottom >= objTop) {
+          collision.found = true;
+          collision.type = 'wall';
+          if (entity.obj.speed.x > 0) {
+            collision.direction = 'right';
+          } else if (entity.obj.speed.x < 0) {
+            collision.direction = 'left';
+          } else if (entity.obj.speed.y < 0) {
+            collision.direction = 'up';
+          } else if (entity.obj.speed.y > 0) {
+            collision.direction = 'down';
+          }
+        }
+      });
+      avatar.obj.collisionMap.forEach(function(avatarSquare) {  // Loop through all the scene object's squares
+        var avatarLeft = avatarSquare.x + avatar.obj.pos.x;
+        var avatarRight = avatarSquare.x + avatarSquare.width + avatar.obj.pos.x;
+        var avatarTop = avatarSquare.y + avatar.obj.pos.y;
+        var avatarBottom = avatarSquare.y + avatarSquare.height + avatar.obj.pos.y;
+        // Pattern: check the left, right, top, and bottom edges of the current entity square against the right, left, bottom, and top edges of the current scene object square (in those exact orders).
+        if (entityLeft <= avatarRight && entityRight >= avatarLeft && entityTop <= avatarBottom && entityBottom >= avatarTop) {
+          collision.found = true;
+          collision.type = 'wall';
+          if (entity.obj.speed.x > 0) {
+            collision.direction = 'right';
+          } else if (entity.obj.speed.x < 0) {
+            collision.direction = 'left';
+          } else if (entity.obj.speed.y < 0) {
+            collision.direction = 'up';
+          } else if (entity.obj.speed.y > 0) {
+            collision.direction = 'down';
+          }
+        }
+      });
+    });
+
+    if (collision.found) {
+      switch (collision.type) {
+        case 'wall':
+          entity.collide(collision.direction);
+          break;
+      }
+      collision = {
+        found: false,
+        direction: 'none',
+        type: 'none'
+      };
+    }
+  }
+
   function updateAvatar() {
     avatar.updatePos();
   }
 
-  function checkAvatarMotion() {
+  function updateEntity() {
+    entity.updatePos();
+  }
+
+  // NOTE: these frame index variables should probably belong to the individual avatar, object, or entity in the factory
+  var currentAvatarFrameIndex = 0;
+  function checkAvatarAction() {
     if (avatar.action === 'walkLeft' || avatar.action === 'walkUp' || avatar.action === 'walkRight' || avatar.action === 'walkDown') {
-      if (currentFrameIndex > avatar.obj.animate[avatar.action].length - 1) {
-        currentFrameIndex = 0;
+      if (currentAvatarFrameIndex > avatar.obj.animate[avatar.action].length - 1) {
+        currentAvatarFrameIndex = 0;
       }
-      avatar.obj.currentFrame = avatar.obj.animate[avatar.action][currentFrameIndex];
-      currentFrameIndex++;
+      avatar.obj.currentFrame = avatar.obj.animate[avatar.action][currentAvatarFrameIndex];
+      currentAvatarFrameIndex++;
     } else {
       // Do nothing, or set frame to a given specific frame.
       // avatar.obj.currentFrame = avatar.obj.animate.walkLeft[0];
+    }
+  }
+
+  var currentSceneObjFrameIndex = 0;
+  function checkSceneObjectAction() {
+    // Animate the object.
+    if (currentSceneObjFrameIndex > sceneObject.obj.animate[sceneObject.allActions[0]].length - 1) {
+      currentSceneObjFrameIndex = 0;
+    }
+    sceneObject.obj.currentFrame = sceneObject.obj.animate[sceneObject.allActions[0]][currentSceneObjFrameIndex];
+    currentSceneObjFrameIndex++;
+  }
+
+  var currentEntityFrameIndex = 0;
+  function checkEntityAction() {
+    if (entity.action === 'stand' || entity.action === 'walkLeft' || entity.action === 'walkUp' || entity.action === 'walkRight' || entity.action === 'walkDown') {
+      switch (entity.action) {
+        case 'walkLeft':
+          entity.obj.speed.x = -1;
+          entity.obj.speed.y = 0;
+          break;
+        case 'walkUp':
+          entity.obj.speed.x = 0;
+          entity.obj.speed.y = -1;
+          break;
+        case 'walkRight':
+          entity.obj.speed.x = 1;
+          entity.obj.speed.y = 0;
+          break;
+        case 'walkDown':
+          entity.obj.speed.x = 0;
+          entity.obj.speed.y = 1;
+          break;
+      }
+      // Animate the entity.
+      if (currentEntityFrameIndex > entity.obj.animate[entity.action].length - 1) {
+        currentEntityFrameIndex = 0;
+      }
+      entity.obj.currentFrame = entity.obj.animate[entity.action][currentEntityFrameIndex];
+      currentEntityFrameIndex++;
     }
   }
 
@@ -1098,8 +1925,34 @@
     gameCtx.save();
     // Translate the canvas origin to be the top left of the avatar
     gameCtx.translate(avatar.obj.pos.x, avatar.obj.pos.y);
-    // Draw the squares from the avatar's current frame AND the collision map.
+    // Draw the squares from the avatar's current frame
     avatar.obj.currentFrame.forEach(function(square) {
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    });
+    gameCtx.globalAlpha = 0.2;
+    // Draw the avatar's collision map (purely for testing)
+    avatar.obj.collisionMap.forEach(function(square) {
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    });
+    gameCtx.restore();
+  }
+
+  function drawBackground() {
+    // Save the drawing context
+    gameCtx.save();
+    // Draw the squares from the background object.
+    gameCtx.globalCompositeOperation = "destination-over";
+    for (var index = background.obj.image.length - 1; index >= 0; index--) {
+      var square = background.obj.image[index];
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    }
+    gameCtx.globalCompositeOperation = "source-over";
+    gameCtx.globalAlpha = 0.2;
+    // Draw the background's collision map (purely for testing)
+    background.obj.collisionMap.forEach(function(square) {
       gameCtx.fillStyle = square.color;
       gameCtx.fillRect(square.x, square.y, square.width, square.height);
     });
@@ -1109,10 +1962,18 @@
   function drawObjects() {
     // Save the drawing context
     gameCtx.save();
-    // Translate the canvas origin to be the top left of the avatar
-    gameCtx.translate(avatar.obj.pos.x, avatar.obj.pos.y);
-    // Draw the squares from the avatar's current frame AND the collision map.
-    avatar.obj.currentFrame.forEach(function(square) {
+    // Translate the canvas origin to be the top left of the sceneObject
+    gameCtx.translate(sceneObject.obj.pos.x, sceneObject.obj.pos.y);
+    // Draw the squares from the sceneObject's current frame
+    gameCtx.globalCompositeOperation = "destination-over";  // If object is behind character.
+    // gameCtx.globalCompositeOperation = "source-over";    // If object is in front of character.
+    sceneObject.obj.currentFrame.forEach(function(square) {
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    });
+    gameCtx.globalAlpha = 0.2;
+    // Draw the sceneObject's collision map (purely for testing)
+    sceneObject.obj.collisionMap.forEach(function(square) {
       gameCtx.fillStyle = square.color;
       gameCtx.fillRect(square.x, square.y, square.width, square.height);
     });
@@ -1122,38 +1983,60 @@
   function drawEntities() {
     // Save the drawing context
     gameCtx.save();
-    // Translate the canvas origin to be the top left of the avatar
-    gameCtx.translate(avatar.obj.pos.x, avatar.obj.pos.y);
-    // Draw the squares from the avatar's current frame AND the collision map.
-    avatar.obj.currentFrame.forEach(function(square) {
+    // Translate the canvas origin to be the top left of the entity
+    gameCtx.translate(entity.obj.pos.x, entity.obj.pos.y);
+    // Draw the squares from the entity's current frame
+    gameCtx.globalCompositeOperation = "destination-over";  // If object is behind character.
+    // gameCtx.globalCompositeOperation = "source-over";    // If object is in front of character.
+    entity.obj.currentFrame.forEach(function(square) {
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    });
+    gameCtx.globalAlpha = 0.2;
+    // Draw the entity's collision map (purely for testing)
+    entity.obj.collisionMap.forEach(function(square) {
       gameCtx.fillStyle = square.color;
       gameCtx.fillRect(square.x, square.y, square.width, square.height);
     });
     gameCtx.restore();
   }
 
-  function drawBackground(bgSquares) {
-    // Draw the squares from the background object.
-    gameCtx.globalCompositeOperation = "destination-over";
-  }
-
   function clearCanvas() {
     gameCtx.clearRect(0, 0, gameWidth, gameHeight);
   }
 
-  function drawGame() {
+  var initialized = false;
+  function runGame() {
     clearCanvas();
     // Draw avatar if it has been loaded
-    if (avatarLoaded) {
-      updateAvatar();
-      drawAvatar();
+    if (avatarLoaded && backgroundLoaded && sceneObjectLoaded && entityLoaded && !initialized) {
+      sceneTest.obj = {
+        avatar: avatar,
+        background: background,
+        objects: [sceneObject],
+        entities: [entity]
+      };
+      avatar = sceneTest.obj.avatar;
+      background = sceneTest.obj.background;
+      sceneObject = sceneTest.obj.objects[0];
+      entity = sceneTest.obj.entities[0];
+      initialized = true;
+      console.log(sceneTest);
+      console.log(JSON.stringify(sceneTest.obj));
     }
-    if (backgroundLoaded) {
+    if (initialized) {
+      checkAvatarCollisions();
+      checkEntityCollisions();
+      updateAvatar();
+      updateEntity();
+      drawAvatar();
+      drawEntities();
+      drawObjects();
       drawBackground();
     }
-    requestAnimationFrame(drawGame);
+    requestAnimationFrame(runGame);
   }
-  requestAnimationFrame(drawGame);
+  requestAnimationFrame(runGame);
 
   /*
   // Socket functionality
@@ -1304,13 +2187,13 @@
   // }
   //
     $scope.createGame = function() {
-        $state.go('main.game.editor');
+        $state.go('main.game.editor.views');
     };
 
     $scope.editGame = function (name) {
         $scope.user.editGame = name;
         UserService.set($scope.user);
-        $state.go('main.game.editor');
+        $state.go('main.game.editor.views');
     };
 
     setTimeout(function() {
@@ -2234,5 +3117,9 @@
       touchMoveEvent = event.touches[0];
       moved = true;
     });
+
+    console.log("here");
 });
-;;
+;angular.module('questCreator').controller('scriptsCtrl', function($state) {
+
+});
