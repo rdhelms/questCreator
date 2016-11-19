@@ -1,18 +1,10 @@
 <div id="editor-view">
 
-<<<<<<< cd26bb6e8eef61e193729ff909e29ac46a68b0ee
-    <section class="pop-up edit-game" ng-if="gameToEdit">
-        <label for="game-edit">Awesome! You're Now Editing:</label>
-        <p>{{ gameToEdit }}</p>
-        <button ng-click="editGame()" type="button" name="cool">COOL!</button>
-        <button ng-click="cancel()" type="button" name="cool">nah!</button>
-=======
     <section class="pop-up edit-game" ng-if="editor.currentEditingGame.name !== ''">
         <label for="game-edit">Awesome! You're Now Editing:</label>
         <p>{{ editor.currentEditingGame.name }}</p>
         <button ng-click="editor.editGame()" type="button" name="cool">COOL!</button>
         <button ng-click="editor.cancel()" type="button" name="cool">nah!</button>
->>>>>>> Adding in editor functionality with database
     </section>
 
     <section class="pop-up create-game" ng-if="editor.currentEditingGame.name === ''">
@@ -76,10 +68,8 @@
             <li class="viewer" id="game-objects">
                 <h4>Game Objects</h4>
                 <ul>
-                    <li><canvas class="asset game-object"></canvas></li>
-                    <li><canvas class="asset game-object"></canvas></li>
-                    <li><canvas class="asset game-object"></canvas></li>
-                    <li><canvas class="asset game-object"></canvas></li>
+                    <li ng-click="editor.createObject()" class="addNewObject"> <div style="height: 50px; width: 50px; border: 2px solid black;"> </div> </li>
+                    <li ng-repeat="object in editor.availableObjects"><canvas class="asset game-object"></canvas></li>
                 </ul>
             </li>
             <li class="viewer" id="entities">

@@ -30,7 +30,6 @@ angular.module('questCreator').service('EditorService', function (UserService, $
         description: "",
         tags: []
       };
-
       return $.ajax({
         method: 'POST',
         url: 'https://forge-api.herokuapp.com/games/create',

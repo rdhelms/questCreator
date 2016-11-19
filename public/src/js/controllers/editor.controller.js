@@ -3,7 +3,7 @@ angular.module('questCreator').controller('editorCtrl', function($scope, $state,
   // $scope.currentEditingGame = UserService.get().editGame;
   this.gameInfo = {};
   this.currentEditingGame = {
-    name: 'Potter Quest',
+    name: 'Potter Quest', // This name would be from localStorage
     description: '',
     info: this.gameInfo,
     tags: [],
@@ -11,6 +11,7 @@ angular.module('questCreator').controller('editorCtrl', function($scope, $state,
   };
   this.currentLargeView = 'background';
   this.currentSmallView = 'object';
+  this.availableObjects = [];
 
   this.editGame = function () {
       EditorService.getGame(this.currentEditingGame.name).done(function(game) {
@@ -22,11 +23,15 @@ angular.module('questCreator').controller('editorCtrl', function($scope, $state,
   this.createNewGame = function (name) {
       EditorService.createGame(name).done(function(game) {
         console.log(game);
+        this.currentEditingGame = game;
       });
       $('.create-game').hide();
-      this.currentEditingGame.name = name;
       UserService.setGameEdit(name);
   };
+
+  this.createObject = function() {
+    console.log("New object created!");
+  }
 
   $scope.cancel = function () {
     $state.go('main.profile');
