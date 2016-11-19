@@ -1,4 +1,4 @@
-angular.module('questCreator').controller('landingCtrl', function($state, $scope, UserService) {
+angular.module('questCreator').controller('landingCtrl', function($state, $scope, UserService, GameService) {
 
   $scope.createGame = function () {
       var user = UserService.get();
@@ -12,6 +12,11 @@ angular.module('questCreator').controller('landingCtrl', function($state, $scope
       }
   };
 
+  $scope.goToGameDetail = function (game) {
+      GameService.setGameDetail(game);
+      $state.go('main.game.detail');
+  };
+
   //This is for testing only
   $scope.games = [{
       thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
@@ -19,63 +24,72 @@ angular.module('questCreator').controller('landingCtrl', function($state, $scope
       creator: "billy badass",
       players: 6,
       created_at: new Date(),
-      responseText: "something"
+      responseText: "something",
+      totalPoints: 75
   }, {
       thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
       name: "King's Quest Collection",
       creator: "billy badass",
       players: 6,
       created_at: new Date(),
-      responseText: "something"
+      responseText: "something",
+      totalPoints: 75
   }, {
       thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
       name: "King's Quest Collection",
       creator: "billy badass",
       players: 6,
       created_at: new Date(),
-      responseText: "something"
+      responseText: "something",
+      totalPoints: 75
   }, {
       thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
       name: "King's Quest Collection",
       creator: "billy badass",
       players: 6,
       created_at: new Date(),
-      responseText: "something"
+      responseText: "something",
+      totalPoints: 75
   }, {
       thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
       name: "King's Quest Collection",
       creator: "billy badass",
       players: 6,
       created_at: new Date(),
-      responseText: "something"
+      responseText: "something",
+      totalPoints: 75
   }, {
       thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
       name: "King's Quest Collection",
       creator: "billy badass",
       players: 6,
       created_at: new Date(),
-      responseText: "something"
+      responseText: "something",
+      totalPoints: 75
   }, {
       thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
       name: "King's Quest Collection",
       creator: "billy badass",
       players: 6,
       created_at: new Date(),
-      responseText: "something"
+      responseText: "something",
+      totalPoints: 75
   }, {
       thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
       name: "King's Quest Collection",
       creator: "billy badass",
       players: 6,
       created_at: new Date(),
-      responseText: "something"
+      responseText: "something",
+      totalPoints: 75
   }, {
       thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
       name: "King's Quest Collection",
       creator: "billy badass",
       players: 6,
       created_at: new Date(),
-      responseText: "something"
+      responseText: "something",
+      totalPoints: 75
   }];
 
   $scope.assets = [
