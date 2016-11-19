@@ -1,25 +1,5 @@
 angular.module('questCreator').controller('profileCtrl', function(socket, $state, $scope, UserService) {
 
-  // var gameCanvas = document.getElementById('play-canvas');
-  // var gameCtx = gameCanvas.getContext('2d');
-  // var gameWidth = 500;
-  // var gameHeight = 700;
-  //
-  // function drawAvatar() {
-  //   // Save the drawing context
-  //   gameCtx.save();
-  //   // Translate the canvas origin to be the top left of the avatar
-  //   gameCtx.translate(avatar.pos.x, avatar.pos.y);
-  //   // Draw the squares from the avatar's current frame AND the collision map.
-  //   avatar.currentFrame.forEach(function(square) {
-  //     gameCtx.fillStyle = square.color;
-  //     gameCtx.fillRect(square.x, square.y, square.width, square.height);
-  //   });
-  //   gameCtx.restore();
-  //   gameCtx.fillStyle = "blue";
-  //   gameCtx.fillRect(0,0,100,100);
-  // }
-  //
     $scope.createGame = function() {
         $state.go('main.game.editor.views');
     };
@@ -28,6 +8,13 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
         $scope.user.editGame = name;
         UserService.set($scope.user);
         $state.go('main.game.editor.views');
+    };
+
+    $scope.archiveGame = function (name) {
+        var agree = confirm("Are you sure you wanna Archive" + name + "? That means no one will be able to play it and all player information will be lost.  You can retrieve it later, but that's such a headache.");
+        if (agree) {
+          UserService.archive(name);
+        }
     };
 
     setTimeout(function() {
