@@ -37,6 +37,10 @@
           }).state('main.game.editor.views', {
             url: '/',
             views: {
+              'palette': {
+                templateUrl: './src/views/game/editor/palette.html',
+                controller: 'paletteCtrl as palette'
+              },
               'maps': {
                 templateUrl: './src/views/game/editor/map.html',
                 controller: 'mapCtrl as map'
@@ -158,6 +162,61 @@
 
   return Entity;
 });
+;angular.module('questCreator').factory('Game', function() {
+  function Game(name) {
+    this.name = name;
+    this.maps = [];
+    this.scenes = [];
+    this.backgrounds = [];
+    this.sceneObjects = [];
+    this.entities = [];
+  };
+
+  return Game;
+});
+;angular.module('questCreator').factory('Map', function() {
+  function Map(name) {
+    this.name = name;
+    this.scenes = [];
+    /*
+      Structure of scenes array:
+      [ [ scenes[0][0], scenes[0][1], scenes[0][2], scenes[0][3] ],
+        [ scenes[1][0], scenes[1][1], scenes[1][2], scenes[1][3] ],
+        [ scenes[2][0], scenes[2][1], scenes[2][2], scenes[2][3] ] ]
+    */
+  };
+
+  return Map;
+});
+;angular.module('questCreator')
+.factory('PopupFactory', function ($compile) {
+
+  function create(content, title, scope) {
+    var popup = $('<popup>')
+      .attr({
+        'popup-title': '\"'+ title +'\"'
+        }
+      )
+      .append(content);
+    popup = $compile(popup)(scope);
+    $(popup).prependTo('body');
+  };
+
+  return {
+    new: create
+  };
+
+});
+;angular.module('questCreator').factory('Scene', function() {
+  function Scene(name) {
+    this.name = name;
+    this.backgrounds = [];
+    this.sceneObjects = [];
+    this.entities = [];
+  };
+
+  return Scene;
+});
 ;angular.module('questCreator').factory('SceneObject', function() {
   function SceneObject(sceneObjectInfo) {
     this.name = sceneObjectInfo.name;
@@ -169,17 +228,68 @@
 
   return SceneObject;
 });
+;angular.module('questCreator')
+.directive('popup', function(){
+  return {
+    scope: {
+      title: '=popupTitle'
+    },
+    replace: true,
+    transclude: true,
+    link: function (scope, element, attrs) {
+      scope.kill = function(){
+        $('#overlay').remove();
+      }
+    },
+    templateUrl: './src/views/popup.html'
+  };
+});
 ;angular.module('questCreator').service('EditorService', function (UserService, $state) {
 
 
     var game = null;
 
-    function getGameAssets(name) {
-
+    function getGame(name) {
+      var nameWrapper = {
+        name: name.toLowerCase()
+      }
+      return $.ajax({
+        method: 'GET',
+        url: 'https://forge-api.herokuapp.com/games/load',
+        data: nameWrapper,
+        success: function(response) {
+          return response;
+        },
+        error: function(error) {
+          alert('There was a problem loading this game');
+        }
+      });
     }
 
-    function createNewGame(name) {
-      var header = {
+    function getGameAssets(game_id) {
+        var headerData = {
+          user_id: UserService.get().id,
+          token: UserService.get().token
+        };
+        var data = {
+          game_id: game_id
+        };
+        return $.ajax({
+          method: 'GET',
+          url: 'https://forge-api.herokuapp.com/articles/game/all',
+          headers: headerData,
+          data: data,
+          success: function(response) {
+            return response;
+          },
+          error: function(error) {
+            console.log(error);
+          }
+        });
+    }
+
+    function createGame(name) {
+      var headerData = {
         user_id: UserService.get().id,
         token: UserService.get().token
       };
@@ -188,12 +298,11 @@
         description: "",
         tags: []
       };
-      console.log(header, game);
-      $.ajax({
+      return $.ajax({
         method: 'POST',
         url: 'https://forge-api.herokuapp.com/games/create',
         data: JSON.stringify(game),
-        headers: header,
+        headers: headerData,
         dataType: 'json',
         contentType: 'application/json',
         success: function(response) {
@@ -207,33 +316,234 @@
       });
     }
 
-    return {
-      getGame: getGameAssets,
-      createGame: createNewGame
-
-    };
-});
-;angular.module('questCreator').service('GameService', function () {
-
-    function loadGame(name) {
-      $.ajax({
-        method: 'GET',
-        url: 'https://forge-api.herokuapp.com/games/load',
-        data: JSON.stringify(name),
+    function createBackground(name, game_id) {
+      var headerData = {
+        user_id: UserService.get().id,
+        token: UserService.get().token
+      };
+      var backgroundInfo = {
+        image: [],
+        collisionMap: []
+      };
+      var currentBackground = {
+        name: name,
+        info: backgroundInfo,
+        tags: [],
+        published: true,
+        game_id: game_id
+      };
+      return $.ajax({
+        method: 'POST',
+        url: 'https://forge-api.herokuapp.com/backgrounds/create',
+        headers: headerData,
+        data: JSON.stringify(currentBackground),
         dataType: 'json',
         contentType: 'application/json',
         success: function(response) {
           return response;
         },
         error: function(error) {
-          alert('There was a problem loading this game');
+          console.log(error);
         }
       });
-}
+    }
 
-return {
-  loadGame: loadGame
-};
+    function saveBackground(imageArr, currentBackground) {
+      currentBackground.info.image = imageArr;
+      var headerData = {
+        user_id: UserService.get().id,
+        token: UserService.get().token
+      };
+      return $.ajax({
+        method: 'PUT',
+        url: 'https://forge-api.herokuapp.com/backgrounds/update',
+        headers: headerData,
+        data: JSON.stringify(currentBackground),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(response) {
+          return response;
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    }
+
+    function createObject(name, game_id) {
+      var headerData = {
+        user_id: UserService.get().id,
+        token: UserService.get().token
+      };
+      var objectInfo = {
+        pos: {
+          x: 350,
+          y: 250
+        },
+        image: [],
+        collisionMap: []
+      };
+      var currentObject = {
+        name: name,
+        info: objectInfo,
+        tags: [],
+        published: false,
+        game_id: game_id
+      };
+      return $.ajax({
+        method: 'POST',
+        url: 'https://forge-api.herokuapp.com/obstacles/create',
+        headers: headerData,
+        data: JSON.stringify(currentObject),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(response) {
+          return response;
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    }
+
+    function saveObject(imageArr, currentObject) {
+      currentObject.info.image = imageArr;
+      var headerData = {
+        user_id: UserService.get().id,
+        token: UserService.get().token
+      };
+      return $.ajax({
+        method: 'PUT',
+        url: 'https://forge-api.herokuapp.com/obstacles/update',
+        headers: headerData,
+        data: JSON.stringify(currentObject),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(response) {
+          return response;
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    }
+
+    return {
+      getGame: getGame,
+      getGameAssets: getGameAssets,
+      createGame: createGame,
+      createBackground: createBackground,
+      saveBackground: saveBackground,
+      createObject: createObject,
+      saveObject: saveObject
+    };
+});
+;angular.module('questCreator').service('GameService', function() {
+
+    var gameDetail = {};
+
+    function loadGame(name) {
+        $.ajax({
+            method: 'GET',
+            url: 'https://forge-api.herokuapp.com/games/load',
+            data: JSON.stringify(name),
+            dataType: 'json',
+            contentType: 'application/json',
+            success: function(response) {
+                return response;
+            },
+            error: function(error) {
+                alert('There was a problem loading this game');
+            }
+        });
+    }
+
+    function getAllGames() {
+        $.ajax({
+            method: 'GET',
+            url: 'https://forge-api.herokuapp.com/games/all',
+            contentType: 'application/json',
+            success: function(response) {
+                return response;
+            },
+            error: function(error) {
+                alert('There was a problem loading the games');
+            }
+        });
+    }
+
+    function getGameDetail() {
+        return gameDetail;
+    }
+
+    function setGameDetail(game) {
+        gameDetail = game;
+    }
+
+    return {
+        loadGame: loadGame,
+        getGameDetail: getGameDetail,
+        setGameDetail: setGameDetail,
+        getGames: getAllGames
+    };
+});
+;angular.module('questCreator').service('PaletteService', function () {
+  function getAllAssets() {
+      $.ajax({
+          method: 'GET',
+          url: 'https://forge-api.herokuapp.com/articles/index',
+          contentType: 'application/json',
+          success: function(response) {
+              console.log('here');
+              return response;
+          },
+          error: function(error) {
+              alert('There was a problem loading the assets');
+          }
+      });
+  }
+
+  return {
+    getAssets: getAllAssets
+  };
+});
+;angular.module('questCreator')
+.service('PopupService', function ($templateRequest, PopupFactory) {
+
+  var path = './src/views/popups/';
+
+  // Keyname is the popup's "Title"
+  // and property is it's url relative to the above path
+  //
+  // So passing "Welcome!" to this service will put the text "Welcome!"
+  // into the title bar of the popup, with the contents of "welcome.html"
+  // in the popup's body.
+  var templates = {
+    'editorGreeting': {
+      title: 'Name your Game',
+      content: 'edit-game.html'
+    },
+    'welcome': {
+      title: 'Welcome!',
+      content: 'welcome.html'
+    },
+    'newUser': {
+      title: 'Hey, you\'re new!',
+      content: 'user-register.html'
+    }
+  }
+
+  function templateSelector(name, scope) {
+    // debugger;
+    var template = path + templates[name].content;
+    var content = $('<ng-include>').attr('src', '\''+ template+ '\'');
+    // Creates new popup on the page in specified scope:
+    PopupFactory.new(content, templates[name].title, scope);
+  }
+
+  return {
+    type: templateSelector
+  }
 });
 ;angular.module('questCreator').service('socket', function() {
   var socket = io();
@@ -251,6 +561,9 @@ return {
   };
 });
 ;angular.module('questCreator').service('UserService', function () {
+    // Google Info
+    var apiKey = 'AIzaSyCe__2EGSmwp0DR-qKGqpYwawfmRsTLBEs';
+    var clientId = '730683845367-tjrrmvelul60250evn5i74uka4ustuln.apps.googleusercontent.com';
     var user = {
             uid: null,
             token: null,
@@ -275,8 +588,30 @@ return {
       user.editGame = name;
     }
 
-    var apiKey = 'AIzaSyCe__2EGSmwp0DR-qKGqpYwawfmRsTLBEs';
-    var clientId = '730683845367-tjrrmvelul60250evn5i74uka4ustuln.apps.googleusercontent.com';
+    function getGameEdit() {
+      return user.editGame || null;
+    }
+
+    function archiveGame(name) {
+      $.ajax({
+        method: 'DELETE',
+        url: 'https://forge-api.herokuapp.com/games/archive',
+        data: JSON.stringify(name),
+        headers: {
+          user_id: user.id,
+          token: user.token
+        },
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(response) {
+          alert('Your game has been archived. If you ever want to see it again, click "Archived Games" below the list of your games. Carry on.');
+        },
+        error: function(error) {
+          alert('There was a problem archiving this game. Please try again.');
+          $state.go('main.landing');
+        }
+      });
+    }
 
     var auth2;
     // When the api has loaded, run the init function.
@@ -399,7 +734,7 @@ return {
             token: user.token
           },
           success: function(response) {
-
+            return response;
           },
           error: function(error) {
             alert('There was a problem loading the profile. Please try again.');
@@ -411,14 +746,660 @@ return {
       get: getUser,
       set: setUser,
       setGameEdit: setGameEdit,
-      games: getUserGames,
+      getGameEdit: getGameEdit,
+      getUserGames: getUserGames,
+      archive: archiveGame,
       register: registerUser,
       signOut: signOut,
       signIn: signIn
     };
 });
-;angular.module('questCreator').controller('bgCtrl', function($state) {
+;angular.module('questCreator').controller('bgCtrl', function($state, $scope, EditorService) {
+  var self = this;      // To help with scope issues
+  var drawHandle = -1;  // Interval handle for drawing rate
+  var moveHandle = -1;  // Interval handle for movement of mouse (possibly does not need to be global)
+  var mouseX = 0;
+  var mouseY = 0;
+  var mouseMoveEvent;       // Global variable to track mouse movement events
+  var touchMoveEvent;       // Global variable to track touch movement events
+  var mobileWidth = 850;    // Width for mobile screen sizes
+  var tabletWidth = 1100;   // Width for tablet screen sizes
+  var tabletScale = 1.4;
+  var mobileScaleX = 2.5;
+  var mobileScaleY = 1.6;
+  var moveType = '';    // Either mouse or touch
+  var moved = false;    // Whether mouse has moved or not
+  var moving = {        // Direction that the main character should be moving.
+    left: false,
+    right: false,
+    up: false,
+    down: false
+  };
+  var drawing = {       // Type of object being drawn. Default: background.
+    // mobile: false,
+    // static: false,
+    background: true
+  };
+  var pixelWidth = $scope.editor.currentPixelSize;
+  var pixelHeight = $scope.editor.currentPixelSize;
+  var undoBackgroundArray = [];   //Array to keep track of background objects that were undone.
+  // var undoObstacleArray = [];   //Array to keep track of obstacle objects that were undone.
+  // var undoCharacterArray = [];   //Array to keep track of character objects that were undone.
+  this.speedRange = 5;     // How fast mobile objects should move.
+  // this.radiusRange = 5;  // Value of radius input in draw.html
+  // this.widthRangeBackground = 50;   // Value of width input in draw.html
+  // this.heightRangeBackground = 50;  // Value of height input in draw.html
+  // this.widthRangeObstacle = 50;     // Value of width input in draw.html
+  // this.heightRangeObstacle = 50;    // Value of height input in draw.html
+  this.currentColor = $scope.editor.currentColor;    // Value of color input in draw.html
+  // this.currentScene = Scenes.fetchCurrentScene() || {}; // Scene selected from scenes controller
+  // this.currentBackground = Backgrounds.fetchCurrentBackground() || {};  // Background selected from scenes controller
+  this.myCanvas = document.getElementById('bg-canvas');  // Canvas html element
+  this.canvasPos = {    // Canvas top and left coordinates on page
+    x: self.myCanvas.getBoundingClientRect().left,
+    y: self.myCanvas.getBoundingClientRect().top
+  };
+  this.draw = this.myCanvas.getContext('2d'); // Canvas context
+  // this.sceneName =  this.currentScene.name || '';       // Current selected Scene name
+  // this.allMobileCircles = this.currentScene.mobileArr || [];  // Array of all mobile objects in current scene
+  // this.allObstacleSquares = this.currentScene.staticArr || [];  // Array of all static objects in current scene
+  // this.backgroundName = this.currentBackground.name || '';  // Current selected Background name
+  // this.allBackgroundSquares = this.currentBackground.staticArr || []; // Array of all static objects in current background
+  this.backgroundName = 'Testing Background';
+  this.allBackgroundSquares = [];
 
+  /*
+  *   Rectangle object constructor
+  *   @params
+  *     x: horizontal coord of top left corner
+  *     y: vertical coord of top left corner
+  *     width: width of rectangle
+  *     height: height of rectangle
+  *     color: color of rectangle
+  *   @methods
+  *     draw: draw the rectangle on the canvas using its position, size, and color.
+  */
+  function Square(x, y, width, height, color) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.color = color;
+    this.draw = function() {
+      self.draw.fillStyle = this.color;
+      if (window.innerWidth <= mobileWidth) { // Mobile size
+        self.draw.fillRect(this.x * mobileScaleX, this.y * mobileScaleY, this.width, this.height);
+      } else if (window.innerWidth <= tabletWidth) { // Tablet size
+        self.draw.fillRect(this.x * tabletScale, this.y / tabletScale, this.width, this.height);
+      } else {  // Desktop size
+        self.draw.fillRect(this.x, this.y, this.width, this.height);
+      }
+    }
+  }
+
+  $scope.$on('redrawBackground', function(event, imageArr) {
+    canvasWidth = self.myCanvas.width;
+    canvasHeight = self.myCanvas.height;
+    self.draw.clearRect(0, 0, canvasWidth, canvasHeight);
+    self.allBackgroundSquares = [];
+    var undoBackgroundArray = [];
+    self.allBackgroundSquares = imageArr;
+    for (var index = 0; index < self.allBackgroundSquares.length; index++) {
+      var square = self.allBackgroundSquares[index];
+      self.draw.fillStyle = square.color;
+      self.draw.fillRect(square.x, square.y, square.width, square.height);
+    }
+  });
+
+  // /*
+  // *   Circle object constructor
+  // *   @params
+  // *     x: horizontal coord of center of circle
+  // *     y: vertical coord of center of circle
+  // *     radius: radius of circle
+  // *     color: color of circle
+  // *   @methods
+  // *     draw: draw the circle on the canvas using its position, size, and color.
+  // */
+  // function Circle(x, y, radius, color) {
+  //   this.x = x;
+  //   this.y = y;
+  //   this.radius = radius;
+  //   this.color = color;
+  //   this.draw = function() {
+  //     self.draw.beginPath();
+  //     self.draw.fillStyle = this.color;
+  //     if (window.innerWidth <= mobileWidth) { // Mobile size
+  //       self.draw.arc(this.x * mobileScaleX, this.y * mobileScaleY, this.radius, 0, 2 * Math.PI);
+  //     } else if (window.innerWidth <= tabletWidth) { // Tablet size
+  //       self.draw.arc(this.x * tabletScale, this.y / tabletScale, this.radius, 0, 2 * Math.PI);
+  //     } else {
+  //       self.draw.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+  //     }
+  //     self.draw.fill();
+  //     // Example for future reference: Can also draw using an image. Image should first be loaded on the page.
+  //     // draw.drawImage(imgElem, this.x, this.y, this.radius, this.radius);
+  //   }
+  // }
+
+  // Called when the mouse button is pressed.
+  // Starts the interval to run every 100ms while the mouse button is still held down.
+  // Only start the interval if it is not already running.
+  function mouseDown(event) {
+    if (drawHandle === -1) {
+      drawHandle = setInterval(mousePressed, 100);
+    }
+  }
+
+  // Called when the mouse button is released.
+  // If the interval is running, then clear it and reset it.
+  function mouseUp(event) {
+    if (drawHandle !== -1) {
+      clearInterval(drawHandle);
+      drawHandle = -1;
+    }
+  }
+
+  // Runs every 100ms after the mouse button is pressed until it is released.
+  // Purpose is to draw the object that the user has chosen every 100ms AND if the mouse has moved from its previous location.
+  function mousePressed() {
+      self.canvasPos = {  // Get the most recent canvas position in case the window has been resized.
+        x: self.myCanvas.getBoundingClientRect().left,
+        y: self.myCanvas.getBoundingClientRect().top
+      };
+      // if (moved && drawing.mobile) { // Create, draw, and record a new mobile object
+      //   var radius = parseInt(self.radiusRange);
+      //   var color = self.currentColor;
+      //   if (moveType === 'mouse') {
+      //     var newCircle = new Circle(mouseMoveEvent.clientX - self.canvasPos.x, mouseMoveEvent.clientY - self.canvasPos.y, radius, color);
+      //     newCircle.draw();
+      //     self.allMobileCircles.push(newCircle);
+      //   } else if (moveType === 'touch') {
+      //     var newCircle = new Circle(touchMoveEvent.clientX - self.canvasPos.x, touchMoveEvent.clientY - self.canvasPos.y, radius, color);
+      //     newCircle.draw();
+      //     self.allMobileCircles.push(newCircle);
+      //   }
+      //   moved = false;
+      // } else if (moved && drawing.static) {  // Create, draw, and record a new static object
+      //   var width = parseInt(self.widthRangeObstacle);
+      //   var height = parseInt(self.heightRangeObstacle);
+      //   var color = self.currentColor;
+      //   if (moveType === 'mouse') {
+      //     var newSquare = new Square(mouseMoveEvent.clientX - width / 2 - self.canvasPos.x, mouseMoveEvent.clientY - height / 2 - self.canvasPos.y, width, height, color);
+      //     newSquare.draw();
+      //     self.allObstacleSquares.push(newSquare);
+      //   } else if (moveType === 'touch') {
+      //     var newSquare = new Square(touchMoveEvent.clientX - width / 2 - self.canvasPos.x, touchMoveEvent.clientY - height / 2 - self.canvasPos.y, width, height, color);
+      //     newSquare.draw();
+      //     self.allObstacleSquares.push(newSquare);
+      //   }
+      //   moved = false;
+      // } else if (moved && drawing.background) { // Create, draw, and record a new background object
+      //   var width = parseInt(self.widthRangeBackground);
+      //   var height = parseInt(self.heightRangeBackground);
+      //   var color = self.currentColor;
+      //   if (moveType === 'mouse') {
+      //     var newSquare = new Square(mouseMoveEvent.clientX - width / 2 - self.canvasPos.x, mouseMoveEvent.clientY - height / 2 - self.canvasPos.y, width, height, color);
+      //     newSquare.draw();
+      //     self.allBackgroundSquares.push(newSquare);
+      //   } else if (moveType === 'touch') {
+      //     var newSquare = new Square(touchMoveEvent.clientX - width / 2 - self.canvasPos.x, touchMoveEvent.clientY - height / 2 - self.canvasPos.y, width, height, color);
+      //     newSquare.draw();
+      //     self.allBackgroundSquares.push(newSquare);
+      //   }
+      //   moved = false;
+      // }
+    if (moved && drawing.background) { // Create, draw, and record a new background object
+      var width = $scope.editor.currentPixelSize;
+      var height = $scope.editor.currentPixelSize;
+      var color = $scope.editor.currentColor;
+      if (moveType === 'mouse') {
+        var newSquareX = mouseX - self.canvasPos.x;
+        var newSquareY = mouseY - self.canvasPos.y;
+        var exists = false;
+        self.allBackgroundSquares.forEach(function(square) {
+          if (square.x === newSquareX && square.y === newSquareY) {
+            exists = true;
+          }
+        });
+        if (!exists) {
+          var newSquare = new Square(mouseX - self.canvasPos.x, mouseY - self.canvasPos.y, width, height, color);
+          newSquare.draw();
+          self.allBackgroundSquares.push(newSquare);
+        }
+      } else if (moveType === 'touch') {
+        var newSquare = new Square(touchMoveEvent.clientX - width / 2 - self.canvasPos.x, touchMoveEvent.clientY - height / 2 - self.canvasPos.y, width, height, color);
+        newSquare.draw();
+        self.allBackgroundSquares.push(newSquare);
+      }
+      moved = false;
+    }
+  }
+
+  // // Check for collisions between all of the mobile objects and all of the obstacle objects.
+  // // The collision is categorized according to which direction the obstacle is found.
+  // function findCollisions() {
+  //   var foundCollision = {  // By default, there is no collision found in any direction.
+  //     left: false,
+  //     right: false,
+  //     up: false,
+  //     down: false
+  //   };
+  //   self.allMobileCircles.forEach(function(circle) {  // Loop through all the mobile objects
+  //     self.allObstacleSquares.forEach(function(square) {  // Loop through all the obstacle objects
+  //       // Pattern: check the left, right, top, and bottom edges of the current mobile object against the right, left, bottom, and top edges of the current obstacle (in those exact orders).
+  //       if (circle.x - circle.radius <= square.x + square.width && circle.x - circle.radius >= square.x && circle.y >= square.y && circle.y <= square.y + square.height) {
+  //         foundCollision.left = true;
+  //         moving.left = false;
+  //       }
+  //       if (circle.x + circle.radius <= square.x + square.width && circle.x + circle.radius >= square.x && circle.y >= square.y && circle.y <= square.y + square.height) {
+  //         foundCollision.right = true;
+  //         moving.right = false;
+  //       }
+  //       if (circle.x <= square.x + square.width && circle.x >= square.x && circle.y - circle.radius >= square.y && circle.y - circle.radius <= square.y + square.height) {
+  //         foundCollision.up = true;
+  //         moving.up = false;
+  //       }
+  //       if (circle.x <= square.x + square.width && circle.x >= square.x && circle.y + circle.radius >= square.y && circle.y + circle.radius <= square.y + square.height) {
+  //         foundCollision.down = true;
+  //         moving.down = false;
+  //       }
+  //     });
+  //     // Check for collisions with the canvas border as well. Take resizing screen sizes into account.
+  //     var canvasEdgeRight;
+  //     var canvasEdgeBottom;
+  //     if (window.innerWidth <= mobileWidth) {
+  //       canvasEdgeRight = self.myCanvas.width / mobileScaleX;
+  //       canvasEdgeBottom = self.myCanvas.height / mobileScaleY;
+  //     } else if (window.innerWidth <= tabletWidth) {
+  //       canvasEdgeRight = self.myCanvas.width / tabletScale;
+  //       canvasEdgeBottom = self.myCanvas.height * tabletScale;
+  //     } else {
+  //       canvasEdgeRight = self.myCanvas.width;
+  //       canvasEdgeBottom = self.myCanvas.height;
+  //     }
+  //     if (circle.x <= 0) {
+  //       foundCollision.left = true;
+  //       moving.left = false;
+  //     }
+  //     if (circle.x >= canvasEdgeRight) {
+  //       foundCollision.right = true;
+  //       moving.right = false;
+  //     }
+  //     if (circle.y <= 0) {
+  //       foundCollision.up = true;
+  //       moving.up = false;
+  //     }
+  //     if (circle.y >= canvasEdgeBottom) {
+  //       foundCollision.down = true;
+  //       moving.down = false;
+  //     }
+  //   });
+  //   return foundCollision;
+  // }
+
+  // // Called when any key is pressed.
+  // function handleKeyDown(event) {
+  //   // If the user presses the left, right, up, or down arrow keys, toggle the movement direction accordingly
+  //   if (event.keyCode === 37) { // Left Key
+  //     event.preventDefault();
+  //     moving = {
+  //       left: !moving.left,
+  //       up: false,
+  //       right: false,
+  //       down: false
+  //     };
+  //   } else if (event.keyCode === 38) { // Up Key
+  //     event.preventDefault();
+  //     moving = {
+  //       left: false,
+  //       up: !moving.up,
+  //       right: false,
+  //       down: false
+  //     };
+  //   } else if (event.keyCode === 39) { // Right Key
+  //     event.preventDefault();
+  //     moving = {
+  //       left: false,
+  //       up: false,
+  //       right: !moving.right,
+  //       down: false
+  //     };
+  //   } else if (event.keyCode === 40) { // Down Key
+  //     event.preventDefault();
+  //     moving = {
+  //       left: false,
+  //       up: false,
+  //       right: false,
+  //       down: !moving.down
+  //     };
+  //   } else {    // For all other keys, stop all movement.
+  //     moving = {
+  //       left: false,
+  //       up: false,
+  //       right: false,
+  //       down: false
+  //     }
+  //   }
+  //   // If any of the arrow keys have been pressed, run the moveMobileCircles function every 20ms.
+  //   // Otherwise, stop running the moveMobileCircles function.
+  //   if ( moving.left || moving.up || moving.right || moving.down ) {
+  //     clearInterval(moveHandle);
+  //     moveHandle = setInterval(moveMobileCircles, 20);
+  //   } else {
+  //     clearInterval(moveHandle);
+  //   }
+  // }
+
+  // // Runs every 20ms after an arrow key has been pressed.
+  // function moveMobileCircles() {
+  //   // Depending on movement direction and collision detection, do the following:
+  //   // 1) Clear the canvas.
+  //   // 2) Redraw background and obstacle objects.
+  //   // 3) Shift the circles in the corresponding direction.
+  //   // 4) Redraw the circles.
+  //   // Note: Checking collision detection and checking movement direction may be redundant.
+  //   if (moving.left && !findCollisions().left) {
+  //     self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+  //     drawBackgroundSquares();
+  //     drawObstacleSquares();
+  //     self.allMobileCircles.forEach(function(circle) {
+  //       circle.x -= parseInt(self.speedRange);
+  //       circle.draw();
+  //     });
+  //   } else if (moving.right && !findCollisions().right) {
+  //     self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+  //     drawBackgroundSquares();
+  //     drawObstacleSquares();
+  //     self.allMobileCircles.forEach(function(circle) {
+  //       circle.x += parseInt(self.speedRange);
+  //       circle.draw();
+  //     });
+  //   } else if (moving.up && !findCollisions().up) {
+  //     self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+  //     drawBackgroundSquares();
+  //     drawObstacleSquares();
+  //     self.allMobileCircles.forEach(function(circle) {
+  //       circle.y -= parseInt(self.speedRange);
+  //       circle.draw();
+  //     });
+  //   } else if (moving.down && !findCollisions().down) {
+  //     self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+  //     drawBackgroundSquares();
+  //     drawObstacleSquares();
+  //     self.allMobileCircles.forEach(function(circle) {
+  //       circle.y += parseInt(self.speedRange);
+  //       circle.draw();
+  //     });
+  //   }
+  // }
+
+  // Loop through the array of background objects and draw them all.
+  function drawBackgroundSquares() {
+    for (var index = 0; index < self.allBackgroundSquares.length; index++) {
+      var square = self.allBackgroundSquares[index];
+      square.draw();
+    }
+  }
+
+  // // Loop through the array of obstacle objects and draw them all.
+  // function drawObstacleSquares() {
+  //   for (var index = 0; index < self.allObstacleSquares.length; index++) {
+  //     var square = self.allObstacleSquares[index];
+  //     square.draw();
+  //   }
+  // }
+
+  // // Loop through the array of mobile objects and draw them all.
+  // function drawMobileCircles() {
+  //   for (var index = 0; index < self.allMobileCircles.length; index++) {
+  //     var circle = self.allMobileCircles[index];
+  //     circle.draw();
+  //   }
+  // }
+
+  // // When the Draw Character button is clicked, change the drawing setting to mobile.
+  // $('.characterDraw').click(function() {
+  //   drawing = {
+  //     mobile: true,
+  //     static: false,
+  //     background: false
+  //   };
+  //   $('.option').removeClass('active');
+  //   $(this).addClass('active');
+  // });
+
+  // // When the Draw Obstacles button is clicked, change the drawing setting to static.
+  // $('.objectDraw').click(function() {
+  //   drawing = {
+  //     mobile: false,
+  //     static: true,
+  //     background: false
+  //   }
+  //   $('.option').removeClass('active');
+  //   $(this).addClass('active');
+  // });
+
+  // // When the Draw Background button is clicked, change the drawing setting to background.
+  // $('.backgroundDraw').click(function() {
+  //   drawing = {
+  //     mobile: false,
+  //     static: false,
+  //     background: true
+  //   }
+  //   $('.option').removeClass('active');
+  //   $(this).addClass('active');
+  // });
+
+  // When the user clicks the undo button, remove the last element from the object array and push it to the undo array, based on current drawing type. Then redraw canvas.
+  $('#undoBackground').click(function() {
+    // if (drawing.mobile && self.allMobileCircles.length > 0) {
+    //   var lastObj = self.allMobileCircles.pop();
+    //   undoCharacterArray.push(lastObj);
+    // } else if (drawing.static && self.allObstacleSquares.length > 0) {
+    //   var lastObj = self.allObstacleSquares.pop();
+    //   undoObstacleArray.push(lastObj);
+    // } else if (drawing.background && self.allBackgroundSquares.length > 0) {
+    //   var lastObj = self.allBackgroundSquares.pop();
+    //   undoBackgroundArray.push(lastObj);
+    // }
+    if (drawing.background && self.allBackgroundSquares.length > 0) {
+      var lastObj = self.allBackgroundSquares.pop();
+      undoBackgroundArray.push(lastObj);
+    }
+    self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+    drawBackgroundSquares();
+    // drawObstacleSquares();
+    // drawMobileCircles();
+  });
+
+  // When the user clicks the redo button, remove the last element from the undo array and push it to the object array, based on current drawing type. Then redraw canvas.
+  $('#redoBackground').click(function() {
+    // if (drawing.mobile && undoCharacterArray.length > 0) {
+    //   var lastObj = undoCharacterArray.pop();
+    //   self.allMobileCircles.push(lastObj);
+    // } else if (drawing.static && undoObstacleArray.length > 0) {
+    //   var lastObj = undoObstacleArray.pop();
+    //   self.allObstacleSquares.push(lastObj);
+    // } else if (drawing.background && undoBackgroundArray.length > 0) {
+    //   var lastObj = undoBackgroundArray.pop();
+    //   self.allBackgroundSquares.push(lastObj);
+    // }
+    if (drawing.background && undoBackgroundArray.length > 0) {
+      var lastObj = undoBackgroundArray.pop();
+      self.allBackgroundSquares.push(lastObj);
+    }
+    self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+    drawBackgroundSquares();
+    // drawObstacleSquares();
+    // drawMobileCircles();
+  });
+
+  // When the Clear Canvas button is clicked, make the current Background and current Scene empty objects and reload the view.
+  // Note: may need extra testing here.
+  $('#clearBackground').click(function() {
+    canvasWidth = self.myCanvas.width;
+    canvasHeight = self.myCanvas.height;
+    // self.allObstacleSquares = [];
+    // self.allMobileCircles = [];
+    self.draw.clearRect(0, 0, canvasWidth, canvasHeight);
+    self.allBackgroundSquares = [];
+    var undoBackgroundArray = [];
+    // var undoObstacleArray = [];
+    // var undoCharacterArray = [];
+    // Scenes.selectScene({})
+    // Backgrounds.selectBackground({});
+    // $state.reload();
+  });
+
+  // // When the Save Scene button is clicked:
+  // // 1) Clear the canvas and redraw only the Obstacles and Character. (ensures thumbnail is scene ONLY)
+  // // 2) Create and store a new scene object and make it the current Scene.
+  // // 3) Clear the canvas again and this time redraw Background, Obstacles, and Character.
+  // $('.saveScene').click(function() {
+  //   self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+  //   drawObstacleSquares();
+  //   drawMobileCircles();
+  //   var newScene = Scenes.create({
+  //     name: self.sceneName,
+  //     staticArr: self.allObstacleSquares,
+  //     mobileArr: self.allMobileCircles,
+  //     thumbnail: self.myCanvas.toDataURL()
+  //   });
+  //   Scenes.selectScene(newScene);
+  //   self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+  //   drawBackgroundSquares();
+  //   drawObstacleSquares();
+  //   drawMobileCircles();
+  // });
+
+  // // When the Publish Scene button is clicked, post it to the database.
+  // $('.publishScene').click(function() {
+  //   // Trying to decide whether to save AND publish or just publish...
+  //   self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+  //   drawObstacleSquares();
+  //   drawMobileCircles();
+  //   var newScene = Scenes.create({
+  //     name: self.sceneName,
+  //     staticArr: self.allObstacleSquares,
+  //     mobileArr: self.allMobileCircles,
+  //     thumbnail: self.myCanvas.toDataURL()
+  //   });
+  //   Scenes.selectScene(newScene);
+  //   self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+  //   drawBackgroundSquares();
+  //   drawObstacleSquares();
+  //   drawMobileCircles();
+  //   Scenes.publishScene(newScene);
+  // });
+
+  // When the Save Background button is clicked:
+  // 1) Clear the canvas and redraw only the Background. (ensures thumbnail is background ONLY)
+  // 2) Create and store a new background object and make it the current Background.
+  // 3) Finally, draw the Obstacles and Character.
+  $('#saveBackground').click(function() {
+    EditorService.saveBackground(self.allBackgroundSquares, $scope.editor.currentBackground).done(function(background) {
+      console.log(background);
+    });
+    // self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+    // drawBackgroundSquares();
+    // var newBackground = Backgrounds.create({
+    //   name: self.backgroundName,
+    //   staticArr: self.allBackgroundSquares,
+    //   thumbnail: self.myCanvas.toDataURL()
+    // });
+    // Backgrounds.selectBackground(newBackground);
+    // drawObstacleSquares();
+    // drawMobileCircles();
+  });
+
+  // // When the Publish Background button is clicked, post it to the database.
+  // $('.publishBackground').click(function() {
+  //   // Trying to decide whether to save AND publish or just publish...
+  //   self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+  //   drawBackgroundSquares();
+  //   var newBackground = Backgrounds.create({
+  //     name: self.backgroundName,
+  //     staticArr: self.allBackgroundSquares,
+  //     thumbnail: self.myCanvas.toDataURL()
+  //   });
+  //   Backgrounds.selectBackground(newBackground);
+  //   drawObstacleSquares();
+  //   drawMobileCircles();
+  //   Backgrounds.publishBackground(newBackground);
+  // });
+
+  // When a key is pressed, run the handleKeyDown function.
+  // $(document).on('keydown', handleKeyDown);
+
+  // When the mouse is pressed, released, moved, or leaves the canvas, run the corresponding function.
+  $(self.myCanvas).on('mousedown', mouseDown);
+  $(self.myCanvas).on('mouseup', mouseUp);
+  $(self.myCanvas).on('mouseleave', mouseUp);
+  $(self.myCanvas).on('mousemove', function(event) {
+    newMouseX = Math.round((event.clientX - $scope.editor.currentPixelSize / 2) / $scope.editor.currentPixelSize) * $scope.editor.currentPixelSize;
+    newMouseY = Math.round((event.clientY - $scope.editor.currentPixelSize / 2) / $scope.editor.currentPixelSize) * $scope.editor.currentPixelSize;
+    if (newMouseX !== mouseX || newMouseY !== mouseY) {
+      mouseX = newMouseX;
+      mouseY = newMouseY;
+      moveType = 'mouse';
+      mouseMoveEvent = event;
+      moved = true;
+    }
+  });
+
+  // // Construct initial full background objects (including methods) from the retrieved partial objects.
+  // // Idea - offload object methods to prototype? Possibly make this step unnecessary?
+  // function constructBackgroundSquares() {
+  //   var oldBackgroundSquares = self.allBackgroundSquares;
+  //   var newBackgroundSquares = [];
+  //   oldBackgroundSquares.forEach(function(square) {
+  //     var newBackgroundSquare = new Square(square.x, square.y, square.width, square.height, square.color);
+  //     newBackgroundSquares.push(newBackgroundSquare);
+  //   });
+  //   self.allBackgroundSquares = newBackgroundSquares;
+  // }
+  // // Construct mobile objects just like background objects.
+  // function constructCircles() {
+  //   var oldCircles = self.allMobileCircles;
+  //   var newCircles = [];
+  //   oldCircles.forEach(function(circle) {
+  //     var newCircle = new Circle(circle.x, circle.y, circle.radius, circle.color);
+  //     newCircles.push(newCircle);
+  //   });
+  //   self.allMobileCircles = newCircles;
+  // }
+  // // Construct static objects just like background and mobile objects.
+  // function constructSquares() {
+  //   var oldSquares = self.allObstacleSquares;
+  //   var newSquares = [];
+  //   oldSquares.forEach(function(square) {
+  //     var newSquare = new Square(square.x, square.y, square.width, square.height, square.color);
+  //     newSquares.push(newSquare);
+  //   });
+  //   self.allObstacleSquares = newSquares;
+  // }
+
+  // Call all object constructing functions.
+  // constructBackgroundSquares();
+  // constructCircles();
+  // constructSquares();
+  // Draw all the objects now that they have been made.
+  // drawBackgroundSquares();
+  // drawMobileCircles();
+  // drawObstacleSquares();
+
+  // Experimental touch screen support
+  // When the mouse is pressed, released, moved, or leaves the canvas, run the corresponding function.
+  $(self.myCanvas).on('touchstart', mouseDown);
+  $(self.myCanvas).on('touchend', mouseUp);
+  $(self.myCanvas).on('touchcancel', mouseUp);
+  $(self.myCanvas).on('touchmove', function(event) {
+    moveType = 'touch';
+    event.preventDefault();
+    touchMoveEvent = event.touches[0];
+    moved = true;
+  });
 });
 ;angular.module('questCreator').controller('chatCtrl', function(socket, $state) {
   $('form').submit(function(){
@@ -441,22 +1422,119 @@ return {
     };
 
     //This is for testing only
-    this.game = {
-      thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-      name: "King's Quest Collection",
-      creator: "billy badass",
-      players: 6,
-      created_at: new Date(),
-      responseText: "something"
-    };
+    this.game = GameService.getGameDetail();
 
+    this.players = [
+      {
+        name: 'billy badass',
+        score: 72,
+        timeToComplete: '00:45:06'
+      }, {
+        name: 'jaime presley',
+        score: 28,
+        timeToComplete: 'incomplete'
+      }, {
+        name: 'rob helms',
+        score: 56,
+        timeToComplete: '02:32:06'
+      }, {
+        name: 'mr. toups',
+        score: 61,
+        timeToComplete: '01:28:15'
+      }, {
+        name: 'nate',
+        score: 36,
+        timeToComplete: 'incomplete'
+      }, {
+        name: 'fitch',
+        score: 73,
+        timeToComplete: '03:45:04'
+      }];
 });
 ;angular.module('questCreator').controller('editorCtrl', function($scope, $state, EditorService, UserService) {
+  var self = this;
+  this.gameInfo = {};
+  this.currentEditingGame = {
+    name: UserService.getGameEdit(),
+    description: '',
+    info: this.gameInfo,
+    tags: [],
+    published: false
+  };
+  this.currentBackground = null;
+  this.currentObject = null;
+  this.currentEntity = null;
+  this.currentLargeView = 'background';
+  this.currentSmallView = 'object';
+  this.availableBackgrounds = [];
+  this.availableObjects = [];
+  this.availableEntities = [];
 
-  this.currentLargeView = 'maps';
-  this.currentSmallView = 'objects';
+  this.currentColor = 'green';
+  this.currentPixelSize = 15;
 
-  this.backgroundName = "Testing Background";
+  this.createNewGame = function (name) {
+      EditorService.createGame(name).done(function(game) {
+        console.log(game);
+        self.currentEditingGame = game;
+      });
+      $('.create-game').hide();
+      UserService.setGameEdit(name);
+  };
+
+  this.editGame = function () {
+      EditorService.getGame(self.currentEditingGame.name).done(function(game) {
+        self.currentEditingGame = game;
+        console.log(self.currentEditingGame);
+        EditorService.getGameAssets(game.id).done(function(assets) {
+          console.log(assets);
+          self.availableBackgrounds = assets.availableBackgrounds;
+          self.availableObjects = assets.availableObstacles;
+          self.availableEntities = assets.availableEntities;
+          $scope.$apply();
+        });
+      });
+      $('.edit-game').hide();
+  };
+
+  this.createBackground = function() {
+    var name = prompt("Enter a name for the new background: ");
+    var game_id = self.currentEditingGame.id;
+    EditorService.createBackground(name, game_id).done(function(background) {
+      console.log(background);
+      self.availableBackgrounds.push(background);
+      self.currentBackground = background;
+      $scope.$apply();
+    });
+  }
+
+  this.editBackground = function(background) {
+    console.log(background);
+    self.currentBackground = background;
+    $scope.$broadcast('redrawBackground', background.info.image);
+  }
+
+  this.createObject = function() {
+    var name = prompt("Enter a name for the new object: ");
+    var game_id = self.currentEditingGame.id;
+    EditorService.createObject(name, game_id).done(function(object) {
+      console.log(object);
+      self.availableObjects.push(object);
+      self.currentObject = object;
+      $scope.$apply();
+    });
+  }
+
+  this.editObject = function(object) {
+    console.log(object);
+    self.currentObject = object;
+    $scope.$broadcast('redrawObject', object.info.image);
+  }
+
+  $scope.cancel = function () {
+    $state.go('main.profile');
+  };
+
   $('.asset').draggable({
     helper: 'clone',
     start: function(event, ui) {
@@ -474,157 +1552,153 @@ return {
       $(this).append(clone);
     }
   });
-
-  $scope.gameToEdit = UserService.get().editGame;
-
-  $scope.editGame = function () {
-      EditorService.getGame($scope.gameToEdit);
-      $('.edit-game').hide();
-  };
-
-  $scope.createNewGame = function (name) {
-      EditorService.createGame(name);
-      $('.create-game').hide();
-      $scope.gameToEdit = name;
-      UserService.setGameEdit(name);
-  };
-
-  $scope.cancel = function () {
-    $state.go('main.profile');
-  };
-
 });
 ;angular.module('questCreator').controller('entCtrl', function($state) {
 
 });
 ;angular.module('questCreator').controller('gameCtrl', function(socket, $state, $scope) {
 });
-;angular.module('questCreator').controller('landingCtrl', function($state, $scope, UserService) {
+;angular.module('questCreator').controller('landingCtrl', function($state, $scope, UserService, GameService) {
 
-  $scope.createGame = function () {
-      var user = UserService.get();
-      if (user.id) {
-        user.editGame = null;
-        UserService.set(user);
-        $state.go('main.game.editor.views');
-      } else {
-        alert('Please Sign In or Register.');
-        $scope.signIn();
-      }
-  };
+    this.allGames = GameService.getGames();
 
-  //This is for testing only
-  $scope.games = [{
-      thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-      name: "King's Quest Collection",
-      creator: "billy badass",
-      players: 6,
-      created_at: new Date(),
-      responseText: "something"
-  }, {
-      thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-      name: "King's Quest Collection",
-      creator: "billy badass",
-      players: 6,
-      created_at: new Date(),
-      responseText: "something"
-  }, {
-      thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-      name: "King's Quest Collection",
-      creator: "billy badass",
-      players: 6,
-      created_at: new Date(),
-      responseText: "something"
-  }, {
-      thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-      name: "King's Quest Collection",
-      creator: "billy badass",
-      players: 6,
-      created_at: new Date(),
-      responseText: "something"
-  }, {
-      thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-      name: "King's Quest Collection",
-      creator: "billy badass",
-      players: 6,
-      created_at: new Date(),
-      responseText: "something"
-  }, {
-      thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-      name: "King's Quest Collection",
-      creator: "billy badass",
-      players: 6,
-      created_at: new Date(),
-      responseText: "something"
-  }, {
-      thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-      name: "King's Quest Collection",
-      creator: "billy badass",
-      players: 6,
-      created_at: new Date(),
-      responseText: "something"
-  }, {
-      thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-      name: "King's Quest Collection",
-      creator: "billy badass",
-      players: 6,
-      created_at: new Date(),
-      responseText: "something"
-  }, {
-      thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-      name: "King's Quest Collection",
-      creator: "billy badass",
-      players: 6,
-      created_at: new Date(),
-      responseText: "something"
-  }];
+    $scope.createGame = function() {
+        var user = UserService.get();
+        if (user.id) {
+            user.editGame = null;
+            UserService.set(user);
+            $state.go('main.game.editor.views');
+        } else {
+            alert('Please Sign In or Register.');
+            $scope.signIn();
+        }
+    };
 
-  $scope.assets = [
-    {
-      name: 'asset'
+    $scope.goToGameDetail = function(game) {
+        GameService.setGameDetail(game);
+        $state.go('main.game.detail');
+    };
+
+    //This is for testing only
+    $scope.games = [{
+        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+        name: "King's Quest Collection",
+        creator: "billy badass",
+        players: 6,
+        created_at: new Date(),
+        responseText: "something",
+        totalPoints: 75
     }, {
-      name: 'asset2'
+        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+        name: "King's Quest Collection",
+        creator: "billy badass",
+        players: 6,
+        created_at: new Date(),
+        responseText: "something",
+        totalPoints: 75
     }, {
-      name: 'asset3'
+        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+        name: "King's Quest Collection",
+        creator: "billy badass",
+        players: 6,
+        created_at: new Date(),
+        responseText: "something",
+        totalPoints: 75
     }, {
-      name: 'asset4'
+        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+        name: "King's Quest Collection",
+        creator: "billy badass",
+        players: 6,
+        created_at: new Date(),
+        responseText: "something",
+        totalPoints: 75
     }, {
-      name: 'asset5'
+        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+        name: "King's Quest Collection",
+        creator: "billy badass",
+        players: 6,
+        created_at: new Date(),
+        responseText: "something",
+        totalPoints: 75
     }, {
-      name: 'asset6'
+        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+        name: "King's Quest Collection",
+        creator: "billy badass",
+        players: 6,
+        created_at: new Date(),
+        responseText: "something",
+        totalPoints: 75
     }, {
-      name: 'asset7'
+        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+        name: "King's Quest Collection",
+        creator: "billy badass",
+        players: 6,
+        created_at: new Date(),
+        responseText: "something",
+        totalPoints: 75
     }, {
-      name: 'asset8'
+        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+        name: "King's Quest Collection",
+        creator: "billy badass",
+        players: 6,
+        created_at: new Date(),
+        responseText: "something",
+        totalPoints: 75
     }, {
-      name: 'asset9'
+        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+        name: "King's Quest Collection",
+        creator: "billy badass",
+        players: 6,
+        created_at: new Date(),
+        responseText: "something",
+        totalPoints: 75
+    }];
+
+    $scope.assets = [{
+        name: 'asset'
     }, {
-      name: 'asset10'
+        name: 'asset2'
     }, {
-      name: 'asset11'
+        name: 'asset3'
     }, {
-      name: 'asset12'
+        name: 'asset4'
     }, {
-      name: 'asset13'
+        name: 'asset5'
     }, {
-      name: 'asset14'
+        name: 'asset6'
     }, {
-      name: 'asset15'
+        name: 'asset7'
     }, {
-      name: 'asset16'
+        name: 'asset8'
     }, {
-      name: 'asset17'
+        name: 'asset9'
     }, {
-      name: 'asset18'
+        name: 'asset10'
     }, {
-      name: 'asset19'
+        name: 'asset11'
     }, {
-      name: 'asset20'
-    }
-  ];
+        name: 'asset12'
+    }, {
+        name: 'asset13'
+    }, {
+        name: 'asset14'
+    }, {
+        name: 'asset15'
+    }, {
+        name: 'asset16'
+    }, {
+        name: 'asset17'
+    }, {
+        name: 'asset18'
+    }, {
+        name: 'asset19'
+    }, {
+        name: 'asset20'
+    }];
 
 });
-;angular.module('questCreator').controller('mainCtrl', function(socket, $state, $scope, UserService) {
+;angular.module('questCreator')
+    .controller('mainCtrl', function(socket, $state, UserService, PopupService, $scope) {
 
     //When the user clicks "Home" on the nav bar view is changed to landing
     this.goHome = function () {
@@ -633,10 +1707,7 @@ return {
 
     //When the user clicks "Profile" on the nav bar user information is loaded and view is changed to profile
     this.goToUser = function () {
-        var games = UserService.games();
-        games.done(function () {
-          $state.go('main.profile');
-        });
+        $state.go('main.profile');
     };
 
     // When the user clicks the sign in button, prompt them to sign in to their google account.
@@ -671,11 +1742,665 @@ return {
         $('#user-popup').css('display', 'none');
         UserService.signOut();
     };
+
+////Debug button: this is how you call a new popup:
+    this.popup = function(){
+      PopupService.type('newUser', $scope);
+    };
+
 });
 ;angular.module('questCreator').controller('mapCtrl', function($state) {
 
 });
-;angular.module('questCreator').controller('objCtrl', function($state) {
+;angular.module('questCreator').controller('objCtrl', function($state, $scope, EditorService) {
+  var self = this;      // To help with scope issues
+  var drawHandle = -1;  // Interval handle for drawing rate
+  var moveHandle = -1;  // Interval handle for movement of mouse (possibly does not need to be global)
+  var mouseX = 0;
+  var mouseY = 0;
+  var mouseMoveEvent;       // Global variable to track mouse movement events
+  var touchMoveEvent;       // Global variable to track touch movement events
+  var mobileWidth = 850;    // Width for mobile screen sizes
+  var tabletWidth = 1100;   // Width for tablet screen sizes
+  var tabletScale = 1.4;
+  var mobileScaleX = 2.5;
+  var mobileScaleY = 1.6;
+  var moveType = '';    // Either mouse or touch
+  var moved = false;    // Whether mouse has moved or not
+  var moving = {        // Direction that the main character should be moving.
+    left: false,
+    right: false,
+    up: false,
+    down: false
+  };
+  var drawing = {       // Type of object being drawn. Default: background.
+    // mobile: false,
+    // static: false,
+    background: true
+  };
+  var pixelWidth = $scope.editor.currentPixelSize;
+  var pixelHeight = $scope.editor.currentPixelSize;
+  var undoBackgroundArray = [];   //Array to keep track of background objects that were undone.
+  // var undoObstacleArray = [];   //Array to keep track of obstacle objects that were undone.
+  // var undoCharacterArray = [];   //Array to keep track of character objects that were undone.
+  this.speedRange = 5;     // How fast mobile objects should move.
+  // this.radiusRange = 5;  // Value of radius input in draw.html
+  // this.widthRangeBackground = 50;   // Value of width input in draw.html
+  // this.heightRangeBackground = 50;  // Value of height input in draw.html
+  // this.widthRangeObstacle = 50;     // Value of width input in draw.html
+  // this.heightRangeObstacle = 50;    // Value of height input in draw.html
+  this.currentColor = $scope.editor.currentColor;    // Value of color input in draw.html
+  // this.currentScene = Scenes.fetchCurrentScene() || {}; // Scene selected from scenes controller
+  // this.currentBackground = Backgrounds.fetchCurrentBackground() || {};  // Background selected from scenes controller
+  this.myCanvas = document.getElementById('obj-canvas');  // Canvas html element
+  this.canvasPos = {    // Canvas top and left coordinates on page
+    x: self.myCanvas.getBoundingClientRect().left,
+    y: self.myCanvas.getBoundingClientRect().top
+  };
+  this.draw = this.myCanvas.getContext('2d'); // Canvas context
+  // this.sceneName =  this.currentScene.name || '';       // Current selected Scene name
+  // this.allMobileCircles = this.currentScene.mobileArr || [];  // Array of all mobile objects in current scene
+  // this.allObstacleSquares = this.currentScene.staticArr || [];  // Array of all static objects in current scene
+  // this.backgroundName = this.currentBackground.name || '';  // Current selected Background name
+  // this.allBackgroundSquares = this.currentBackground.staticArr || []; // Array of all static objects in current background
+  this.allBackgroundSquares = [];
+
+  /*
+  *   Rectangle object constructor
+  *   @params
+  *     x: horizontal coord of top left corner
+  *     y: vertical coord of top left corner
+  *     width: width of rectangle
+  *     height: height of rectangle
+  *     color: color of rectangle
+  *   @methods
+  *     draw: draw the rectangle on the canvas using its position, size, and color.
+  */
+  function Square(x, y, width, height, color) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.color = color;
+    this.draw = function() {
+      self.draw.fillStyle = this.color;
+      if (window.innerWidth <= mobileWidth) { // Mobile size
+        self.draw.fillRect(this.x * mobileScaleX, this.y * mobileScaleY, this.width, this.height);
+      } else if (window.innerWidth <= tabletWidth) { // Tablet size
+        self.draw.fillRect(this.x * tabletScale, this.y / tabletScale, this.width, this.height);
+      } else {  // Desktop size
+        self.draw.fillRect(this.x, this.y, this.width, this.height);
+      }
+    }
+  }
+
+  $scope.$on('redrawObject', function(event, imageArr) {
+    canvasWidth = self.myCanvas.width;
+    canvasHeight = self.myCanvas.height;
+    self.draw.clearRect(0, 0, canvasWidth, canvasHeight);
+    self.allBackgroundSquares = [];
+    var undoBackgroundArray = [];
+    self.allBackgroundSquares = imageArr;
+    for (var index = 0; index < self.allBackgroundSquares.length; index++) {
+      var square = self.allBackgroundSquares[index];
+      self.draw.fillStyle = square.color;
+      self.draw.fillRect(square.x, square.y, square.width, square.height);
+    }
+  });
+
+  // /*
+  // *   Circle object constructor
+  // *   @params
+  // *     x: horizontal coord of center of circle
+  // *     y: vertical coord of center of circle
+  // *     radius: radius of circle
+  // *     color: color of circle
+  // *   @methods
+  // *     draw: draw the circle on the canvas using its position, size, and color.
+  // */
+  // function Circle(x, y, radius, color) {
+  //   this.x = x;
+  //   this.y = y;
+  //   this.radius = radius;
+  //   this.color = color;
+  //   this.draw = function() {
+  //     self.draw.beginPath();
+  //     self.draw.fillStyle = this.color;
+  //     if (window.innerWidth <= mobileWidth) { // Mobile size
+  //       self.draw.arc(this.x * mobileScaleX, this.y * mobileScaleY, this.radius, 0, 2 * Math.PI);
+  //     } else if (window.innerWidth <= tabletWidth) { // Tablet size
+  //       self.draw.arc(this.x * tabletScale, this.y / tabletScale, this.radius, 0, 2 * Math.PI);
+  //     } else {
+  //       self.draw.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+  //     }
+  //     self.draw.fill();
+  //     // Example for future reference: Can also draw using an image. Image should first be loaded on the page.
+  //     // draw.drawImage(imgElem, this.x, this.y, this.radius, this.radius);
+  //   }
+  // }
+
+  // Called when the mouse button is pressed.
+  // Starts the interval to run every 100ms while the mouse button is still held down.
+  // Only start the interval if it is not already running.
+  function mouseDown(event) {
+    if (drawHandle === -1) {
+      drawHandle = setInterval(mousePressed, 100);
+    }
+  }
+
+  // Called when the mouse button is released.
+  // If the interval is running, then clear it and reset it.
+  function mouseUp(event) {
+    if (drawHandle !== -1) {
+      clearInterval(drawHandle);
+      drawHandle = -1;
+    }
+  }
+
+  // Runs every 100ms after the mouse button is pressed until it is released.
+  // Purpose is to draw the object that the user has chosen every 100ms AND if the mouse has moved from its previous location.
+  function mousePressed() {
+      self.canvasPos = {  // Get the most recent canvas position in case the window has been resized.
+        x: self.myCanvas.getBoundingClientRect().left,
+        y: self.myCanvas.getBoundingClientRect().top
+      };
+      // if (moved && drawing.mobile) { // Create, draw, and record a new mobile object
+      //   var radius = parseInt(self.radiusRange);
+      //   var color = self.currentColor;
+      //   if (moveType === 'mouse') {
+      //     var newCircle = new Circle(mouseMoveEvent.clientX - self.canvasPos.x, mouseMoveEvent.clientY - self.canvasPos.y, radius, color);
+      //     newCircle.draw();
+      //     self.allMobileCircles.push(newCircle);
+      //   } else if (moveType === 'touch') {
+      //     var newCircle = new Circle(touchMoveEvent.clientX - self.canvasPos.x, touchMoveEvent.clientY - self.canvasPos.y, radius, color);
+      //     newCircle.draw();
+      //     self.allMobileCircles.push(newCircle);
+      //   }
+      //   moved = false;
+      // } else if (moved && drawing.static) {  // Create, draw, and record a new static object
+      //   var width = parseInt(self.widthRangeObstacle);
+      //   var height = parseInt(self.heightRangeObstacle);
+      //   var color = self.currentColor;
+      //   if (moveType === 'mouse') {
+      //     var newSquare = new Square(mouseMoveEvent.clientX - width / 2 - self.canvasPos.x, mouseMoveEvent.clientY - height / 2 - self.canvasPos.y, width, height, color);
+      //     newSquare.draw();
+      //     self.allObstacleSquares.push(newSquare);
+      //   } else if (moveType === 'touch') {
+      //     var newSquare = new Square(touchMoveEvent.clientX - width / 2 - self.canvasPos.x, touchMoveEvent.clientY - height / 2 - self.canvasPos.y, width, height, color);
+      //     newSquare.draw();
+      //     self.allObstacleSquares.push(newSquare);
+      //   }
+      //   moved = false;
+      // } else if (moved && drawing.background) { // Create, draw, and record a new background object
+      //   var width = parseInt(self.widthRangeBackground);
+      //   var height = parseInt(self.heightRangeBackground);
+      //   var color = self.currentColor;
+      //   if (moveType === 'mouse') {
+      //     var newSquare = new Square(mouseMoveEvent.clientX - width / 2 - self.canvasPos.x, mouseMoveEvent.clientY - height / 2 - self.canvasPos.y, width, height, color);
+      //     newSquare.draw();
+      //     self.allBackgroundSquares.push(newSquare);
+      //   } else if (moveType === 'touch') {
+      //     var newSquare = new Square(touchMoveEvent.clientX - width / 2 - self.canvasPos.x, touchMoveEvent.clientY - height / 2 - self.canvasPos.y, width, height, color);
+      //     newSquare.draw();
+      //     self.allBackgroundSquares.push(newSquare);
+      //   }
+      //   moved = false;
+      // }
+    if (moved && drawing.background) { // Create, draw, and record a new background object
+      var width = $scope.editor.currentPixelSize;
+      var height = $scope.editor.currentPixelSize;
+      var color = $scope.editor.currentColor;
+      if (moveType === 'mouse') {
+        var newSquareX = mouseX - self.canvasPos.x;
+        var newSquareY = mouseY - self.canvasPos.y;
+        var exists = false;
+        self.allBackgroundSquares.forEach(function(square) {
+          if (square.x === newSquareX && square.y === newSquareY) {
+            exists = true;
+          }
+        });
+        if (!exists) {
+          var newSquare = new Square(mouseX - self.canvasPos.x, mouseY - self.canvasPos.y, width, height, color);
+          newSquare.draw();
+          self.allBackgroundSquares.push(newSquare);
+        }
+      } else if (moveType === 'touch') {
+        var newSquare = new Square(touchMoveEvent.clientX - width / 2 - self.canvasPos.x, touchMoveEvent.clientY - height / 2 - self.canvasPos.y, width, height, color);
+        newSquare.draw();
+        self.allBackgroundSquares.push(newSquare);
+      }
+      moved = false;
+    }
+  }
+
+  // // Check for collisions between all of the mobile objects and all of the obstacle objects.
+  // // The collision is categorized according to which direction the obstacle is found.
+  // function findCollisions() {
+  //   var foundCollision = {  // By default, there is no collision found in any direction.
+  //     left: false,
+  //     right: false,
+  //     up: false,
+  //     down: false
+  //   };
+  //   self.allMobileCircles.forEach(function(circle) {  // Loop through all the mobile objects
+  //     self.allObstacleSquares.forEach(function(square) {  // Loop through all the obstacle objects
+  //       // Pattern: check the left, right, top, and bottom edges of the current mobile object against the right, left, bottom, and top edges of the current obstacle (in those exact orders).
+  //       if (circle.x - circle.radius <= square.x + square.width && circle.x - circle.radius >= square.x && circle.y >= square.y && circle.y <= square.y + square.height) {
+  //         foundCollision.left = true;
+  //         moving.left = false;
+  //       }
+  //       if (circle.x + circle.radius <= square.x + square.width && circle.x + circle.radius >= square.x && circle.y >= square.y && circle.y <= square.y + square.height) {
+  //         foundCollision.right = true;
+  //         moving.right = false;
+  //       }
+  //       if (circle.x <= square.x + square.width && circle.x >= square.x && circle.y - circle.radius >= square.y && circle.y - circle.radius <= square.y + square.height) {
+  //         foundCollision.up = true;
+  //         moving.up = false;
+  //       }
+  //       if (circle.x <= square.x + square.width && circle.x >= square.x && circle.y + circle.radius >= square.y && circle.y + circle.radius <= square.y + square.height) {
+  //         foundCollision.down = true;
+  //         moving.down = false;
+  //       }
+  //     });
+  //     // Check for collisions with the canvas border as well. Take resizing screen sizes into account.
+  //     var canvasEdgeRight;
+  //     var canvasEdgeBottom;
+  //     if (window.innerWidth <= mobileWidth) {
+  //       canvasEdgeRight = self.myCanvas.width / mobileScaleX;
+  //       canvasEdgeBottom = self.myCanvas.height / mobileScaleY;
+  //     } else if (window.innerWidth <= tabletWidth) {
+  //       canvasEdgeRight = self.myCanvas.width / tabletScale;
+  //       canvasEdgeBottom = self.myCanvas.height * tabletScale;
+  //     } else {
+  //       canvasEdgeRight = self.myCanvas.width;
+  //       canvasEdgeBottom = self.myCanvas.height;
+  //     }
+  //     if (circle.x <= 0) {
+  //       foundCollision.left = true;
+  //       moving.left = false;
+  //     }
+  //     if (circle.x >= canvasEdgeRight) {
+  //       foundCollision.right = true;
+  //       moving.right = false;
+  //     }
+  //     if (circle.y <= 0) {
+  //       foundCollision.up = true;
+  //       moving.up = false;
+  //     }
+  //     if (circle.y >= canvasEdgeBottom) {
+  //       foundCollision.down = true;
+  //       moving.down = false;
+  //     }
+  //   });
+  //   return foundCollision;
+  // }
+
+  // // Called when any key is pressed.
+  // function handleKeyDown(event) {
+  //   // If the user presses the left, right, up, or down arrow keys, toggle the movement direction accordingly
+  //   if (event.keyCode === 37) { // Left Key
+  //     event.preventDefault();
+  //     moving = {
+  //       left: !moving.left,
+  //       up: false,
+  //       right: false,
+  //       down: false
+  //     };
+  //   } else if (event.keyCode === 38) { // Up Key
+  //     event.preventDefault();
+  //     moving = {
+  //       left: false,
+  //       up: !moving.up,
+  //       right: false,
+  //       down: false
+  //     };
+  //   } else if (event.keyCode === 39) { // Right Key
+  //     event.preventDefault();
+  //     moving = {
+  //       left: false,
+  //       up: false,
+  //       right: !moving.right,
+  //       down: false
+  //     };
+  //   } else if (event.keyCode === 40) { // Down Key
+  //     event.preventDefault();
+  //     moving = {
+  //       left: false,
+  //       up: false,
+  //       right: false,
+  //       down: !moving.down
+  //     };
+  //   } else {    // For all other keys, stop all movement.
+  //     moving = {
+  //       left: false,
+  //       up: false,
+  //       right: false,
+  //       down: false
+  //     }
+  //   }
+  //   // If any of the arrow keys have been pressed, run the moveMobileCircles function every 20ms.
+  //   // Otherwise, stop running the moveMobileCircles function.
+  //   if ( moving.left || moving.up || moving.right || moving.down ) {
+  //     clearInterval(moveHandle);
+  //     moveHandle = setInterval(moveMobileCircles, 20);
+  //   } else {
+  //     clearInterval(moveHandle);
+  //   }
+  // }
+
+  // // Runs every 20ms after an arrow key has been pressed.
+  // function moveMobileCircles() {
+  //   // Depending on movement direction and collision detection, do the following:
+  //   // 1) Clear the canvas.
+  //   // 2) Redraw background and obstacle objects.
+  //   // 3) Shift the circles in the corresponding direction.
+  //   // 4) Redraw the circles.
+  //   // Note: Checking collision detection and checking movement direction may be redundant.
+  //   if (moving.left && !findCollisions().left) {
+  //     self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+  //     drawBackgroundSquares();
+  //     drawObstacleSquares();
+  //     self.allMobileCircles.forEach(function(circle) {
+  //       circle.x -= parseInt(self.speedRange);
+  //       circle.draw();
+  //     });
+  //   } else if (moving.right && !findCollisions().right) {
+  //     self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+  //     drawBackgroundSquares();
+  //     drawObstacleSquares();
+  //     self.allMobileCircles.forEach(function(circle) {
+  //       circle.x += parseInt(self.speedRange);
+  //       circle.draw();
+  //     });
+  //   } else if (moving.up && !findCollisions().up) {
+  //     self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+  //     drawBackgroundSquares();
+  //     drawObstacleSquares();
+  //     self.allMobileCircles.forEach(function(circle) {
+  //       circle.y -= parseInt(self.speedRange);
+  //       circle.draw();
+  //     });
+  //   } else if (moving.down && !findCollisions().down) {
+  //     self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+  //     drawBackgroundSquares();
+  //     drawObstacleSquares();
+  //     self.allMobileCircles.forEach(function(circle) {
+  //       circle.y += parseInt(self.speedRange);
+  //       circle.draw();
+  //     });
+  //   }
+  // }
+
+  // Loop through the array of background objects and draw them all.
+  function drawBackgroundSquares() {
+    for (var index = 0; index < self.allBackgroundSquares.length; index++) {
+      var square = self.allBackgroundSquares[index];
+      square.draw();
+    }
+  }
+
+  // // Loop through the array of obstacle objects and draw them all.
+  // function drawObstacleSquares() {
+  //   for (var index = 0; index < self.allObstacleSquares.length; index++) {
+  //     var square = self.allObstacleSquares[index];
+  //     square.draw();
+  //   }
+  // }
+
+  // // Loop through the array of mobile objects and draw them all.
+  // function drawMobileCircles() {
+  //   for (var index = 0; index < self.allMobileCircles.length; index++) {
+  //     var circle = self.allMobileCircles[index];
+  //     circle.draw();
+  //   }
+  // }
+
+  // // When the Draw Character button is clicked, change the drawing setting to mobile.
+  // $('.characterDraw').click(function() {
+  //   drawing = {
+  //     mobile: true,
+  //     static: false,
+  //     background: false
+  //   };
+  //   $('.option').removeClass('active');
+  //   $(this).addClass('active');
+  // });
+
+  // // When the Draw Obstacles button is clicked, change the drawing setting to static.
+  // $('.objectDraw').click(function() {
+  //   drawing = {
+  //     mobile: false,
+  //     static: true,
+  //     background: false
+  //   }
+  //   $('.option').removeClass('active');
+  //   $(this).addClass('active');
+  // });
+
+  // // When the Draw Background button is clicked, change the drawing setting to background.
+  // $('.backgroundDraw').click(function() {
+  //   drawing = {
+  //     mobile: false,
+  //     static: false,
+  //     background: true
+  //   }
+  //   $('.option').removeClass('active');
+  //   $(this).addClass('active');
+  // });
+
+  // When the user clicks the undo button, remove the last element from the object array and push it to the undo array, based on current drawing type. Then redraw canvas.
+  $('#undoObject').click(function() {
+    // if (drawing.mobile && self.allMobileCircles.length > 0) {
+    //   var lastObj = self.allMobileCircles.pop();
+    //   undoCharacterArray.push(lastObj);
+    // } else if (drawing.static && self.allObstacleSquares.length > 0) {
+    //   var lastObj = self.allObstacleSquares.pop();
+    //   undoObstacleArray.push(lastObj);
+    // } else if (drawing.background && self.allBackgroundSquares.length > 0) {
+    //   var lastObj = self.allBackgroundSquares.pop();
+    //   undoBackgroundArray.push(lastObj);
+    // }
+    if (drawing.background && self.allBackgroundSquares.length > 0) {
+      var lastObj = self.allBackgroundSquares.pop();
+      undoBackgroundArray.push(lastObj);
+    }
+    self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+    drawBackgroundSquares();
+    // drawObstacleSquares();
+    // drawMobileCircles();
+  });
+
+  // When the user clicks the redo button, remove the last element from the undo array and push it to the object array, based on current drawing type. Then redraw canvas.
+  $('#redoObject').click(function() {
+    // if (drawing.mobile && undoCharacterArray.length > 0) {
+    //   var lastObj = undoCharacterArray.pop();
+    //   self.allMobileCircles.push(lastObj);
+    // } else if (drawing.static && undoObstacleArray.length > 0) {
+    //   var lastObj = undoObstacleArray.pop();
+    //   self.allObstacleSquares.push(lastObj);
+    // } else if (drawing.background && undoBackgroundArray.length > 0) {
+    //   var lastObj = undoBackgroundArray.pop();
+    //   self.allBackgroundSquares.push(lastObj);
+    // }
+    if (drawing.background && undoBackgroundArray.length > 0) {
+      var lastObj = undoBackgroundArray.pop();
+      self.allBackgroundSquares.push(lastObj);
+    }
+    self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+    drawBackgroundSquares();
+    // drawObstacleSquares();
+    // drawMobileCircles();
+  });
+
+  // When the Clear Canvas button is clicked, make the current Background and current Scene empty objects and reload the view.
+  // Note: may need extra testing here.
+  $('#clearObject').click(function() {
+    canvasWidth = self.myCanvas.width;
+    canvasHeight = self.myCanvas.height;
+    // self.allObstacleSquares = [];
+    // self.allMobileCircles = [];
+    self.draw.clearRect(0, 0, canvasWidth, canvasHeight);
+    self.allBackgroundSquares = [];
+    var undoBackgroundArray = [];
+    // var undoObstacleArray = [];
+    // var undoCharacterArray = [];
+    // Scenes.selectScene({})
+    // Backgrounds.selectBackground({});
+    // $state.reload();
+  });
+
+  // // When the Save Scene button is clicked:
+  // // 1) Clear the canvas and redraw only the Obstacles and Character. (ensures thumbnail is scene ONLY)
+  // // 2) Create and store a new scene object and make it the current Scene.
+  // // 3) Clear the canvas again and this time redraw Background, Obstacles, and Character.
+  // $('.saveScene').click(function() {
+  //   self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+  //   drawObstacleSquares();
+  //   drawMobileCircles();
+  //   var newScene = Scenes.create({
+  //     name: self.sceneName,
+  //     staticArr: self.allObstacleSquares,
+  //     mobileArr: self.allMobileCircles,
+  //     thumbnail: self.myCanvas.toDataURL()
+  //   });
+  //   Scenes.selectScene(newScene);
+  //   self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+  //   drawBackgroundSquares();
+  //   drawObstacleSquares();
+  //   drawMobileCircles();
+  // });
+
+  // // When the Publish Scene button is clicked, post it to the database.
+  // $('.publishScene').click(function() {
+  //   // Trying to decide whether to save AND publish or just publish...
+  //   self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+  //   drawObstacleSquares();
+  //   drawMobileCircles();
+  //   var newScene = Scenes.create({
+  //     name: self.sceneName,
+  //     staticArr: self.allObstacleSquares,
+  //     mobileArr: self.allMobileCircles,
+  //     thumbnail: self.myCanvas.toDataURL()
+  //   });
+  //   Scenes.selectScene(newScene);
+  //   self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+  //   drawBackgroundSquares();
+  //   drawObstacleSquares();
+  //   drawMobileCircles();
+  //   Scenes.publishScene(newScene);
+  // });
+
+  // When the Save Background button is clicked:
+  // 1) Clear the canvas and redraw only the Background. (ensures thumbnail is background ONLY)
+  // 2) Create and store a new background object and make it the current Background.
+  // 3) Finally, draw the Obstacles and Character.
+  $('#saveObject').click(function() {
+    EditorService.saveObject(self.allBackgroundSquares, $scope.editor.currentObject).done(function(object) {
+      console.log(object);
+    });
+    // self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+    // drawBackgroundSquares();
+    // var newBackground = Backgrounds.create({
+    //   name: self.backgroundName,
+    //   staticArr: self.allBackgroundSquares,
+    //   thumbnail: self.myCanvas.toDataURL()
+    // });
+    // Backgrounds.selectBackground(newBackground);
+    // drawObstacleSquares();
+    // drawMobileCircles();
+  });
+
+  // // When the Publish Background button is clicked, post it to the database.
+  // $('.publishBackground').click(function() {
+  //   // Trying to decide whether to save AND publish or just publish...
+  //   self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+  //   drawBackgroundSquares();
+  //   var newBackground = Backgrounds.create({
+  //     name: self.backgroundName,
+  //     staticArr: self.allBackgroundSquares,
+  //     thumbnail: self.myCanvas.toDataURL()
+  //   });
+  //   Backgrounds.selectBackground(newBackground);
+  //   drawObstacleSquares();
+  //   drawMobileCircles();
+  //   Backgrounds.publishBackground(newBackground);
+  // });
+
+  // When a key is pressed, run the handleKeyDown function.
+  // $(document).on('keydown', handleKeyDown);
+
+  // When the mouse is pressed, released, moved, or leaves the canvas, run the corresponding function.
+  $(self.myCanvas).on('mousedown', mouseDown);
+  $(self.myCanvas).on('mouseup', mouseUp);
+  $(self.myCanvas).on('mouseleave', mouseUp);
+  $(self.myCanvas).on('mousemove', function(event) {
+    newMouseX = Math.round((event.clientX - $scope.editor.currentPixelSize / 2) / $scope.editor.currentPixelSize) * $scope.editor.currentPixelSize;
+    newMouseY = Math.round((event.clientY - $scope.editor.currentPixelSize / 2) / $scope.editor.currentPixelSize) * $scope.editor.currentPixelSize;
+    if (newMouseX !== mouseX || newMouseY !== mouseY) {
+      mouseX = newMouseX;
+      mouseY = newMouseY;
+      moveType = 'mouse';
+      mouseMoveEvent = event;
+      moved = true;
+    }
+  });
+
+  // // Construct initial full background objects (including methods) from the retrieved partial objects.
+  // // Idea - offload object methods to prototype? Possibly make this step unnecessary?
+  // function constructBackgroundSquares() {
+  //   var oldBackgroundSquares = self.allBackgroundSquares;
+  //   var newBackgroundSquares = [];
+  //   oldBackgroundSquares.forEach(function(square) {
+  //     var newBackgroundSquare = new Square(square.x, square.y, square.width, square.height, square.color);
+  //     newBackgroundSquares.push(newBackgroundSquare);
+  //   });
+  //   self.allBackgroundSquares = newBackgroundSquares;
+  // }
+  // // Construct mobile objects just like background objects.
+  // function constructCircles() {
+  //   var oldCircles = self.allMobileCircles;
+  //   var newCircles = [];
+  //   oldCircles.forEach(function(circle) {
+  //     var newCircle = new Circle(circle.x, circle.y, circle.radius, circle.color);
+  //     newCircles.push(newCircle);
+  //   });
+  //   self.allMobileCircles = newCircles;
+  // }
+  // // Construct static objects just like background and mobile objects.
+  // function constructSquares() {
+  //   var oldSquares = self.allObstacleSquares;
+  //   var newSquares = [];
+  //   oldSquares.forEach(function(square) {
+  //     var newSquare = new Square(square.x, square.y, square.width, square.height, square.color);
+  //     newSquares.push(newSquare);
+  //   });
+  //   self.allObstacleSquares = newSquares;
+  // }
+
+  // Call all object constructing functions.
+  // constructBackgroundSquares();
+  // constructCircles();
+  // constructSquares();
+  // Draw all the objects now that they have been made.
+  // drawBackgroundSquares();
+  // drawMobileCircles();
+  // drawObstacleSquares();
+
+  // Experimental touch screen support
+  // When the mouse is pressed, released, moved, or leaves the canvas, run the corresponding function.
+  $(self.myCanvas).on('touchstart', mouseDown);
+  $(self.myCanvas).on('touchend', mouseUp);
+  $(self.myCanvas).on('touchcancel', mouseUp);
+  $(self.myCanvas).on('touchmove', function(event) {
+    moveType = 'touch';
+    event.preventDefault();
+    touchMoveEvent = event.touches[0];
+    moved = true;
+  });
+});
+;angular.module('questCreator').controller('PaletteCtrl', function (PaletteService) {
+  
+  this.allAssets = PaletteService.getAssets();
 
 });
 ;angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, $state, $scope) {
@@ -683,17 +2408,6 @@ return {
   var gameCtx = gameCanvas.getContext('2d');
   var gameWidth = 700;
   var gameHeight = 500;
-
-  var avatar = null;
-  var background = null;
-  var sceneObject = null;
-  var entity = null;
-
-  var avatarLoaded = false;
-  var backgroundLoaded = false;
-  var sceneObjectLoaded = false;
-  var entityLoaded = false;
-
   var typing = {
     show: false,
     phrase: ''
@@ -708,6 +2422,714 @@ return {
   }
   var pause = false;
   var startTime = new Date();
+
+  var avatar = null;
+  var background = null;
+  var sceneObject = null;
+  var entity = null;
+  var scene = null;
+
+  var avatarLoaded = false;
+  var backgroundLoaded = false;
+  var sceneObjectLoaded = false;
+  var entityLoaded = false;
+  var sceneLoaded = false;
+
+  // // returns all games a user has created.
+  // $.ajax({
+  //   method: 'GET',
+  //   url: 'https://forge-api.herokuapp.com/games/user-games',
+  //   headers: headerData,
+  //   success: function(response) {
+  //     console.log(response);
+  //   },
+  //   error: function(error) {
+  //     console.log(error);
+  //   }
+  // });
+
+  // // Gets a specific game by name
+  // var gameToGetInfo = {
+  //   name: 'potter quest'
+  // };
+  // $.ajax({
+  //   method: 'GET',
+  //   url: 'https://forge-api.herokuapp.com/games/load',
+  //   data: gameToGetInfo,
+  //   success: function(response) {
+  //     console.log(response);
+  //   },
+  //   error: function(error) {
+  //     console.log(error);
+  //   }
+  // });
+
+  // Step 1: Create Game (POST request to database)
+  var gameInfo = {};
+  var currentEditingGame = {
+    name: 'Potter Quest 9', // Game ID in database is 16
+    description: '',
+    info: gameInfo,
+    tags: [],
+    published: false
+  };
+  // POST empty Game to database
+  $('.createGameBtn').click(function() {
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
+    $.ajax({
+      method: 'POST',
+      url: 'https://forge-api.herokuapp.com/games/create',
+      headers: headerData,
+      data: JSON.stringify(currentEditingGame),
+      dataType: 'json',
+      contentType: 'application/json',
+      success: function(response) {
+        console.log(response);
+        currentEditingGame.id = response.id;
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  })
+
+  // Step 2: Create Background (POST request)
+  var backgroundInfo = {
+    image: [],
+    collisionMap: []
+  };
+  var currentBackground = {
+    name: 'Cupboard',   // ID in database is 123
+    info: backgroundInfo,
+    tags: [],
+    published: true
+  };
+  $('.createBgBtn').click(function() {
+    currentBackground.game_id = currentEditingGame.id;
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
+    // Background
+    $.ajax({
+      method: 'POST',
+      url: 'https://forge-api.herokuapp.com/backgrounds/create',
+      headers: headerData,
+      data: JSON.stringify(currentBackground),
+      dataType: 'json',
+      contentType: 'application/json',
+      success: function(response) {
+        console.log(response);
+        currentBackground.id = response.id;
+        // background = new Background(response);
+        // backgroundLoaded = true;
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  });
+
+  // Step 3: Draw Background picture (stored in front end)
+  $('.drawImgBgBtn').click(function() {
+    console.log("Drawing Background Image");
+    backgroundInfo.image = [{
+            x: 0,
+            y: 0,
+            width: 700,
+            height: 500,
+            color: 'beige'
+          }, {
+            x: 150,
+            y: 150,
+            width: 50,
+            height: 50,
+            color: 'yellow'
+          }];
+  })
+
+  // Step 4: Draw Background collision map (stored in front end)
+  $('.drawColBgBtn').click(function() {
+    console.log("Drawing Background Collision Map");
+    backgroundInfo.collisionMap = [{
+            type: 'wall',
+            x: 150,
+            y: 200,
+            width: 50,
+            height: 20,
+            color: 'gray'
+          }];
+  });
+
+  // Step 5: Save Background (PUT request to database)
+  $('.saveBgBtn').click(function() {
+    currentBackground.info = backgroundInfo;
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
+    // Background
+    $.ajax({
+      method: 'PUT',
+      url: 'https://forge-api.herokuapp.com/backgrounds/update',
+      headers: headerData,
+      data: JSON.stringify(currentBackground),
+      dataType: 'json',
+      contentType: 'application/json',
+      success: function(response) {
+        console.log(response);
+        // background = new Background(response);
+        // backgroundLoaded = true;
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  });
+
+  // Step 6: Create Object
+  var sceneObjectInfo = {
+    pos: {
+      x: 350,
+      y: 250
+    },
+    image: [],
+    collisionMap: []
+  };
+  var currentSceneObject = {
+    name: 'Light Bulb',
+    info: sceneObjectInfo,
+    tags: [],
+    published: false
+  };
+  $('.createObjBtn').click(function() {
+    currentSceneObject.game_id = currentEditingGame.id;
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
+    // Object
+    $.ajax({
+      method: 'POST',
+      url: 'https://forge-api.herokuapp.com/obstacles/create',
+      headers: headerData,
+      data: JSON.stringify(currentSceneObject),
+      dataType: 'json',
+      contentType: 'application/json',
+      success: function(response) {
+        console.log(response);
+        currentSceneObject.id = response.id;
+        // sceneObject = new SceneObject(response);
+        // sceneObject.allActions = Object.keys(sceneObject.obj.animate);
+        // sceneObject.action = sceneObject.allActions[0]; // The first action
+        // sceneObject.obj.currentFrame = sceneObject.obj.animate[sceneObject.action][0]; // The first frame of the first action, whatever it is.
+        // sceneObjectLoaded = true;
+        // setInterval(checkSceneObjectAction, 75);
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  });
+
+  // Not currently animating objects
+  // // Step X: Create Object Action
+  // sceneObjectObj.animate.wave = [];
+
+  // Step 7: Draw Object picture
+  $('.drawImgObjBtn').click(function() {
+    console.log("Drawing Object Image");
+    sceneObjectInfo.image = [
+          {
+            x: 0,
+            y: 0,
+            width: 10,
+            height: 100,
+            color: 'brown'
+          }, {
+            x: 0,
+            y: 0,
+            width: 50,
+            height: 10,
+            color: 'red'
+          }, {
+            x: 50,
+            y: 10,
+            width: 50,
+            height: 10,
+            color: 'red'
+          }];
+  });
+
+  // Step 9: Draw Object collision map
+  $('.drawColObjBtn').click(function() {
+    console.log("Drawing Object Collision Map");
+    sceneObjectInfo.collisionMap = [
+      {
+        x: -10,
+        y: 100,
+        width: 10,
+        height: 10,
+        color: 'gray'
+      }, {
+        x: 0,
+        y: 100,
+        width: 10,
+        height: 10,
+        color: 'gray'
+      }, {
+        x: 0,
+        y: 100,
+        width: 10,
+        height: 10,
+        color: 'gray'
+      }
+    ];
+  });
+
+  // Step 10: Save Object (PUT Request)
+  $('.saveObjBtn').click(function() {
+    currentSceneObject.info = sceneObjectInfo;
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
+    // Object
+    $.ajax({
+      method: 'PUT',
+      url: 'https://forge-api.herokuapp.com/obstacles/update',
+      headers: headerData,
+      data: JSON.stringify(currentSceneObject),
+      dataType: 'json',
+      contentType: 'application/json',
+      success: function(response) {
+        console.log(response);
+        // sceneObject = new SceneObject(response);
+        // sceneObject.allActions = Object.keys(sceneObject.obj.animate);
+        // sceneObject.action = sceneObject.allActions[0]; // The first action
+        // sceneObject.obj.currentFrame = sceneObject.obj.animate[sceneObject.action][0]; // The first frame of the first action, whatever it is.
+        // sceneObjectLoaded = true;
+        // setInterval(checkSceneObjectAction, 75);
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  });
+
+  // Step 11: Create Entity
+  var entityInfo = {
+    pos: {
+      x: 350,
+      y: 250
+    },
+    speed: {
+      mag: 3,
+      x: 0,
+      y: 0
+    },
+    animate: {},
+    collisionMap: []
+  };
+  var currentEntity = {
+    name: 'Rat',
+    info: entityInfo,
+    tags: [],
+    published: false
+  };
+  $('.createEntityBtn').click(function() {
+    currentEntity.game_id = currentEditingGame.id;
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
+    // Entity
+    $.ajax({
+      method: 'POST',
+      url: 'https://forge-api.herokuapp.com/entities/create',
+      headers: headerData,
+      data: JSON.stringify(currentEntity),
+      dataType: 'json',
+      contentType: 'application/json',
+      success: function(response) {
+        console.log(response);
+        currentEntity.id = response.id;
+        // entity = new Entity(response);
+        // console.log(entity);
+        // entity.obj.currentFrame = entity.obj.animate[entity.action][0];
+        // entityLoaded = true;
+        // setInterval(checkEntityAction, 75);
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  });
+
+  // Step 12: Draw Entity picture frames per Action
+  $('.drawImgEntityBtn').click(function() {
+    console.log("Drawing Entity Image Frames");
+    entityInfo.animate = {
+      stand: [
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'orange'
+        }, {
+          x: 150,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'purple'
+        }],
+        [{
+          x: 110,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'orange'
+        }, {
+          x: 140,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'purple'
+        }]
+      ],
+      walkLeft: [
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'purple'
+        }, {
+          x: 110,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'orange'
+        }],
+        [{
+          x: 110,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'purple'
+        }, {
+          x: 100,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'orange'
+        }]
+      ],
+      walkRight: [
+        [{
+          x: 150,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'purple'
+        }, {
+          x: 140,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'orange'
+        }],
+        [{
+          x: 140,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'purple'
+        }, {
+          x: 150,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'orange'
+        }]
+      ],
+      walkUp: [
+        [{
+          x: 100,
+          y: 110,
+          width: 30,
+          height: 30,
+          color: 'purple'
+        }, {
+          x: 150,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'orange'
+        }],
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'purple'
+        }, {
+          x: 150,
+          y: 110,
+          width: 30,
+          height: 30,
+          color: 'orange'
+        }]
+      ],
+      walkDown: [
+        [{
+          x: 100,
+          y: 140,
+          width: 30,
+          height: 30,
+          color: 'purple'
+        }, {
+          x: 150,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'orange'
+        }],
+        [{
+          x: 100,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'purple'
+        }, {
+          x: 150,
+          y: 140,
+          width: 30,
+          height: 30,
+          color: 'orange'
+        }]
+      ],
+      swimLeft: [
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'lightblue'
+        }, {
+          x: 150,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'lightblue'
+        }],
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'gray'
+        }, {
+          x: 150,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'gray'
+        }]
+      ],
+      swimRight: [
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'lightblue'
+        }, {
+          x: 150,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'lightblue'
+        }],
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'gray'
+        }, {
+          x: 150,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'gray'
+        }]
+      ],
+      swimUp: [
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'lightblue'
+        }, {
+          x: 150,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'lightblue'
+        }],
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'gray'
+        }, {
+          x: 150,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'gray'
+        }]
+      ],
+      swimDown: [
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'lightblue'
+        }, {
+          x: 150,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'lightblue'
+        }],
+        [{
+          x: 100,
+          y: 100,
+          width: 30,
+          height: 30,
+          color: 'gray'
+        }, {
+          x: 150,
+          y: 150,
+          width: 30,
+          height: 30,
+          color: 'gray'
+        }]
+      ]
+    };
+  });
+
+  // Step 13: Draw Entity collision map per Action
+  $('.drawColEntityBtn').click(function() {
+    console.log("Drawing Entity Collision Map");
+    entityInfo.collisionMap = [
+      {
+        x: 100,
+        y: 180,
+        width: 80,
+        height: 10,
+        color: 'gray'
+      }, {
+        x: 100,
+        y: 185,
+        width: 80,
+        height: 10,
+        color: 'gray'
+      }
+    ];
+  });
+
+  // Step 14: Save Entity
+  $('.saveEntityBtn').click(function() {
+    currentEntity.info = entityInfo;
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
+    // Entity
+    $.ajax({
+      method: 'PUT',
+      url: 'https://forge-api.herokuapp.com/entities/update',
+      headers: headerData,
+      data: JSON.stringify(currentEntity),
+      dataType: 'json',
+      contentType: 'application/json',
+      success: function(response) {
+        console.log(response);
+        // entity = new Entity(response);
+        // console.log(entity);
+        // entity.obj.currentFrame = entity.obj.animate[entity.action][0];
+        // entityLoaded = true;
+        // setInterval(checkEntityAction, 75);
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  });
+
+  // Step 15: Create Event
+  // Step 16: Specify Event trigger and response
+  // Step 17: Save Event
+
+  // Step 18: Create Scene
+  // Step 19: Add Background to Scene
+  // Step 20: Add Objects and Entities to Scene
+  // Step 21: Set coordinates of Objects and Entities
+  // sceneObjectObj = {
+  //   x: 150,
+  //   y: 100
+  // },
+  // entityObj.pos = {
+  //   x: 50,
+  //   y: 220
+  // };
+
+  // Step 22: Add events to Scene
+  // Step 23: Save Scene
+  // Step 24: Create Map
+  // Step 25: Specify Scene coordinates within Map
+  // Step 26: Save Map
+  // Step 27: Save Game
+
+
+  // Updating an asset (background, object, entity)
+  /*
+    1) User selects an existing public asset
+    2) User draws on canvas and sets metadata.
+    3) User clicks "save" button. All info is sent to database in PATCH request
+    4) Info for saved asset also gets added to list of "current game assets" available to be placed into scenes.
+  */
+
+  // Updating a scene
+  /*
+    1) In the scene editor, user has available visible assets that have already been made and saved to the list of current game assets.
+    2) Clicking on an asset will add that asset to the particular scene within the game object (and the scene preview will continually be looping through the game object to preview the game)
+    3) Clicking the "save scene" button will update the game object with the most recent x,y positions of all the assets in the scene.
+  */
+
+  // Updating a map
+  /*
+    1) The list of maps will be visible.
+    2) Clicking on a map will show all scenes for that map.
+    3) Clicking on a scene will add it to the current map.
+    4) The coordinates of the scene can be edited numerically. (x, y)
+    5) Clicking the "save map" button will update the game object with the most recent arrangement of scenes.
+  */
+
+  // Updating a game
+  /*
+    1) Clicking the "save game" button will send a PATCH request to the database.
+  */
 
   // Testing creation of avatar
   var avatarTest = {
@@ -990,436 +3412,6 @@ return {
     current: false
   };
 
-  // Testing creation of background
-  var backgroundTest = {
-    name: 'Beige Background',
-    obj: {
-      image: [{
-        x: 0,
-        y: 0,
-        width: gameWidth,
-        height: gameHeight,
-        color: 'beige'
-      }, {
-        x: 150,
-        y: 150,
-        width: 50,
-        height: 50,
-        color: 'yellow'
-      }],
-      collisionMap: [{
-        type: 'wall',
-        x: 150,
-        y: 200,
-        width: 50,
-        height: 20,
-        color: 'gray'
-      }]
-    },
-    game_id: 1,
-    tags: ['Testing Stuff', 'Plain beige'],
-    public: true
-  };
-
-  // Testing creation of object
-  var sceneObjectTest = {
-    name: 'Object Test',
-    obj: {
-      // The x and y coordinate of the top left corner of the object
-      pos: {
-        x: 400,
-        y: 300
-      },
-      // The animate object contains all the possible object actions with all of the frames to be drawn for each action.
-      animate: {
-        // Key: possible action, Value: array of frames
-        wave: [
-          // Each frame array element is an array of square objects to be drawn
-          // Frame 1 - wave
-          [{
-            x: 0,
-            y: 0,
-            width: 10,
-            height: 100,
-            color: 'brown'
-          }, {
-            x: 0,
-            y: 0,
-            width: 50,
-            height: 10,
-            color: 'red'
-          }, {
-            x: 50,
-            y: 10,
-            width: 50,
-            height: 10,
-            color: 'red'
-          }],
-          // Frame 2 - wave
-          [{
-            x: 0,
-            y: 0,
-            width: 10,
-            height: 100,
-            color: 'brown'
-          }, {
-            x: 0,
-            y: 10,
-            width: 50,
-            height: 10,
-            color: 'red'
-          }, {
-            x: 50,
-            y: 0,
-            width: 50,
-            height: 10,
-            color: 'red'
-          }]
-        ],
-        // Other actions could go here
-      },
-      // The collision map is how the game can know whether the character has collided with another object or event trigger. It is an array of invisible (or gray for now) squares.
-      collisionMap: [
-        {
-          x: -10,
-          y: 100,
-          width: 10,
-          height: 10,
-          color: 'gray'
-        }, {
-          x: 0,
-          y: 100,
-          width: 10,
-          height: 10,
-          color: 'gray'
-        }, {
-          x: 0,
-          y: 100,
-          width: 10,
-          height: 10,
-          color: 'gray'
-        }
-      ]
-    },
-    game_id: 1,
-    tags: ['Object thing', 'Really fun new object'],
-    public: false
-  };
-
-  // Testing creation of entity
-  var entityTest = {
-    name: 'AI Entity Test',
-    obj: {
-      // The x and y coordinate of the top left corner of the avatar
-      pos: {
-        x: 50,
-        y: 220
-      },
-      // The character's speed
-      speed: {
-        mag: 3,
-        x: 0,
-        y: 0
-      },
-      // The animate object contains all the possible character actions with all of the frames to be drawn for each action.
-      animate: {
-        // Key: possible action, Value: array of frames
-        stand: [
-          // Each frame array element is an array of square objects to be drawn
-          // Frame 1 - walk left
-          [{
-            x: 100,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'orange'
-          }, {
-            x: 150,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'purple'
-          }],
-          // Frame 2 - walk left
-          [{
-            x: 110,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'orange'
-          }, {
-            x: 140,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'purple'
-          }]
-        ],
-        walkLeft: [
-          // Each frame array element is an array of square objects to be drawn
-          // Frame 1 - walk left
-          [{
-            x: 100,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'purple'
-          }, {
-            x: 110,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'orange'
-          }],
-          // Frame 2 - walk left
-          [{
-            x: 110,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'purple'
-          }, {
-            x: 100,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'orange'
-          }]
-        ],
-        walkRight: [
-          // Frame 1 - walk right
-          [{
-            x: 150,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'purple'
-          }, {
-            x: 140,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'orange'
-          }],
-          // Frame 2 - walk right
-          [{
-            x: 140,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'purple'
-          }, {
-            x: 150,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'orange'
-          }]
-        ],
-        walkUp: [
-          // Frame 1 - walk up
-          [{
-            x: 100,
-            y: 110,
-            width: 30,
-            height: 30,
-            color: 'purple'
-          }, {
-            x: 150,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'orange'
-          }],
-          // Frame 2 - walk up
-          [{
-            x: 100,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'purple'
-          }, {
-            x: 150,
-            y: 110,
-            width: 30,
-            height: 30,
-            color: 'orange'
-          }]
-        ],
-        walkDown: [
-          // Frame 1 - walk down
-          [{
-            x: 100,
-            y: 140,
-            width: 30,
-            height: 30,
-            color: 'purple'
-          }, {
-            x: 150,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'orange'
-          }],
-          // Frame 2 - walk down
-          [{
-            x: 100,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'purple'
-          }, {
-            x: 150,
-            y: 140,
-            width: 30,
-            height: 30,
-            color: 'orange'
-          }]
-        ],
-        swimLeft: [
-          // Frame 1 - swim left
-          [{
-            x: 100,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'lightblue'
-          }, {
-            x: 150,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'lightblue'
-          }],
-          // Frame 2 - swim left
-          [{
-            x: 100,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'gray'
-          }, {
-            x: 150,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'gray'
-          }]
-        ],
-        swimRight: [
-          // Frame 1 - swim right
-          [{
-            x: 100,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'lightblue'
-          }, {
-            x: 150,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'lightblue'
-          }],
-          // Frame 2 - swim right
-          [{
-            x: 100,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'gray'
-          }, {
-            x: 150,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'gray'
-          }]
-        ],
-        swimUp: [
-          // Frame 1 - swim up
-          [{
-            x: 100,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'lightblue'
-          }, {
-            x: 150,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'lightblue'
-          }],
-          // Frame 2 - swim up
-          [{
-            x: 100,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'gray'
-          }, {
-            x: 150,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'gray'
-          }]
-        ],
-        swimDown: [
-          // Frame 1 - swim down
-          [{
-            x: 100,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'lightblue'
-          }, {
-            x: 150,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'lightblue'
-          }],
-          // Frame 2 - swim down
-          [{
-            x: 100,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'gray'
-          }, {
-            x: 150,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'gray'
-          }]
-        ]
-        // Other actions could go here
-      },
-      // The collision map is how the game can know whether the character has collided with another object or event trigger. It is an array of invisible (or gray for now) squares.
-      collisionMap: [
-        {
-          x: 100,
-          y: 180,
-          width: 80,
-          height: 10,
-          color: 'gray'
-        }, {
-          x: 100,
-          y: 185,
-          width: 80,
-          height: 10,
-          color: 'gray'
-        }
-      ]
-    },
-    game_id: 1,
-    tags: ['Entity thing', 'Awesome entity ftw'],
-    public: false
-  };
-
   // Testing creation of scene
   var sceneTest = {
     name: 'Scene Test 3',
@@ -1452,35 +3444,12 @@ return {
     }
   };
 
-  // Testing creation of game
-  var gameTest = {
-    name: 'Game Test 2',
-    description: 'This is my game',
-    obj: {
-      canvasElems: [{
-        x: 100,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'blue'
-      }],
-      collisionMap: [{
-        x: 300,
-        y: 300,
-        width: 30,
-        height: 30,
-        color: 'red'
-      }]
-    },
-    tags: ['The best game', 'fun stuff', "Everybody's favorite"],
-    public: false,
-  };
-
-  $('.createAvatarBgObjEntityBtn').click(function() {
+  $('.createAvatarBtn').click(function() {
     var headerData = {
       user_id: UserService.get().id,
       token: UserService.get().token
     };
+    // Avatar
     $.ajax({
       method: 'POST',
       url: 'https://forge-api.herokuapp.com/characters/create',
@@ -1498,60 +3467,9 @@ return {
         console.log(error);
       }
     });
-    $.ajax({
-      method: 'POST',
-      url: 'https://forge-api.herokuapp.com/backgrounds/create',
-      headers: headerData,
-      data: JSON.stringify(backgroundTest),
-      dataType: 'json',
-      contentType: 'application/json',
-      success: function(response) {
-        background = new Background(response);
-        backgroundLoaded = true;
-      },
-      error: function(error) {
-        console.log(error);
-      }
-    });
-    $.ajax({
-      method: 'POST',
-      url: 'https://forge-api.herokuapp.com/obstacles/create',
-      headers: headerData,
-      data: JSON.stringify(sceneObjectTest),
-      dataType: 'json',
-      contentType: 'application/json',
-      success: function(response) {
-        sceneObject = new SceneObject(response);
-        sceneObject.allActions = Object.keys(sceneObject.obj.animate);
-        sceneObject.action = sceneObject.allActions[0]; // The first action
-        sceneObject.obj.currentFrame = sceneObject.obj.animate[sceneObject.action][0]; // The first frame of the first action, whatever it is.
-        sceneObjectLoaded = true;
-        setInterval(checkSceneObjectAction, 75);
-      },
-      error: function(error) {
-        console.log(error);
-      }
-    });
-    $.ajax({
-      method: 'POST',
-      url: 'https://forge-api.herokuapp.com/entities/create',
-      headers: headerData,
-      data: JSON.stringify(entityTest),
-      dataType: 'json',
-      contentType: 'application/json',
-      success: function(response) {
-        entity = new Entity(response);
-        console.log(entity);
-        entity.obj.currentFrame = entity.obj.animate[entity.action][0];
-        entityLoaded = true;
-        setInterval(checkEntityAction, 75);
-      },
-      error: function(error) {
-        console.log(error);
-      }
-    });
   });
 
+  // Scene
   $('.createSceneBtn').click(function() {
     var headerData = {
       user_id: UserService.get().id,
@@ -1571,8 +3489,9 @@ return {
         console.log(error);
       }
     });
-  })
+  });
 
+  // Map
   $('.createMapBtn').click(function() {
     var headerData = {
       user_id: UserService.get().id,
@@ -1583,27 +3502,6 @@ return {
       url: 'https://forge-api.herokuapp.com/maps/create',
       headers: headerData,
       data: JSON.stringify(mapTest),
-      dataType: 'json',
-      contentType: 'application/json',
-      success: function(response) {
-        console.log(response);
-      },
-      error: function(error) {
-        console.log(error);
-      }
-    });
-  })
-
-  $('.createGameBtn').click(function() {
-    var headerData = {
-      user_id: UserService.get().id,
-      token: UserService.get().token
-    };
-    $.ajax({
-      method: 'POST',
-      url: 'https://forge-api.herokuapp.com/games/create',
-      headers: headerData,
-      data: JSON.stringify(gameTest),
       dataType: 'json',
       contentType: 'application/json',
       success: function(response) {
@@ -2166,26 +4064,6 @@ return {
 });
 ;angular.module('questCreator').controller('profileCtrl', function(socket, $state, $scope, UserService) {
 
-  // var gameCanvas = document.getElementById('play-canvas');
-  // var gameCtx = gameCanvas.getContext('2d');
-  // var gameWidth = 500;
-  // var gameHeight = 700;
-  //
-  // function drawAvatar() {
-  //   // Save the drawing context
-  //   gameCtx.save();
-  //   // Translate the canvas origin to be the top left of the avatar
-  //   gameCtx.translate(avatar.pos.x, avatar.pos.y);
-  //   // Draw the squares from the avatar's current frame AND the collision map.
-  //   avatar.currentFrame.forEach(function(square) {
-  //     gameCtx.fillStyle = square.color;
-  //     gameCtx.fillRect(square.x, square.y, square.width, square.height);
-  //   });
-  //   gameCtx.restore();
-  //   gameCtx.fillStyle = "blue";
-  //   gameCtx.fillRect(0,0,100,100);
-  // }
-  //
     $scope.createGame = function() {
         $state.go('main.game.editor.views');
     };
@@ -2194,6 +4072,13 @@ return {
         $scope.user.editGame = name;
         UserService.set($scope.user);
         $state.go('main.game.editor.views');
+    };
+
+    $scope.archiveGame = function (name) {
+        var agree = confirm("Are you sure you wanna Archive" + name + "? That means no one will be able to play it and all player information will be lost.  You can retrieve it later, but that's such a headache.");
+        if (agree) {
+          UserService.archive(name);
+        }
     };
 
     setTimeout(function() {
@@ -2206,43 +4091,49 @@ return {
         $scope.$apply();
     }, 1000);
 
-    //This is for testing only
-    $scope.games = [{
-        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-        name: "King's Quest Collection",
-        creator: "billy badass",
-        players: 6,
-        created_at: new Date(),
-        responseText: "something"
-    }, {
-        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-        name: "King's Quest Collection",
-        creator: "billy badass",
-        players: 6,
-        created_at: new Date(),
-        responseText: "something"
-    }, {
-        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-        name: "King's Quest Collection",
-        creator: "billy badass",
-        players: 6,
-        created_at: new Date(),
-        responseText: "something"
-    }, {
-        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-        name: "King's Quest Collection",
-        creator: "billy badass",
-        players: 6,
-        created_at: new Date(),
-        responseText: "something"
-    }, {
-        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-        name: "King's Quest Collection",
-        creator: "billy badass",
-        players: 6,
-        created_at: new Date(),
-        responseText: "something"
-    }];
+    $scope.games;
+
+    UserService.getUserGames().done(function(games) {
+      $scope.games = games;
+    });
+
+    // //This is for testing only
+    // $scope.games = [{
+    //     thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+    //     name: "King's Quest Collection",
+    //     creator: "billy badass",
+    //     players: 6,
+    //     created_at: new Date(),
+    //     responseText: "something"
+    // }, {
+    //     thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+    //     name: "King's Quest Collection",
+    //     creator: "billy badass",
+    //     players: 6,
+    //     created_at: new Date(),
+    //     responseText: "something"
+    // }, {
+    //     thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+    //     name: "King's Quest Collection",
+    //     creator: "billy badass",
+    //     players: 6,
+    //     created_at: new Date(),
+    //     responseText: "something"
+    // }, {
+    //     thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+    //     name: "King's Quest Collection",
+    //     creator: "billy badass",
+    //     players: 6,
+    //     created_at: new Date(),
+    //     responseText: "something"
+    // }, {
+    //     thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+    //     name: "King's Quest Collection",
+    //     creator: "billy badass",
+    //     players: 6,
+    //     created_at: new Date(),
+    //     responseText: "something"
+    // }];
 
     $scope.avatarTest = {
         walkLeft: [
@@ -2488,638 +4379,205 @@ return {
     };
 });
 ;angular.module('questCreator').controller('sceneCtrl', function(socket, $state, $scope) {
-    var self = this;      // To help with scope issues
-    var drawHandle = -1;  // Interval handle for drawing rate
-    var moveHandle = -1;  // Interval handle for movement of mouse (possibly does not need to be global)
-    var mouseX = 0;
-    var mouseY = 0;
-    var mouseMoveEvent;       // Global variable to track mouse movement events
-    var touchMoveEvent;       // Global variable to track touch movement events
-    var mobileWidth = 850;    // Width for mobile screen sizes
-    var tabletWidth = 1100;   // Width for tablet screen sizes
-    var tabletScale = 1.4;
-    var mobileScaleX = 2.5;
-    var mobileScaleY = 1.6;
-    var moveType = '';    // Either mouse or touch
-    var moved = false;    // Whether mouse has moved or not
-    var moving = {        // Direction that the main character should be moving.
-      left: false,
-      right: false,
-      up: false,
-      down: false
-    };
-    var drawing = {       // Type of object being drawn. Default: background.
-      // mobile: false,
-      // static: false,
-      background: true
-    };
-    var pixelWidth = 10;
-    var pixelHeight = 10;
-    var undoBackgroundArray = [];   //Array to keep track of background objects that were undone.
-    // var undoObstacleArray = [];   //Array to keep track of obstacle objects that were undone.
-    // var undoCharacterArray = [];   //Array to keep track of character objects that were undone.
-    this.speedRange = 5;     // How fast mobile objects should move.
-    // this.radiusRange = 5;  // Value of radius input in draw.html
-    // this.widthRangeBackground = 50;   // Value of width input in draw.html
-    // this.heightRangeBackground = 50;  // Value of height input in draw.html
-    // this.widthRangeObstacle = 50;     // Value of width input in draw.html
-    // this.heightRangeObstacle = 50;    // Value of height input in draw.html
-    this.currentColor = "#005500";    // Value of color input in draw.html
-    // this.currentScene = Scenes.fetchCurrentScene() || {}; // Scene selected from scenes controller
-    // this.currentBackground = Backgrounds.fetchCurrentBackground() || {};  // Background selected from scenes controller
-    this.myCanvas = document.getElementById('bg-canvas');  // Canvas html element
-    this.canvasPos = {    // Canvas top and left coordinates on page
-      x: self.myCanvas.getBoundingClientRect().left,
-      y: self.myCanvas.getBoundingClientRect().top
-    };
-    this.draw = this.myCanvas.getContext('2d'); // Canvas context
-    // this.sceneName =  this.currentScene.name || '';       // Current selected Scene name
-    // this.allMobileCircles = this.currentScene.mobileArr || [];  // Array of all mobile objects in current scene
-    // this.allObstacleSquares = this.currentScene.staticArr || [];  // Array of all static objects in current scene
-    // this.backgroundName = this.currentBackground.name || '';  // Current selected Background name
-    // this.allBackgroundSquares = this.currentBackground.staticArr || []; // Array of all static objects in current background
-    this.backgroundName = 'Testing Background';
-    this.allBackgroundSquares = [];
 
-    /*
-    *   Rectangle object constructor
-    *   @params
-    *     x: horizontal coord of top left corner
-    *     y: vertical coord of top left corner
-    *     width: width of rectangle
-    *     height: height of rectangle
-    *     color: color of rectangle
-    *   @methods
-    *     draw: draw the rectangle on the canvas using its position, size, and color.
-    */
-    function Square(x, y, width, height, color) {
-      this.x = x;
-      this.y = y;
-      this.width = width;
-      this.height = height;
-      this.color = color;
-      this.draw = function() {
-        self.draw.fillStyle = this.color;
-        if (window.innerWidth <= mobileWidth) { // Mobile size
-          self.draw.fillRect(this.x * mobileScaleX, this.y * mobileScaleY, this.width, this.height);
-        } else if (window.innerWidth <= tabletWidth) { // Tablet size
-          self.draw.fillRect(this.x * tabletScale, this.y / tabletScale, this.width, this.height);
-        } else {  // Desktop size
-          self.draw.fillRect(this.x, this.y, this.width, this.height);
-        }
-      }
-    }
-
-    // /*
-    // *   Circle object constructor
-    // *   @params
-    // *     x: horizontal coord of center of circle
-    // *     y: vertical coord of center of circle
-    // *     radius: radius of circle
-    // *     color: color of circle
-    // *   @methods
-    // *     draw: draw the circle on the canvas using its position, size, and color.
-    // */
-    // function Circle(x, y, radius, color) {
-    //   this.x = x;
-    //   this.y = y;
-    //   this.radius = radius;
-    //   this.color = color;
-    //   this.draw = function() {
-    //     self.draw.beginPath();
-    //     self.draw.fillStyle = this.color;
-    //     if (window.innerWidth <= mobileWidth) { // Mobile size
-    //       self.draw.arc(this.x * mobileScaleX, this.y * mobileScaleY, this.radius, 0, 2 * Math.PI);
-    //     } else if (window.innerWidth <= tabletWidth) { // Tablet size
-    //       self.draw.arc(this.x * tabletScale, this.y / tabletScale, this.radius, 0, 2 * Math.PI);
-    //     } else {
-    //       self.draw.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-    //     }
-    //     self.draw.fill();
-    //     // Example for future reference: Can also draw using an image. Image should first be loaded on the page.
-    //     // draw.drawImage(imgElem, this.x, this.y, this.radius, this.radius);
-    //   }
-    // }
-
-    // Called when the mouse button is pressed.
-    // Starts the interval to run every 100ms while the mouse button is still held down.
-    // Only start the interval if it is not already running.
-    function mouseDown(event) {
-      if (drawHandle === -1) {
-        drawHandle = setInterval(mousePressed, 100);
-      }
-    }
-
-    // Called when the mouse button is released.
-    // If the interval is running, then clear it and reset it.
-    function mouseUp(event) {
-      if (drawHandle !== -1) {
-        clearInterval(drawHandle);
-        drawHandle = -1;
-      }
-    }
-
-    // Runs every 100ms after the mouse button is pressed until it is released.
-    // Purpose is to draw the object that the user has chosen every 100ms AND if the mouse has moved from its previous location.
-    function mousePressed() {
-        self.canvasPos = {  // Get the most recent canvas position in case the window has been resized.
-          x: self.myCanvas.getBoundingClientRect().left,
-          y: self.myCanvas.getBoundingClientRect().top
-        };
-        // if (moved && drawing.mobile) { // Create, draw, and record a new mobile object
-        //   var radius = parseInt(self.radiusRange);
-        //   var color = self.currentColor;
-        //   if (moveType === 'mouse') {
-        //     var newCircle = new Circle(mouseMoveEvent.clientX - self.canvasPos.x, mouseMoveEvent.clientY - self.canvasPos.y, radius, color);
-        //     newCircle.draw();
-        //     self.allMobileCircles.push(newCircle);
-        //   } else if (moveType === 'touch') {
-        //     var newCircle = new Circle(touchMoveEvent.clientX - self.canvasPos.x, touchMoveEvent.clientY - self.canvasPos.y, radius, color);
-        //     newCircle.draw();
-        //     self.allMobileCircles.push(newCircle);
-        //   }
-        //   moved = false;
-        // } else if (moved && drawing.static) {  // Create, draw, and record a new static object
-        //   var width = parseInt(self.widthRangeObstacle);
-        //   var height = parseInt(self.heightRangeObstacle);
-        //   var color = self.currentColor;
-        //   if (moveType === 'mouse') {
-        //     var newSquare = new Square(mouseMoveEvent.clientX - width / 2 - self.canvasPos.x, mouseMoveEvent.clientY - height / 2 - self.canvasPos.y, width, height, color);
-        //     newSquare.draw();
-        //     self.allObstacleSquares.push(newSquare);
-        //   } else if (moveType === 'touch') {
-        //     var newSquare = new Square(touchMoveEvent.clientX - width / 2 - self.canvasPos.x, touchMoveEvent.clientY - height / 2 - self.canvasPos.y, width, height, color);
-        //     newSquare.draw();
-        //     self.allObstacleSquares.push(newSquare);
-        //   }
-        //   moved = false;
-        // } else if (moved && drawing.background) { // Create, draw, and record a new background object
-        //   var width = parseInt(self.widthRangeBackground);
-        //   var height = parseInt(self.heightRangeBackground);
-        //   var color = self.currentColor;
-        //   if (moveType === 'mouse') {
-        //     var newSquare = new Square(mouseMoveEvent.clientX - width / 2 - self.canvasPos.x, mouseMoveEvent.clientY - height / 2 - self.canvasPos.y, width, height, color);
-        //     newSquare.draw();
-        //     self.allBackgroundSquares.push(newSquare);
-        //   } else if (moveType === 'touch') {
-        //     var newSquare = new Square(touchMoveEvent.clientX - width / 2 - self.canvasPos.x, touchMoveEvent.clientY - height / 2 - self.canvasPos.y, width, height, color);
-        //     newSquare.draw();
-        //     self.allBackgroundSquares.push(newSquare);
-        //   }
-        //   moved = false;
-        // }
-      if (moved && drawing.background) { // Create, draw, and record a new background object
-        var width = pixelWidth;
-        var height = pixelHeight;
-        var color = self.currentColor;
-        if (moveType === 'mouse') {
-          var newSquareX = mouseX - self.canvasPos.x;
-          var newSquareY = mouseY - self.canvasPos.y;
-          var exists = false;
-          self.allBackgroundSquares.forEach(function(square) {
-            if (square.x === newSquareX && square.y === newSquareY) {
-              exists = true;
-            }
-          });
-          if (!exists) {
-            var newSquare = new Square(mouseX - self.canvasPos.x, mouseY - self.canvasPos.y, width, height, color);
-            newSquare.draw();
-            self.allBackgroundSquares.push(newSquare);
-          }
-        } else if (moveType === 'touch') {
-          var newSquare = new Square(touchMoveEvent.clientX - width / 2 - self.canvasPos.x, touchMoveEvent.clientY - height / 2 - self.canvasPos.y, width, height, color);
-          newSquare.draw();
-          self.allBackgroundSquares.push(newSquare);
-        }
-        moved = false;
-      }
-    }
-
-    // // Check for collisions between all of the mobile objects and all of the obstacle objects.
-    // // The collision is categorized according to which direction the obstacle is found.
-    // function findCollisions() {
-    //   var foundCollision = {  // By default, there is no collision found in any direction.
-    //     left: false,
-    //     right: false,
-    //     up: false,
-    //     down: false
-    //   };
-    //   self.allMobileCircles.forEach(function(circle) {  // Loop through all the mobile objects
-    //     self.allObstacleSquares.forEach(function(square) {  // Loop through all the obstacle objects
-    //       // Pattern: check the left, right, top, and bottom edges of the current mobile object against the right, left, bottom, and top edges of the current obstacle (in those exact orders).
-    //       if (circle.x - circle.radius <= square.x + square.width && circle.x - circle.radius >= square.x && circle.y >= square.y && circle.y <= square.y + square.height) {
-    //         foundCollision.left = true;
-    //         moving.left = false;
-    //       }
-    //       if (circle.x + circle.radius <= square.x + square.width && circle.x + circle.radius >= square.x && circle.y >= square.y && circle.y <= square.y + square.height) {
-    //         foundCollision.right = true;
-    //         moving.right = false;
-    //       }
-    //       if (circle.x <= square.x + square.width && circle.x >= square.x && circle.y - circle.radius >= square.y && circle.y - circle.radius <= square.y + square.height) {
-    //         foundCollision.up = true;
-    //         moving.up = false;
-    //       }
-    //       if (circle.x <= square.x + square.width && circle.x >= square.x && circle.y + circle.radius >= square.y && circle.y + circle.radius <= square.y + square.height) {
-    //         foundCollision.down = true;
-    //         moving.down = false;
-    //       }
-    //     });
-    //     // Check for collisions with the canvas border as well. Take resizing screen sizes into account.
-    //     var canvasEdgeRight;
-    //     var canvasEdgeBottom;
-    //     if (window.innerWidth <= mobileWidth) {
-    //       canvasEdgeRight = self.myCanvas.width / mobileScaleX;
-    //       canvasEdgeBottom = self.myCanvas.height / mobileScaleY;
-    //     } else if (window.innerWidth <= tabletWidth) {
-    //       canvasEdgeRight = self.myCanvas.width / tabletScale;
-    //       canvasEdgeBottom = self.myCanvas.height * tabletScale;
-    //     } else {
-    //       canvasEdgeRight = self.myCanvas.width;
-    //       canvasEdgeBottom = self.myCanvas.height;
-    //     }
-    //     if (circle.x <= 0) {
-    //       foundCollision.left = true;
-    //       moving.left = false;
-    //     }
-    //     if (circle.x >= canvasEdgeRight) {
-    //       foundCollision.right = true;
-    //       moving.right = false;
-    //     }
-    //     if (circle.y <= 0) {
-    //       foundCollision.up = true;
-    //       moving.up = false;
-    //     }
-    //     if (circle.y >= canvasEdgeBottom) {
-    //       foundCollision.down = true;
-    //       moving.down = false;
-    //     }
-    //   });
-    //   return foundCollision;
-    // }
-
-    // // Called when any key is pressed.
-    // function handleKeyDown(event) {
-    //   // If the user presses the left, right, up, or down arrow keys, toggle the movement direction accordingly
-    //   if (event.keyCode === 37) { // Left Key
-    //     event.preventDefault();
-    //     moving = {
-    //       left: !moving.left,
-    //       up: false,
-    //       right: false,
-    //       down: false
-    //     };
-    //   } else if (event.keyCode === 38) { // Up Key
-    //     event.preventDefault();
-    //     moving = {
-    //       left: false,
-    //       up: !moving.up,
-    //       right: false,
-    //       down: false
-    //     };
-    //   } else if (event.keyCode === 39) { // Right Key
-    //     event.preventDefault();
-    //     moving = {
-    //       left: false,
-    //       up: false,
-    //       right: !moving.right,
-    //       down: false
-    //     };
-    //   } else if (event.keyCode === 40) { // Down Key
-    //     event.preventDefault();
-    //     moving = {
-    //       left: false,
-    //       up: false,
-    //       right: false,
-    //       down: !moving.down
-    //     };
-    //   } else {    // For all other keys, stop all movement.
-    //     moving = {
-    //       left: false,
-    //       up: false,
-    //       right: false,
-    //       down: false
-    //     }
-    //   }
-    //   // If any of the arrow keys have been pressed, run the moveMobileCircles function every 20ms.
-    //   // Otherwise, stop running the moveMobileCircles function.
-    //   if ( moving.left || moving.up || moving.right || moving.down ) {
-    //     clearInterval(moveHandle);
-    //     moveHandle = setInterval(moveMobileCircles, 20);
-    //   } else {
-    //     clearInterval(moveHandle);
-    //   }
-    // }
-
-    // // Runs every 20ms after an arrow key has been pressed.
-    // function moveMobileCircles() {
-    //   // Depending on movement direction and collision detection, do the following:
-    //   // 1) Clear the canvas.
-    //   // 2) Redraw background and obstacle objects.
-    //   // 3) Shift the circles in the corresponding direction.
-    //   // 4) Redraw the circles.
-    //   // Note: Checking collision detection and checking movement direction may be redundant.
-    //   if (moving.left && !findCollisions().left) {
-    //     self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
-    //     drawBackgroundSquares();
-    //     drawObstacleSquares();
-    //     self.allMobileCircles.forEach(function(circle) {
-    //       circle.x -= parseInt(self.speedRange);
-    //       circle.draw();
-    //     });
-    //   } else if (moving.right && !findCollisions().right) {
-    //     self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
-    //     drawBackgroundSquares();
-    //     drawObstacleSquares();
-    //     self.allMobileCircles.forEach(function(circle) {
-    //       circle.x += parseInt(self.speedRange);
-    //       circle.draw();
-    //     });
-    //   } else if (moving.up && !findCollisions().up) {
-    //     self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
-    //     drawBackgroundSquares();
-    //     drawObstacleSquares();
-    //     self.allMobileCircles.forEach(function(circle) {
-    //       circle.y -= parseInt(self.speedRange);
-    //       circle.draw();
-    //     });
-    //   } else if (moving.down && !findCollisions().down) {
-    //     self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
-    //     drawBackgroundSquares();
-    //     drawObstacleSquares();
-    //     self.allMobileCircles.forEach(function(circle) {
-    //       circle.y += parseInt(self.speedRange);
-    //       circle.draw();
-    //     });
-    //   }
-    // }
-
-    // Loop through the array of background objects and draw them all.
-    function drawBackgroundSquares() {
-      for (var index = 0; index < self.allBackgroundSquares.length; index++) {
-        var square = self.allBackgroundSquares[index];
-        square.draw();
-      }
-    }
-
-    // // Loop through the array of obstacle objects and draw them all.
-    // function drawObstacleSquares() {
-    //   for (var index = 0; index < self.allObstacleSquares.length; index++) {
-    //     var square = self.allObstacleSquares[index];
-    //     square.draw();
-    //   }
-    // }
-
-    // // Loop through the array of mobile objects and draw them all.
-    // function drawMobileCircles() {
-    //   for (var index = 0; index < self.allMobileCircles.length; index++) {
-    //     var circle = self.allMobileCircles[index];
-    //     circle.draw();
-    //   }
-    // }
-
-    // // When the Draw Character button is clicked, change the drawing setting to mobile.
-    // $('.characterDraw').click(function() {
-    //   drawing = {
-    //     mobile: true,
-    //     static: false,
-    //     background: false
-    //   };
-    //   $('.option').removeClass('active');
-    //   $(this).addClass('active');
-    // });
-
-    // // When the Draw Obstacles button is clicked, change the drawing setting to static.
-    // $('.objectDraw').click(function() {
-    //   drawing = {
-    //     mobile: false,
-    //     static: true,
-    //     background: false
-    //   }
-    //   $('.option').removeClass('active');
-    //   $(this).addClass('active');
-    // });
-
-    // // When the Draw Background button is clicked, change the drawing setting to background.
-    // $('.backgroundDraw').click(function() {
-    //   drawing = {
-    //     mobile: false,
-    //     static: false,
-    //     background: true
-    //   }
-    //   $('.option').removeClass('active');
-    //   $(this).addClass('active');
-    // });
-
-    // When the user clicks the undo button, remove the last element from the object array and push it to the undo array, based on current drawing type. Then redraw canvas.
-    $('#undo').click(function() {
-      // if (drawing.mobile && self.allMobileCircles.length > 0) {
-      //   var lastObj = self.allMobileCircles.pop();
-      //   undoCharacterArray.push(lastObj);
-      // } else if (drawing.static && self.allObstacleSquares.length > 0) {
-      //   var lastObj = self.allObstacleSquares.pop();
-      //   undoObstacleArray.push(lastObj);
-      // } else if (drawing.background && self.allBackgroundSquares.length > 0) {
-      //   var lastObj = self.allBackgroundSquares.pop();
-      //   undoBackgroundArray.push(lastObj);
-      // }
-      if (drawing.background && self.allBackgroundSquares.length > 0) {
-        var lastObj = self.allBackgroundSquares.pop();
-        undoBackgroundArray.push(lastObj);
-      }
-      self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
-      drawBackgroundSquares();
-      // drawObstacleSquares();
-      // drawMobileCircles();
-    });
-
-    // When the user clicks the redo button, remove the last element from the undo array and push it to the object array, based on current drawing type. Then redraw canvas.
-    $('#redo').click(function() {
-      // if (drawing.mobile && undoCharacterArray.length > 0) {
-      //   var lastObj = undoCharacterArray.pop();
-      //   self.allMobileCircles.push(lastObj);
-      // } else if (drawing.static && undoObstacleArray.length > 0) {
-      //   var lastObj = undoObstacleArray.pop();
-      //   self.allObstacleSquares.push(lastObj);
-      // } else if (drawing.background && undoBackgroundArray.length > 0) {
-      //   var lastObj = undoBackgroundArray.pop();
-      //   self.allBackgroundSquares.push(lastObj);
-      // }
-      if (drawing.background && undoBackgroundArray.length > 0) {
-        var lastObj = undoBackgroundArray.pop();
-        self.allBackgroundSquares.push(lastObj);
-      }
-      self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
-      drawBackgroundSquares();
-      // drawObstacleSquares();
-      // drawMobileCircles();
-    });
-
-    // When the Clear Canvas button is clicked, make the current Background and current Scene empty objects and reload the view.
-    // Note: may need extra testing here.
-    $('#clear').click(function() {
-      canvasWidth = self.myCanvas.width;
-      canvasHeight = self.myCanvas.height;
-      // self.allObstacleSquares = [];
-      // self.allMobileCircles = [];
-      self.draw.clearRect(0, 0, canvasWidth, canvasHeight);
-      self.allBackgroundSquares = [];
-      var undoBackgroundArray = [];
-      // var undoObstacleArray = [];
-      // var undoCharacterArray = [];
-      // Scenes.selectScene({})
-      // Backgrounds.selectBackground({});
-      // $state.reload();
-    });
-
-    // // When the Save Scene button is clicked:
-    // // 1) Clear the canvas and redraw only the Obstacles and Character. (ensures thumbnail is scene ONLY)
-    // // 2) Create and store a new scene object and make it the current Scene.
-    // // 3) Clear the canvas again and this time redraw Background, Obstacles, and Character.
-    // $('.saveScene').click(function() {
-    //   self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
-    //   drawObstacleSquares();
-    //   drawMobileCircles();
-    //   var newScene = Scenes.create({
-    //     name: self.sceneName,
-    //     staticArr: self.allObstacleSquares,
-    //     mobileArr: self.allMobileCircles,
-    //     thumbnail: self.myCanvas.toDataURL()
-    //   });
-    //   Scenes.selectScene(newScene);
-    //   self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
-    //   drawBackgroundSquares();
-    //   drawObstacleSquares();
-    //   drawMobileCircles();
-    // });
-
-    // // When the Publish Scene button is clicked, post it to the database.
-    // $('.publishScene').click(function() {
-    //   // Trying to decide whether to save AND publish or just publish...
-    //   self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
-    //   drawObstacleSquares();
-    //   drawMobileCircles();
-    //   var newScene = Scenes.create({
-    //     name: self.sceneName,
-    //     staticArr: self.allObstacleSquares,
-    //     mobileArr: self.allMobileCircles,
-    //     thumbnail: self.myCanvas.toDataURL()
-    //   });
-    //   Scenes.selectScene(newScene);
-    //   self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
-    //   drawBackgroundSquares();
-    //   drawObstacleSquares();
-    //   drawMobileCircles();
-    //   Scenes.publishScene(newScene);
-    // });
-
-    // When the Save Background button is clicked:
-    // 1) Clear the canvas and redraw only the Background. (ensures thumbnail is background ONLY)
-    // 2) Create and store a new background object and make it the current Background.
-    // 3) Finally, draw the Obstacles and Character.
-    $('#save').click(function() {
-      console.log(self.allBackgroundSquares);
-      // self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
-      // drawBackgroundSquares();
-      // var newBackground = Backgrounds.create({
-      //   name: self.backgroundName,
-      //   staticArr: self.allBackgroundSquares,
-      //   thumbnail: self.myCanvas.toDataURL()
-      // });
-      // Backgrounds.selectBackground(newBackground);
-      // drawObstacleSquares();
-      // drawMobileCircles();
-    });
-
-    // // When the Publish Background button is clicked, post it to the database.
-    // $('.publishBackground').click(function() {
-    //   // Trying to decide whether to save AND publish or just publish...
-    //   self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
-    //   drawBackgroundSquares();
-    //   var newBackground = Backgrounds.create({
-    //     name: self.backgroundName,
-    //     staticArr: self.allBackgroundSquares,
-    //     thumbnail: self.myCanvas.toDataURL()
-    //   });
-    //   Backgrounds.selectBackground(newBackground);
-    //   drawObstacleSquares();
-    //   drawMobileCircles();
-    //   Backgrounds.publishBackground(newBackground);
-    // });
-
-    // When a key is pressed, run the handleKeyDown function.
-    // $(document).on('keydown', handleKeyDown);
-
-    // When the mouse is pressed, released, moved, or leaves the canvas, run the corresponding function.
-    $(self.myCanvas).on('mousedown', mouseDown);
-    $(self.myCanvas).on('mouseup', mouseUp);
-    $(self.myCanvas).on('mouseleave', mouseUp);
-    $(self.myCanvas).on('mousemove', function(event) {
-      newMouseX = Math.round((event.clientX - pixelWidth / 2) / pixelWidth) * pixelWidth;
-      newMouseY = Math.round((event.clientY - pixelHeight / 2) / pixelHeight) * pixelHeight;
-      if (newMouseX !== mouseX || newMouseY !== mouseY) {
-        mouseX = newMouseX;
-        mouseY = newMouseY;
-        moveType = 'mouse';
-        mouseMoveEvent = event;
-        moved = true;
-      }
-    });
-
-    // // Construct initial full background objects (including methods) from the retrieved partial objects.
-    // // Idea - offload object methods to prototype? Possibly make this step unnecessary?
-    // function constructBackgroundSquares() {
-    //   var oldBackgroundSquares = self.allBackgroundSquares;
-    //   var newBackgroundSquares = [];
-    //   oldBackgroundSquares.forEach(function(square) {
-    //     var newBackgroundSquare = new Square(square.x, square.y, square.width, square.height, square.color);
-    //     newBackgroundSquares.push(newBackgroundSquare);
-    //   });
-    //   self.allBackgroundSquares = newBackgroundSquares;
-    // }
-    // // Construct mobile objects just like background objects.
-    // function constructCircles() {
-    //   var oldCircles = self.allMobileCircles;
-    //   var newCircles = [];
-    //   oldCircles.forEach(function(circle) {
-    //     var newCircle = new Circle(circle.x, circle.y, circle.radius, circle.color);
-    //     newCircles.push(newCircle);
-    //   });
-    //   self.allMobileCircles = newCircles;
-    // }
-    // // Construct static objects just like background and mobile objects.
-    // function constructSquares() {
-    //   var oldSquares = self.allObstacleSquares;
-    //   var newSquares = [];
-    //   oldSquares.forEach(function(square) {
-    //     var newSquare = new Square(square.x, square.y, square.width, square.height, square.color);
-    //     newSquares.push(newSquare);
-    //   });
-    //   self.allObstacleSquares = newSquares;
-    // }
-
-    // Call all object constructing functions.
-    // constructBackgroundSquares();
-    // constructCircles();
-    // constructSquares();
-    // Draw all the objects now that they have been made.
-    // drawBackgroundSquares();
-    // drawMobileCircles();
-    // drawObstacleSquares();
-
-    // Experimental touch screen support
-    // When the mouse is pressed, released, moved, or leaves the canvas, run the corresponding function.
-    $(self.myCanvas).on('touchstart', mouseDown);
-    $(self.myCanvas).on('touchend', mouseUp);
-    $(self.myCanvas).on('touchcancel', mouseUp);
-    $(self.myCanvas).on('touchmove', function(event) {
-      moveType = 'touch';
-      event.preventDefault();
-      touchMoveEvent = event.touches[0];
-      moved = true;
-    });
-
-    console.log("here");
 });
 ;angular.module('questCreator').controller('scriptsCtrl', function($state) {
 
 });
+;if (false) {
+
+  var headerData = {
+    user_id: UserService.get().id,
+    token: UserService.get().token
+  };
+
+  // returns 3 separate arrays of objects with all asset information
+  $.ajax({
+    method: 'GET',
+    url: 'https://forge-api.herokuapp.com/articles/index',
+    headers: headerData,
+    success: function(response) {
+      console.log(response);
+    },
+    error: function(error) {
+      console.log(error);
+    }
+  });
+
+
+  // returns correct objects still broken out into backgrounds, obstacles, and entities.
+  var testData = {
+    // tags needs to be userInput from search.  As of now, the tags are limited to one search term.
+    tags: 'sky',
+  };
+
+  $.ajax({
+    method: 'GET',
+    url: 'https://forge-api.herokuapp.com/articles/search',
+    data: testData,
+    headers: headerData,
+    success: function(response) {
+      console.log(response);
+    },
+    error: function(error) {
+      console.log(error);
+    }
+  });
+
+
+  // returns all backgrounds
+  $.ajax({
+    method: 'GET',
+    url: 'https://forge-api.herokuapp.com/backgrounds/index',
+    success: function(response) {
+      console.log(response);
+    },
+    error: function(error) {
+      console.log(error);
+    }
+  });
+
+
+  //returns all characters (including all data re:character) that match the user ID given - see note below
+
+  $.ajax({
+    method: 'GET',
+    url: 'https://forge-api.herokuapp.com/characters/index',
+    headers: headerData,
+    success: function(response) {
+      console.log(response);
+    },
+    error: function(error) {
+      console.log(error);
+    }
+  });
+
+
+  // returns only one character and data that match the truthfulness of current boolean
+  $.ajax({
+    method: 'GET',
+    url: 'https://forge-api.herokuapp.com/characters/current_character',
+    headers: headerData,
+    success: function(response) {
+      console.log(response);
+    },
+    error: function(error) {
+      console.log(error);
+    }
+  });
+
+
+  // returns array of entities objects
+  $.ajax({
+    method: 'GET',
+    url: 'https://forge-api.herokuapp.com/entities/index',
+    headers: headerData,
+    success: function(response) {
+      console.log(response);
+    },
+    error: function(error) {
+      console.log(error);
+    }
+  });
+
+
+  // returns games based on a search term in their tags column in the database or the specific name
+  var testData = {
+    // tags needs to be userInput from search.  As of now, the tags are limited to one search term.
+    tags: 'war',
+  };
+
+  $.ajax({
+    method: 'GET',
+    url: 'https://forge-api.herokuapp.com/games/search',
+    data: testData,
+    headers: headerData,
+    success: function(response) {
+      console.log(response);
+    },
+    error: function(error) {
+      console.log(error);
+    }
+  });
+
+
+  // returns all games a user has created.
+  $.ajax({
+    method: 'GET',
+    url: 'https://forge-api.herokuapp.com/games/user-games',
+    headers: headerData,
+    success: function(response) {
+      console.log(response);
+    },
+    error: function(error) {
+      console.log(error);
+    }
+  });
+
+
+  //returns all maps - we should probably add some sort of data validation like, per game request which will req game_id be sent in the data body.
+  $.ajax({
+    method: 'GET',
+    url: 'https://forge-api.herokuapp.com/maps/index',
+    headers: headerData,
+    success: function(response) {
+      console.log(response);
+    },
+    error: function(error) {
+      console.log(error);
+    }
+  });
+
+
+  // returns a specific map if name CONTAINS any part of the searched word
+  var testData = {
+    // this should be searched data from the user
+    name: 'map 1',
+  };
+
+  $.ajax({
+    method: 'GET',
+    url: 'https://forge-api.herokuapp.com/maps/search',
+    data: testData,
+    headers: headerData,
+    success: function(response) {
+      console.log(response);
+    },
+    error: function(error) {
+      console.log(error);
+    }
+  });
+
+
+  // returns all obstacles
+  $.ajax({
+    method: 'GET',
+    url: 'https://forge-api.herokuapp.com/obstacles/index',
+    headers: headerData,
+    success: function(response) {
+      console.log(response);
+    },
+    error: function(error) {
+      console.log(error);
+    }
+  });
+
+
+  // returns searched scenes
+  var testData = {
+    name: 'scene',
+  };
+
+  $.ajax({
+    method: 'GET',
+    url: 'https://forge-api.herokuapp.com/scenes/search',
+    data: testData,
+    headers: headerData,
+    success: function(response) {
+      console.log(response);
+    },
+    error: function(error) {
+      console.log(error);
+    }
+  });
+}
