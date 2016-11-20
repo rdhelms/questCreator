@@ -61,21 +61,21 @@
     <aside id="asset-bar">
         <ul class="assets">
             <li class="viewer" id="backgrounds">
-                <h4>Backgrounds</h4>
+                <h4><a ng-click="editor.goToPalette(bg)">Backgrounds</a></h4>
                 <ul>
                   <li ng-click="editor.createBackground()"> <div class="availableAsset"> + </div> </li>
                   <li ng-repeat="background in editor.availableBackgrounds | orderBy:'-'" ng-click="editor.editBackground(background)"><div class="availableAsset"> {{background.name}} </div></li>
                 </ul>
             </li>
             <li class="viewer" id="game-objects">
-                <h4>Game Objects</h4>
+                <h4><a ng-click="editor.goToPalette(obj)">Game Objects</a></h4>
                 <ul>
                     <li ng-click="editor.createObject()"> <div class="availableAsset"> + </div> </li>
                     <li ng-repeat="object in editor.availableObjects | orderBy:'-'" ng-click="editor.editObject(object)"><div class="availableAsset"> {{object.name}} </div></li>
                 </ul>
             </li>
             <li class="viewer" id="entities">
-                <h4>Entities</h4>
+                <h4><a ng-click="editor.goToPalette(ent)">Entities</a></h4>
                 <ul>
                     <li><canvas class="asset entity"></canvas></li>
                     <li><canvas class="asset entity"></canvas></li>
