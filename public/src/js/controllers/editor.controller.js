@@ -1,4 +1,4 @@
-angular.module('questCreator').controller('editorCtrl', function($scope, $state, EditorService, UserService) {
+angular.module('questCreator').controller('editorCtrl', function($scope, $state, EditorService, UserService, PaletteService) {
   var self = this;
   this.gameInfo = {};
   this.currentEditingGame = {
@@ -19,6 +19,11 @@ angular.module('questCreator').controller('editorCtrl', function($scope, $state,
 
   this.currentColor = 'green';
   this.currentPixelSize = 15;
+
+  this.goToPalette = function (type) {
+    PaletteService.setType(type);
+    $state.go('main.game.editor.palette');
+  };
 
   this.createNewGame = function (name) {
       EditorService.createGame(name).done(function(game) {
