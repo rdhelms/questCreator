@@ -37,6 +37,10 @@
           }).state('main.game.editor.views', {
             url: '/',
             views: {
+              'palette': {
+                templateUrl: './src/views/game/editor/palette.html',
+                controller: 'paletteCtrl as palette'
+              },
               'maps': {
                 templateUrl: './src/views/game/editor/map.html',
                 controller: 'mapCtrl as map'
