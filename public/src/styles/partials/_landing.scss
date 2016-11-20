@@ -47,26 +47,5 @@
             font-size: 1.8em;
             height: 8em;
         }
-
-        .assets-results {
-            padding-top: 500px;
-            display: flex;
-            justify-content: space-around;
-            align-content: space-around;
-            flex-wrap: wrap;
-            width: 100%;
-            overflow-y: scroll;
-
-            .asset {
-                border: black 2px solid;
-                width: 132px;
-                height: 200px;
-                margin: 10px 0;
-
-                .asset-canvas {
-                    background-color: pink;
-                }
-            }
-        }
     }
 }
