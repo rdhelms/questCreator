@@ -27,43 +27,49 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
         $scope.$apply();
     }, 1000);
 
-    //This is for testing only
-    $scope.games = [{
-        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-        name: "King's Quest Collection",
-        creator: "billy badass",
-        players: 6,
-        created_at: new Date(),
-        responseText: "something"
-    }, {
-        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-        name: "King's Quest Collection",
-        creator: "billy badass",
-        players: 6,
-        created_at: new Date(),
-        responseText: "something"
-    }, {
-        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-        name: "King's Quest Collection",
-        creator: "billy badass",
-        players: 6,
-        created_at: new Date(),
-        responseText: "something"
-    }, {
-        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-        name: "King's Quest Collection",
-        creator: "billy badass",
-        players: 6,
-        created_at: new Date(),
-        responseText: "something"
-    }, {
-        thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-        name: "King's Quest Collection",
-        creator: "billy badass",
-        players: 6,
-        created_at: new Date(),
-        responseText: "something"
-    }];
+    $scope.games;
+
+    UserService.getUserGames().done(function(games) {
+      $scope.games = games;
+    });
+
+    // //This is for testing only
+    // $scope.games = [{
+    //     thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+    //     name: "King's Quest Collection",
+    //     creator: "billy badass",
+    //     players: 6,
+    //     created_at: new Date(),
+    //     responseText: "something"
+    // }, {
+    //     thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+    //     name: "King's Quest Collection",
+    //     creator: "billy badass",
+    //     players: 6,
+    //     created_at: new Date(),
+    //     responseText: "something"
+    // }, {
+    //     thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+    //     name: "King's Quest Collection",
+    //     creator: "billy badass",
+    //     players: 6,
+    //     created_at: new Date(),
+    //     responseText: "something"
+    // }, {
+    //     thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+    //     name: "King's Quest Collection",
+    //     creator: "billy badass",
+    //     players: 6,
+    //     created_at: new Date(),
+    //     responseText: "something"
+    // }, {
+    //     thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
+    //     name: "King's Quest Collection",
+    //     creator: "billy badass",
+    //     players: 6,
+    //     created_at: new Date(),
+    //     responseText: "something"
+    // }];
 
     $scope.avatarTest = {
         walkLeft: [

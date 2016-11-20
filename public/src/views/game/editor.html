@@ -1,13 +1,13 @@
 <div id="editor-view">
 
-    <section class="pop-up edit-game" ng-if="editor.currentEditingGame.name !== ''">
+    <section class="pop-up edit-game" ng-if="editor.currentEditingGame.name !== null">
         <label for="game-edit">Awesome! You're Now Editing:</label>
         <p>{{ editor.currentEditingGame.name }}</p>
         <button ng-click="editor.editGame()" type="button" name="cool">COOL!</button>
         <button ng-click="editor.cancel()" type="button" name="cool">nah!</button>
     </section>
 
-    <section class="pop-up create-game" ng-if="editor.currentEditingGame.name === ''">
+    <section class="pop-up create-game" ng-if="editor.currentEditingGame.name === null">
         <form ng-submit="editor.createNewGame(newGameName)">
             <label for="game-create">Start by Giving Your New Game a Name:</label>
             <input ng-required="true" type="text" ng-model="newGameName" placeholder="Game Name">
@@ -40,13 +40,17 @@
                 </li>
                 <li class="color">
                 </li>
-                <li class="color">
-                </li>
-                <ul class="picker">
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
+                <ul class="size-picker">
+                    <li ng-click="editor.currentPixelSize = 7">S</li>
+                    <li ng-click="editor.currentPixelSize = 15">M</li>
+                    <li ng-click="editor.currentPixelSize = 40">L</li>
+                    <li ng-click="editor.currentPixelSize = 80">XL</li>
+                </ul>
+                <ul class="color-picker">
+                    <li ng-click="editor.currentColor = 'skyblue'"></li>
+                    <li ng-click="editor.currentColor = 'green'"></li>
+                    <li ng-click="editor.currentColor = 'brown'"></li>
+                    <li ng-click="editor.currentColor = 'orange'"></li>
                 </ul>
             </ul>
         </section>
@@ -59,17 +63,15 @@
             <li class="viewer" id="backgrounds">
                 <h4>Backgrounds</h4>
                 <ul>
-                    <li><canvas class="asset background"></canvas></li>
-                    <li><canvas class="asset background"></canvas></li>
-                    <li><canvas class="asset background"></canvas></li>
-                    <li><canvas class="asset background"></canvas></li>
+                  <li ng-click="editor.createBackground()"> <div class="availableAsset"> + </div> </li>
+                  <li ng-repeat="background in editor.availableBackgrounds | orderBy:'-'" ng-click="editor.editBackground(background)"><div class="availableAsset"> {{background.name}} </div></li>
                 </ul>
             </li>
             <li class="viewer" id="game-objects">
                 <h4>Game Objects</h4>
                 <ul>
-                    <li ng-click="editor.createObject()" class="addNewObject"> <div style="height: 50px; width: 50px; border: 2px solid black;"> </div> </li>
-                    <li ng-repeat="object in editor.availableObjects"><canvas class="asset game-object"></canvas></li>
+                    <li ng-click="editor.createObject()"> <div class="availableAsset"> + </div> </li>
+                    <li ng-repeat="object in editor.availableObjects | orderBy:'-'" ng-click="editor.editObject(object)"><div class="availableAsset"> {{object.name}} </div></li>
                 </ul>
             </li>
             <li class="viewer" id="entities">
@@ -92,16 +94,9 @@
             </li>
         </ul>
         <section class="editor-contents" id="asset">
-            <div class="edit-canvas"><canvas height="200" width="200"></canvas></div>
             <ui-view name="objects" ng-show="editor.currentSmallView === 'object'"></ui-view>
             <ui-view name="entities" ng-show="editor.currentSmallView === 'entity'"></ui-view>
             <ui-view name="scripts" ng-show="editor.currentSmallView === 'script'"></ui-view>
-            <ul class="editor-controls">
-                <li><button id="clear">Clear</button></li>
-                <li><button id="save">Save <code ng-non-bindable>{{canvas}}</code></button></li>
-                <li><button id="save">Undo</button></li>
-                <li><button id="save">Redo</button></li>
-            </ul>
         </section>
     </aside>
 

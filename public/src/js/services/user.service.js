@@ -1,4 +1,7 @@
 angular.module('questCreator').service('UserService', function () {
+    // Google Info
+    var apiKey = 'AIzaSyCe__2EGSmwp0DR-qKGqpYwawfmRsTLBEs';
+    var clientId = '730683845367-tjrrmvelul60250evn5i74uka4ustuln.apps.googleusercontent.com';
     var user = {
             uid: null,
             token: null,
@@ -23,6 +26,10 @@ angular.module('questCreator').service('UserService', function () {
       user.editGame = name;
     }
 
+    function getGameEdit() {
+      return user.editGame || null;
+    }
+
     function archiveGame(name) {
       $.ajax({
         method: 'DELETE',
@@ -43,9 +50,6 @@ angular.module('questCreator').service('UserService', function () {
         }
       });
     }
-
-    var apiKey = 'AIzaSyCe__2EGSmwp0DR-qKGqpYwawfmRsTLBEs';
-    var clientId = '730683845367-tjrrmvelul60250evn5i74uka4ustuln.apps.googleusercontent.com';
 
     var auth2;
     // When the api has loaded, run the init function.
@@ -168,7 +172,7 @@ angular.module('questCreator').service('UserService', function () {
             token: user.token
           },
           success: function(response) {
-
+            return response;
           },
           error: function(error) {
             alert('There was a problem loading the profile. Please try again.');
@@ -180,7 +184,8 @@ angular.module('questCreator').service('UserService', function () {
       get: getUser,
       set: setUser,
       setGameEdit: setGameEdit,
-      games: getUserGames,
+      getGameEdit: getGameEdit,
+      getUserGames: getUserGames,
       archive: archiveGame,
       register: registerUser,
       signOut: signOut,

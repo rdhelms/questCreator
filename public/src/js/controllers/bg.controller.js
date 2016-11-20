@@ -1,4 +1,4 @@
-angular.module('questCreator').controller('bgCtrl', function($state) {
+angular.module('questCreator').controller('bgCtrl', function($state, $scope, EditorService) {
   var self = this;      // To help with scope issues
   var drawHandle = -1;  // Interval handle for drawing rate
   var moveHandle = -1;  // Interval handle for movement of mouse (possibly does not need to be global)
@@ -24,8 +24,8 @@ angular.module('questCreator').controller('bgCtrl', function($state) {
     // static: false,
     background: true
   };
-  var pixelWidth = 10;
-  var pixelHeight = 10;
+  var pixelWidth = $scope.editor.currentPixelSize;
+  var pixelHeight = $scope.editor.currentPixelSize;
   var undoBackgroundArray = [];   //Array to keep track of background objects that were undone.
   // var undoObstacleArray = [];   //Array to keep track of obstacle objects that were undone.
   // var undoCharacterArray = [];   //Array to keep track of character objects that were undone.
@@ -35,7 +35,7 @@ angular.module('questCreator').controller('bgCtrl', function($state) {
   // this.heightRangeBackground = 50;  // Value of height input in draw.html
   // this.widthRangeObstacle = 50;     // Value of width input in draw.html
   // this.heightRangeObstacle = 50;    // Value of height input in draw.html
-  this.currentColor = "#005500";    // Value of color input in draw.html
+  this.currentColor = $scope.editor.currentColor;    // Value of color input in draw.html
   // this.currentScene = Scenes.fetchCurrentScene() || {}; // Scene selected from scenes controller
   // this.currentBackground = Backgrounds.fetchCurrentBackground() || {};  // Background selected from scenes controller
   this.myCanvas = document.getElementById('bg-canvas');  // Canvas html element
@@ -80,6 +80,20 @@ angular.module('questCreator').controller('bgCtrl', function($state) {
       }
     }
   }
+
+  $scope.$on('redrawBackground', function(event, imageArr) {
+    canvasWidth = self.myCanvas.width;
+    canvasHeight = self.myCanvas.height;
+    self.draw.clearRect(0, 0, canvasWidth, canvasHeight);
+    self.allBackgroundSquares = [];
+    var undoBackgroundArray = [];
+    self.allBackgroundSquares = imageArr;
+    for (var index = 0; index < self.allBackgroundSquares.length; index++) {
+      var square = self.allBackgroundSquares[index];
+      self.draw.fillStyle = square.color;
+      self.draw.fillRect(square.x, square.y, square.width, square.height);
+    }
+  });
 
   // /*
   // *   Circle object constructor
@@ -180,9 +194,9 @@ angular.module('questCreator').controller('bgCtrl', function($state) {
       //   moved = false;
       // }
     if (moved && drawing.background) { // Create, draw, and record a new background object
-      var width = pixelWidth;
-      var height = pixelHeight;
-      var color = self.currentColor;
+      var width = $scope.editor.currentPixelSize;
+      var height = $scope.editor.currentPixelSize;
+      var color = $scope.editor.currentColor;
       if (moveType === 'mouse') {
         var newSquareX = mouseX - self.canvasPos.x;
         var newSquareY = mouseY - self.canvasPos.y;
@@ -422,7 +436,7 @@ angular.module('questCreator').controller('bgCtrl', function($state) {
   // });
 
   // When the user clicks the undo button, remove the last element from the object array and push it to the undo array, based on current drawing type. Then redraw canvas.
-  $('#undo').click(function() {
+  $('#undoBackground').click(function() {
     // if (drawing.mobile && self.allMobileCircles.length > 0) {
     //   var lastObj = self.allMobileCircles.pop();
     //   undoCharacterArray.push(lastObj);
@@ -444,7 +458,7 @@ angular.module('questCreator').controller('bgCtrl', function($state) {
   });
 
   // When the user clicks the redo button, remove the last element from the undo array and push it to the object array, based on current drawing type. Then redraw canvas.
-  $('#redo').click(function() {
+  $('#redoBackground').click(function() {
     // if (drawing.mobile && undoCharacterArray.length > 0) {
     //   var lastObj = undoCharacterArray.pop();
     //   self.allMobileCircles.push(lastObj);
@@ -467,7 +481,7 @@ angular.module('questCreator').controller('bgCtrl', function($state) {
 
   // When the Clear Canvas button is clicked, make the current Background and current Scene empty objects and reload the view.
   // Note: may need extra testing here.
-  $('#clear').click(function() {
+  $('#clearBackground').click(function() {
     canvasWidth = self.myCanvas.width;
     canvasHeight = self.myCanvas.height;
     // self.allObstacleSquares = [];
@@ -527,8 +541,10 @@ angular.module('questCreator').controller('bgCtrl', function($state) {
   // 1) Clear the canvas and redraw only the Background. (ensures thumbnail is background ONLY)
   // 2) Create and store a new background object and make it the current Background.
   // 3) Finally, draw the Obstacles and Character.
-  $('#save').click(function() {
-    console.log(self.allBackgroundSquares);
+  $('#saveBackground').click(function() {
+    EditorService.saveBackground(self.allBackgroundSquares, $scope.editor.currentBackground).done(function(background) {
+      console.log(background);
+    });
     // self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
     // drawBackgroundSquares();
     // var newBackground = Backgrounds.create({
@@ -565,8 +581,8 @@ angular.module('questCreator').controller('bgCtrl', function($state) {
   $(self.myCanvas).on('mouseup', mouseUp);
   $(self.myCanvas).on('mouseleave', mouseUp);
   $(self.myCanvas).on('mousemove', function(event) {
-    newMouseX = Math.round((event.clientX - pixelWidth / 2) / pixelWidth) * pixelWidth;
-    newMouseY = Math.round((event.clientY - pixelHeight / 2) / pixelHeight) * pixelHeight;
+    newMouseX = Math.round((event.clientX - $scope.editor.currentPixelSize / 2) / $scope.editor.currentPixelSize) * $scope.editor.currentPixelSize;
+    newMouseY = Math.round((event.clientY - $scope.editor.currentPixelSize / 2) / $scope.editor.currentPixelSize) * $scope.editor.currentPixelSize;
     if (newMouseX !== mouseX || newMouseY !== mouseY) {
       mouseX = newMouseX;
       mouseY = newMouseY;

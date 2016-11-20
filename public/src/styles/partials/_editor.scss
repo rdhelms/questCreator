@@ -70,8 +70,9 @@
 
   .edit-canvas {
     flex: 1;
-
-    border: 2px solid black;
+    canvas {
+      border: 2px solid black;
+    }
 
     @include radial-gradient (
     ellipse at center,
@@ -138,40 +139,51 @@
       border: 4px dashed black;
     }
 
-    .picker {
+    .size-picker, .color-picker {
       border: none;
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
       vertical-align: middle;
-      font-size: 70px;
-
-      &:hover {
-        cursor: pointer;
-        background: lightgrey;
+      &.size-picker {
+        li {
+          cursor: pointer;
+          height: 40%;
+          width: 40%;
+          margin: 5%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          &:hover {
+            background: lightgrey;
+          }
+        }
       }
+      &.color-picker {
+        font-size: 70px;
+        li {
+          cursor: pointer;
+          height: 40%;
+          width: 40%;
+          margin: 5%;
 
-      li {
-        height: 40%;
-        width: 40%;
-        margin: 5%;
+          &:nth-child(1){
+            background: skyblue;
+          }
 
-        &:nth-child(1){
-          background: skyblue;
+          &:nth-child(2){
+            background: green;
+          }
+
+          &:nth-child(3){
+            background: brown;
+          }
+
+          &:nth-child(4){
+            background: orange;
+          }
+
         }
-
-        &:nth-child(2){
-          background: green;
-        }
-
-        &:nth-child(3){
-          background: brown;
-        }
-
-        &:nth-child(4){
-          background: orange;
-        }
-
       }
     }
   }
@@ -218,6 +230,7 @@ canvas.asset {
 
   .viewer {
     width: 50%;
+    max-width: 300px;
     border-bottom: 4px black dashed;
     display: flex;
     flex-direction: column;
@@ -249,6 +262,14 @@ canvas.asset {
       border-right: 2px black dashed;
     }
   }
+}
+
+.availableAsset {
+  height: 75px;
+  width: 75px;
+  border: 2px solid black;
+  font-size: 15px;
+  word-wrap: break-word;
 }
 
 .grabbed {

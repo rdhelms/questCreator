@@ -1,7 +1,9 @@
-<div class="edit-canvas"><canvas id="bg-canvas" height="500" width="700"></canvas></div>
+<p class="backgroundEditorTitle"> {{editor.currentBackground.name}} </p>
+<input class="currentColor" ng-model="bg.currentColor" value="{{editor.currentColor}}" ng-hide="true">
+<div ng-show="editor.currentBackground" class="edit-canvas"><canvas id="bg-canvas" height="500" width="700"></canvas></div>
 <ul class="editor-controls">
-    <li><button id="clear">Clear</button></li>
-    <li><button id="save">Save {{editor.backgroundName}}</button></li>
-    <li><button id="undo">Undo</button></li>
-    <li><button id="redo">Redo</button></li>
+    <li><button id="clearBackground">Clear</button></li>
+    <li><button id="saveBackground">Save Background</button></li>
+    <li><button id="undoBackground">Undo</button></li>
+    <li><button id="redoBackground">Redo</button></li>
 </ul>

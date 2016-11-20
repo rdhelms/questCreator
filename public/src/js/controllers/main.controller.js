@@ -8,10 +8,7 @@ angular.module('questCreator')
 
     //When the user clicks "Profile" on the nav bar user information is loaded and view is changed to profile
     this.goToUser = function () {
-        var games = UserService.games();
-        games.done(function () {
-          $state.go('main.profile');
-        });
+        $state.go('main.profile');
     };
 
     // When the user clicks the sign in button, prompt them to sign in to their google account.
