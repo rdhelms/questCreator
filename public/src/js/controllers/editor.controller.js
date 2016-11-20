@@ -11,11 +11,13 @@ angular.module('questCreator').controller('editorCtrl', function($scope, $state,
   this.currentBackground = null;
   this.currentObject = null;
   this.currentEntity = null;
+  this.currentScene = null;
   this.currentLargeView = 'background';
   this.currentSmallView = 'object';
   this.availableBackgrounds = [];
   this.availableObjects = [];
   this.availableEntities = [];
+  this.allMaps = [];
 
   this.currentColor = 'green';
   this.currentPixelSize = 15;

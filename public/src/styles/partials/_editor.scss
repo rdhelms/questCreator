@@ -46,6 +46,20 @@
   }
 }
 
+.map-container {
+  .fullMap {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0;
+    .mapRow {
+      display: flex;
+      .mapColumn {
+        margin: 0 10px;
+      }
+    }
+  }
+}
+
 #scene-editor {
   background: whitesmoke;
   height: 800px;

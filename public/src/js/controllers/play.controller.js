@@ -62,7 +62,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
   // Step 1: Create Game (POST request to database)
   var gameInfo = {};
   var currentEditingGame = {
-    name: 'Potter Quest 9', // Game ID in database is 16
+    name: 'Potter Quest 11', // Game ID in database is 16
     description: '',
     info: gameInfo,
     tags: [],
