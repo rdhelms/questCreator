@@ -1,7 +1,7 @@
 <div id="landing-container">
   <section id="game-results">
     <h1>Games You Can Play Now:</h1>
-    <div ng-repeat="game in games" class="game" ng-click="goToGameDetail(game)">
+    <div ng-repeat="game in landing.allGames" class="game" ng-click="goToGameDetail(game)">
           <img src="{{ game.thumbnail }}" alt="Game thumbnail"/>
           <ul>
               <li>
@@ -30,20 +30,5 @@
   <aside id="create-splash">
     <h1>Yazua DPS</h1>
     <button ng-click="createGame()">Create New Game</button>
-    <label for="asset-type">Available Assets for Game Creation</label>
-    <select ng-model="assetType" class="asset-type">
-      <option value="backgrounds">Backgrounds</option>
-      <option value="objects" selected="selected">Objects</option>
-      <option value="entities">Characters</option>
-    </select>
-    <label for="asset-search">Search Assets By Keyword:</label>
-    <input type="text" ng-model="searchText" placeholder="{{ assetType }}">
-
-    <section class="assets-results">
-      <div ng-repeat="asset in assets" class="asset">
-        <canvas class="asset-canvas" width="130" height="170"></canvas>
-        <p>{{ asset.name }}</p>
-      </div>
-    </section>
   </aside>
 </div>
