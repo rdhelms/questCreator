@@ -21,16 +21,19 @@
   background: whitesmoke;
   font-family: PCSenior;
 
-  .nav ul {
-    justify-content: space-between;
-    width: 100%;
+  .nav {
+    position: static;
+    ul {
+      justify-content: space-between;
+      width: 100%;
 
-    li:hover {
-      background: whitesmoke;
-      color: black;
+      li:hover {
+        background: whitesmoke;
+        color: black;
+      }
     }
-
   }
+
 
   #close {
     padding: 2px;
