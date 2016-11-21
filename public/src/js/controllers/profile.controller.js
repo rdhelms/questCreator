@@ -1,6 +1,8 @@
 angular.module('questCreator').controller('profileCtrl', function(socket, $state, $scope, UserService) {
 
     $scope.createGame = function() {
+        $scope.user.editGame = null;
+        UserService.set($scope.user);
         $state.go('main.game.editor.views');
     };
 
@@ -11,8 +13,9 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
     };
 
     $scope.archiveGame = function (name) {
-        var agree = confirm("Are you sure you wanna Archive" + name + "? That means no one will be able to play it and all player information will be lost.  You can retrieve it later, but that's such a headache.");
+        var agree = confirm("Are you sure you wanna archive '" + name + "'? That means no one will be able to play it and all player information will be lost.  You can retrieve it later, but that's such a headache.");
         if (agree) {
+          console.log(agree);
           UserService.archive(name);
         }
     };
