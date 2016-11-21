@@ -2,13 +2,12 @@ angular.module('questCreator').controller('detailCtrl', function ($state, GameSe
 
 
     this.playGame = function (name) {
-        var gameToPlay = GameService.loadGame(name);
         $state.go('main.game.play');
     };
 
-    //This is for testing only
     this.game = GameService.getGameDetail();
 
+    //This is for testing only
     this.players = [
       {
         name: 'billy badass',
