@@ -1,91 +1,97 @@
-<button ng-click="editor.saveGame()" class="saveGame"> SAVE </button>
-<button ng-click="editor.publishGame()" class="publishGame"> PUBLISH </button>
+<section id="editor">
+  <ui-view class= "asset-search" name="palette" ng-show="editor.selectingAssets"> </ui-view>
 
-<ui-view class= "asset-search" name="palette" ng-show="editor.selectingAssets"> </ui-view>
+  <div id="editor-view">
 
-<div id="editor-view">
-
-    <!-- SCENE EDITOR -->
-    <section id="scene-editor">
-        <ul class="tab-nav">
-            <li class="tab" ng-class="{'active': editor.currentLargeView === 'map'}" ng-click="editor.currentLargeView = 'map'">Map</li>
-            <li class="tab" ng-class="{'active': editor.currentLargeView === 'scene'}" ng-click="editor.currentLargeView = 'scene'">Scene</li>
-            <li class="tab" ng-class="{'active': editor.currentLargeView === 'background'}" ng-click="editor.currentLargeView = 'background'">Backgrounds</li>
-        </ul>
-        <section class="editor-contents" id="scene">
-            <ui-view ng-show="editor.currentLargeView === 'map'" name="maps"></ui-view>
-            <ui-view ng-show="editor.currentLargeView === 'scene'" name="scenes"></ui-view>
-            <ui-view ng-show="editor.currentLargeView === 'background'" name="backgrounds"></ui-view>
-        </section>
-        <section id="palette">
-            <h4>Palette</h4>
-            <ul id="colors-menu">
-                <li class="tools">
-                    <button class="collision">Draw Collision</button>
-                    <button class="eraser">Erase</button>
-                </li>
-                <li class="color">
-                </li>
-                <li class="color">
-                </li>
-                <li class="color">
-                </li>
-                <ul class="size-picker">
-                    <li ng-click="editor.currentPixelSize = 7">S</li>
-                    <li ng-click="editor.currentPixelSize = 15">M</li>
-                    <li ng-click="editor.currentPixelSize = 40">L</li>
-                    <li ng-click="editor.currentPixelSize = 80">XL</li>
-                </ul>
-                <ul class="color-picker">
-                    <li ng-click="editor.currentColor = 'skyblue'"></li>
-                    <li ng-click="editor.currentColor = 'green'"></li>
-                    <li ng-click="editor.currentColor = 'brown'"></li>
-                    <li ng-click="editor.currentColor = 'orange'"></li>
-                </ul>
-            </ul>
-        </section>
-    </section>
+      <!-- SCENE EDITOR -->
+      <section id="scene-editor">
+          <ul class="tab-nav">
+              <li class="tab" ng-class="{'active': editor.currentLargeView === 'map'}" ng-click="editor.currentLargeView = 'map'"><h5>Map</h3></li>
+              <li class="tab" ng-class="{'active': editor.currentLargeView === 'scene'}" ng-click="editor.currentLargeView = 'scene'"><h5>Scene</h3></li>
+              <li class="tab" ng-class="{'active': editor.currentLargeView === 'background'}" ng-click="editor.currentLargeView = 'background'"><h5>Backgrounds</h3></li>
+          </ul>
+          <section class="editor-contents" id="scene">
+              <ui-view ng-show="editor.currentLargeView === 'map'" name="maps"></ui-view>
+              <ui-view ng-show="editor.currentLargeView === 'scene'" name="scenes"></ui-view>
+              <ui-view ng-show="editor.currentLargeView === 'background'" name="backgrounds"></ui-view>
+          </section>
+          <section id="palette">
+              <h4>Palette</h4>
+              <ul id="colors-menu">
+                  <li class="tools">
+                      <button class="collision">Draw Collision</button>
+                      <button class="eraser">Erase</button>
+                  </li>
+                  <li class="color">
+                  </li>
+                  <li class="color">
+                  </li>
+                  <li class="color">
+                  </li>
+                  <ul class="size-picker">
+                      <li ng-click="editor.currentPixelSize = 7">S</li>
+                      <li ng-click="editor.currentPixelSize = 15">M</li>
+                      <li ng-click="editor.currentPixelSize = 40">L</li>
+                      <li ng-click="editor.currentPixelSize = 80">XL</li>
+                  </ul>
+                  <ul class="color-picker">
+                      <li ng-click="editor.currentColor = 'skyblue'"></li>
+                      <li ng-click="editor.currentColor = 'green'"></li>
+                      <li ng-click="editor.currentColor = 'brown'"></li>
+                      <li ng-click="editor.currentColor = 'orange'"></li>
+                  </ul>
+              </ul>
+          </section>
+      </section>
 
 
-    <!-- ASSET BAR -->
-    <aside id="asset-bar">
-        <ul class="assets">
-            <li class="viewer" id="backgrounds">
-                <h4><a title="Click to browse backgrounds to add to your palette." ng-click="editor.goToPalette('backgrounds')">Backgrounds</a></h4>
-                <ul>
-                  <li ng-click="editor.createBackground()"> <div class="availableAsset"> + </div> </li>
-                  <li ng-repeat="background in editor.availableBackgrounds | orderBy:'-'" ng-click="editor.editBackground(background)"><div class="availableAsset"> {{background.name}} </div></li>
-                </ul>
-            </li>
-            <li class="viewer" id="game-objects">
-                <h4><a title="Click to browse game objects to add to your palette." ng-click="editor.goToPalette('obstacles')">Game Objects</a></h4>
-                <ul>
-                    <li ng-click="editor.createObject()"> <div class="availableAsset"> + </div> </li>
-                    <li ng-repeat="object in editor.availableObjects | orderBy:'-'" ng-click="editor.editObject(object)"><div class="availableAsset"> {{object.name}} </div></li>
-                </ul>
-            </li>
-            <li class="viewer" id="entities">
-                <h4><a title="Click to browse entities to add to your palette." ng-click="editor.goToPalette('entities')">Entities</a></h4>
-                <ul>
-                    <li ng-click="editor.createEntity()"> <div class="availableAsset"> + </div> </li>
-                    <li ng-repeat="entity in editor.availableEntities | orderBy:'-'" ng-click="editor.editEntity(entity)"><div class="availableAsset"> {{entity.name}} </div></li>
-                </ul>
-            </li>
-            <li class="viewer" id="scripts">
-                <h4>Scripts</h4>
-                <ul>
-                    <li><canvas class="asset script"></canvas></li>
-                    <li><canvas class="asset script"></canvas></li>
-                    <li><canvas class="asset script"></canvas></li>
-                    <li><canvas class="asset script"></canvas></li>
-                </ul>
-            </li>
-        </ul>
-        <section class="editor-contents" id="asset">
-            <ui-view name="objects" ng-show="editor.currentSmallView === 'object'"></ui-view>
-            <ui-view name="entities" ng-show="editor.currentSmallView === 'entity'"></ui-view>
-            <ui-view name="scripts" ng-show="editor.currentSmallView === 'script'"></ui-view>
-        </section>
-    </aside>
+      <!-- ASSET BAR -->
+      <aside id="asset-bar">
+          <ul class="assets">
+              <li class="viewer" id="backgrounds">
+                  <h4><a title="Click to browse backgrounds to add to your palette." ng-click="editor.goToPalette('backgrounds')">Backgrounds</a></h4>
+                  <ul>
+                    <li ng-click="editor.createBackground()"> <div class="availableAsset"> + </div> </li>
+                    <li ng-repeat="background in editor.availableBackgrounds | orderBy:'-'" ng-click="editor.editBackground(background)"><div class="availableAsset"> {{background.name}} </div></li>
+                  </ul>
+              </li>
+              <li class="viewer" id="game-objects">
+                  <h4><a title="Click to browse game objects to add to your palette." ng-click="editor.goToPalette('obstacles')">Game Objects</a></h4>
+                  <ul>
+                      <li ng-click="editor.createObject()"> <div class="availableAsset"> + </div> </li>
+                      <li ng-repeat="object in editor.availableObjects | orderBy:'-'" ng-click="editor.editObject(object)"><div class="availableAsset"> {{object.name}} </div></li>
+                  </ul>
+              </li>
+              <li class="viewer" id="entities">
+                  <h4><a title="Click to browse entities to add to your palette." ng-click="editor.goToPalette('entities')">Entities</a></h4>
+                  <ul>
+                      <li ng-click="editor.createEntity()"> <div class="availableAsset"> + </div> </li>
+                      <li ng-repeat="entity in editor.availableEntities | orderBy:'-'" ng-click="editor.editEntity(entity)"><div class="availableAsset"> {{entity.name}} </div></li>
+                  </ul>
+              </li>
+              <li class="viewer" id="scripts">
+                  <h4>Scripts</h4>
+                  <ul>
+                      <li><canvas class="asset script"></canvas></li>
+                      <li><canvas class="asset script"></canvas></li>
+                      <li><canvas class="asset script"></canvas></li>
+                      <li><canvas class="asset script"></canvas></li>
+                  </ul>
+              </li>
+          </ul>
+          <section class="editor-contents" id="asset">
+              <ui-view name="objects" ng-show="editor.currentSmallView === 'object'"></ui-view>
+              <ui-view name="entities" ng-show="editor.currentSmallView === 'entity'"></ui-view>
+              <ui-view name="scripts" ng-show="editor.currentSmallView === 'script'"></ui-view>
+          </section>
+      </aside>
 
-</div>
+  </div>
+
+  <footer id="editor-footer">
+    <ul>
+      <li><button ng-click="editor.saveGame()" class="saveGame big"> SAVE </button></li>
+      <li><button ng-click="editor.publishGame()" class="publishGame big"> PUBLISH </button></li>
+    </ul>
+  </footer>
+</section>
