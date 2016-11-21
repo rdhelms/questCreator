@@ -1,4 +1,16 @@
 <p class="entityEditorTitle"> {{editor.currentEntity.name}} </p>
+
+<p>Choose Animation:</p>
+<span class="select" tabindex="1">
+  {{editor.selectedAnimation}}
+  <ul class="options" tabindex="1">
+    <li ng-repeat="(animation, data) in editor.currentEntity.info.animate" class="option" tabindex="1" ng-mouseover="editor.selectedAnimation = animation; editor.editEntityFrame(editor.currentEntity);">{{animation}}</li>
+  </ul>
+</span>
+<span id="frame-counter">
+  <input id="frame-selector" ng-model="editor.frameindex" type="number" min="0" max="{{editor.currentEntity.info.animate.walkleft.length - 1}}" ng-click="editor.editEntityFrame(editor.currentEntity)">
+  / {{editor.currentEntity.info.animate.walkleft.length - 1}}
+</span>
 <div ng-show="editor.currentEntity" class="edit-canvas"><canvas id="ent-canvas" height="200" width="200"></canvas></div>
 <ul class="editor-controls">
     <li><button id="clearEntity">Clear</button></li>

@@ -1088,11 +1088,11 @@ angular.module('questCreator')
     });
   };
 
-  this.editEntity = function(entity) {
-    console.log(entity);
+  this.editEntityFrame = function(entity) {
     self.currentEntity = entity;
     self.currentSmallView = 'entity';
-    $scope.$broadcast('redrawEntity', entity.info.image);
+    console.log("ent", entity);
+    $scope.$broadcast('redrawEntity', entity.info.animate[this.selectedAnimation][this.frameindex].image);
   };
 
   this.cancel = function () {

@@ -294,6 +294,15 @@ canvas.asset {
   }
 }
 
+#frame-counter {
+  font-size: 3em;
+  #frame-selector {
+    font-size: 1em;
+    border: none;
+    box-shadow: none;
+  }
+}
+
 .availableAsset {
   height: 75px;
   width: 75px;
