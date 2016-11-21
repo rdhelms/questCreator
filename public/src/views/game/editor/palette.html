@@ -1,17 +1,25 @@
 <div class="palette-container">
-  <label for="asset-type">Available Assets for Game Creation</label>
-  <select ng-model="assetType" class="asset-type">
-    <option value="backgrounds">Backgrounds</option>
-    <option value="objects" selected="selected">Objects</option>
-    <option value="entities">Characters</option>
-  </select>
-  <label for="asset-search">Search Assets By Keyword:</label>
-  <input type="text" ng-model="searchText" placeholder="{{ assetType }}">
+  <button ng-click="palette.goToEditor()" type="button">Return To Editing</button>
+  <label for="asset-search">Search {{ palette.currentType }} By Keyword:</label>
+  <input type="text" ng-model="searchText" placeholder="Enter 1 word to search by...">
 
-  <section class="assets-results">
-    <div ng-repeat="asset in landing.allAssets" class="asset">
+  <section id="assets-results">
+    <div ng-click="palette.addToPalette(element)" ng-repeat="asset in landing.allAssets" class="asset">
       <canvas class="asset-canvas" width="130" height="170"></canvas>
       <p>{{ asset.name }}</p>
+      <p>{{ asset.tags }}</p>
+    </div>
+  </section>
+
+  <section id="assets-palette">
+    <div ng-if="palette.elements" class="palette-buttons">
+      <button ng-click="palette.saveElements()" type="button">Save These to Your Palette</button>
+    </div>
+
+    <div ng-repeat="element in palette.elements" class="palette-element">
+      <canvas width="130" height="170"></canvas>
+      <p>{{ element.name }}</p>
+      <p>{{ element.tags }}</p>
     </div>
   </section>
 </div>
