@@ -17,7 +17,7 @@ angular.module('questCreator').service('PaletteService', function (UserService) 
     return currentType;
   }
 
-  function getAllAssets(UserService) {
+  function getAllAssets() {
       $.ajax({
           method: 'GET',
           url: 'https://forge-api.herokuapp.com/articles/index',
