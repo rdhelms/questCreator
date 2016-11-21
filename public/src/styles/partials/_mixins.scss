@@ -63,3 +63,17 @@
       scrollbar-track-color: $secondary;
   }
 }
+
+@mixin sheen {
+  @include pseudo();
+  height: 800px;
+  width: 800px;
+  left: -200px;
+  top: -200px;
+  background: url('../images/pixel-sheen.png');
+  background-size: 100%;
+  background-repeat: no-repeat;
+  background-position: 0px 0px;
+  animation: sheen 3s forwards infinite steps(100);
+  opacity: .5;
+}

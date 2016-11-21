@@ -1,51 +1,49 @@
 #landing-container {
     display: flex;
-    justify-content: space-between;
-    height: 100vh;
+    margin-top: 3.6rem;
+    height: 90vh;
+    overflow-x: hidden;
 
-    #game-results {
-        margin: 2rem;
-        width: 60%;
+    main {
+      flex: 3;
+      padding: 2rem;
+
+      #game-results {
+        background: #A4AC96;
+        padding: 2rem;
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: space-around;
-        overflow-y: scroll;
-
-        .game {
-            margin: 15px;
-            width: 300px;
-            height: 250px;
-
-            img {
-                width: 300px;
-                height: 200px;
-            }
-
-            ul {
-                display: flex;
-                font-size: 0.75em;
-            }
-        }
+        height: 90%;
+        overflow-y: auto;
+        border: 4px black solid;
+      }
     }
+
 
     #create-splash {
         margin: 2rem;
-        width: 40%;
+        flex: 1;
         display: flex;
         flex-direction: column;
-        align-items: flex-end;
+        align-items: center;
+        justify-content: space-around;
 
         h1 {
             font-size: 3em;
-            color: pink;
-            -webkit-text-stroke: 2px red;
-            font-style: italic;
         }
 
         button {
-            font-size: 1.8em;
-            height: 8em;
+            font-family: PCSenior;
+            font-size: 2em;
+            padding: 2em;
+            overflow: hidden;
+            position: relative;
+            &::after {
+              @include sheen();
+            }
+
         }
     }
 }
