@@ -27,8 +27,6 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
         $scope.$apply();
     }, 1000);
 
-    $scope.games;
-
     UserService.getUserGames().done(function(games) {
       $scope.games = games;
     });

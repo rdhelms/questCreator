@@ -1,6 +1,6 @@
 <div ng-model="detail.game" id="detail-container">
     <section class="game-detail">
-        <!-- <h1>{{ detail.game.name }}</h1> -->
+        <h1>{{ detail.game.name | capitalize }}</h1>
         <img src="{{ detail.game.thumbnail }}" alt="Game thumbnail" />
         <ul>
             <li>{{ detail.game.description }}</li>
@@ -20,7 +20,7 @@
     </section>
     <aside id="play-splash">
         <h1>Yazua DPS</h1>
-        <button ng-click="detail.playGame(detail.game.name)">Play <span>{{ detail.game.name }}</span></button>
+        <button ng-click="detail.playGame(detail.game.name)">Play <span>{{ detail.game.name | capitalize }}</span></button>
 
         <table id="leaderboard">
           <tr>
