@@ -17,50 +17,13 @@ header {
 }
 
 .nav ul {
-  height: 1.5rem;
-  align-items: center;
   display: flex;
-  justify-content: space-between;
   color: black;
-  width: 40%;
   li {
-    display: flex;
-    align-items: center;
-    height: 100%;
-    padding: 0 1rem;
+    padding: .1rem 1rem;
   }
   li:hover {
     background: black;
     color: whitesmoke;
   }
-}
-
-#user-popup {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  > * {
-    min-width: 100px;
-    max-width: 350px;
-    background: whitesmoke;
-    border: 4px black solid;
-    padding: 10px;
-    margin: 1em;
-  }
-
-  #register-form {
-    text-align: center;
-    background: whitesmoke;
-    color: black;
-    display: none;
-    margin-bottom: 20%;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-  }
-}
-
-#welcome {
-  display: none;
 }

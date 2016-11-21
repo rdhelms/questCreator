@@ -1,34 +1,31 @@
 <div id="landing-container">
-  <section id="game-results">
-    <h1>Games You Can Play Now:</h1>
-    <div ng-repeat="game in landing.allGames" class="game" ng-click="goToGameDetail(game)">
-          <img src="{{ game.thumbnail }}" alt="Game thumbnail"/>
-          <ul>
-              <li>
-                  <label for="game-name">Game Name:</label>
-                  {{ game.name }}</li>
-              <li>
-                  <label for="creator">Created By:</label>
-                  <p>{{ game.creator }}</p>
-              </li>
-              <li>
-                  <label for="created">Date Created:</label>
-                  <p>{{ game.created_at }}</p>
-              </li>
-              <li>
-                  <label for="players">Players:</label>
-                  <p>{{ game.players }}</p>
-              </li>
-              <li>
-                  <label for="players">Total Number of Points:</label>
-                  <p>{{ game.totalPoints }}</p>
-              </li>
-          </ul>
+  <main>
+    <h1>HOT NEW GAMES:</h1>
+    <div id="game-results">
+      <div ng-repeat="game in landing.allGames" class="game" ng-click="goToGameDetail(game)">
+        <img src="{{ game.thumbnail }}" alt="Game thumbnail"/>
+        <ul>
+            <li>
+                <span><h1>{{ game.name }}</h1></span>
+            </li>
+            <li>
+                <p>by <span>{{ game.creator }}</span></p>
+            </li>
+            <li>
+                <p>on <span>{{ game.created_at }}</span></p>
+            </li>
+            <li>
+                <p>up to <span>{{ game.players }}</span> players</p>
+            </li>
+            <li>
+                <p><span>{{ game.totalPoints }}</span> points earned so far</p>
+            </li>
+        </ul>
       </div>
-
-    </section>
+    </div>
+  </main>
   <aside id="create-splash">
-    <h1>Yazua DPS</h1>
+    <h1 class='yazua'>Yazua DPS</h1>
     <button ng-click="createGame()">Create New Game</button>
   </aside>
 </div>
