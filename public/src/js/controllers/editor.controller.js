@@ -75,7 +75,12 @@ angular.module('questCreator')
     EditorService.saveGame(self.currentEditingGame).done(function(savedGame) {
       console.log(savedGame);
     });
-  }
+  };
+
+  this.publishGame = function () {
+    self.currentEditingGame.published = true;
+    this.saveGame();
+  };
 
   this.createBackground = function() {
     var name = prompt("Enter a name for the new background: ");
@@ -86,13 +91,13 @@ angular.module('questCreator')
       self.currentBackground = background;
       $scope.$apply();
     });
-  }
+  };
 
   this.editBackground = function(background) {
     console.log(background);
     self.currentBackground = background;
     $scope.$broadcast('redrawBackground', background.info.image);
-  }
+  };
 
   this.createObject = function() {
     var name = prompt("Enter a name for the new object: ");
@@ -104,14 +109,14 @@ angular.module('questCreator')
       self.currentSmallView = 'object';
       $scope.$apply();
     });
-  }
+  };
 
   this.editObject = function(object) {
     console.log(object);
     self.currentObject = object;
     self.currentSmallView = 'object';
     $scope.$broadcast('redrawObject', object.info.image);
-  }
+  };
 
   this.createEntity = function() {
     var name = prompt("Enter a name for the new entity: ");
@@ -123,14 +128,14 @@ angular.module('questCreator')
       self.currentSmallView = 'entity';
       $scope.$apply();
     });
-  }
+  };
 
   this.editEntity = function(entity) {
     console.log(entity);
     self.currentEntity = entity;
     self.currentSmallView = 'entity';
     $scope.$broadcast('redrawEntity', entity.info.image);
-  }
+  };
 
   this.cancel = function () {
     PopupService.close();
