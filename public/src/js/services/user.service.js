@@ -31,23 +31,22 @@ angular.module('questCreator')
       return user.editGame || null;
     }
 
-    function archiveGame(name) {
+    function archiveGame(gameId) {
       $.ajax({
         method: 'DELETE',
         url: 'https://forge-api.herokuapp.com/games/archive',
-        data: JSON.stringify(name),
+        data: {
+          id: gameId
+        },
         headers: {
           user_id: user.id,
           token: user.token
         },
-        dataType: 'json',
-        contentType: 'application/json',
         success: function(response) {
           alert('Your game has been archived. If you ever want to see it again, click "Archived Games" below the list of your games. Carry on.');
         },
         error: function(error) {
           alert('There was a problem archiving this game. Please try again.');
-          $state.go('main.landing');
         }
       });
     }
@@ -168,6 +167,7 @@ angular.module('questCreator')
             token: user.token
           },
           success: function(response) {
+            console.log(response);
             return response;
           },
           error: function(error) {

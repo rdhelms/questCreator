@@ -6,72 +6,32 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
         $state.go('main.game.editor.views');
     };
 
-    $scope.editGame = function (name) {
+    $scope.editGame = function(name) {
         $scope.user.editGame = name;
         UserService.set($scope.user);
         $state.go('main.game.editor.views');
     };
 
-    $scope.archiveGame = function (name) {
-        var agree = confirm("Are you sure you wanna archive '" + name + "'? That means no one will be able to play it and all player information will be lost.  You can retrieve it later, but that's such a headache.");
+    $scope.archiveGame = function(game) {
+        var agree = confirm("Are you sure you wanna archive '" + game.name + "'? That means no one will be able to play it and all player information will be lost. You will NOT be able to retrieve this later");
         if (agree) {
-          console.log(agree);
-          UserService.archive(name);
+            UserService.archive(game.id);
         }
     };
 
-    setTimeout(function() {
-        $scope.user = UserService.get();
-        // $scope.games = UserService.games();
-
-        $scope.getJoinedDate = function(date) {
-            return new Date(date);
-        };
-        $scope.$apply();
-    }, 1000);
-
-    UserService.getUserGames().done(function(games) {
-      $scope.games = games;
+    $scope.user = UserService.get().done(function(response) {
+        $scope.apply();
     });
 
-    // //This is for testing only
-    // $scope.games = [{
-    //     thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-    //     name: "King's Quest Collection",
-    //     creator: "billy badass",
-    //     players: 6,
-    //     created_at: new Date(),
-    //     responseText: "something"
-    // }, {
-    //     thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-    //     name: "King's Quest Collection",
-    //     creator: "billy badass",
-    //     players: 6,
-    //     created_at: new Date(),
-    //     responseText: "something"
-    // }, {
-    //     thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-    //     name: "King's Quest Collection",
-    //     creator: "billy badass",
-    //     players: 6,
-    //     created_at: new Date(),
-    //     responseText: "something"
-    // }, {
-    //     thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-    //     name: "King's Quest Collection",
-    //     creator: "billy badass",
-    //     players: 6,
-    //     created_at: new Date(),
-    //     responseText: "something"
-    // }, {
-    //     thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-    //     name: "King's Quest Collection",
-    //     creator: "billy badass",
-    //     players: 6,
-    //     created_at: new Date(),
-    //     responseText: "something"
-    // }];
+    $scope.getJoinedDate = function(date) {
+        return new Date(date);
+    };
 
+    UserService.getUserGames().done(function(games) {
+        $scope.games = games;
+    });
+
+    //Testing Data
     $scope.avatarTest = {
         walkLeft: [
             // Frame 1 - walk left

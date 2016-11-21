@@ -5,7 +5,8 @@ angular.module('questCreator').service('GameService', function() {
     function loadGame(name) {
       var nameWrapper = {
         name: name.toLowerCase()
-      }
+      };
+
       return $.ajax({
           method: 'GET',
           url: 'https://forge-api.herokuapp.com/games/load',
