@@ -35,15 +35,12 @@
         }
 
         button {
-            font-family: PCSenior;
-            font-size: 2em;
-            padding: 2em;
             overflow: hidden;
             position: relative;
+
             &::after {
               @include sheen();
             }
-
         }
     }
 }
@@ -59,17 +56,21 @@
 
     ul {
         font-size: 0.75em;
+
         li {
           color: grey;
           display: flex;
           justify-content: flex-start;
           padding: .5em;
+
           &:nth-child(odd) {
             background: whitesmoke;
           }
+
           &:nth-child(even) {
             background: $lightgrey;
           }
+          
           span {
             color: black;
           }
