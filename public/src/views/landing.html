@@ -2,8 +2,8 @@
   <main>
     <h1>HOT NEW GAMES:</h1>
     <div id="game-results">
-      <div ng-repeat="game in landing.allGames" class="game" ng-click="goToGameDetail(game)">
-        <img src="{{ game.thumbnail }}" alt="Game thumbnail"/>
+      <div ng-repeat="game in landing.allGames.responseJSON" class="game" ng-click="goToGameDetail(game)">
+        <!-- <img src="{{ game.thumbnail }}" alt="Game thumbnail"/> -->
         <ul>
             <li>
                 <span><h1>{{ game.name }}</h1></span>
@@ -15,10 +15,10 @@
                 <p>on <span>{{ game.created_at }}</span></p>
             </li>
             <li>
-                <p>up to <span>{{ game.players }}</span> players</p>
+                <p>up to <span>{{ game.plays }}</span> plays</p>
             </li>
             <li>
-                <p><span>{{ game.totalPoints }}</span> points earned so far</p>
+                <p><span>{{ game.score }}</span> available points </p>
             </li>
         </ul>
       </div>
