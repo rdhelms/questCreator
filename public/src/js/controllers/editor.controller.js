@@ -21,7 +21,7 @@ angular.module('questCreator').controller('editorCtrl', function($scope, $state,
   this.currentPixelSize = 15;
 
   this.goToPalette = function (type) {
-    PaletteService.setType(type);
+    PaletteService.getByType(type);
     $state.go('main.game.editor.palette');
   };
 
