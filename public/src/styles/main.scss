@@ -3,6 +3,11 @@
   src: url('fonts/pc_senior/pcsenior.ttf');
 }
 
+@font-face {
+  font-family: Pixelmix;
+  src: url('fonts/pixelmix/pixelmix.ttf');
+}
+
 @import 'partials/bourbon/bourbon';
 @import 'partials/jquery-ui';
 @import 'partials/mixins';
@@ -23,9 +28,11 @@
     box-sizing: border-box;
     list-style: none;
     @include scrollbar(16px, black, whitesmoke);
+    overflow: auto;
+    font-family: Pixelmix;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1, h2, h3, h4, h5, h6, a {
   font-family: PCSenior;
 }
 
@@ -35,7 +42,7 @@ button {
   padding: .1rem .3rem;
   background: whitesmoke;
   color: black;
-  font-family: PCSenior;
+  font-family: Pixelmix;
 
   &:active {
     background: black;
