@@ -61,21 +61,21 @@
     <aside id="asset-bar">
         <ul class="assets">
             <li class="viewer" id="backgrounds">
-                <h4><a ng-click="editor.goToPalette(bg)">Backgrounds</a></h4>
+                <h4><a title="Click to browse backgrounds to add to your palette." ng-click="editor.goToPalette('backgrounds')">Backgrounds</a></h4>
                 <ul>
                   <li ng-click="editor.createBackground()"> <div class="availableAsset"> + </div> </li>
                   <li ng-repeat="background in editor.availableBackgrounds | orderBy:'-'" ng-click="editor.editBackground(background)"><div class="availableAsset"> {{background.name}} </div></li>
                 </ul>
             </li>
             <li class="viewer" id="game-objects">
-                <h4><a ng-click="editor.goToPalette(obj)">Game Objects</a></h4>
+                <h4><a title="Click to browse game objects to add to your palette." ng-click="editor.goToPalette('obstacles')">Game Objects</a></h4>
                 <ul>
                     <li ng-click="editor.createObject()"> <div class="availableAsset"> + </div> </li>
                     <li ng-repeat="object in editor.availableObjects | orderBy:'-'" ng-click="editor.editObject(object)"><div class="availableAsset"> {{object.name}} </div></li>
                 </ul>
             </li>
             <li class="viewer" id="entities">
-                <h4><a ng-click="editor.goToPalette(ent)">Entities</a></h4>
+                <h4><a title="Click to browse entities to add to your palette." ng-click="editor.goToPalette('entities')">Entities</a></h4>
                 <ul>
                     <li><canvas class="asset entity"></canvas></li>
                     <li><canvas class="asset entity"></canvas></li>
