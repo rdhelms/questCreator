@@ -1,4 +1,5 @@
-angular.module('questCreator').service('UserService', function () {
+angular.module('questCreator')
+.service('UserService', function (PopupService) {
     // Google Info
     var apiKey = 'AIzaSyCe__2EGSmwp0DR-qKGqpYwawfmRsTLBEs';
     var clientId = '730683845367-tjrrmvelul60250evn5i74uka4ustuln.apps.googleusercontent.com';
@@ -115,14 +116,12 @@ angular.module('questCreator').service('UserService', function () {
                   user.joined = response.created_at;
                     user.username = response.username;
                     user.id = response.id;
-                    $('#welcome').css('display', 'flex');
-                    setTimeout(function() {
-                        $('#welcome').css('display', 'none');
-                    }, 2000);
+                    PopupService.open('welcome');
                 },
                 error: function(error) {
                     if (error.status === 404) {
-                        $('#register-form').css('display', 'flex');
+                        // $('#register-form').css('display', 'flex');
+                        PopupService.open('user-register');
                     } else if (error.status === 0) {
                       // Do nothing
                     } else {
@@ -146,13 +145,10 @@ angular.module('questCreator').service('UserService', function () {
             },
             success: function(response) {
               user.id = response.id;
-              $('#register-form').css('display', 'none');
-              setTimeout(function() {
-                  $('#welcome').css('display', 'none');
-              }, 2000);
+              // $('#register-form').css('display', 'none');
+              PopupService.open('user-register');
             },
             error: function(error) {
-              $('#register-form').css('display', 'none');
               alert('There was a problem logging in. Please try again');
               signOut();
             }

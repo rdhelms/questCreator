@@ -44,9 +44,4 @@ angular.module('questCreator')
         UserService.signOut();
     };
 
-////Debug button: this is how you call a new popup:
-    this.popup = function(){
-      PopupService.type('newUser', $scope);
-    };
-
 });

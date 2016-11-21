@@ -3,25 +3,23 @@ angular.module('questCreator')
 
   var path = './src/views/popups/';
 
-  // Keyname is the popup's "Title"
-  // and property is it's url relative to the above path
-  //
-  // So passing "Welcome!" to this service will put the text "Welcome!"
-  // into the title bar of the popup, with the contents of "welcome.html"
-  // in the popup's body.
   var templates = {
-    'editorGreeting': {
-      title: 'Name your Game',
-      content: 'edit-game.html'
-    },
     'welcome': {
       title: 'Welcome!',
       content: 'welcome.html'
     },
-    'newUser': {
+    'user-register': {
       title: 'Hey, you\'re new!',
       content: 'user-register.html'
-    }
+    },
+    'edit-game': {
+      title: 'Awesome! Now you\'re editing:',
+      content: 'edit-game.html'
+    },
+    'create-game': {
+      title: 'Name your game:',
+      content: 'create-game.html'
+    },
   }
 
   function templateSelector(name, scope) {
@@ -32,7 +30,12 @@ angular.module('questCreator')
     PopupFactory.new(content, templates[name].title, scope);
   }
 
+  function close() {
+    $('#overlay').remove();
+  }
+
   return {
-    type: templateSelector
+    open: templateSelector,
+    close: close
   }
 });

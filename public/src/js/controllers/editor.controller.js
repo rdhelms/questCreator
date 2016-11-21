@@ -1,4 +1,12 @@
-angular.module('questCreator').controller('editorCtrl', function($scope, $state, EditorService, UserService, PaletteService) {
+angular.module('questCreator')
+.controller('editorCtrl', function(
+  $scope,
+  $state,
+  EditorService,
+  UserService,
+  PopupService
+  ) {
+
   var self = this;
   this.gameInfo = {};
   this.currentEditingGame = {
@@ -26,7 +34,16 @@ angular.module('questCreator').controller('editorCtrl', function($scope, $state,
     $state.go('main.game.editor.palette');
   };
 
-  this.createNewGame = function(name) {
+  if (this.currentEditingGame.name === null) {
+    PopupService.close();
+    PopupService.open('create-game', $scope);
+  } else {
+    PopupService.close();
+    PopupService.open('edit-game', $scope);
+  }
+
+  this.createNewGame = function (name) {
+      PopupService.close();
       EditorService.createGame(name).done(function(game) {
         console.log(game);
         self.currentEditingGame = game;
@@ -35,7 +52,8 @@ angular.module('questCreator').controller('editorCtrl', function($scope, $state,
       UserService.setGameEdit(name);
   };
 
-  this.editGame = function() {
+  this.editGame = function () {
+      PopupService.close();
       EditorService.getGame(self.currentEditingGame.name).done(function(game) {
         self.currentEditingGame = game;
         console.log(self.currentEditingGame);
@@ -111,9 +129,12 @@ angular.module('questCreator').controller('editorCtrl', function($scope, $state,
     $scope.$broadcast('redrawEntity', entity.info.image);
   }
 
-  $scope.cancel = function () {
+  this.cancel = function () {
+    PopupService.close();
     $state.go('main.profile');
   };
+
+  //jquery UI Stuff
 
   $('.asset').draggable({
     helper: 'clone',

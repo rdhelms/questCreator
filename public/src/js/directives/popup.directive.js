@@ -2,7 +2,8 @@ angular.module('questCreator')
 .directive('popup', function(){
   return {
     scope: {
-      title: '=popupTitle'
+      title: '=popupTitle',
+      kill: '@'
     },
     replace: true,
     transclude: true,
@@ -11,6 +12,11 @@ angular.module('questCreator')
         $('#overlay').remove();
       }
     },
-    templateUrl: './src/views/popup.html'
+    templateUrl: './src/views/popup.html',
+    controller: function($scope) {
+      $scope.killPopUp = function(){
+        $scope.kill();
+      }
+    }
   };
 });
