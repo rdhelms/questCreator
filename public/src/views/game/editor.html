@@ -7,9 +7,9 @@
     <!-- SCENE EDITOR -->
     <section id="scene-editor">
         <ul class="tab-nav">
-            <li class="tab active" ng-class="{'active': toggle}" ng-click="toggle=!toggle"><a ng-click="editor.currentLargeView = 'map'">Map</a></li>
-            <li class="tab" ng-class="{'active': !toggle}" ng-click="toggle=!toggle"><a ng-click="editor.currentLargeView = 'scene'">Scene</a></li>
-            <li class="tab" ng-class="{'active': !toggle}" ng-click="toggle=!toggle"><a ng-click="editor.currentLargeView = 'background'">Backgrounds</a></li>
+            <li class="tab" ng-class="{'active': editor.currentLargeView === 'map'}" ng-click="editor.currentLargeView = 'map'">Map</li>
+            <li class="tab" ng-class="{'active': editor.currentLargeView === 'scene'}" ng-click="editor.currentLargeView = 'scene'">Scene</li>
+            <li class="tab" ng-class="{'active': editor.currentLargeView === 'background'}" ng-click="editor.currentLargeView = 'background'">Backgrounds</li>
         </ul>
         <section class="editor-contents" id="scene">
             <ui-view ng-show="editor.currentLargeView === 'map'" name="maps"></ui-view>

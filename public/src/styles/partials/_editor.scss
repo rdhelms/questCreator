@@ -26,22 +26,14 @@
     text-align: center;
     border-bottom: 4px solid black;
 
-    &:first-child {
-      border-right: 2px solid black;
-    }
-
-    &:nth-child(2) {
-      border-left: 2px solid black;
+    &:hover {
+      cursor: pointer;
     }
 
     &.active {
       background: whitesmoke;
+      border: 4px solid black;
       border-bottom: none;
-      border-top: 4px solid black;
-
-      &:first-child {
-        border-left: 4px solid black;
-      }
     }
   }
 }
@@ -73,6 +65,10 @@
   height: 800px;
   display: flex;
   flex-direction: column;
+
+  .tab:last-child {
+    border-right: none;
+  }
 }
 
 .editor-contents {
