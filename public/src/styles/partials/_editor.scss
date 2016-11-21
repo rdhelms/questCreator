@@ -27,7 +27,7 @@
   border-right: 4px solid black;
 
   .tab {
-    background: $medgrey;
+    background: $lightgrey;
     width: 100%;
     padding: .3em 0;
     text-align: center;
@@ -38,6 +38,8 @@
     }
 
     &.active {
+      box-shadow: 10px 0px 0px -4px $medgrey;
+      z-index: 1;
       background: whitesmoke;
       border: 4px solid black;
       border-bottom: none;
@@ -76,6 +78,7 @@
 
   .tab:last-child {
     border-right: none;
+    box-shadow: none;
   }
 }
 
