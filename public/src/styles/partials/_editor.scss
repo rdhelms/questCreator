@@ -88,6 +88,8 @@
 
   .edit-canvas {
     flex: 1;
+    display: flex;
+    justify-content: center;
     canvas {
       border: 2px solid black;
     }
