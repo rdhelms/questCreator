@@ -10,6 +10,7 @@
 
 @import 'partials/bourbon/bourbon';
 @import 'partials/jquery-ui';
+@import 'partials/variables';
 @import 'partials/mixins';
 @import 'partials/animations';
 @import 'partials/nav';
@@ -57,7 +58,7 @@ button, input, select, option {
 }
 
 body {
-  background: #cbd0ca;
+  background: $lightgrey;
 }
 
 a {

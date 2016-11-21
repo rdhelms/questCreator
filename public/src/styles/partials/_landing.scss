@@ -8,7 +8,7 @@
       padding: 2rem;
 
       #game-results {
-        background: #A4AC96;
+        background: $medgrey;
         padding: 2rem;
         display: flex;
         flex-direction: row;
@@ -68,7 +68,7 @@
             background: whitesmoke;
           }
           &:nth-child(even) {
-            background: #cbd0ca;
+            background: $lightgrey;
           }
           span {
             color: black;
