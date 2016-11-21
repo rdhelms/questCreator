@@ -1,12 +1,12 @@
 <div class="map-container">
-  <ul class="fullMap" ng-repeat="mapObj in map.allMaps"> {{mapObj.name}}
+  <ul class="fullMap" ng-repeat="mapObj in editor.currentEditingGame.info.maps"> {{mapObj.name}}
     <ul class="mapRow" ng-repeat="row in mapObj.scenes">
-      <li ng-click="map.editScene(scene)" class="mapColumn" ng-repeat="scene in row">
-        {{scene}}
+      <li ng-repeat="scene in row" ng-click="map.editScene(scene)" class="mapColumn">
+        {{scene.name}}
       </li>
-      <button ng-if="map.allMaps.indexOf(mapObj) > 0" ng-click="map.createScene(mapObj, mapObj.scenes.indexOf(row))" class="newSceneBtn">Add a Scene</button>
+      <button ng-if="editor.currentEditingGame.info.maps.indexOf(mapObj) > 0" ng-click="map.createScene(mapObj, mapObj.scenes.indexOf(row))" class="newSceneBtn">Add a Scene</button>
     </ul>
-    <button ng-if="map.allMaps.indexOf(mapObj) > 0" ng-click="map.createMapRow(mapObj)" class="newMapRowBtn">Add a Row</button>
+    <button ng-if="editor.currentEditingGame.info.maps.indexOf(mapObj) > 0" ng-click="map.createMapRow(mapObj)" class="newMapRowBtn">Add a Row</button>
   </ul>
   <button ng-click="map.createMap()" class="newMapBtn">Add Another Map</button>
 

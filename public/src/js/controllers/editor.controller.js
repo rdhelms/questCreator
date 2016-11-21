@@ -17,7 +17,6 @@ angular.module('questCreator').controller('editorCtrl', function($scope, $state,
   this.availableBackgrounds = [];
   this.availableObjects = [];
   this.availableEntities = [];
-  this.allMaps = [];
 
   this.currentColor = 'green';
   this.currentPixelSize = 15;
@@ -27,7 +26,7 @@ angular.module('questCreator').controller('editorCtrl', function($scope, $state,
     $state.go('main.game.editor.palette');
   };
 
-  this.createNewGame = function (name) {
+  this.createNewGame = function(name) {
       EditorService.createGame(name).done(function(game) {
         console.log(game);
         self.currentEditingGame = game;
@@ -36,7 +35,7 @@ angular.module('questCreator').controller('editorCtrl', function($scope, $state,
       UserService.setGameEdit(name);
   };
 
-  this.editGame = function () {
+  this.editGame = function() {
       EditorService.getGame(self.currentEditingGame.name).done(function(game) {
         self.currentEditingGame = game;
         console.log(self.currentEditingGame);
@@ -50,6 +49,12 @@ angular.module('questCreator').controller('editorCtrl', function($scope, $state,
       });
       $('.edit-game').hide();
   };
+
+  this.saveGame = function() {
+    EditorService.saveGame(self.currentEditingGame).done(function(savedGame) {
+      console.log(savedGame);
+    });
+  }
 
   this.createBackground = function() {
     var name = prompt("Enter a name for the new background: ");
@@ -75,6 +80,7 @@ angular.module('questCreator').controller('editorCtrl', function($scope, $state,
       console.log(object);
       self.availableObjects.push(object);
       self.currentObject = object;
+      self.currentSmallView = 'object';
       $scope.$apply();
     });
   }
@@ -82,7 +88,27 @@ angular.module('questCreator').controller('editorCtrl', function($scope, $state,
   this.editObject = function(object) {
     console.log(object);
     self.currentObject = object;
+    self.currentSmallView = 'object';
     $scope.$broadcast('redrawObject', object.info.image);
+  }
+
+  this.createEntity = function() {
+    var name = prompt("Enter a name for the new entity: ");
+    var game_id = self.currentEditingGame.id;
+    EditorService.createEntity(name, game_id).done(function(entity) {
+      console.log(entity);
+      self.availableEntities.push(entity);
+      self.currentEntity = entity;
+      self.currentSmallView = 'entity';
+      $scope.$apply();
+    });
+  }
+
+  this.editEntity = function(entity) {
+    console.log(entity);
+    self.currentEntity = entity;
+    self.currentSmallView = 'entity';
+    $scope.$broadcast('redrawEntity', entity.info.image);
   }
 
   $scope.cancel = function () {

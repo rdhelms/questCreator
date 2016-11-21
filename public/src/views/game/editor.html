@@ -1,3 +1,4 @@
+<button ng-click="editor.saveGame()" class="saveGame"> SAVE GAME </button>
 <div id="editor-view">
 
     <section class="pop-up edit-game" ng-if="editor.currentEditingGame.name !== null">
@@ -77,10 +78,8 @@
             <li class="viewer" id="entities">
                 <h4><a title="Click to browse entities to add to your palette." ng-click="editor.goToPalette('entities')">Entities</a></h4>
                 <ul>
-                    <li><canvas class="asset entity"></canvas></li>
-                    <li><canvas class="asset entity"></canvas></li>
-                    <li><canvas class="asset entity"></canvas></li>
-                    <li><canvas class="asset entity"></canvas></li>
+                    <li ng-click="editor.createEntity()"> <div class="availableAsset"> + </div> </li>
+                    <li ng-repeat="entity in editor.availableEntities | orderBy:'-'" ng-click="editor.editEntity(entity)"><div class="availableAsset"> {{entity.name}} </div></li>
                 </ul>
             </li>
             <li class="viewer" id="scripts">

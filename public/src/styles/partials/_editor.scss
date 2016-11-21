@@ -60,6 +60,14 @@
   }
 }
 
+.selector-box {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: whitesmoke;
+  border: 4px black solid;
+}
+
 #scene-editor {
   background: whitesmoke;
   height: 800px;

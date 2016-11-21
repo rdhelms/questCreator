@@ -1,1 +1,8 @@
-
+<p class="entityEditorTitle"> {{editor.currentEntity.name}} </p>
+<div ng-show="editor.currentEntity" class="edit-canvas"><canvas id="ent-canvas" height="200" width="200"></canvas></div>
+<ul class="editor-controls">
+    <li><button id="clearEntity">Clear</button></li>
+    <li><button id="saveEntity">Save Object</button></li>
+    <li><button id="undoEntity">Undo</button></li>
+    <li><button id="redoEntity">Redo</button></li>
+</ul>

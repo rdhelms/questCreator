@@ -1,8 +1,5 @@
 angular.module('questCreator').service('EditorService', function (UserService, $state) {
 
-
-    var game = null;
-
     function getGame(name) {
       var nameWrapper = {
         name: name.toLowerCase()
@@ -47,10 +44,28 @@ angular.module('questCreator').service('EditorService', function (UserService, $
         user_id: UserService.get().id,
         token: UserService.get().token
       };
+      var titleScene = {
+        name: 'Title Screen',
+        pos: [0,0,0],
+        background: null,
+        objects: [],
+        entities: []
+      };
+      var titleMap = {
+        name: 'Title Map',
+        scenes: [
+          [titleScene]
+        ]
+      };
       var game = {
         name: name,
         description: "",
-        tags: []
+        tags: [],
+        info: {
+          maps: [
+            titleMap
+          ]
+        }
       };
       return $.ajax({
         method: 'POST',
@@ -66,6 +81,35 @@ angular.module('questCreator').service('EditorService', function (UserService, $
         error: function(error) {
           alert('There was a problem creating this game. Please try again.');
           $state.go('main.landing');
+        }
+      });
+    }
+
+    function saveGame(game) {
+      var gameUpdateData = {
+        name: game.name,
+        id: game.id,
+        tags: game.tags,
+        description: game.description,
+        info: game.info,
+        published: true,
+      };
+      var headerData = {
+        user_id: UserService.get().id,
+        token: UserService.get().token
+      };
+      return $.ajax({
+        method: 'PUT',
+        url: 'https://forge-api.herokuapp.com/games/update',
+        headers: headerData,
+        data: JSON.stringify(gameUpdateData),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(response) {
+          return response;
+        },
+        error: function(error) {
+          console.log(error);
         }
       });
     }
@@ -182,13 +226,74 @@ angular.module('questCreator').service('EditorService', function (UserService, $
       });
     }
 
+    function createEntity(name, game_id) {
+      var headerData = {
+        user_id: UserService.get().id,
+        token: UserService.get().token
+      };
+      var entityInfo = {
+        pos: {
+          x: 350,
+          y: 250
+        },
+        image: [],
+        collisionMap: []
+      };
+      var currentEntity = {
+        name: name,
+        info: entityInfo,
+        tags: [],
+        published: false,
+        game_id: game_id
+      };
+      return $.ajax({
+        method: 'POST',
+        url: 'https://forge-api.herokuapp.com/entities/create',
+        headers: headerData,
+        data: JSON.stringify(currentEntity),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(response) {
+          return response;
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    }
+
+    function saveEntity(imageArr, currentEntity) {
+      currentEntity.info.image = imageArr;
+      var headerData = {
+        user_id: UserService.get().id,
+        token: UserService.get().token
+      };
+      return $.ajax({
+        method: 'PUT',
+        url: 'https://forge-api.herokuapp.com/entities/update',
+        headers: headerData,
+        data: JSON.stringify(currentEntity),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(response) {
+          return response;
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    }
+
     return {
       getGame: getGame,
       getGameAssets: getGameAssets,
       createGame: createGame,
+      saveGame: saveGame,
       createBackground: createBackground,
       saveBackground: saveBackground,
       createObject: createObject,
-      saveObject: saveObject
+      saveObject: saveObject,
+      createEntity: createEntity,
+      saveEntity: saveEntity
     };
 });
