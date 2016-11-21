@@ -1,5 +1,5 @@
 angular.module('questCreator')
-.service('PopupService', function ($templateRequest, PopupFactory) {
+.service('PopupService', function ($templateRequest, PopupFactory, $rootScope) {
 
   var path = './src/views/popups/';
 
@@ -23,7 +23,7 @@ angular.module('questCreator')
   }
 
   function templateSelector(name, scope) {
-    // debugger;
+    scope = scope || $rootScope.$$childHead;
     var template = path + templates[name].content;
     var content = $('<ng-include>').attr('src', '\''+ template+ '\'');
     // Creates new popup on the page in specified scope:
