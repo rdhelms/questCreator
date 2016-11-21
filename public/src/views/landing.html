@@ -12,7 +12,7 @@
                 <p>by <span>{{ game.creator }}</span></p>
             </li>
             <li>
-                <p>on <span>{{ game.created_at }}</span></p>
+                <p>on <span>{{ game.created_at | date: "yyyy-MM-dd HH:mm:ss Z"}}</span></p>
             </li>
             <li>
                 <p>up to <span>{{ game.plays }}</span> plays</p>
