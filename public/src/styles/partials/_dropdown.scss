@@ -1,0 +1,48 @@
+.select {
+  display: inline-block;
+  position: relative;
+  min-width: 5em;
+  border: 4px solid black;
+  background: whitesmoke;
+  padding: .5em;
+  padding-right: 2em;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  .options {
+    display: none;
+    .option {
+      padding: 2px;
+      &:hover {
+        background: $lightgrey;
+      }
+    }
+    &:focus {
+      display: inline-block;
+    }
+  }
+
+  &:focus > .options {
+    display: inline-block;
+    border: 4px black solid;
+    position: absolute;
+    width: 100%;
+    padding: 4px;
+    background: whitesmoke;
+    left: 0;
+    z-index: 1;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  &:after {
+    @include pseudo();
+    height: 50%;
+    width: 95%;
+    content: "^";
+    transform: rotate(180deg) translateY(-50%);
+    pointer-events: none;
+  }
+}
