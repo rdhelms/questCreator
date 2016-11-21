@@ -4,7 +4,8 @@ angular.module('questCreator')
   $state,
   EditorService,
   UserService,
-  PopupService
+  PopupService,
+  PaletteService
   ) {
 
   var self = this;
@@ -28,10 +29,12 @@ angular.module('questCreator')
 
   this.currentColor = 'green';
   this.currentPixelSize = 15;
+  this.selectingAssets = false;
 
   this.goToPalette = function (type) {
-    PaletteService.getByType(type);
-    $state.go('main.game.editor.palette');
+    self.selectingAssets = true;
+    // PaletteService.getByType(type);
+    // $state.go('main.game.editor.palette');
   };
 
   if (this.currentEditingGame.name === null) {

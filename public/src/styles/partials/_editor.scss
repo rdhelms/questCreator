@@ -299,3 +299,11 @@ canvas.asset {
   transform: scale(1.2);
   opacity: .5;
 }
+
+.asset-search {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: whitesmoke;
+  border: 4px solid black;
+}

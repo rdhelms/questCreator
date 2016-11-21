@@ -1,15 +1,15 @@
-angular.module('questCreator').controller('PaletteCtrl', function (PaletteService) {
+angular.module('questCreator').controller('paletteCtrl', function (PaletteService) {
 
-  this.elements = [];
-  this.currentType = PaletteService.getCurrentType();
-
-  this.allAssets = PaletteService.getAll();
-
-  this.assets = PaletteService.getCurrent();
-
-  this.searchByTag = function (tag) {
-    PaletteService.getByTag(tag);
-  };
+  // this.elements = [];
+  // this.currentType = PaletteService.getCurrentType();
+  //
+  // this.allAssets = PaletteService.getAll();
+  //
+  // this.assets = PaletteService.getCurrent();
+  //
+  // this.searchByTag = function (tag) {
+  //   PaletteService.getByTag(tag);
+  // };
 
   this.goToEditor = function () {
     if (this.elements) {
