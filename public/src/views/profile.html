@@ -8,8 +8,8 @@
                 <label for="joined">Another Stat:<li>Something Impressive</li></label>
             </ul>
 
-            <div ng-if="collaborators" class="collaborators">
-                <a ng-click="showCollaborators()">Requests to collaborate</a>
+            <div ng-if="requests" class="requests">
+                <a ng-click="showRequests()">Requests to collaborate</a>
                 <table>
                   <tr>
                     <th>Game:</th>
@@ -17,11 +17,29 @@
                     <th>Approved:</th>
                     <th>Remove</th>
                   </tr>
-                  <tr ng-repeat="collab in collaborators">
-                    <td>{{ collab.game }}</td>
-                    <td>{{ collab.username }}</td>
-                    <td ng-change="toggleCollab(collab)"><input type="checkbox" value="{{ collab.approved }}"></td>
-                    <td><button ng-click="removeRequest(collab)" type="button" name="button"></button></td>
+                  <tr ng-repeat="request in requests">
+                    <td>{{ request.game }}</td>
+                    <td>{{ request.username }}</td>
+                    <td><input ng-change="toggleCollab(request)" type="checkbox" value="{{ request.accepted }}"></td>
+                    <td><button ng-click="removeRequest(request)" type="button" name="button"></button></td>
+                  </tr>
+                </table>
+            </div>
+
+            <div ng-if="collaborators" class="collaborators">
+                <a ng-click="showCollaborators()">Currently Approved Collaborators:</a>
+                <table>
+                  <tr>
+                    <th>Game:</th>
+                    <th>Collaborator:</th>
+                    <th>Approved:</th>
+                    <th>Remove</th>
+                  </tr>
+                  <tr ng-repeat="collaborator in collaborators">
+                    <td>{{ collaborator.game }}</td>
+                    <td>{{ collaborator.username }}</td>
+                    <td><input ng-change= "toggleCollab(collaborator)"type="checkbox" value="{{ collaborator.accepted }}"></td>
+                    <td><button ng-click="removeCollaborator(collaborator)" type="button" name="button"></button></td>
                   </tr>
                 </table>
             </div>
@@ -60,15 +78,14 @@
                     <label for="game-name">Game Name:</label>
                     {{ game.name | capitalize }}</li>
                 <li>
-                    <label for="creator">Created By:</label>
-                    <p>{{ game.creator }}</p>
+                  <label for="published">Published:</label>{{ game.published ? 'Y' : 'N' }}
                 </li>
                 <li>
                     <label for="created">Date Created:</label>
                     <p>{{ game.created_at | date:'MMM d - h:mm a' }}</p>
                 </li>
                 <li>
-                    <label for="players">Players:</label>
+                    <label for="players">Play:</label>
                     <p>{{ game.players }}</p>
                 </li>
             </ul>
@@ -77,6 +94,32 @@
               <button type="button" ng-click="archiveGame(game)">Archive</button>
             </div>
         </div>
+
+        <h1 ng-if="collaborations">You're a Collaborator On:</h1>
+        <div ng-if="collaborations" class="user-games" ng-repeat="collaboration in collaborations">
+            <!-- <img src="{{ game.thumbnail }}" alt="Game thumbnail"/> -->
+            <ul>
+                <li>
+                    <label for="game-name">Game Name:</label>
+                    {{ collaboration.name | capitalize }}</li>
+                <li>
+                    <label for="creator">Created By:</label>
+                    <p>{{ collaboration.user_id }}</p>
+                </li>
+                <li>
+                    <label for="created">Date Created:</label>
+                    <p>{{ collaboration.created_at | date:'MMM d - h:mm a' }}</p>
+                </li>
+                <li>
+                    <label for="players">Players:</label>
+                    <p>{{ collaboration.players }}</p>
+                </li>
+            </ul>
+            <div class="buttons">
+              <button type="button" ng-click="editGame(collaboration.name)">Edit</button>
+            </div>
+        </div>
+
     </aside>
 
 </div>
