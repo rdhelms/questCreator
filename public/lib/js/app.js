@@ -87,37 +87,37 @@
 ;angular.module('questCreator').factory('Avatar', function() {
   function Avatar(avatarInfo) {
     this.name = avatarInfo.name;
-    this.obj = avatarInfo.obj;
+    this.info = avatarInfo.info;
     this.user_id = avatarInfo.user_id;
     this.current = avatarInfo.current;
     this.action = 'stand';
   };
 
   Avatar.prototype.updatePos = function() {
-    this.obj.pos.x += this.obj.speed.x;
-    this.obj.pos.y += this.obj.speed.y;
+    this.info.pos.x += this.info.speed.x;
+    this.info.pos.y += this.info.speed.y;
   }
 
   Avatar.prototype.stop = function() {
     this.action = 'stand';
-    this.obj.speed.x = 0;
-    this.obj.speed.y = 0;
+    this.info.speed.x = 0;
+    this.info.speed.y = 0;
   }
 
   Avatar.prototype.collide = function(direction) {
     this.stop();
     switch (direction) {
       case 'left':
-        this.obj.pos.x += this.obj.speed.mag;
+        this.info.pos.x += this.info.speed.mag;
         break;
       case 'right':
-        this.obj.pos.x -= this.obj.speed.mag;
+        this.info.pos.x -= this.info.speed.mag;
         break;
       case 'up':
-        this.obj.pos.y += this.obj.speed.mag;
+        this.info.pos.y += this.info.speed.mag;
         break;
       case 'down':
-        this.obj.pos.y -= this.obj.speed.mag;
+        this.info.pos.y -= this.info.speed.mag;
         break;
     }
   }
@@ -918,7 +918,6 @@
             token: user.token
           },
           success: function(response) {
-            console.log(response);
             return response;
           },
           error: function(error) {
@@ -1646,6 +1645,7 @@
   ) {
 
   var self = this;
+
   this.gameInfo = {};
   this.currentEditingGame = {
     name: UserService.getGameEdit(),
@@ -1663,10 +1663,967 @@
   this.availableBackgrounds = [];
   this.availableObjects = [];
   this.availableEntities = [];
+  this.selectedAnimation = "Animations";
 
   this.currentColor = 'green';
   this.currentPixelSize = 15;
   this.selectingAssets = false;
+  this.frameindex = 0;
+
+  //TESTING PLEASE REMOVE:
+  this.dummyent = {
+      "id": 11,
+      "info": {
+          "pos": {
+              "x": 350,
+              "y": 250
+          },
+          "animate": {
+            "walkleft": [
+                {
+                  "image": [{
+                      "x": 79.296875,
+                      "y": 43.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 58.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 58.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 43.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 58.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 43.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 28.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 28.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 28.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 73.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 103.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 118.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 133.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 133.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 148.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 163.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 133.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 148.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 163.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 124.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 139.296875,
+                      "y": 73.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 64.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 49.296875,
+                      "y": 73.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }],
+                  "collisionMap": []
+                },
+                {
+                  "image": [{
+                      "x": 94.296875,
+                      "y": 43.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 58.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 43.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 28.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 28.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 28.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 73.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 103.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 118.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 133.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 133.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 148.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 163.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 133.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 148.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 163.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 124.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 139.296875,
+                      "y": 73.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 64.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 49.296875,
+                      "y": 73.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }],
+                  "collisionMap": []
+
+                },
+                {
+                  "image": [{
+                      "x": 79.296875,
+                      "y": 43.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 58.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 58.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 43.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 58.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 43.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 28.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 28.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 28.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 73.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 103.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 118.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 133.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 133.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 148.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 163.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 133.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 148.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 163.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 124.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }],
+                  "collisionMap": []
+
+                },
+              ],
+              "walkright": [
+                {
+                  "image": [{
+                      "x": 79.296875,
+                      "y": 43.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 58.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 58.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 43.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 58.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 43.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 28.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 28.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 28.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 73.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 103.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 118.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 133.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 133.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 148.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 163.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 133.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 148.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 163.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 124.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 139.296875,
+                      "y": 73.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 64.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 49.296875,
+                      "y": 73.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }],
+                  "collisionMap": []
+                },
+                {
+                  "image": [{
+                      "x": 79.296875,
+                      "y": 43.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 58.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 58.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 43.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 58.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 43.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 28.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 28.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 28.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 73.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 103.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 118.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 133.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 133.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 148.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 163.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 133.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 148.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 163.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 124.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 139.296875,
+                      "y": 73.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 64.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 49.296875,
+                      "y": 73.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }],
+                  "collisionMap": []
+
+                },
+                {
+                  "image": [{
+                      "x": 79.296875,
+                      "y": 43.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 58.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 58.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 43.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 58.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 43.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 28.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 28.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 28.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 73.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 103.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 118.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 94.296875,
+                      "y": 133.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 133.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 148.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 163.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 133.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 148.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 163.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 79.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 109.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 124.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 139.296875,
+                      "y": 73.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 64.296875,
+                      "y": 88.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }, {
+                      "x": 49.296875,
+                      "y": 73.203125,
+                      "width": 15,
+                      "height": 15,
+                      "color": "brown"
+                  }],
+                  "collisionMap": []
+
+                },
+              ],
+          },
+      },
+      "user_id": 5,
+      "game_id": 40,
+      "name": "ent 1",
+      "published": false,
+      "tags": "[]",
+      "created_at": "2016-11-21T18:50:12.509Z",
+      "updated_at": "2016-11-21T18:52:59.961Z",
+      "$$hashKey": "object:105"
+  }
+  this.availableEntities.push(this.dummyent);
+
 
   this.goToPalette = function (type) {
     self.selectingAssets = true;
@@ -1759,7 +2716,7 @@
     var name = prompt("Enter a name for the new entity: ");
     var game_id = self.currentEditingGame.id;
     EditorService.createEntity(name, game_id).done(function(entity) {
-      console.log(entity);
+      console.log("ent", entity);
       self.availableEntities.push(entity);
       self.currentEntity = entity;
       self.currentSmallView = 'entity';
@@ -1767,11 +2724,11 @@
     });
   };
 
-  this.editEntity = function(entity) {
-    console.log(entity);
+  this.editEntityFrame = function(entity) {
     self.currentEntity = entity;
     self.currentSmallView = 'entity';
-    $scope.$broadcast('redrawEntity', entity.info.image);
+    console.log("ent", entity);
+    $scope.$broadcast('redrawEntity', entity.info.animate[this.selectedAnimation][this.frameindex].image);
   };
 
   this.cancel = function () {
@@ -2639,11 +3596,14 @@
 ;angular.module('questCreator').controller('mapCtrl', function($state, $scope) {
   var self = this;
 
+  this.width = 1;
+  this.height = 1;
+
   // Scene pos should be [x,y,z], where x=mapIndex, y=rowIndex, z=columnIndex
 
   this.createMap = function() {
-    var name = prompt("Enter a name for the map: ");
-    var sceneName = prompt("Enter a name for the first scene: ");
+    var name = "new map";
+    var sceneName = "new scene";
     console.log("Creating a map!", name);
     var newScene = {
       name: sceneName,
@@ -2661,7 +3621,7 @@
   }
 
   this.createMapRow = function(mapObj) {
-    var name = prompt("Enter a name for the first scene in this row");
+    var name = "new scene";
     var newScene = {
       name: name,
       background: null,
@@ -2672,7 +3632,7 @@
   }
 
   this.createScene = function(mapObj, rowNum) {
-    var name = prompt("Enter a name for the scene: ");
+    var name = "new scene";
     var newScene = {
       name: name,
       background: null,
@@ -3369,11 +4329,12 @@
   };
 });
 ;angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, GameService, $state, $scope) {
-
+  var self = this;
   var gameCanvas = document.getElementById('play-canvas');
   var gameCtx = gameCanvas.getContext('2d');
   var gameWidth = 700;
   var gameHeight = 500;
+  this.warning = '';
   var typing = {
     show: false,
     phrase: ''
@@ -3395,23 +4356,865 @@
   var entity = null;
   var scene = null;
 
-  var avatarLoaded = false;
   var gameLoaded = false;
+  var avatarLoaded = false;
 
-  var gameToPlay = GameService.getGameDetail().name;
+  this.gameToPlay = GameService.getGameDetail().name;
   var gameInfo = null;
   var allMaps = null;
-  var currentMap = null;
-  var currentScenePos = [0,4,8];
-  var currentGame = GameService.loadGame(gameToPlay).done(function(response) {
+  this.currentMap = null;
+  this.allRows = null;
+  this.currentRow = null;
+  this.currentScene = null;
+  this.currentScenePos = [0,0,0];
+  this.gameLoaded = false;
+
+  this.gameStarted = false;
+
+  var currentGame = GameService.loadGame(self.gameToPlay).done(function(response) {
+    self.gameLoaded = true;
     gameInfo = response.info;
     allMaps = gameInfo.maps;
-    currentMap = allMaps[currentScenePos[0]];
-    currentScene = currentMap[currentScenePos[1]][currentScenePos[2]]
-    console.log("Info:", gameInfo);
-    console.log("Current Map:", currentMap);
-    console.log("Current Scene:", currentScene);
+    self.currentMap = allMaps[0];
+    self.allRows = self.currentMap.scenes;
+    self.currentRow = self.allRows[0];
+    self.currentScene = self.currentRow[0];
+    background = self.currentScene.background;
+    drawBackground();
+    $scope.$apply();
   });
+
+  function loadMainCharacter() {
+    // Testing creation of avatar
+    var avatarTest = {
+      name: 'Avatar Test',
+      info: {
+        // The x and y coordinate of the top left corner of the avatar
+        pos: {
+          x: 100,
+          y: 100
+        },
+        // The character's speed
+        speed: {
+          mag: 3,
+          x: 0,
+          y: 0
+        },
+        // The animate object contains all the possible character actions with all of the frames to be drawn for each action.
+        animate: {
+          // Key: possible action, Value: array of frames
+          walkLeft: [
+            // Each frame array element is an array of square objects to be drawn
+            // Frame 1 - walk left
+            [{
+              x: 100,
+              y: 100,
+              width: 30,
+              height: 30,
+              color: 'blue'
+            }, {
+              x: 110,
+              y: 150,
+              width: 30,
+              height: 30,
+              color: 'green'
+            }],
+            // Frame 2 - walk left
+            [{
+              x: 110,
+              y: 100,
+              width: 30,
+              height: 30,
+              color: 'blue'
+            }, {
+              x: 100,
+              y: 150,
+              width: 30,
+              height: 30,
+              color: 'green'
+            }]
+          ],
+          walkRight: [
+            // Frame 1 - walk right
+            [{
+              x: 150,
+              y: 100,
+              width: 30,
+              height: 30,
+              color: 'blue'
+            }, {
+              x: 140,
+              y: 150,
+              width: 30,
+              height: 30,
+              color: 'green'
+            }],
+            // Frame 2 - walk right
+            [{
+              x: 140,
+              y: 100,
+              width: 30,
+              height: 30,
+              color: 'blue'
+            }, {
+              x: 150,
+              y: 150,
+              width: 30,
+              height: 30,
+              color: 'green'
+            }]
+          ],
+          walkUp: [
+            // Frame 1 - walk up
+            [{
+              x: 100,
+              y: 110,
+              width: 30,
+              height: 30,
+              color: 'red'
+            }, {
+              x: 150,
+              y: 100,
+              width: 30,
+              height: 30,
+              color: 'yellow'
+            }],
+            // Frame 2 - walk up
+            [{
+              x: 100,
+              y: 100,
+              width: 30,
+              height: 30,
+              color: 'red'
+            }, {
+              x: 150,
+              y: 110,
+              width: 30,
+              height: 30,
+              color: 'yellow'
+            }]
+          ],
+          walkDown: [
+            // Frame 1 - walk down
+            [{
+              x: 100,
+              y: 140,
+              width: 30,
+              height: 30,
+              color: 'red'
+            }, {
+              x: 150,
+              y: 150,
+              width: 30,
+              height: 30,
+              color: 'yellow'
+            }],
+            // Frame 2 - walk down
+            [{
+              x: 100,
+              y: 150,
+              width: 30,
+              height: 30,
+              color: 'red'
+            }, {
+              x: 150,
+              y: 140,
+              width: 30,
+              height: 30,
+              color: 'yellow'
+            }]
+          ],
+          swimLeft: [
+            // Frame 1 - swim left
+            [{
+              x: 100,
+              y: 100,
+              width: 30,
+              height: 30,
+              color: 'lightblue'
+            }, {
+              x: 150,
+              y: 150,
+              width: 30,
+              height: 30,
+              color: 'lightblue'
+            }],
+            // Frame 2 - swim left
+            [{
+              x: 100,
+              y: 100,
+              width: 30,
+              height: 30,
+              color: 'gray'
+            }, {
+              x: 150,
+              y: 150,
+              width: 30,
+              height: 30,
+              color: 'gray'
+            }]
+          ],
+          swimRight: [
+            // Frame 1 - swim right
+            [{
+              x: 100,
+              y: 100,
+              width: 30,
+              height: 30,
+              color: 'lightblue'
+            }, {
+              x: 150,
+              y: 150,
+              width: 30,
+              height: 30,
+              color: 'lightblue'
+            }],
+            // Frame 2 - swim right
+            [{
+              x: 100,
+              y: 100,
+              width: 30,
+              height: 30,
+              color: 'gray'
+            }, {
+              x: 150,
+              y: 150,
+              width: 30,
+              height: 30,
+              color: 'gray'
+            }]
+          ],
+          swimUp: [
+            // Frame 1 - swim up
+            [{
+              x: 100,
+              y: 100,
+              width: 30,
+              height: 30,
+              color: 'lightblue'
+            }, {
+              x: 150,
+              y: 150,
+              width: 30,
+              height: 30,
+              color: 'lightblue'
+            }],
+            // Frame 2 - swim up
+            [{
+              x: 100,
+              y: 100,
+              width: 30,
+              height: 30,
+              color: 'gray'
+            }, {
+              x: 150,
+              y: 150,
+              width: 30,
+              height: 30,
+              color: 'gray'
+            }]
+          ],
+          swimDown: [
+            // Frame 1 - swim down
+            [{
+              x: 100,
+              y: 100,
+              width: 30,
+              height: 30,
+              color: 'lightblue'
+            }, {
+              x: 150,
+              y: 150,
+              width: 30,
+              height: 30,
+              color: 'lightblue'
+            }],
+            // Frame 2 - swim down
+            [{
+              x: 100,
+              y: 100,
+              width: 30,
+              height: 30,
+              color: 'gray'
+            }, {
+              x: 150,
+              y: 150,
+              width: 30,
+              height: 30,
+              color: 'gray'
+            }]
+          ]
+          // Other actions could go here
+        },
+        // The collision map is how the game can know whether the character has collided with another object or event trigger. It is an array of invisible (or gray for now) squares.
+        collisionMap: [
+          {
+            x: 100,
+            y: 180,
+            width: 80,
+            height: 10,
+            color: 'gray'
+          }, {
+            x: 100,
+            y: 185,
+            width: 80,
+            height: 10,
+            color: 'gray'
+          }
+        ]
+      },
+      current: false
+    };
+    var headerData = {
+      user_id: UserService.get().id,
+      token: UserService.get().token
+    };
+    // Avatar
+    $.ajax({
+      method: 'POST',
+      url: 'https://forge-api.herokuapp.com/characters/create',
+      headers: headerData,
+      data: JSON.stringify(avatarTest),
+      dataType: 'json',
+      contentType: 'application/json',
+      success: function(response) {
+        console.log(response);
+        avatar = new Avatar(response);
+        console.log(avatar);
+        avatar.info.currentFrame = avatar.info.animate.walkLeft[0];
+        avatarLoaded = true;
+        setInterval(checkAvatarAction, 75);
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  }
+
+  $('body').off('keyup').on('keyup', function(event) {
+    var keyCode = event.which;
+    if (keyCode === 37) {
+      avatar.action = (avatar.action === 'walkLeft') ? 'stand' : 'walkLeft';
+      avatar.info.speed.x = (avatar.info.speed.x === -1 * avatar.info.speed.mag) ? 0 : -1 * avatar.info.speed.mag;
+      avatar.info.speed.y = 0;
+    } else if (keyCode === 38) {
+      avatar.action = (avatar.action === 'walkUp') ? 'stand' : 'walkUp';
+      avatar.info.speed.x = 0;
+      avatar.info.speed.y = (avatar.info.speed.y === -1 * avatar.info.speed.mag) ? 0 : -1 * avatar.info.speed.mag;
+    } else if (keyCode === 39) {
+      avatar.action = (avatar.action === 'walkRight') ? 'stand' : 'walkRight';
+      avatar.info.speed.x = (avatar.info.speed.x === avatar.info.speed.mag) ? 0 : avatar.info.speed.mag;
+      avatar.info.speed.y = 0;
+    } else if (keyCode === 40) {
+      avatar.action = (avatar.action === 'walkDown') ? 'stand' : 'walkDown';
+      avatar.info.speed.x = 0;
+      avatar.info.speed.y = (avatar.info.speed.y === avatar.info.speed.mag) ? 0 : avatar.info.speed.mag;
+    }
+  });
+
+  $('body').off('keypress').on('keypress', function(event) {
+    var keyCode = event.which;
+    if (typing.show && keyCode >= 32 && keyCode <= 220 && !responding.show && $('.active').length === 0) {
+      pause = true;
+      var char = String.fromCharCode(keyCode);
+      typing.phrase += char;
+      $('.typing').text(typing.phrase);
+    } else if (keyCode === 13) {
+      // Enter
+        if (typing.show) { // If the user is finishing typing
+          typing.show = false;
+          $('.typing').hide();
+          var userPhrase = typing.phrase;
+          typing.phrase = '';
+          checkTyping(userPhrase);
+        } else if (responding.show) { // If the user is finished reading a response
+          responding.show = false;
+          $('.dialog').hide();
+          responding.phrase = '';
+        } else if (inventory.show) { // If the user is finished looking at inventory
+          // $('.inventoryContainer').hide();
+          // this.inventory.show = false;
+        }
+        if (!responding.show && !inventory.show && $('.active').length === 0) { // Resume the game if all windows have been closed
+          pause = false;
+        }
+    } else if (keyCode === 32) {
+      // Space
+      if (!typing.show) {
+        typing.phrase = '>';
+        typing.show = true;
+        $('.typing').text(typing.phrase).show();
+      }
+    }
+  });
+
+  function checkTyping(phrase) {
+    if (phrase.includes('look')) {
+      responding.phrase = "This is a description of your current scene. I hope it's helpful.";
+    } else {
+      responding.phrase = "I don't understand that.";
+    }
+    $('.dialog').text(responding.phrase).show();
+    responding.show = true;
+    pause = true;
+  }
+
+  function checkAvatarBounds() {
+    var left = avatar.info.collisionMap[0].x;
+    var right = avatar.info.collisionMap[0].x + avatar.info.collisionMap[0].width;
+    var top = avatar.info.collisionMap[0].y;
+    var bottom = avatar.info.collisionMap[0].y + avatar.info.collisionMap[0].height;
+    avatar.info.collisionMap.forEach(function(square) {
+      if (square.x < left) {
+        left = square.x;
+      }
+      if (square.x + square.width > right) {
+        right = square.x + square.width;
+      }
+      if (square.y < top) {
+        top = square.y;
+      }
+      if (square.y + square.height > bottom) {
+        bottom = square.y + square.height;
+      }
+    });
+    var bounds = {
+      left: left + avatar.info.pos.x,
+      right: right + avatar.info.pos.x,
+      top: top + avatar.info.pos.y,
+      bottom: bottom + avatar.info.pos.y,
+      width: right - left,
+      height: bottom - top
+    };
+    if (bounds.right < 0) { // Character moves to the left scene
+      self.currentScenePos[2]--;
+      if (self.currentScenePos[2] < 0) {
+        self.currentScenePos[2] = self.currentRow.length - 1;
+      }
+      updateLocation();
+      avatar.info.pos.x += gameWidth;
+    } else if (bounds.left > gameWidth) { // Character moves to the right scene
+      self.currentScenePos[2]++;
+      if (self.currentScenePos[2] > self.currentRow.length - 1) {
+        self.currentScenePos[2] = 0;
+      }
+      updateLocation();
+      avatar.info.pos.x -= gameWidth;
+    } else if (bounds.bottom < 0) { // Character moves to the above scene
+      self.currentScenePos[1]--;
+      if (self.currentScenePos[1] > self.allRows.length - 1) {
+        self.currentScenePos[1] = 0;
+      }
+      updateLocation();
+      avatar.info.pos.y += gameHeight;
+    } else if (bounds.top > gameHeight) { // Character moves to the below scene
+      self.currentScenePos[1]++;
+      if (self.currentScenePos[1] > self.allRows.length - 1) {
+        self.currentScenePos[1] = 0;
+      }
+      updateLocation();
+      avatar.info.pos.y -= gameHeight;
+    }
+  }
+
+  function checkAvatarCollisions() {
+    var collision = {
+      found: false,
+      direction: 'none',
+      type: 'none'
+    };
+    avatar.info.collisionMap.forEach(function(avatarSquare) {  // Loop through all the avatar squares
+      var avatarLeft = avatarSquare.x + avatar.info.pos.x;
+      var avatarRight = avatarSquare.x + avatarSquare.width + avatar.info.pos.x;
+      var avatarTop = avatarSquare.y + avatar.info.pos.y;
+      var avatarBottom = avatarSquare.y + avatarSquare.height + avatar.info.pos.y;
+      /*
+      background.info.collisionMap.forEach(function(bgSquare) {  // Loop through all the background's squares
+        var bgLeft = bgSquare.x;
+        var bgRight = bgSquare.x + bgSquare.width;
+        var bgTop = bgSquare.y;
+        var bgBottom = bgSquare.y + bgSquare.height;
+        // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current bg square (in those exact orders).
+        if (avatarLeft <= bgRight && avatarRight >= bgLeft && avatarTop <= bgBottom && avatarBottom >= bgTop) {
+          collision.found = true;
+          collision.type = 'wall';
+          if (avatar.info.speed.x > 0) {
+            collision.direction = 'right';
+          } else if (avatar.info.speed.x < 0) {
+            collision.direction = 'left';
+          } else if (avatar.info.speed.y < 0) {
+            collision.direction = 'up';
+          } else if (avatar.info.speed.y > 0) {
+            collision.direction = 'down';
+          }
+        }
+      });
+      sceneObject.info.collisionMap.forEach(function(objSquare) {  // Loop through all the scene object's squares
+        var objLeft = objSquare.x + sceneObject.info.pos.x;
+        var objRight = objSquare.x + objSquare.width + sceneObject.info.pos.x;
+        var objTop = objSquare.y + sceneObject.info.pos.y;
+        var objBottom = objSquare.y + objSquare.height + sceneObject.info.pos.y;
+        // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current scene object square (in those exact orders).
+        if (avatarLeft <= objRight && avatarRight >= objLeft && avatarTop <= objBottom && avatarBottom >= objTop) {
+          collision.found = true;
+          collision.type = 'wall';
+          if (avatar.info.speed.x > 0) {
+            collision.direction = 'right';
+          } else if (avatar.info.speed.x < 0) {
+            collision.direction = 'left';
+          } else if (avatar.info.speed.y < 0) {
+            collision.direction = 'up';
+          } else if (avatar.info.speed.y > 0) {
+            collision.direction = 'down';
+          }
+        }
+      });
+      entity.info.collisionMap.forEach(function(entitySquare) {  // Loop through all the scene object's squares
+        var entityLeft = entitySquare.x + entity.info.pos.x;
+        var entityRight = entitySquare.x + entitySquare.width + entity.info.pos.x;
+        var entityTop = entitySquare.y + entity.info.pos.y;
+        var entityBottom = entitySquare.y + entitySquare.height + entity.info.pos.y;
+        // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current scene object square (in those exact orders).
+        if (avatarLeft <= entityRight && avatarRight >= entityLeft && avatarTop <= entityBottom && avatarBottom >= entityTop) {
+          collision.found = true;
+          collision.type = 'wall';
+          if (avatar.info.speed.x > 0) {
+            collision.direction = 'right';
+          } else if (avatar.info.speed.x < 0) {
+            collision.direction = 'left';
+          } else if (avatar.info.speed.y < 0) {
+            collision.direction = 'up';
+          } else if (avatar.info.speed.y > 0) {
+            collision.direction = 'down';
+          }
+        }
+      });
+      */
+    });
+
+    if (collision.found) {
+      switch (collision.type) {
+        case 'wall':
+          avatar.collide(collision.direction);
+          break;
+      }
+      collision = {
+        found: false,
+        direction: 'none',
+        type: 'none'
+      };
+    }
+  }
+
+  function checkEntityCollisions() {
+    var collision = {
+      found: false,
+      direction: 'none',
+      type: 'none'
+    };
+    entity.info.collisionMap.forEach(function(entitySquare) {  // Loop through all the entity squares
+      var entityLeft = entitySquare.x + entity.info.pos.x;
+      var entityRight = entitySquare.x + entitySquare.width + entity.info.pos.x;
+      var entityTop = entitySquare.y + entity.info.pos.y;
+      var entityBottom = entitySquare.y + entitySquare.height + entity.info.pos.y;
+      background.info.collisionMap.forEach(function(bgSquare) {  // Loop through all the background's squares
+        var bgLeft = bgSquare.x;
+        var bgRight = bgSquare.x + bgSquare.width;
+        var bgTop = bgSquare.y;
+        var bgBottom = bgSquare.y + bgSquare.height;
+        // Pattern: check the left, right, top, and bottom edges of the current entity square against the right, left, bottom, and top edges of the current bg square (in those exact orders).
+        if (entityLeft <= bgRight && entityRight >= bgLeft && entityTop <= bgBottom && entityBottom >= bgTop) {
+          collision.found = true;
+          collision.type = 'wall';
+          if (entity.info.speed.x > 0) {
+            collision.direction = 'right';
+          } else if (entity.info.speed.x < 0) {
+            collision.direction = 'left';
+          } else if (entity.info.speed.y < 0) {
+            collision.direction = 'up';
+          } else if (entity.info.speed.y > 0) {
+            collision.direction = 'down';
+          }
+        }
+      });
+      sceneObject.info.collisionMap.forEach(function(objSquare) {  // Loop through all the scene object's squares
+        var objLeft = objSquare.x + sceneObject.info.pos.x;
+        var objRight = objSquare.x + objSquare.width + sceneObject.info.pos.x;
+        var objTop = objSquare.y + sceneObject.info.pos.y;
+        var objBottom = objSquare.y + objSquare.height + sceneObject.info.pos.y;
+        // Pattern: check the left, right, top, and bottom edges of the current entity square against the right, left, bottom, and top edges of the current scene object square (in those exact orders).
+        if (entityLeft <= objRight && entityRight >= objLeft && entityTop <= objBottom && entityBottom >= objTop) {
+          collision.found = true;
+          collision.type = 'wall';
+          if (entity.info.speed.x > 0) {
+            collision.direction = 'right';
+          } else if (entity.info.speed.x < 0) {
+            collision.direction = 'left';
+          } else if (entity.info.speed.y < 0) {
+            collision.direction = 'up';
+          } else if (entity.info.speed.y > 0) {
+            collision.direction = 'down';
+          }
+        }
+      });
+      avatar.info.collisionMap.forEach(function(avatarSquare) {  // Loop through all the scene object's squares
+        var avatarLeft = avatarSquare.x + avatar.info.pos.x;
+        var avatarRight = avatarSquare.x + avatarSquare.width + avatar.info.pos.x;
+        var avatarTop = avatarSquare.y + avatar.info.pos.y;
+        var avatarBottom = avatarSquare.y + avatarSquare.height + avatar.info.pos.y;
+        // Pattern: check the left, right, top, and bottom edges of the current entity square against the right, left, bottom, and top edges of the current scene object square (in those exact orders).
+        if (entityLeft <= avatarRight && entityRight >= avatarLeft && entityTop <= avatarBottom && entityBottom >= avatarTop) {
+          collision.found = true;
+          collision.type = 'wall';
+          if (entity.info.speed.x > 0) {
+            collision.direction = 'right';
+          } else if (entity.info.speed.x < 0) {
+            collision.direction = 'left';
+          } else if (entity.info.speed.y < 0) {
+            collision.direction = 'up';
+          } else if (entity.info.speed.y > 0) {
+            collision.direction = 'down';
+          }
+        }
+      });
+    });
+
+    if (collision.found) {
+      switch (collision.type) {
+        case 'wall':
+          entity.collide(collision.direction);
+          break;
+      }
+      collision = {
+        found: false,
+        direction: 'none',
+        type: 'none'
+      };
+    }
+  }
+
+  function updateLocation() {
+    self.currentMap = allMaps[self.currentScenePos[0]];
+    self.allRows = self.currentMap.scenes;
+    self.currentRow = self.allRows[self.currentScenePos[1]];
+    self.currentScene = self.currentRow[self.currentScenePos[2]];
+    background = self.currentScene.background;
+  }
+
+  function updateAvatar() {
+    avatar.updatePos();
+  }
+
+  function updateEntity() {
+    entity.updatePos();
+  }
+
+  // NOTE: these frame index variables should probably belong to the individual avatar, object, or entity in the factory
+  var currentAvatarFrameIndex = 0;
+  function checkAvatarAction() {
+    if (avatar.action === 'walkLeft' || avatar.action === 'walkUp' || avatar.action === 'walkRight' || avatar.action === 'walkDown') {
+      if (currentAvatarFrameIndex > avatar.info.animate[avatar.action].length - 1) {
+        currentAvatarFrameIndex = 0;
+      }
+      avatar.info.currentFrame = avatar.info.animate[avatar.action][currentAvatarFrameIndex];
+      currentAvatarFrameIndex++;
+    } else {
+      // Do nothing, or set frame to a given specific frame.
+      // avatar.info.currentFrame = avatar.info.animate.walkLeft[0];
+    }
+  }
+
+  var currentSceneObjFrameIndex = 0;
+  function checkSceneObjectAction() {
+    // Animate the object.
+    if (currentSceneObjFrameIndex > sceneObject.info.animate[sceneObject.allActions[0]].length - 1) {
+      currentSceneObjFrameIndex = 0;
+    }
+    sceneObject.info.currentFrame = sceneObject.info.animate[sceneObject.allActions[0]][currentSceneObjFrameIndex];
+    currentSceneObjFrameIndex++;
+  }
+
+  var currentEntityFrameIndex = 0;
+  function checkEntityAction() {
+    if (entity.action === 'stand' || entity.action === 'walkLeft' || entity.action === 'walkUp' || entity.action === 'walkRight' || entity.action === 'walkDown') {
+      switch (entity.action) {
+        case 'walkLeft':
+          entity.info.speed.x = -1;
+          entity.info.speed.y = 0;
+          break;
+        case 'walkUp':
+          entity.info.speed.x = 0;
+          entity.info.speed.y = -1;
+          break;
+        case 'walkRight':
+          entity.info.speed.x = 1;
+          entity.info.speed.y = 0;
+          break;
+        case 'walkDown':
+          entity.info.speed.x = 0;
+          entity.info.speed.y = 1;
+          break;
+      }
+      // Animate the entity.
+      if (currentEntityFrameIndex > entity.info.animate[entity.action].length - 1) {
+        currentEntityFrameIndex = 0;
+      }
+      entity.info.currentFrame = entity.info.animate[entity.action][currentEntityFrameIndex];
+      currentEntityFrameIndex++;
+    }
+  }
+
+  function drawAvatar() {
+    // Save the drawing context
+    gameCtx.save();
+    // Translate the canvas origin to be the top left of the avatar
+    gameCtx.translate(avatar.info.pos.x, avatar.info.pos.y);
+    // Draw the squares from the avatar's current frame
+    avatar.info.currentFrame.forEach(function(square) {
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    });
+    gameCtx.globalAlpha = 0.2;
+    // Draw the avatar's collision map (purely for testing)
+    avatar.info.collisionMap.forEach(function(square) {
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    });
+    gameCtx.restore();
+  }
+
+  function drawBackground() {
+    if (background) {
+      // Save the drawing context
+      gameCtx.save();
+      // Draw the squares from the background object.
+      gameCtx.globalCompositeOperation = "destination-over";
+      for (var index = background.info.image.length - 1; index >= 0; index--) {
+        var square = background.info.image[index];
+        gameCtx.fillStyle = square.color;
+        gameCtx.fillRect(square.x, square.y, square.width, square.height);
+      }
+      gameCtx.globalCompositeOperation = "source-over";
+      gameCtx.globalAlpha = 0.2;
+      // Draw the background's collision map (purely for testing)
+      background.info.collisionMap.forEach(function(square) {
+        gameCtx.fillStyle = square.color;
+        gameCtx.fillRect(square.x, square.y, square.width, square.height);
+      });
+      gameCtx.restore();
+    } else {
+      self.warning = "This scene has no background yet!";
+      setTimeout(function() {
+        self.warning = '';
+      }, 2000);
+    }
+    $scope.$apply();
+  }
+
+  function drawObjects() {
+    // Save the drawing context
+    gameCtx.save();
+    // Translate the canvas origin to be the top left of the sceneObject
+    gameCtx.translate(sceneObject.info.pos.x, sceneObject.info.pos.y);
+    // Draw the squares from the sceneObject's current frame
+    gameCtx.globalCompositeOperation = "destination-over";  // If object is behind character.
+    // gameCtx.globalCompositeOperation = "source-over";    // If object is in front of character.
+    sceneObject.info.currentFrame.forEach(function(square) {
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    });
+    gameCtx.globalAlpha = 0.2;
+    // Draw the sceneObject's collision map (purely for testing)
+    sceneObject.info.collisionMap.forEach(function(square) {
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    });
+    gameCtx.restore();
+  }
+
+  function drawEntities() {
+    // Save the drawing context
+    gameCtx.save();
+    // Translate the canvas origin to be the top left of the entity
+    gameCtx.translate(entity.info.pos.x, entity.info.pos.y);
+    // Draw the squares from the entity's current frame
+    gameCtx.globalCompositeOperation = "destination-over";  // If object is behind character.
+    // gameCtx.globalCompositeOperation = "source-over";    // If object is in front of character.
+    entity.info.currentFrame.forEach(function(square) {
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    });
+    gameCtx.globalAlpha = 0.2;
+    // Draw the entity's collision map (purely for testing)
+    entity.info.collisionMap.forEach(function(square) {
+      gameCtx.fillStyle = square.color;
+      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    });
+    gameCtx.restore();
+  }
+
+  function clearCanvas() {
+    gameCtx.clearRect(0, 0, gameWidth, gameHeight);
+  }
+
+  this.startGame = function() {
+    self.currentScenePos = [1,0,0]; // NOTE: Initial character start position, need to get from editor
+    updateLocation();
+    loadMainCharacter();
+    self.gameStarted = true;
+  }
+
+  function runGame() {
+    if (self.gameStarted) {
+      clearCanvas();
+      if (avatarLoaded) {
+        checkAvatarBounds();
+        checkAvatarCollisions();
+        updateAvatar();
+        drawAvatar();
+      }
+      // checkEntityCollisions();
+      // updateEntity();
+      // drawEntities();
+      // drawObjects();
+      drawBackground();
+    }
+    requestAnimationFrame(runGame);
+  }
+  requestAnimationFrame(runGame);
+
+  // // Testing creation of scene
+  // var sceneTest = {
+  //   name: 'Scene Test 3',
+  //   description: 'This is the opening scene for my game.',
+  //   info: {},
+  //   game_id: 1,
+  //   map_id: 1
+  // };
+  //
+  // // Testing creation of map
+  // var mapTest = {
+  //   game_id: 1,
+  //   name: 'Map Test 2',
+  //   description: 'This is the main map for my game',
+  //   info: {
+  //     canvasElems: [{
+  //       x: 100,
+  //       y: 100,
+  //       width: 30,
+  //       height: 30,
+  //       color: 'blue'
+  //     }],
+  //     collisionMap: [{
+  //       x: 300,
+  //       y: 300,
+  //       width: 30,
+  //       height: 30,
+  //       color: 'red'
+  //     }]
+  //   }
+  // };
+
 
   // // returns all games a user has created.
   // $.ajax({
@@ -4109,344 +5912,6 @@
     1) Clicking the "save game" button will send a PATCH request to the database.
   */
 
-  // Testing creation of avatar
-  var avatarTest = {
-    name: 'Avatar Test',
-    obj: {
-      // The x and y coordinate of the top left corner of the avatar
-      pos: {
-        x: 100,
-        y: 100
-      },
-      // The character's speed
-      speed: {
-        mag: 3,
-        x: 0,
-        y: 0
-      },
-      // The animate object contains all the possible character actions with all of the frames to be drawn for each action.
-      animate: {
-        // Key: possible action, Value: array of frames
-        walkLeft: [
-          // Each frame array element is an array of square objects to be drawn
-          // Frame 1 - walk left
-          [{
-            x: 100,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'blue'
-          }, {
-            x: 110,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'green'
-          }],
-          // Frame 2 - walk left
-          [{
-            x: 110,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'blue'
-          }, {
-            x: 100,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'green'
-          }]
-        ],
-        walkRight: [
-          // Frame 1 - walk right
-          [{
-            x: 150,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'blue'
-          }, {
-            x: 140,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'green'
-          }],
-          // Frame 2 - walk right
-          [{
-            x: 140,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'blue'
-          }, {
-            x: 150,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'green'
-          }]
-        ],
-        walkUp: [
-          // Frame 1 - walk up
-          [{
-            x: 100,
-            y: 110,
-            width: 30,
-            height: 30,
-            color: 'red'
-          }, {
-            x: 150,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'yellow'
-          }],
-          // Frame 2 - walk up
-          [{
-            x: 100,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'red'
-          }, {
-            x: 150,
-            y: 110,
-            width: 30,
-            height: 30,
-            color: 'yellow'
-          }]
-        ],
-        walkDown: [
-          // Frame 1 - walk down
-          [{
-            x: 100,
-            y: 140,
-            width: 30,
-            height: 30,
-            color: 'red'
-          }, {
-            x: 150,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'yellow'
-          }],
-          // Frame 2 - walk down
-          [{
-            x: 100,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'red'
-          }, {
-            x: 150,
-            y: 140,
-            width: 30,
-            height: 30,
-            color: 'yellow'
-          }]
-        ],
-        swimLeft: [
-          // Frame 1 - swim left
-          [{
-            x: 100,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'lightblue'
-          }, {
-            x: 150,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'lightblue'
-          }],
-          // Frame 2 - swim left
-          [{
-            x: 100,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'gray'
-          }, {
-            x: 150,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'gray'
-          }]
-        ],
-        swimRight: [
-          // Frame 1 - swim right
-          [{
-            x: 100,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'lightblue'
-          }, {
-            x: 150,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'lightblue'
-          }],
-          // Frame 2 - swim right
-          [{
-            x: 100,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'gray'
-          }, {
-            x: 150,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'gray'
-          }]
-        ],
-        swimUp: [
-          // Frame 1 - swim up
-          [{
-            x: 100,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'lightblue'
-          }, {
-            x: 150,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'lightblue'
-          }],
-          // Frame 2 - swim up
-          [{
-            x: 100,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'gray'
-          }, {
-            x: 150,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'gray'
-          }]
-        ],
-        swimDown: [
-          // Frame 1 - swim down
-          [{
-            x: 100,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'lightblue'
-          }, {
-            x: 150,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'lightblue'
-          }],
-          // Frame 2 - swim down
-          [{
-            x: 100,
-            y: 100,
-            width: 30,
-            height: 30,
-            color: 'gray'
-          }, {
-            x: 150,
-            y: 150,
-            width: 30,
-            height: 30,
-            color: 'gray'
-          }]
-        ]
-        // Other actions could go here
-      },
-      // The collision map is how the game can know whether the character has collided with another object or event trigger. It is an array of invisible (or gray for now) squares.
-      collisionMap: [
-        {
-          x: 100,
-          y: 180,
-          width: 80,
-          height: 10,
-          color: 'gray'
-        }, {
-          x: 100,
-          y: 185,
-          width: 80,
-          height: 10,
-          color: 'gray'
-        }
-      ]
-    },
-    current: false
-  };
-
-  // Testing creation of scene
-  var sceneTest = {
-    name: 'Scene Test 3',
-    description: 'This is the opening scene for my game.',
-    obj: {},
-    game_id: 1,
-    map_id: 1
-  };
-
-  // Testing creation of map
-  var mapTest = {
-    game_id: 1,
-    name: 'Map Test 2',
-    description: 'This is the main map for my game',
-    obj: {
-      canvasElems: [{
-        x: 100,
-        y: 100,
-        width: 30,
-        height: 30,
-        color: 'blue'
-      }],
-      collisionMap: [{
-        x: 300,
-        y: 300,
-        width: 30,
-        height: 30,
-        color: 'red'
-      }]
-    }
-  };
-
-  $('.createAvatarBtn').click(function() {
-    var headerData = {
-      user_id: UserService.get().id,
-      token: UserService.get().token
-    };
-    // Avatar
-    $.ajax({
-      method: 'POST',
-      url: 'https://forge-api.herokuapp.com/characters/create',
-      headers: headerData,
-      data: JSON.stringify(avatarTest),
-      dataType: 'json',
-      contentType: 'application/json',
-      success: function(response) {
-        avatar = new Avatar(response);
-        avatar.obj.currentFrame = avatar.obj.animate.walkLeft[0];
-        avatarLoaded = true;
-        setInterval(checkAvatarAction, 75);
-      },
-      error: function(error) {
-        console.log(error);
-      }
-    });
-  });
-
   // // Scene
   // $('.createSceneBtn').click(function() {
   //   var headerData = {
@@ -4491,428 +5956,6 @@
   //   });
   // })
 
-  $('body').off('keyup').on('keyup', function(event) {
-    var keyCode = event.which;
-    if (keyCode === 37) {
-      avatar.action = (avatar.action === 'walkLeft') ? 'stand' : 'walkLeft';
-      avatar.obj.speed.x = (avatar.obj.speed.x === -1 * avatar.obj.speed.mag) ? 0 : -1 * avatar.obj.speed.mag;
-      avatar.obj.speed.y = 0;
-    } else if (keyCode === 38) {
-      avatar.action = (avatar.action === 'walkUp') ? 'stand' : 'walkUp';
-      avatar.obj.speed.x = 0;
-      avatar.obj.speed.y = (avatar.obj.speed.y === -1 * avatar.obj.speed.mag) ? 0 : -1 * avatar.obj.speed.mag;
-    } else if (keyCode === 39) {
-      avatar.action = (avatar.action === 'walkRight') ? 'stand' : 'walkRight';
-      avatar.obj.speed.x = (avatar.obj.speed.x === avatar.obj.speed.mag) ? 0 : avatar.obj.speed.mag;
-      avatar.obj.speed.y = 0;
-    } else if (keyCode === 40) {
-      avatar.action = (avatar.action === 'walkDown') ? 'stand' : 'walkDown';
-      avatar.obj.speed.x = 0;
-      avatar.obj.speed.y = (avatar.obj.speed.y === avatar.obj.speed.mag) ? 0 : avatar.obj.speed.mag;
-    }
-  });
-
-  $('body').off('keypress').on('keypress', function(event) {
-    var keyCode = event.which;
-    if (typing.show && keyCode >= 32 && keyCode <= 220 && !responding.show && $('.active').length === 0) {
-      pause = true;
-      var char = String.fromCharCode(keyCode);
-      typing.phrase += char;
-      $('.typing').text(typing.phrase);
-    } else if (keyCode === 13) {
-      // Enter
-        if (typing.show) { // If the user is finishing typing
-          typing.show = false;
-          $('.typing').hide();
-          var userPhrase = typing.phrase;
-          typing.phrase = '';
-          checkTyping(userPhrase);
-        } else if (responding.show) { // If the user is finished reading a response
-          responding.show = false;
-          $('.dialog').hide();
-          responding.phrase = '';
-        } else if (inventory.show) { // If the user is finished looking at inventory
-          // $('.inventoryContainer').hide();
-          // this.inventory.show = false;
-        }
-        if (!responding.show && !inventory.show && $('.active').length === 0) { // Resume the game if all windows have been closed
-          pause = false;
-        }
-    } else if (keyCode === 32) {
-      // Space
-      if (!typing.show) {
-        typing.phrase = '>';
-        typing.show = true;
-        $('.typing').text(typing.phrase).show();
-      }
-    }
-  });
-
-  function checkTyping(phrase) {
-    if (phrase.includes('look')) {
-      responding.phrase = "This is a description of your current scene. I hope it's helpful.";
-    } else {
-      responding.phrase = "I don't understand that.";
-    }
-    $('.dialog').text(responding.phrase).show();
-    responding.show = true;
-    pause = true;
-  }
-
-  function checkAvatarCollisions() {
-    var collision = {
-      found: false,
-      direction: 'none',
-      type: 'none'
-    };
-    avatar.obj.collisionMap.forEach(function(avatarSquare) {  // Loop through all the avatar squares
-      var avatarLeft = avatarSquare.x + avatar.obj.pos.x;
-      var avatarRight = avatarSquare.x + avatarSquare.width + avatar.obj.pos.x;
-      var avatarTop = avatarSquare.y + avatar.obj.pos.y;
-      var avatarBottom = avatarSquare.y + avatarSquare.height + avatar.obj.pos.y;
-      background.obj.collisionMap.forEach(function(bgSquare) {  // Loop through all the background's squares
-        var bgLeft = bgSquare.x;
-        var bgRight = bgSquare.x + bgSquare.width;
-        var bgTop = bgSquare.y;
-        var bgBottom = bgSquare.y + bgSquare.height;
-        // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current bg square (in those exact orders).
-        if (avatarLeft <= bgRight && avatarRight >= bgLeft && avatarTop <= bgBottom && avatarBottom >= bgTop) {
-          collision.found = true;
-          collision.type = 'wall';
-          if (avatar.obj.speed.x > 0) {
-            collision.direction = 'right';
-          } else if (avatar.obj.speed.x < 0) {
-            collision.direction = 'left';
-          } else if (avatar.obj.speed.y < 0) {
-            collision.direction = 'up';
-          } else if (avatar.obj.speed.y > 0) {
-            collision.direction = 'down';
-          }
-        }
-      });
-      sceneObject.obj.collisionMap.forEach(function(objSquare) {  // Loop through all the scene object's squares
-        var objLeft = objSquare.x + sceneObject.obj.pos.x;
-        var objRight = objSquare.x + objSquare.width + sceneObject.obj.pos.x;
-        var objTop = objSquare.y + sceneObject.obj.pos.y;
-        var objBottom = objSquare.y + objSquare.height + sceneObject.obj.pos.y;
-        // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current scene object square (in those exact orders).
-        if (avatarLeft <= objRight && avatarRight >= objLeft && avatarTop <= objBottom && avatarBottom >= objTop) {
-          collision.found = true;
-          collision.type = 'wall';
-          if (avatar.obj.speed.x > 0) {
-            collision.direction = 'right';
-          } else if (avatar.obj.speed.x < 0) {
-            collision.direction = 'left';
-          } else if (avatar.obj.speed.y < 0) {
-            collision.direction = 'up';
-          } else if (avatar.obj.speed.y > 0) {
-            collision.direction = 'down';
-          }
-        }
-      });
-      entity.obj.collisionMap.forEach(function(entitySquare) {  // Loop through all the scene object's squares
-        var entityLeft = entitySquare.x + entity.obj.pos.x;
-        var entityRight = entitySquare.x + entitySquare.width + entity.obj.pos.x;
-        var entityTop = entitySquare.y + entity.obj.pos.y;
-        var entityBottom = entitySquare.y + entitySquare.height + entity.obj.pos.y;
-        // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current scene object square (in those exact orders).
-        if (avatarLeft <= entityRight && avatarRight >= entityLeft && avatarTop <= entityBottom && avatarBottom >= entityTop) {
-          collision.found = true;
-          collision.type = 'wall';
-          if (avatar.obj.speed.x > 0) {
-            collision.direction = 'right';
-          } else if (avatar.obj.speed.x < 0) {
-            collision.direction = 'left';
-          } else if (avatar.obj.speed.y < 0) {
-            collision.direction = 'up';
-          } else if (avatar.obj.speed.y > 0) {
-            collision.direction = 'down';
-          }
-        }
-      });
-    });
-
-    if (collision.found) {
-      switch (collision.type) {
-        case 'wall':
-          avatar.collide(collision.direction);
-          break;
-      }
-      collision = {
-        found: false,
-        direction: 'none',
-        type: 'none'
-      };
-    }
-  }
-
-  function checkEntityCollisions() {
-    var collision = {
-      found: false,
-      direction: 'none',
-      type: 'none'
-    };
-    entity.obj.collisionMap.forEach(function(entitySquare) {  // Loop through all the entity squares
-      var entityLeft = entitySquare.x + entity.obj.pos.x;
-      var entityRight = entitySquare.x + entitySquare.width + entity.obj.pos.x;
-      var entityTop = entitySquare.y + entity.obj.pos.y;
-      var entityBottom = entitySquare.y + entitySquare.height + entity.obj.pos.y;
-      background.obj.collisionMap.forEach(function(bgSquare) {  // Loop through all the background's squares
-        var bgLeft = bgSquare.x;
-        var bgRight = bgSquare.x + bgSquare.width;
-        var bgTop = bgSquare.y;
-        var bgBottom = bgSquare.y + bgSquare.height;
-        // Pattern: check the left, right, top, and bottom edges of the current entity square against the right, left, bottom, and top edges of the current bg square (in those exact orders).
-        if (entityLeft <= bgRight && entityRight >= bgLeft && entityTop <= bgBottom && entityBottom >= bgTop) {
-          collision.found = true;
-          collision.type = 'wall';
-          if (entity.obj.speed.x > 0) {
-            collision.direction = 'right';
-          } else if (entity.obj.speed.x < 0) {
-            collision.direction = 'left';
-          } else if (entity.obj.speed.y < 0) {
-            collision.direction = 'up';
-          } else if (entity.obj.speed.y > 0) {
-            collision.direction = 'down';
-          }
-        }
-      });
-      sceneObject.obj.collisionMap.forEach(function(objSquare) {  // Loop through all the scene object's squares
-        var objLeft = objSquare.x + sceneObject.obj.pos.x;
-        var objRight = objSquare.x + objSquare.width + sceneObject.obj.pos.x;
-        var objTop = objSquare.y + sceneObject.obj.pos.y;
-        var objBottom = objSquare.y + objSquare.height + sceneObject.obj.pos.y;
-        // Pattern: check the left, right, top, and bottom edges of the current entity square against the right, left, bottom, and top edges of the current scene object square (in those exact orders).
-        if (entityLeft <= objRight && entityRight >= objLeft && entityTop <= objBottom && entityBottom >= objTop) {
-          collision.found = true;
-          collision.type = 'wall';
-          if (entity.obj.speed.x > 0) {
-            collision.direction = 'right';
-          } else if (entity.obj.speed.x < 0) {
-            collision.direction = 'left';
-          } else if (entity.obj.speed.y < 0) {
-            collision.direction = 'up';
-          } else if (entity.obj.speed.y > 0) {
-            collision.direction = 'down';
-          }
-        }
-      });
-      avatar.obj.collisionMap.forEach(function(avatarSquare) {  // Loop through all the scene object's squares
-        var avatarLeft = avatarSquare.x + avatar.obj.pos.x;
-        var avatarRight = avatarSquare.x + avatarSquare.width + avatar.obj.pos.x;
-        var avatarTop = avatarSquare.y + avatar.obj.pos.y;
-        var avatarBottom = avatarSquare.y + avatarSquare.height + avatar.obj.pos.y;
-        // Pattern: check the left, right, top, and bottom edges of the current entity square against the right, left, bottom, and top edges of the current scene object square (in those exact orders).
-        if (entityLeft <= avatarRight && entityRight >= avatarLeft && entityTop <= avatarBottom && entityBottom >= avatarTop) {
-          collision.found = true;
-          collision.type = 'wall';
-          if (entity.obj.speed.x > 0) {
-            collision.direction = 'right';
-          } else if (entity.obj.speed.x < 0) {
-            collision.direction = 'left';
-          } else if (entity.obj.speed.y < 0) {
-            collision.direction = 'up';
-          } else if (entity.obj.speed.y > 0) {
-            collision.direction = 'down';
-          }
-        }
-      });
-    });
-
-    if (collision.found) {
-      switch (collision.type) {
-        case 'wall':
-          entity.collide(collision.direction);
-          break;
-      }
-      collision = {
-        found: false,
-        direction: 'none',
-        type: 'none'
-      };
-    }
-  }
-
-  function updateAvatar() {
-    avatar.updatePos();
-  }
-
-  function updateEntity() {
-    entity.updatePos();
-  }
-
-  // NOTE: these frame index variables should probably belong to the individual avatar, object, or entity in the factory
-  var currentAvatarFrameIndex = 0;
-  function checkAvatarAction() {
-    if (avatar.action === 'walkLeft' || avatar.action === 'walkUp' || avatar.action === 'walkRight' || avatar.action === 'walkDown') {
-      if (currentAvatarFrameIndex > avatar.obj.animate[avatar.action].length - 1) {
-        currentAvatarFrameIndex = 0;
-      }
-      avatar.obj.currentFrame = avatar.obj.animate[avatar.action][currentAvatarFrameIndex];
-      currentAvatarFrameIndex++;
-    } else {
-      // Do nothing, or set frame to a given specific frame.
-      // avatar.obj.currentFrame = avatar.obj.animate.walkLeft[0];
-    }
-  }
-
-  var currentSceneObjFrameIndex = 0;
-  function checkSceneObjectAction() {
-    // Animate the object.
-    if (currentSceneObjFrameIndex > sceneObject.obj.animate[sceneObject.allActions[0]].length - 1) {
-      currentSceneObjFrameIndex = 0;
-    }
-    sceneObject.obj.currentFrame = sceneObject.obj.animate[sceneObject.allActions[0]][currentSceneObjFrameIndex];
-    currentSceneObjFrameIndex++;
-  }
-
-  var currentEntityFrameIndex = 0;
-  function checkEntityAction() {
-    if (entity.action === 'stand' || entity.action === 'walkLeft' || entity.action === 'walkUp' || entity.action === 'walkRight' || entity.action === 'walkDown') {
-      switch (entity.action) {
-        case 'walkLeft':
-          entity.obj.speed.x = -1;
-          entity.obj.speed.y = 0;
-          break;
-        case 'walkUp':
-          entity.obj.speed.x = 0;
-          entity.obj.speed.y = -1;
-          break;
-        case 'walkRight':
-          entity.obj.speed.x = 1;
-          entity.obj.speed.y = 0;
-          break;
-        case 'walkDown':
-          entity.obj.speed.x = 0;
-          entity.obj.speed.y = 1;
-          break;
-      }
-      // Animate the entity.
-      if (currentEntityFrameIndex > entity.obj.animate[entity.action].length - 1) {
-        currentEntityFrameIndex = 0;
-      }
-      entity.obj.currentFrame = entity.obj.animate[entity.action][currentEntityFrameIndex];
-      currentEntityFrameIndex++;
-    }
-  }
-
-  function drawAvatar() {
-    // Save the drawing context
-    gameCtx.save();
-    // Translate the canvas origin to be the top left of the avatar
-    gameCtx.translate(avatar.obj.pos.x, avatar.obj.pos.y);
-    // Draw the squares from the avatar's current frame
-    avatar.obj.currentFrame.forEach(function(square) {
-      gameCtx.fillStyle = square.color;
-      gameCtx.fillRect(square.x, square.y, square.width, square.height);
-    });
-    gameCtx.globalAlpha = 0.2;
-    // Draw the avatar's collision map (purely for testing)
-    avatar.obj.collisionMap.forEach(function(square) {
-      gameCtx.fillStyle = square.color;
-      gameCtx.fillRect(square.x, square.y, square.width, square.height);
-    });
-    gameCtx.restore();
-  }
-
-  function drawBackground() {
-    // Save the drawing context
-    gameCtx.save();
-    // Draw the squares from the background object.
-    gameCtx.globalCompositeOperation = "destination-over";
-    for (var index = background.obj.image.length - 1; index >= 0; index--) {
-      var square = background.obj.image[index];
-      gameCtx.fillStyle = square.color;
-      gameCtx.fillRect(square.x, square.y, square.width, square.height);
-    }
-    gameCtx.globalCompositeOperation = "source-over";
-    gameCtx.globalAlpha = 0.2;
-    // Draw the background's collision map (purely for testing)
-    background.obj.collisionMap.forEach(function(square) {
-      gameCtx.fillStyle = square.color;
-      gameCtx.fillRect(square.x, square.y, square.width, square.height);
-    });
-    gameCtx.restore();
-  }
-
-  function drawObjects() {
-    // Save the drawing context
-    gameCtx.save();
-    // Translate the canvas origin to be the top left of the sceneObject
-    gameCtx.translate(sceneObject.obj.pos.x, sceneObject.obj.pos.y);
-    // Draw the squares from the sceneObject's current frame
-    gameCtx.globalCompositeOperation = "destination-over";  // If object is behind character.
-    // gameCtx.globalCompositeOperation = "source-over";    // If object is in front of character.
-    sceneObject.obj.currentFrame.forEach(function(square) {
-      gameCtx.fillStyle = square.color;
-      gameCtx.fillRect(square.x, square.y, square.width, square.height);
-    });
-    gameCtx.globalAlpha = 0.2;
-    // Draw the sceneObject's collision map (purely for testing)
-    sceneObject.obj.collisionMap.forEach(function(square) {
-      gameCtx.fillStyle = square.color;
-      gameCtx.fillRect(square.x, square.y, square.width, square.height);
-    });
-    gameCtx.restore();
-  }
-
-  function drawEntities() {
-    // Save the drawing context
-    gameCtx.save();
-    // Translate the canvas origin to be the top left of the entity
-    gameCtx.translate(entity.obj.pos.x, entity.obj.pos.y);
-    // Draw the squares from the entity's current frame
-    gameCtx.globalCompositeOperation = "destination-over";  // If object is behind character.
-    // gameCtx.globalCompositeOperation = "source-over";    // If object is in front of character.
-    entity.obj.currentFrame.forEach(function(square) {
-      gameCtx.fillStyle = square.color;
-      gameCtx.fillRect(square.x, square.y, square.width, square.height);
-    });
-    gameCtx.globalAlpha = 0.2;
-    // Draw the entity's collision map (purely for testing)
-    entity.obj.collisionMap.forEach(function(square) {
-      gameCtx.fillStyle = square.color;
-      gameCtx.fillRect(square.x, square.y, square.width, square.height);
-    });
-    gameCtx.restore();
-  }
-
-  function clearCanvas() {
-    gameCtx.clearRect(0, 0, gameWidth, gameHeight);
-  }
-
-  var initialized = false;
-  function runGame() {
-    clearCanvas();
-    // Draw avatar if it has been loaded
-    if (avatarLoaded && backgroundLoaded && sceneObjectLoaded && entityLoaded && !initialized) {
-      sceneTest.obj = {
-        avatar: avatar,
-        background: background,
-        objects: [sceneObject],
-        entities: [entity]
-      };
-      avatar = sceneTest.obj.avatar;
-      background = sceneTest.obj.background;
-      sceneObject = sceneTest.obj.objects[0];
-      entity = sceneTest.obj.entities[0];
-      initialized = true;
-      console.log(sceneTest);
-      console.log(JSON.stringify(sceneTest.obj));
-    }
-    if (initialized) {
-      checkAvatarCollisions();
-      checkEntityCollisions();
-      updateAvatar();
-      updateEntity();
-      drawAvatar();
-      drawEntities();
-      drawObjects();
-      drawBackground();
-    }
-    requestAnimationFrame(runGame);
-  }
-  requestAnimationFrame(runGame);
 
   /*
   // Socket functionality
@@ -5048,313 +6091,273 @@
         $state.go('main.game.editor.views');
     };
 
-    $scope.editGame = function (name) {
+    $scope.editGame = function(name) {
         $scope.user.editGame = name;
         UserService.set($scope.user);
         $state.go('main.game.editor.views');
     };
 
-    $scope.archiveGame = function (game) {
+    $scope.archiveGame = function(game) {
         var agree = confirm("Are you sure you wanna archive '" + game.name + "'? That means no one will be able to play it and all player information will be lost. You will NOT be able to retrieve this later");
         if (agree) {
-          UserService.archive(game.id);
+            UserService.archive(game.id);
         }
     };
 
-    setTimeout(function() {
-        $scope.user = UserService.get();
-        // $scope.games = UserService.games();
+    $scope.user = UserService.get();
 
-        $scope.getJoinedDate = function(date) {
-            return new Date(date);
-        };
-        $scope.$apply();
-    }, 1000);
+    $scope.getJoinedDate = function(date) {
+        return new Date(date);
+    };
 
     UserService.getUserGames().done(function(games) {
-      $scope.games = games;
+        $scope.games = games;
+        $scope.$apply();
     });
 
-    // //This is for testing only
-    // $scope.games = [{
-    //     thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-    //     name: "King's Quest Collection",
-    //     creator: "billy badass",
-    //     players: 6,
-    //     created_at: new Date(),
-    //     responseText: "something"
-    // }, {
-    //     thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-    //     name: "King's Quest Collection",
-    //     creator: "billy badass",
-    //     players: 6,
-    //     created_at: new Date(),
-    //     responseText: "something"
-    // }, {
-    //     thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-    //     name: "King's Quest Collection",
-    //     creator: "billy badass",
-    //     players: 6,
-    //     created_at: new Date(),
-    //     responseText: "something"
-    // }, {
-    //     thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-    //     name: "King's Quest Collection",
-    //     creator: "billy badass",
-    //     players: 6,
-    //     created_at: new Date(),
-    //     responseText: "something"
-    // }, {
-    //     thumbnail: "http://cdn.akamai.steamstatic.com/steam/apps/345390/extras/KQ_CC-PC_Bundle-Art_Capsule_Main.png?t=1477527248",
-    //     name: "King's Quest Collection",
-    //     creator: "billy badass",
-    //     players: 6,
-    //     created_at: new Date(),
-    //     responseText: "something"
-    // }];
-
-    $scope.avatarTest = {
-        walkLeft: [
-            // Frame 1 - walk left
-            [{
-                x: 100,
-                y: 100,
-                width: 30,
-                height: 30,
-                color: 'blue'
-            }, {
-                x: 150,
-                y: 150,
-                width: 30,
-                height: 30,
-                color: 'green'
-            }],
-            // Frame 2 - walk left
-            [{
-                x: 100,
-                y: 100,
-                width: 30,
-                height: 30,
-                color: 'red'
-            }, {
-                x: 150,
-                y: 150,
-                width: 30,
-                height: 30,
-                color: 'yellow'
-            }]
-        ],
-        walkRight: [
-            // Frame 1 - walk right
-            [{
-                x: 100,
-                y: 100,
-                width: 30,
-                height: 30,
-                color: 'blue'
-            }, {
-                x: 150,
-                y: 150,
-                width: 30,
-                height: 30,
-                color: 'green'
-            }],
-            // Frame 2 - walk right
-            [{
-                x: 100,
-                y: 100,
-                width: 30,
-                height: 30,
-                color: 'red'
-            }, {
-                x: 150,
-                y: 150,
-                width: 30,
-                height: 30,
-                color: 'yellow'
-            }]
-        ],
-        walkUp: [
-            // Frame 1 - walk up
-            [{
-                x: 100,
-                y: 100,
-                width: 30,
-                height: 30,
-                color: 'blue'
-            }, {
-                x: 150,
-                y: 150,
-                width: 30,
-                height: 30,
-                color: 'green'
-            }],
-            // Frame 2 - walk up
-            [{
-                x: 100,
-                y: 100,
-                width: 30,
-                height: 30,
-                color: 'red'
-            }, {
-                x: 150,
-                y: 150,
-                width: 30,
-                height: 30,
-                color: 'yellow'
-            }]
-        ],
-        walkDown: [
-            // Frame 1 - walk down
-            [{
-                x: 100,
-                y: 100,
-                width: 30,
-                height: 30,
-                color: 'blue'
-            }, {
-                x: 150,
-                y: 150,
-                width: 30,
-                height: 30,
-                color: 'green'
-            }],
-            // Frame 2 - walk down
-            [{
-                x: 100,
-                y: 100,
-                width: 30,
-                height: 30,
-                color: 'red'
-            }, {
-                x: 150,
-                y: 150,
-                width: 30,
-                height: 30,
-                color: 'yellow'
-            }]
-        ],
-        swimLeft: [
-            // Frame 1 - swim left
-            [{
-                x: 100,
-                y: 100,
-                width: 30,
-                height: 30,
-                color: 'lightblue'
-            }, {
-                x: 150,
-                y: 150,
-                width: 30,
-                height: 30,
-                color: 'lightblue'
-            }],
-            // Frame 2 - swim left
-            [{
-                x: 100,
-                y: 100,
-                width: 30,
-                height: 30,
-                color: 'gray'
-            }, {
-                x: 150,
-                y: 150,
-                width: 30,
-                height: 30,
-                color: 'gray'
-            }]
-        ],
-        swimRight: [
-            // Frame 1 - swim right
-            [{
-                x: 100,
-                y: 100,
-                width: 30,
-                height: 30,
-                color: 'lightblue'
-            }, {
-                x: 150,
-                y: 150,
-                width: 30,
-                height: 30,
-                color: 'lightblue'
-            }],
-            // Frame 2 - swim right
-            [{
-                x: 100,
-                y: 100,
-                width: 30,
-                height: 30,
-                color: 'gray'
-            }, {
-                x: 150,
-                y: 150,
-                width: 30,
-                height: 30,
-                color: 'gray'
-            }]
-        ],
-        swimUp: [
-            // Frame 1 - swim up
-            [{
-                x: 100,
-                y: 100,
-                width: 30,
-                height: 30,
-                color: 'lightblue'
-            }, {
-                x: 150,
-                y: 150,
-                width: 30,
-                height: 30,
-                color: 'lightblue'
-            }],
-            // Frame 2 - swim up
-            [{
-                x: 100,
-                y: 100,
-                width: 30,
-                height: 30,
-                color: 'gray'
-            }, {
-                x: 150,
-                y: 150,
-                width: 30,
-                height: 30,
-                color: 'gray'
-            }]
-        ],
-        swimDown: [
-            // Frame 1 - swim down
-            [{
-                x: 100,
-                y: 100,
-                width: 30,
-                height: 30,
-                color: 'lightblue'
-            }, {
-                x: 150,
-                y: 150,
-                width: 30,
-                height: 30,
-                color: 'lightblue'
-            }],
-            // Frame 2 - swim down
-            [{
-                x: 100,
-                y: 100,
-                width: 30,
-                height: 30,
-                color: 'gray'
-            }, {
-                x: 150,
-                y: 150,
-                width: 30,
-                height: 30,
-                color: 'gray'
-            }]
-        ]
-    };
+    // //Testing Data
+    // $scope.avatarTest = {
+    //     walkLeft: [
+    //         // Frame 1 - walk left
+    //         [{
+    //             x: 100,
+    //             y: 100,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'blue'
+    //         }, {
+    //             x: 150,
+    //             y: 150,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'green'
+    //         }],
+    //         // Frame 2 - walk left
+    //         [{
+    //             x: 100,
+    //             y: 100,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'red'
+    //         }, {
+    //             x: 150,
+    //             y: 150,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'yellow'
+    //         }]
+    //     ],
+    //     walkRight: [
+    //         // Frame 1 - walk right
+    //         [{
+    //             x: 100,
+    //             y: 100,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'blue'
+    //         }, {
+    //             x: 150,
+    //             y: 150,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'green'
+    //         }],
+    //         // Frame 2 - walk right
+    //         [{
+    //             x: 100,
+    //             y: 100,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'red'
+    //         }, {
+    //             x: 150,
+    //             y: 150,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'yellow'
+    //         }]
+    //     ],
+    //     walkUp: [
+    //         // Frame 1 - walk up
+    //         [{
+    //             x: 100,
+    //             y: 100,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'blue'
+    //         }, {
+    //             x: 150,
+    //             y: 150,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'green'
+    //         }],
+    //         // Frame 2 - walk up
+    //         [{
+    //             x: 100,
+    //             y: 100,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'red'
+    //         }, {
+    //             x: 150,
+    //             y: 150,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'yellow'
+    //         }]
+    //     ],
+    //     walkDown: [
+    //         // Frame 1 - walk down
+    //         [{
+    //             x: 100,
+    //             y: 100,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'blue'
+    //         }, {
+    //             x: 150,
+    //             y: 150,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'green'
+    //         }],
+    //         // Frame 2 - walk down
+    //         [{
+    //             x: 100,
+    //             y: 100,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'red'
+    //         }, {
+    //             x: 150,
+    //             y: 150,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'yellow'
+    //         }]
+    //     ],
+    //     swimLeft: [
+    //         // Frame 1 - swim left
+    //         [{
+    //             x: 100,
+    //             y: 100,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'lightblue'
+    //         }, {
+    //             x: 150,
+    //             y: 150,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'lightblue'
+    //         }],
+    //         // Frame 2 - swim left
+    //         [{
+    //             x: 100,
+    //             y: 100,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'gray'
+    //         }, {
+    //             x: 150,
+    //             y: 150,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'gray'
+    //         }]
+    //     ],
+    //     swimRight: [
+    //         // Frame 1 - swim right
+    //         [{
+    //             x: 100,
+    //             y: 100,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'lightblue'
+    //         }, {
+    //             x: 150,
+    //             y: 150,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'lightblue'
+    //         }],
+    //         // Frame 2 - swim right
+    //         [{
+    //             x: 100,
+    //             y: 100,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'gray'
+    //         }, {
+    //             x: 150,
+    //             y: 150,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'gray'
+    //         }]
+    //     ],
+    //     swimUp: [
+    //         // Frame 1 - swim up
+    //         [{
+    //             x: 100,
+    //             y: 100,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'lightblue'
+    //         }, {
+    //             x: 150,
+    //             y: 150,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'lightblue'
+    //         }],
+    //         // Frame 2 - swim up
+    //         [{
+    //             x: 100,
+    //             y: 100,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'gray'
+    //         }, {
+    //             x: 150,
+    //             y: 150,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'gray'
+    //         }]
+    //     ],
+    //     swimDown: [
+    //         // Frame 1 - swim down
+    //         [{
+    //             x: 100,
+    //             y: 100,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'lightblue'
+    //         }, {
+    //             x: 150,
+    //             y: 150,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'lightblue'
+    //         }],
+    //         // Frame 2 - swim down
+    //         [{
+    //             x: 100,
+    //             y: 100,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'gray'
+    //         }, {
+    //             x: 150,
+    //             y: 150,
+    //             width: 30,
+    //             height: 30,
+    //             color: 'gray'
+    //         }]
+    //     ]
+    // };
 });
 ;angular.module('questCreator').controller('sceneCtrl', function(socket, $state, $scope) {
   var self = this;
