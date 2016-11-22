@@ -96,6 +96,11 @@ angular.module('questCreator').controller('bgCtrl', function($state, $scope, Edi
     self.allCollisionSquares = collisionArray;
     drawBackgroundSquares();
     drawCollisionSquares();
+    var dataURL = self.myCanvas.toDataURL();
+    $scope.editor.currentSceneImg = {
+      'background': 'url("' + dataURL + '")'
+    };
+    console.log("??", $scope.editor.currentSceneImg);
   });
 
   // /*

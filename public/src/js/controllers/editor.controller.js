@@ -22,6 +22,7 @@ angular.module('questCreator')
   this.currentObject = null;
   this.currentEntity = null;
   this.currentScene = null;
+  this.currentSceneImg = {};
   this.currentLargeView = 'background';
   this.currentSmallView = 'object';
   this.availableBackgrounds = [];
@@ -988,7 +989,6 @@ angular.module('questCreator')
       "$$hashKey": "object:105"
   }
   this.availableEntities.push(this.dummyent);
-
 
   this.goToPalette = function (type) {
     self.selectingAssets = true;
