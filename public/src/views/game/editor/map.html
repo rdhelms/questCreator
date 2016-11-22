@@ -3,7 +3,7 @@
     <ul class="mapRow" ng-repeat="row in mapObj.scenes">
       <li ng-repeat="scene in row" class="mapColumn">
         <button class="scene-button" ng-click="map.editScene(scene)">Select</button>
-        <input ng-model="scene.name"></input>
+        <input ng-model="scene.name" ng-click="editor.selectText($event)" blur-on-enter></input>
       </li>
       <button ng-if="editor.currentEditingGame.info.maps.indexOf(mapObj) > 0" ng-click="map.createScene(mapObj, mapObj.scenes.indexOf(row))" class="newSceneBtn">+</button>
     </ul>
