@@ -3,11 +3,10 @@ angular.module('questCreator').controller('landingCtrl', function($state, $scope
     this.searching = false;
 
     var self = this;
+
     this.allGames = GameService.getGames().done(function(response) {
         $scope.$apply();
     });
-
-
 
     $scope.createGame = function() {
         var user;
