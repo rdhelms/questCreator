@@ -1,5 +1,21 @@
 if (false) {
 
+  // Thumbnail code:
+  // In JS:
+  // game.thumbnail = gameCanvas.toDataURL();
+  // In HTML:
+  // <img ng-cloak src="{{game.thumbnail}}">
+  /* Also:
+  clearCanvas();
+  base_image = new Image();
+  base_image.src = "./lib/images/logo.png";
+  base_image.onload = function(){
+    gameCtx.drawImage(base_image, 0, 0, gameWidth, gameHeight);
+    self.thumbnail = gameCanvas.toDataURL();
+    console.log(self.thumbnail);
+  }
+  */
+
   var headerData = {
     user_id: UserService.get().id,
     token: UserService.get().token
