@@ -7,6 +7,24 @@
                 <label for="joined">Joined the Quest:<li>{{ getJoinedDate(user.joined) | date:'MMM d - h:mm a' }}</li></label>
                 <label for="joined">Another Stat:<li>Something Impressive</li></label>
             </ul>
+
+            <div ng-if="collaborators" class="collaborators">
+                <a ng-click="showCollaborators()">Requests to collaborate</a>
+                <table>
+                  <tr>
+                    <th>Game:</th>
+                    <th>Requested By:</th>
+                    <th>Approved:</th>
+                    <th>Remove</th>
+                  </tr>
+                  <tr ng-repeat="collab in collaborators">
+                    <td>{{ collab.game }}</td>
+                    <td>{{ collab.username }}</td>
+                    <td ng-change="toggleCollab(collab)"><input type="checkbox" value="{{ collab.approved }}"></td>
+                    <td><button ng-click="removeRequest(collab)" type="button" name="button"></button></td>
+                  </tr>
+                </table>
+            </div>
         </section>
 
         <section class="canvas-tools">

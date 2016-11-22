@@ -1,31 +1,37 @@
 <div id="landing-container">
-  <main>
-    <h1>HOT NEW GAMES:</h1>
-    <div id="game-results">
-      <div ng-repeat="game in landing.allGames.responseJSON" class="game" ng-click="goToGameDetail(game)">
-        <!-- <img src="{{ game.thumbnail }}" alt="Game thumbnail"/> -->
-        <ul>
-            <li>
-                <span><h1>{{ game.name | capitalize }}</h1></span>
-            </li>
-            <li>
-                <p>by <span>{{ game.creator }}</span></p>
-            </li>
-            <li>
-                <p>on <span>{{ game.created_at | date: "yyyy-MM-dd HH:mm:ss Z"}}</span></p>
-            </li>
-            <li>
-                <p>up to <span>{{ game.plays }}</span> plays</p>
-            </li>
-            <li>
-                <p><span>{{ game.score }}</span> available points </p>
-            </li>
-        </ul>
-      </div>
-    </div>
-  </main>
-  <aside id="create-splash">
-    <h1 class='yazua'>Yazua DPS</h1>
-    <button class='big' ng-click="createGame()">Create New Game</button>
-  </aside>
+    <main>
+        <form ng-submit="landing.searchGames(gameSearch)">
+            <label for="game-search">Search for games by keyword:</label>
+            <input ng-model="gameSearch" type="text" placeholder="Search">
+            <button type="submit">Search</button>
+        </form>
+        <h1 ng-if="!landing.searching">HOT NEW GAMES:</h1>
+        <button ng-if="landing.searching" ng-click="landing.showAll()" type="button">Show All Games</button>
+        <div id="game-results">
+            <div ng-repeat="game in landing.allGames.responseJSON" class="game" ng-click="goToGameDetail(game)">
+                <!-- <img src="{{ game.thumbnail }}" alt="Game thumbnail"/> -->
+                <ul>
+                    <li>
+                        <span><h1>{{ game.name | capitalize }}</h1></span>
+                    </li>
+                    <li>
+                        <p>by <span>{{ game.creator }}</span></p>
+                    </li>
+                    <li>
+                        <p>on <span>{{ game.created_at | date: "yyyy-MM-dd HH:mm:ss Z" }}</span></p>
+                    </li>
+                    <li>
+                        <p>up to <span>{{ game.plays }}</span> plays</p>
+                    </li>
+                    <li>
+                        <p><span>{{ game.score }}</span> available points </p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </main>
+    <aside id="create-splash">
+        <h1 class='yazua'>Yazua DPS</h1>
+        <button ng-click="createGame()">Create New Game</button>
+    </aside>
 </div>
