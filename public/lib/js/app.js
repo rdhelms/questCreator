@@ -408,8 +408,9 @@
       });
     }
 
-    function saveBackground(imageArr, currentBackground) {
+    function saveBackground(imageArr, collisionArr, currentBackground) {
       currentBackground.info.image = imageArr;
+      currentBackground.info.collisionMap = collisionArr;
       var headerData = {
         user_id: UserService.get().id,
         token: UserService.get().token
@@ -967,6 +968,7 @@
   var pixelWidth = $scope.editor.currentPixelSize;
   var pixelHeight = $scope.editor.currentPixelSize;
   var undoBackgroundArray = [];   //Array to keep track of background objects that were undone.
+  var undoCollisionArray = [];
   // var undoObstacleArray = [];   //Array to keep track of obstacle objects that were undone.
   // var undoCharacterArray = [];   //Array to keep track of character objects that were undone.
   this.speedRange = 5;     // How fast mobile objects should move.
@@ -989,7 +991,7 @@
   // this.allObstacleSquares = this.currentScene.staticArr || [];  // Array of all static objects in current scene
   // this.backgroundName = this.currentBackground.name || '';  // Current selected Background name
   // this.allBackgroundSquares = this.currentBackground.staticArr || []; // Array of all static objects in current background
-  this.backgroundName = 'Testing Background';
+  this.allCollisionSquares = [];
   this.allBackgroundSquares = [];
 
   /*
@@ -1003,36 +1005,38 @@
   *   @methods
   *     draw: draw the rectangle on the canvas using its position, size, and color.
   */
-  function Square(x, y, width, height, color) {
+  function Square(x, y, width, height, color, type) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
     this.color = color;
-    this.draw = function() {
-      self.draw.fillStyle = this.color;
-      if (window.innerWidth <= mobileWidth) { // Mobile size
-        self.draw.fillRect(this.x * mobileScaleX, this.y * mobileScaleY, this.width, this.height);
-      } else if (window.innerWidth <= tabletWidth) { // Tablet size
-        self.draw.fillRect(this.x * tabletScale, this.y / tabletScale, this.width, this.height);
-      } else {  // Desktop size
-        self.draw.fillRect(this.x, this.y, this.width, this.height);
-      }
-    }
+    this.type = type;
   }
 
-  $scope.$on('redrawBackground', function(event, imageArr) {
+  Square.prototype.draw = function() {
+    self.draw.fillStyle = this.color;
+    if (window.innerWidth <= mobileWidth) { // Mobile size
+      self.draw.fillRect(this.x * mobileScaleX, this.y * mobileScaleY, this.width, this.height);
+    } else if (window.innerWidth <= tabletWidth) { // Tablet size
+      self.draw.fillRect(this.x * tabletScale, this.y / tabletScale, this.width, this.height);
+    } else {  // Desktop size
+      self.draw.fillRect(this.x, this.y, this.width, this.height);
+    }
+  };
+
+  $scope.$on('redrawBackground', function(event, imageArr, collisionArray) {
     canvasWidth = self.myCanvas.width;
     canvasHeight = self.myCanvas.height;
     self.draw.clearRect(0, 0, canvasWidth, canvasHeight);
     self.allBackgroundSquares = [];
+    self.allCollisionSquares = [];
     var undoBackgroundArray = [];
+    var undoCollisionArray = [];
     self.allBackgroundSquares = imageArr;
-    for (var index = 0; index < self.allBackgroundSquares.length; index++) {
-      var square = self.allBackgroundSquares[index];
-      self.draw.fillStyle = square.color;
-      self.draw.fillRect(square.x, square.y, square.width, square.height);
-    }
+    self.allCollisionSquares = collisionArray;
+    drawBackgroundSquares();
+    drawCollisionSquares();
   });
 
   // /*
@@ -1136,7 +1140,7 @@
     if (moved && drawing.background) { // Create, draw, and record a new background object
       var width = $scope.editor.currentPixelSize;
       var height = $scope.editor.currentPixelSize;
-      var color = $scope.editor.currentColor;
+      var color = $scope.editor.drawingCollision ? 'rgba(100, 100, 100, 0.5)' : $scope.editor.currentColor;
       if (moveType === 'mouse') {
         var newSquareX = mouseX - self.canvasPos.x;
         var newSquareY = mouseY - self.canvasPos.y;
@@ -1147,14 +1151,24 @@
           }
         });
         if (!exists) {
-          var newSquare = new Square(mouseX - self.canvasPos.x, mouseY - self.canvasPos.y, width, height, color);
+          var type = $scope.editor.drawingCollision ? 'collision' : 'normal';
+          var newSquare = new Square(mouseX - self.canvasPos.x, mouseY - self.canvasPos.y, width, height, color, type);
           newSquare.draw();
-          self.allBackgroundSquares.push(newSquare);
+          if ($scope.editor.drawingCollision) {
+            self.allCollisionSquares.push(newSquare);
+          } else {
+            self.allBackgroundSquares.push(newSquare);
+          }
         }
       } else if (moveType === 'touch') {
-        var newSquare = new Square(touchMoveEvent.clientX - width / 2 - self.canvasPos.x, touchMoveEvent.clientY - height / 2 - self.canvasPos.y, width, height, color);
+        var type = $scope.editor.drawingCollision ? 'collision' : 'normal';
+        var newSquare = new Square(touchMoveEvent.clientX - width / 2 - self.canvasPos.x, touchMoveEvent.clientY - height / 2 - self.canvasPos.y, width, height, color, type);
         newSquare.draw();
-        self.allBackgroundSquares.push(newSquare);
+        if ($scope.editor.drawingCollision) {
+          self.allCollisionSquares.push(newSquare);
+        } else {
+          self.allBackgroundSquares.push(newSquare);
+        }
       }
       moved = false;
     }
@@ -1322,7 +1336,15 @@
   function drawBackgroundSquares() {
     for (var index = 0; index < self.allBackgroundSquares.length; index++) {
       var square = self.allBackgroundSquares[index];
-      square.draw();
+      self.draw.fillStyle = square.color;
+      self.draw.fillRect(square.x, square.y, square.width, square.height);
+    }
+  }
+  function drawCollisionSquares() {
+    for (var index = 0; index < self.allCollisionSquares.length; index++) {
+      var square = self.allCollisionSquares[index];
+      self.draw.fillStyle = square.color;
+      self.draw.fillRect(square.x, square.y, square.width, square.height);
     }
   }
 
@@ -1387,12 +1409,16 @@
     //   var lastObj = self.allBackgroundSquares.pop();
     //   undoBackgroundArray.push(lastObj);
     // }
-    if (drawing.background && self.allBackgroundSquares.length > 0) {
+    if (!$scope.editor.drawingCollision && self.allBackgroundSquares.length > 0) {
       var lastObj = self.allBackgroundSquares.pop();
       undoBackgroundArray.push(lastObj);
+    } else if ($scope.editor.drawingCollision && self.allCollisionSquares.length > 0) {
+      var lastObj = self.allCollisionSquares.pop();
+      undoCollisionArray.push(lastObj);
     }
     self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
     drawBackgroundSquares();
+    drawCollisionSquares();
     // drawObstacleSquares();
     // drawMobileCircles();
   });
@@ -1409,12 +1435,16 @@
     //   var lastObj = undoBackgroundArray.pop();
     //   self.allBackgroundSquares.push(lastObj);
     // }
-    if (drawing.background && undoBackgroundArray.length > 0) {
+    if (!$scope.editor.drawingCollision && undoBackgroundArray.length > 0) {
       var lastObj = undoBackgroundArray.pop();
       self.allBackgroundSquares.push(lastObj);
+    } else if ($scope.editor.drawingCollision && undoCollisionArray.length > 0) {
+      var lastObj = undoCollisionArray.pop();
+      self.allCollisionSquares.push(lastObj);
     }
     self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
     drawBackgroundSquares();
+    drawCollisionSquares();
     // drawObstacleSquares();
     // drawMobileCircles();
   });
@@ -1428,7 +1458,9 @@
     // self.allMobileCircles = [];
     self.draw.clearRect(0, 0, canvasWidth, canvasHeight);
     self.allBackgroundSquares = [];
+    self.allCollisionSquares = [];
     var undoBackgroundArray = [];
+    var undoCollisionArray = [];
     // var undoObstacleArray = [];
     // var undoCharacterArray = [];
     // Scenes.selectScene({})
@@ -1482,7 +1514,7 @@
   // 2) Create and store a new background object and make it the current Background.
   // 3) Finally, draw the Obstacles and Character.
   $('#saveBackground').click(function() {
-    EditorService.saveBackground(self.allBackgroundSquares, $scope.editor.currentBackground).done(function(background) {
+    EditorService.saveBackground(self.allBackgroundSquares, self.allCollisionSquares, $scope.editor.currentBackground).done(function(background) {
       console.log(background);
     });
     // self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
@@ -1667,6 +1699,7 @@
 
   this.currentColor = 'green';
   this.currentPixelSize = 15;
+  this.drawingCollision = false;
   this.selectingAssets = false;
   this.frameindex = 0;
 
@@ -2690,7 +2723,7 @@
   this.editBackground = function(background) {
     console.log(background);
     self.currentBackground = background;
-    $scope.$broadcast('redrawBackground', background.info.image);
+    $scope.$broadcast('redrawBackground', background.info.image, background.info.collisionMap);
   };
 
   this.createObject = function() {
@@ -4301,7 +4334,7 @@
   this.elements = [];
   this.currentType = PaletteService.getCurrentType();
 
-  this.allAssets = PaletteService.getAll();
+  // this.allAssets = PaletteService.getAll();
 
   this.assets = PaletteService.getCurrent();
 
@@ -4352,8 +4385,8 @@
 
   var avatar = null;
   var background = null;
-  var sceneObject = null;
-  var entity = null;
+  var objects = null;
+  var entities = null;
   var scene = null;
 
   var gameLoaded = false;
@@ -4383,313 +4416,6 @@
     drawBackground();
     $scope.$apply();
   });
-
-  function loadMainCharacter() {
-    // Testing creation of avatar
-    var avatarTest = {
-      name: 'Avatar Test',
-      info: {
-        // The x and y coordinate of the top left corner of the avatar
-        pos: {
-          x: 100,
-          y: 100
-        },
-        // The character's speed
-        speed: {
-          mag: 3,
-          x: 0,
-          y: 0
-        },
-        // The animate object contains all the possible character actions with all of the frames to be drawn for each action.
-        animate: {
-          // Key: possible action, Value: array of frames
-          walkLeft: [
-            // Each frame array element is an array of square objects to be drawn
-            // Frame 1 - walk left
-            [{
-              x: 100,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'blue'
-            }, {
-              x: 110,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'green'
-            }],
-            // Frame 2 - walk left
-            [{
-              x: 110,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'blue'
-            }, {
-              x: 100,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'green'
-            }]
-          ],
-          walkRight: [
-            // Frame 1 - walk right
-            [{
-              x: 150,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'blue'
-            }, {
-              x: 140,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'green'
-            }],
-            // Frame 2 - walk right
-            [{
-              x: 140,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'blue'
-            }, {
-              x: 150,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'green'
-            }]
-          ],
-          walkUp: [
-            // Frame 1 - walk up
-            [{
-              x: 100,
-              y: 110,
-              width: 30,
-              height: 30,
-              color: 'red'
-            }, {
-              x: 150,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'yellow'
-            }],
-            // Frame 2 - walk up
-            [{
-              x: 100,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'red'
-            }, {
-              x: 150,
-              y: 110,
-              width: 30,
-              height: 30,
-              color: 'yellow'
-            }]
-          ],
-          walkDown: [
-            // Frame 1 - walk down
-            [{
-              x: 100,
-              y: 140,
-              width: 30,
-              height: 30,
-              color: 'red'
-            }, {
-              x: 150,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'yellow'
-            }],
-            // Frame 2 - walk down
-            [{
-              x: 100,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'red'
-            }, {
-              x: 150,
-              y: 140,
-              width: 30,
-              height: 30,
-              color: 'yellow'
-            }]
-          ],
-          swimLeft: [
-            // Frame 1 - swim left
-            [{
-              x: 100,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'lightblue'
-            }, {
-              x: 150,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'lightblue'
-            }],
-            // Frame 2 - swim left
-            [{
-              x: 100,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'gray'
-            }, {
-              x: 150,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'gray'
-            }]
-          ],
-          swimRight: [
-            // Frame 1 - swim right
-            [{
-              x: 100,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'lightblue'
-            }, {
-              x: 150,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'lightblue'
-            }],
-            // Frame 2 - swim right
-            [{
-              x: 100,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'gray'
-            }, {
-              x: 150,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'gray'
-            }]
-          ],
-          swimUp: [
-            // Frame 1 - swim up
-            [{
-              x: 100,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'lightblue'
-            }, {
-              x: 150,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'lightblue'
-            }],
-            // Frame 2 - swim up
-            [{
-              x: 100,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'gray'
-            }, {
-              x: 150,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'gray'
-            }]
-          ],
-          swimDown: [
-            // Frame 1 - swim down
-            [{
-              x: 100,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'lightblue'
-            }, {
-              x: 150,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'lightblue'
-            }],
-            // Frame 2 - swim down
-            [{
-              x: 100,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'gray'
-            }, {
-              x: 150,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'gray'
-            }]
-          ]
-          // Other actions could go here
-        },
-        // The collision map is how the game can know whether the character has collided with another object or event trigger. It is an array of invisible (or gray for now) squares.
-        collisionMap: [
-          {
-            x: 100,
-            y: 180,
-            width: 80,
-            height: 10,
-            color: 'gray'
-          }, {
-            x: 100,
-            y: 185,
-            width: 80,
-            height: 10,
-            color: 'gray'
-          }
-        ]
-      },
-      current: false
-    };
-    var headerData = {
-      user_id: UserService.get().id,
-      token: UserService.get().token
-    };
-    // Avatar
-    $.ajax({
-      method: 'POST',
-      url: 'https://forge-api.herokuapp.com/characters/create',
-      headers: headerData,
-      data: JSON.stringify(avatarTest),
-      dataType: 'json',
-      contentType: 'application/json',
-      success: function(response) {
-        console.log(response);
-        avatar = new Avatar(response);
-        console.log(avatar);
-        avatar.info.currentFrame = avatar.info.animate.walkLeft[0];
-        avatarLoaded = true;
-        setInterval(checkAvatarAction, 75);
-      },
-      error: function(error) {
-        console.log(error);
-      }
-    });
-  }
 
   $('body').off('keyup').on('keyup', function(event) {
     var keyCode = event.which;
@@ -4747,6 +4473,312 @@
       }
     }
   });
+
+
+  function loadMainCharacter() {
+      // Testing creation of avatar
+      var avatarTest = {
+        name: 'Avatar Test',
+        info: {
+          // The x and y coordinate of the top left corner of the avatar
+          pos: {
+            x: 100,
+            y: 100
+          },
+          // The character's speed
+          speed: {
+            mag: 3,
+            x: 0,
+            y: 0
+          },
+          // The animate object contains all the possible character actions with all of the frames to be drawn for each action.
+          animate: {
+            // Key: possible action, Value: array of frames
+            walkLeft: [
+              // Each frame array element is an array of square objects to be drawn
+              // Frame 1 - walk left
+              [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'blue'
+              }, {
+                x: 110,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'green'
+              }],
+              // Frame 2 - walk left
+              [{
+                x: 110,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'blue'
+              }, {
+                x: 100,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'green'
+              }]
+            ],
+            walkRight: [
+              // Frame 1 - walk right
+              [{
+                x: 150,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'blue'
+              }, {
+                x: 140,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'green'
+              }],
+              // Frame 2 - walk right
+              [{
+                x: 140,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'blue'
+              }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'green'
+              }]
+            ],
+            walkUp: [
+              // Frame 1 - walk up
+              [{
+                x: 100,
+                y: 110,
+                width: 30,
+                height: 30,
+                color: 'red'
+              }, {
+                x: 150,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'yellow'
+              }],
+              // Frame 2 - walk up
+              [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'red'
+              }, {
+                x: 150,
+                y: 110,
+                width: 30,
+                height: 30,
+                color: 'yellow'
+              }]
+            ],
+            walkDown: [
+              // Frame 1 - walk down
+              [{
+                x: 100,
+                y: 140,
+                width: 30,
+                height: 30,
+                color: 'red'
+              }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'yellow'
+              }],
+              // Frame 2 - walk down
+              [{
+                x: 100,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'red'
+              }, {
+                x: 150,
+                y: 140,
+                width: 30,
+                height: 30,
+                color: 'yellow'
+              }]
+            ],
+            swimLeft: [
+              // Frame 1 - swim left
+              [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+              }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+              }],
+              // Frame 2 - swim left
+              [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'gray'
+              }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'gray'
+              }]
+            ],
+            swimRight: [
+              // Frame 1 - swim right
+              [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+              }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+              }],
+              // Frame 2 - swim right
+              [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'gray'
+              }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'gray'
+              }]
+            ],
+            swimUp: [
+              // Frame 1 - swim up
+              [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+              }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+              }],
+              // Frame 2 - swim up
+              [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'gray'
+              }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'gray'
+              }]
+            ],
+            swimDown: [
+              // Frame 1 - swim down
+              [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+              }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+              }],
+              // Frame 2 - swim down
+              [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'gray'
+              }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'gray'
+              }]
+            ]
+            // Other actions could go here
+          },
+          // The collision map is how the game can know whether the character has collided with another object or event trigger. It is an array of invisible (or gray for now) squares.
+          collisionMap: [
+            {
+              x: 100,
+              y: 180,
+              width: 80,
+              height: 10,
+              color: 'gray'
+            }, {
+              x: 100,
+              y: 185,
+              width: 80,
+              height: 10,
+              color: 'gray'
+            }
+          ]
+        },
+        current: false
+      };
+      var headerData = {
+        user_id: UserService.get().id,
+        token: UserService.get().token
+      };
+      // Avatar
+      $.ajax({
+        method: 'POST',
+        url: 'https://forge-api.herokuapp.com/characters/create',
+        headers: headerData,
+        data: JSON.stringify(avatarTest),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(response) {
+          avatar = new Avatar(response);
+          avatar.info.currentFrame = avatar.info.animate.walkLeft[0];
+          avatarLoaded = true;
+          setInterval(checkAvatarAction, 75);
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    }
 
   function checkTyping(phrase) {
     if (phrase.includes('look')) {
@@ -4828,27 +4860,30 @@
       var avatarRight = avatarSquare.x + avatarSquare.width + avatar.info.pos.x;
       var avatarTop = avatarSquare.y + avatar.info.pos.y;
       var avatarBottom = avatarSquare.y + avatarSquare.height + avatar.info.pos.y;
-      /*
-      background.info.collisionMap.forEach(function(bgSquare) {  // Loop through all the background's squares
-        var bgLeft = bgSquare.x;
-        var bgRight = bgSquare.x + bgSquare.width;
-        var bgTop = bgSquare.y;
-        var bgBottom = bgSquare.y + bgSquare.height;
-        // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current bg square (in those exact orders).
-        if (avatarLeft <= bgRight && avatarRight >= bgLeft && avatarTop <= bgBottom && avatarBottom >= bgTop) {
-          collision.found = true;
-          collision.type = 'wall';
-          if (avatar.info.speed.x > 0) {
-            collision.direction = 'right';
-          } else if (avatar.info.speed.x < 0) {
-            collision.direction = 'left';
-          } else if (avatar.info.speed.y < 0) {
-            collision.direction = 'up';
-          } else if (avatar.info.speed.y > 0) {
-            collision.direction = 'down';
+
+      if (background) {
+        background.info.collisionMap.forEach(function(bgSquare) {  // Loop through all the background's squares
+          var bgLeft = bgSquare.x;
+          var bgRight = bgSquare.x + bgSquare.width;
+          var bgTop = bgSquare.y;
+          var bgBottom = bgSquare.y + bgSquare.height;
+          // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current bg square (in those exact orders).
+          if (avatarLeft <= bgRight && avatarRight >= bgLeft && avatarTop <= bgBottom && avatarBottom >= bgTop) {
+            collision.found = true;
+            collision.type = 'wall';
+            if (avatar.info.speed.x > 0) {
+              collision.direction = 'right';
+            } else if (avatar.info.speed.x < 0) {
+              collision.direction = 'left';
+            } else if (avatar.info.speed.y < 0) {
+              collision.direction = 'up';
+            } else if (avatar.info.speed.y > 0) {
+              collision.direction = 'down';
+            }
           }
-        }
-      });
+        });
+      }
+      /*
       sceneObject.info.collisionMap.forEach(function(objSquare) {  // Loop through all the scene object's squares
         var objLeft = objSquare.x + sceneObject.info.pos.x;
         var objRight = objSquare.x + objSquare.width + sceneObject.info.pos.x;
@@ -4999,6 +5034,7 @@
     self.currentRow = self.allRows[self.currentScenePos[1]];
     self.currentScene = self.currentRow[self.currentScenePos[2]];
     background = self.currentScene.background;
+    objects = self.currentScene.objects;
   }
 
   function updateAvatar() {
@@ -5024,15 +5060,16 @@
     }
   }
 
-  var currentSceneObjFrameIndex = 0;
-  function checkSceneObjectAction() {
-    // Animate the object.
-    if (currentSceneObjFrameIndex > sceneObject.info.animate[sceneObject.allActions[0]].length - 1) {
-      currentSceneObjFrameIndex = 0;
-    }
-    sceneObject.info.currentFrame = sceneObject.info.animate[sceneObject.allActions[0]][currentSceneObjFrameIndex];
-    currentSceneObjFrameIndex++;
-  }
+  // Not currently animating objects
+  // var currentSceneObjFrameIndex = 0;
+  // function checkSceneObjectAction() {
+  //   // Animate the object.
+  //   if (currentSceneObjFrameIndex > sceneObject.info.animate[sceneObject.allActions[0]].length - 1) {
+  //     currentSceneObjFrameIndex = 0;
+  //   }
+  //   sceneObject.info.currentFrame = sceneObject.info.animate[sceneObject.allActions[0]][currentSceneObjFrameIndex];
+  //   currentSceneObjFrameIndex++;
+  // }
 
   var currentEntityFrameIndex = 0;
   function checkEntityAction() {
@@ -5112,24 +5149,26 @@
   }
 
   function drawObjects() {
-    // Save the drawing context
-    gameCtx.save();
-    // Translate the canvas origin to be the top left of the sceneObject
-    gameCtx.translate(sceneObject.info.pos.x, sceneObject.info.pos.y);
-    // Draw the squares from the sceneObject's current frame
-    gameCtx.globalCompositeOperation = "destination-over";  // If object is behind character.
-    // gameCtx.globalCompositeOperation = "source-over";    // If object is in front of character.
-    sceneObject.info.currentFrame.forEach(function(square) {
-      gameCtx.fillStyle = square.color;
-      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    objects.forEach(function(object) {
+      // Save the drawing context
+      gameCtx.save();
+      // Translate the canvas origin to be the top left of the object
+      gameCtx.translate(object.info.pos.x, object.info.pos.y);
+      // Draw the squares from the object's current frame
+      // gameCtx.globalCompositeOperation = "destination-over";  // If object is behind character.
+      gameCtx.globalCompositeOperation = "source-over";    // If object is in front of character.
+      object.info.image.forEach(function(square) {
+        gameCtx.fillStyle = square.color;
+        gameCtx.fillRect(square.x, square.y, square.width, square.height);
+      });
+      gameCtx.globalAlpha = 0.2;
+      // Draw the object's collision map (purely for testing)
+      object.info.collisionMap.forEach(function(square) {
+        gameCtx.fillStyle = square.color;
+        gameCtx.fillRect(square.x, square.y, square.width, square.height);
+      });
+      gameCtx.restore();
     });
-    gameCtx.globalAlpha = 0.2;
-    // Draw the sceneObject's collision map (purely for testing)
-    sceneObject.info.collisionMap.forEach(function(square) {
-      gameCtx.fillStyle = square.color;
-      gameCtx.fillRect(square.x, square.y, square.width, square.height);
-    });
-    gameCtx.restore();
   }
 
   function drawEntities() {
@@ -5162,7 +5201,7 @@
     updateLocation();
     loadMainCharacter();
     self.gameStarted = true;
-  }
+  };
 
   function runGame() {
     if (self.gameStarted) {
@@ -5172,12 +5211,12 @@
         checkAvatarCollisions();
         updateAvatar();
         drawAvatar();
+        drawObjects();
+        drawBackground();
       }
       // checkEntityCollisions();
       // updateEntity();
       // drawEntities();
-      // drawObjects();
-      drawBackground();
     }
     requestAnimationFrame(runGame);
   }
