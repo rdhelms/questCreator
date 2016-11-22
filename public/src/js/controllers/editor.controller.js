@@ -1009,6 +1009,14 @@ angular.module('questCreator')
       EditorService.createGame(name).done(function(game) {
         console.log(game);
         self.currentEditingGame = game;
+        EditorService.getGameAssets(game.id).done(function(assets) {
+          console.log(assets);
+          self.availableBackgrounds = assets.availableBackgrounds;
+          self.availableObjects = assets.availableObstacles;
+          self.availableEntities = assets.availableEntities;
+          self.currentBackground = self.availableBackgrounds[0] || null;
+          $scope.$apply();
+        });
       });
       $('.create-game').hide();
       UserService.setGameEdit(name);
@@ -1042,7 +1050,7 @@ angular.module('questCreator')
   };
 
   this.createBackground = function() {
-    var name = prompt("Enter a name for the new background: ");
+    var name = "New Background";
     var game_id = self.currentEditingGame.id;
     EditorService.createBackground(name, game_id).done(function(background) {
       console.log(background);
@@ -1059,7 +1067,7 @@ angular.module('questCreator')
   };
 
   this.createObject = function() {
-    var name = prompt("Enter a name for the new object: ");
+    var name = "New Object";
     var game_id = self.currentEditingGame.id;
     EditorService.createObject(name, game_id).done(function(object) {
       console.log(object);
@@ -1078,7 +1086,7 @@ angular.module('questCreator')
   };
 
   this.createEntity = function() {
-    var name = prompt("Enter a name for the new entity: ");
+    var name = "New Entity";
     var game_id = self.currentEditingGame.id;
     EditorService.createEntity(name, game_id).done(function(entity) {
       console.log("ent", entity);

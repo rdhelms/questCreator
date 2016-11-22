@@ -76,6 +76,7 @@ angular.module('questCreator').service('EditorService', function (UserService, $
         contentType: 'application/json',
         success: function(response) {
           game = response;
+          createBackground('Title Screen', game.id)
           return game;
         },
         error: function(error) {
