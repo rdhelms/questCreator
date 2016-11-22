@@ -1,16 +1,20 @@
 angular.module('questCreator').controller('profileCtrl', function(socket, $state, $scope, UserService) {
+
     UserService.checkLogin().then(function(response) {
-      console.log("Logged in!");
-      console.log(response);
-      $scope.user = UserService.get();
+
+      $scope.user = null;
+      $scope.games = null;
+
+      UserService.get().then(function(user) {
+        $scope.user = user;
+        $scope.$apply();
+      });
 
       $scope.getJoinedDate = function(date) {
           return new Date(date);
       };
 
-      // $scope.games;
       UserService.getUserGames().done(function(games) {
-        console.log(games);
           $scope.games = games;
           $scope.$apply();
       });
