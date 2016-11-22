@@ -19,6 +19,9 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      .playBtn {
+        position: absolute;
+      }
       .typing, .dialog {
         display: none;
         min-width: 150px;

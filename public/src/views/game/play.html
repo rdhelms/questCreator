@@ -1,5 +1,5 @@
 <div id="play-container">
-  <div class="test-buttons">
+  <!-- <div class="test-buttons">
     <button style="background: lightgreen;" class="createGameBtn">Create Game 'Potter Quest'</button>
     <button style="background: lightgreen;" class="createBgBtn">Create Background 'Cupboard'</button>
     <button style="background: lightgreen;" class="drawImgBgBtn">Draw Image for Background 'Cupboard'</button>
@@ -21,14 +21,19 @@
     <button class="createAvatarBtn">Create Avatar 'Harry'</button>
     <button class="saveAvatarBtn">Save Avatar 'Harry'</button>
     <button class="playGameBtn">Play Game</button>
-  </div>
+  </div> -->
   <div class="game-window">
-    <h1> Game Title </h1>
+    <h1> {{play.gameToPlay}} </h1>
     <div class="game-screen">
       <canvas id="play-canvas" width=700 height=500></canvas>
       <div class="typing"> </div>
       <div class="dialog"> </div>
+      <button ng-show="!play.gameStarted" ng-click="play.startGame()" class="playBtn">PLAY GAME</button>
     </div>
+    <p>Press spacebar to type command</p>
+    <p>Current Map: {{play.currentMap.name}}</p>
+    <p>Current Scene: {{play.currentScene.name}}</p>
+    <p>{{play.warning}}</p>
   </div>
   <div class="chat-window">
     <h1> Chat </h1>
