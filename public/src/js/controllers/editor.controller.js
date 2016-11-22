@@ -31,6 +31,7 @@ angular.module('questCreator')
 
   this.currentColor = 'green';
   this.currentPixelSize = 15;
+  this.drawingCollision = false;
   this.selectingAssets = false;
   this.frameindex = 0;
 
@@ -1054,7 +1055,7 @@ angular.module('questCreator')
   this.editBackground = function(background) {
     console.log(background);
     self.currentBackground = background;
-    $scope.$broadcast('redrawBackground', background.info.image);
+    $scope.$broadcast('redrawBackground', background.info.image, background.info.collisionMap);
   };
 
   this.createObject = function() {

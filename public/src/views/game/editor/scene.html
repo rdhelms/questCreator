@@ -19,7 +19,13 @@
   <hr>
   <ul ng-show="editor.currentScene.objects.length > 0">
     Current objects:
-    <li ng-repeat="object in editor.currentScene.objects"> {{object.name}} </li>
+    <li ng-repeat="object in editor.currentScene.objects">
+      {{object.name}}
+      <label>X</label>
+      <input ng-model="object.info.pos.x" placeholder="350" type="number">
+      <label>Y</label>
+      <input ng-model="object.info.pos.y" placeholder="250" type="number">
+    </li>
   </ul>
   <p ng-show="editor.currentScene.objects.length === 0">No Objects Added Yet</p>
   <button ng-click="scene.selecting.object = true" class="addSceneBackground"> Add Object </button>
