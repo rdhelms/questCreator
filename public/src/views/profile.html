@@ -67,11 +67,11 @@
 
     <aside class="games-created">
         <button ng-click="createGame()">Create a New Game</button>
-        <div ng-if="games === []" class="make-some">
+        <div ng-if="games" class="make-some">
             <h1>You Should Totally Make Some Games!</h1>
         </div>
-        <h1 ng-if="games.length > 0">You Did This:</h1>
-        <div ng-if="games.length > 0" class="user-games" ng-repeat="game in games">
+        <h1 ng-if="games">You Did This:</h1>
+        <div ng-if="games" class="user-games" ng-repeat="game in games">
             <!-- <img src="{{ game.thumbnail }}" alt="Game thumbnail"/> -->
             <ul>
                 <li>
