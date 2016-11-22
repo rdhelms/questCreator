@@ -15,9 +15,20 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
             $scope.$apply();
         });
 
-        // $scope.collaborators = UserService.getCollabRequests().done(function (collaborators) {
-        //   $scope.$apply();
-        // });
+        UserService.getCollabRequests().done(function(requests) {
+            $scope.requests = requests;
+            $scope.$apply();
+        });
+
+        UserService.getCollaborators().done(function(collaborators) {
+            $scope.collaborators = collaborators;
+            $scope.$apply();
+        });
+
+        UserService.getCollaborations().done(function(collaborations) {
+            $scope.collaborations = collaborations;
+            $scope.$apply();
+        });
 
         $scope.createGame = function() {
             $scope.user.editGame = null;
@@ -42,12 +53,22 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
 
         };
 
-        $scope.toggleCollab = function(collab) {
-            UserService.toggleAccepted(collab.game);
+        $scope.showRequests = function() {
+
+        };
+
+        $scope.toggleCollab = function(info) {
+            UserService.toggleAccepted(info.game, info.requester);
         };
 
         $scope.removeRequest = function(collab) {
             UserService.toggleRequested(collab.game);
         };
+
+        $scope.removeCollaborator = function(collaborator) {
+            UserService.toggleRequested(collaborator.game, collaborator.requester);
+            UserService.toggleAccepted(collaborator.game, collaborator.requester);
+        };
+
     });
 });
