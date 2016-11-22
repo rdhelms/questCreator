@@ -1109,6 +1109,10 @@ angular.module('questCreator')
     $state.go('main.profile');
   };
 
+  this.selectText = function($event){
+    $event.target.select();
+  };
+
   //jquery UI Stuff
 
   $('.asset').draggable({
