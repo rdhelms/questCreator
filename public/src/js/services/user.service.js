@@ -167,7 +167,6 @@ angular.module('questCreator')
             token: user.token
           },
           success: function(response) {
-            console.log(response);
             return response;
           },
           error: function(error) {
