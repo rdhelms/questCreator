@@ -8,7 +8,12 @@ angular.module('questCreator')
 
     //When the user clicks "Profile" on the nav bar user information is loaded and view is changed to profile
     this.goToUser = function () {
+      if (UserService.get().id) {
         $state.go('main.profile');
+      } else {
+        alert ("You must login to see your profile page.");
+        $scope.signIn();
+      }
     };
 
     // When the user clicks the sign in button, prompt them to sign in to their google account.

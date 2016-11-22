@@ -13,6 +13,18 @@ angular.module('questCreator')
             joined: null,
             editGame: null
         };
+        var loggedIn = false;
+
+        function checkLogin() {
+          return new Promise(function(resolve, reject) {
+            var loopHandle = setInterval(function() {
+              if (loggedIn) {
+                resolve(true);
+                clearInterval(loopHandle);
+              }
+            }, 20);
+          })
+        }
 
         //Get the current values for user data
         function getUser() {
@@ -116,6 +128,7 @@ angular.module('questCreator')
                         user.username = response.username;
                         user.id = response.id;
                         PopupService.open('welcome');
+                        loggedIn = true;
                     },
                     error: function(error) {
                         if (error.status === 404) {
@@ -155,25 +168,20 @@ angular.module('questCreator')
         }
 
         function getUserGames() {
-            if (!user.id) {
-                alert('Please Login or Register');
-                signIn();
-            } else {
-                return $.ajax({
-                    method: 'GET',
-                    url: 'https://forge-api.herokuapp.com/games/user-games',
-                    headers: {
-                        user_id: user.id,
-                        token: user.token
-                    },
-                    success: function(response) {
-                        return response;
-                    },
-                    error: function(error) {
-                        alert('There was a problem loading the profile. Please try again.');
-                    }
-                });
-            }
+            return $.ajax({
+                method: 'GET',
+                url: 'https://forge-api.herokuapp.com/games/user-games',
+                headers: {
+                    user_id: user.id,
+                    token: user.token
+                },
+                success: function(response) {
+                    return response;
+                },
+                error: function(error) {
+                    alert('There was a problem loading the profile. Please try again.');
+                }
+            });
         }
 
         function validateCollabRequest(gameId) {
@@ -299,6 +307,7 @@ angular.module('questCreator')
             archive: archiveGame,
             register: registerUser,
             signOut: signOut,
-            signIn: signIn
+            signIn: signIn,
+            checkLogin: checkLogin
         };
     });
