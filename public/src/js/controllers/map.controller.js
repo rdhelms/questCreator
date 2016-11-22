@@ -1,11 +1,14 @@
 angular.module('questCreator').controller('mapCtrl', function($state, $scope) {
   var self = this;
 
+  this.width = 1;
+  this.height = 1;
+
   // Scene pos should be [x,y,z], where x=mapIndex, y=rowIndex, z=columnIndex
 
   this.createMap = function() {
-    var name = prompt("Enter a name for the map: ");
-    var sceneName = prompt("Enter a name for the first scene: ");
+    var name = "new map";
+    var sceneName = "new scene";
     console.log("Creating a map!", name);
     var newScene = {
       name: sceneName,
@@ -23,7 +26,7 @@ angular.module('questCreator').controller('mapCtrl', function($state, $scope) {
   }
 
   this.createMapRow = function(mapObj) {
-    var name = prompt("Enter a name for the first scene in this row");
+    var name = "new scene";
     var newScene = {
       name: name,
       background: null,
@@ -34,7 +37,7 @@ angular.module('questCreator').controller('mapCtrl', function($state, $scope) {
   }
 
   this.createScene = function(mapObj, rowNum) {
-    var name = prompt("Enter a name for the scene: ");
+    var name = "new scene";
     var newScene = {
       name: name,
       background: null,
