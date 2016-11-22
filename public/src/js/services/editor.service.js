@@ -77,11 +77,36 @@ angular.module('questCreator').service('EditorService', function (UserService, $
         success: function(response) {
           game = response;
           createBackground('Title Screen', game.id)
+          createCollaborator(game.id).done(function(response) {
+            console.log(response);
+          });
           return game;
         },
         error: function(error) {
           alert('There was a problem creating this game. Please try again.');
           $state.go('main.landing');
+        }
+      });
+    }
+
+    function createCollaborator(game_id) {
+      var headerData = {
+        user_id: UserService.get().id,
+        token: UserService.get().token
+      };
+      var data = {
+        game_id: game_id,
+      };
+      return $.ajax({
+        method: 'POST',
+        url: 'https://forge-api.herokuapp.com/collaborators/self',
+        headers: headerData,
+        data: data,
+        success: function(response) {
+          return response;
+        },
+        error: function(error) {
+          console.log(error);
         }
       });
     }
@@ -206,8 +231,9 @@ angular.module('questCreator').service('EditorService', function (UserService, $
       });
     }
 
-    function saveObject(imageArr, currentObject) {
+    function saveObject(imageArr, collisionArr, currentObject) {
       currentObject.info.image = imageArr;
+      currentObject.info.collisionMap = collisionArr;
       var headerData = {
         user_id: UserService.get().id,
         token: UserService.get().token

@@ -1082,7 +1082,7 @@ angular.module('questCreator')
     console.log(object);
     self.currentObject = object;
     self.currentSmallView = 'object';
-    $scope.$broadcast('redrawObject', object.info.image);
+    $scope.$broadcast('redrawObject', object.info.image, object.info.collisionMap);
   };
 
   this.createEntity = function() {
