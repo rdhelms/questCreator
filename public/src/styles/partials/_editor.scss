@@ -33,6 +33,11 @@
     text-align: center;
     border-bottom: 4px solid black;
 
+    h5 {
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
     &:hover {
       cursor: pointer;
     }
@@ -78,9 +83,6 @@
             color: black;
           }
         }
-        margin: 0 10px;
-        display: flex;
-        flex-direction: column;
       }
     }
   }
@@ -108,10 +110,10 @@
 }
 
 .editor-contents {
-  // background: beige;
   padding: 30px;
   display: flex;
   flex-direction: column;
+  position: relative;
 
   &#scene {
     border-right: 4px solid black;
