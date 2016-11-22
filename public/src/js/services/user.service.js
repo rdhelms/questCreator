@@ -1,5 +1,5 @@
 angular.module('questCreator')
-    .service('UserService', function(PopupService) {
+    .service('UserService', function(PopupService, $state) {
         // Google Info
         var apiKey = 'AIzaSyCe__2EGSmwp0DR-qKGqpYwawfmRsTLBEs';
         var clientId = '730683845367-tjrrmvelul60250evn5i74uka4ustuln.apps.googleusercontent.com';
@@ -16,7 +16,12 @@ angular.module('questCreator')
 
         //Get the current values for user data
         function getUser() {
-            return user;
+          var userPromise = new Promise(
+            function(resolve, reject) {
+              resolve(user);
+            }
+          );
+          return userPromise;
         }
 
         function setUser(adjUser) {
@@ -156,8 +161,9 @@ angular.module('questCreator')
 
         function getUserGames() {
             if (!user.id) {
-                alert('Please Login or Register');
-                signIn();
+                // alert('Please Login or Register');
+                // signIn();
+                $state.go('main.landing');
             } else {
                 return $.ajax({
                     method: 'GET',
@@ -200,8 +206,8 @@ angular.module('questCreator')
 
         function sendCollabRequest(gameId) {
             $.ajax({
-                method: 'PATCH',
-                url: 'https://forge-api.herokuapp.com/collaborators/update/requested',
+                method: 'POST',
+                url: 'https://forge-api.herokuapp.com/collaborators/create',
                 headers: {
                     user_id: user.id,
                     token: user.token
@@ -212,7 +218,7 @@ angular.module('questCreator')
                 dataType: 'json',
                 contentType: 'application/json',
                 success: function(response) {
-                    console.log(response);
+                    console.log(response.requested);
                 },
                 error: function(error) {
                     console.log(error);
@@ -221,15 +227,12 @@ angular.module('questCreator')
         }
 
         function getCollabRequests() {
-            $.ajax({
+            return $.ajax({
                 method: 'GET',
                 url: 'https://forge-api.herokuapp.com/collaborators/user/requesters',
                 headers: {
                     user_id: user.id,
                     token: user.token
-                },
-                data: {
-                    user_id: user.id
                 },
                 dataType: 'json',
                 contentType: 'application/json',
@@ -296,6 +299,7 @@ angular.module('questCreator')
             sendCollabRequest: sendCollabRequest,
             getCollabRequests: getCollabRequests,
             toggleAccepted: toggleAccepted,
+            toggleRequested: toggleRequested,
             archive: archiveGame,
             register: registerUser,
             signOut: signOut,
