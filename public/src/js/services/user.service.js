@@ -28,12 +28,7 @@ angular.module('questCreator')
 
         //Get the current values for user data
         function getUser() {
-          var userPromise = new Promise(
-            function(resolve, reject) {
-              resolve(user);
-            }
-          );
-          return userPromise;
+          return user;
         }
 
         function setUser(adjUser) {
