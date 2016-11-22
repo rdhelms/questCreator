@@ -1,5 +1,5 @@
 angular.module('questCreator')
-    .service('UserService', function(PopupService, $state) {
+    .service('UserService', function(PopupService) {
         // Google Info
         var apiKey = 'AIzaSyCe__2EGSmwp0DR-qKGqpYwawfmRsTLBEs';
         var clientId = '730683845367-tjrrmvelul60250evn5i74uka4ustuln.apps.googleusercontent.com';
@@ -247,16 +247,13 @@ angular.module('questCreator')
             });
         }
 
-        function toggleAccepted(gameId) {
-            $.ajax({
-                method: 'PATCH',
-                url: 'https://forge-api.herokuapp.com/collaborators/update/accepted',
+        function getCollaborators() {
+            return $.ajax({
+                method: 'GET',
+                url: 'https://forge-api.herokuapp.com/collaborators/user/collaborators',
                 headers: {
                     user_id: user.id,
                     token: user.token
-                },
-                data: {
-                    game_id: gameId
                 },
                 dataType: 'json',
                 contentType: 'application/json',
@@ -269,7 +266,49 @@ angular.module('questCreator')
             });
         }
 
-        function toggleRequested(gameId) {
+        function getCollaborations() {
+            return $.ajax({
+                method: 'GET',
+                url: 'https://forge-api.herokuapp.com/collaborators/user/collaborators',
+                headers: {
+                    user_id: user.id,
+                    token: user.token
+                },
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function(response) {
+                    console.log(response);
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+
+        function toggleAccepted(gameId, requesterId) {
+            $.ajax({
+                method: 'PATCH',
+                url: 'https://forge-api.herokuapp.com/collaborators/update/accepted',
+                headers: {
+                    user_id: user.id,
+                    token: user.token
+                },
+                data: {
+                    game_id: gameId,
+                    requester_id: requesterId
+                },
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function(response) {
+                    console.log(response);
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+
+        function toggleRequested(gameId, requesterId) {
             $.ajax({
                 method: 'PATCH',
                 url: 'https://forge-api.herokuapp.com/collaborators/update/requested',
@@ -278,7 +317,8 @@ angular.module('questCreator')
                     token: user.token
                 },
                 data: {
-                  game_id: gameId
+                  game_id: gameId,
+                  requester_id: requesterId
                 },
                 dataType: 'json',
                 contentType: 'application/json',
@@ -300,6 +340,8 @@ angular.module('questCreator')
             validateCollabRequest: validateCollabRequest,
             sendCollabRequest: sendCollabRequest,
             getCollabRequests: getCollabRequests,
+            getCollaborators: getCollaborators,
+            getCollaborations: getCollaborations,
             toggleAccepted: toggleAccepted,
             toggleRequested: toggleRequested,
             archive: archiveGame,
