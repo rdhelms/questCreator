@@ -1,0 +1,26 @@
+<h4>Palette</h4>
+<ul id="colors-menu">
+    <li class="tools">
+        <button ng-show="editor.drawingCollision" ng-click="editor.drawingCollision = false" class="collision">Stop Drawing Collisions</button>
+        <button ng-show="!editor.drawingCollision" ng-click="editor.drawingCollision = true" class="collision">Draw Collision</button>
+        <button class="eraser">Erase</button>
+    </li>
+    <li class="color">
+    </li>
+    <li class="color">
+    </li>
+    <li class="color">
+    </li>
+    <ul class="size-picker">
+        <li ng-click="editor.currentPixelSize = 7">S</li>
+        <li ng-click="editor.currentPixelSize = 15">M</li>
+        <li ng-click="editor.currentPixelSize = 40">L</li>
+        <li ng-click="editor.currentPixelSize = 80">XL</li>
+    </ul>
+    <ul class="color-picker">
+        <li ng-click="editor.currentColor = 'skyblue'"></li>
+        <li ng-click="editor.currentColor = 'green'"></li>
+        <li ng-click="editor.currentColor = 'brown'"></li>
+        <li ng-click="editor.currentColor = 'orange'"></li>
+    </ul>
+</ul>

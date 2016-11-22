@@ -1,0 +1,66 @@
+<p ng-show="editor.currentScene === null"> First pick a scene from a map! </p>
+<section ng-show="editor.currentScene !== null">
+  <h4>{{editor.currentScene.name}} Properties</h4>
+
+  <ul id="colors-menu">
+
+    <li>
+      <h5> Background </h5>
+      <p ng-show="editor.currentScene.background !== null">Current background selected: {{editor.currentScene.background.name}}</p>
+      <p ng-show="editor.currentScene.background === null">(none)</p>
+      <button ng-click="scene.selecting.background = true" class="addSceneBackground"> Pick Background </button>
+
+      <div ng-show="scene.selecting.background" class="selector-box">
+        <ul class="available-backgrounds-list">
+          <li ng-repeat="background in editor.availableBackgrounds | orderBy:'-'" ng-click="scene.selectBackground(background)">{{background.name}}</li>
+        </ul>
+        <button ng-click="scene.selecting.background = false">Cancel</button>
+      </div>
+    </li>
+
+    <li>
+      <h5> Objects </h5>
+      <ul ng-show="editor.currentScene.objects.length > 0">
+        Current objects:
+        <li ng-repeat="object in editor.currentScene.objects">
+          {{object.name}}
+          <label>X</label>
+          <input ng-model="object.info.pos.x" placeholder="350" type="number">
+          <label>Y</label>
+          <input ng-model="object.info.pos.y" placeholder="250" type="number">
+        </li>
+      </ul>
+      <p ng-show="editor.currentScene.objects.length === 0">(none)</p>
+      <button ng-click="scene.selecting.object = true" class="addSceneBackground"> Add Object </button>
+
+      <div ng-show="scene.selecting.object" class="selector-box">
+        <ul class="available-objects-list">
+          <li ng-repeat="object in editor.availableObjects | orderBy:'-'" ng-click="scene.selectObject(object)">{{object.name}}</li>
+        </ul>
+        <button ng-click="scene.selecting.object = false">Cancel</button>
+      </div>
+    </li>
+
+    <li>
+      <h5> Entities </h5>
+      <ul ng-show="editor.currentScene.entities.length > 0">
+        Current entities:
+        <li ng-repeat="entity in editor.currentScene.entities"> {{entity.name}} </li>
+      </ul>
+      <p ng-show="editor.currentScene.entities.length === 0">(none)</p>
+      <button ng-click="scene.selecting.entity = true" class="addSceneBackground"> Add Entity </button>
+
+      <div ng-show="scene.selecting.entity" class="selector-box">
+        <ul class="available-entities-list">
+          <li ng-repeat="entity in editor.availableEntities | orderBy:'-'" ng-click="scene.selectEntity(entity)">{{entity.name}}</li>
+        </ul>
+        <button ng-click="scene.selecting.entity = false">Cancel</button>
+      </div>
+    </li>
+
+  </ul>
+</section>
+
+
+
+<!-- <button class="saveScene" ng-click="scene.saveScene(editor.currentScene)"> Save Scene </button> -->
