@@ -185,7 +185,7 @@ angular.module('questCreator')
             }
 
         function validateCollabRequest(gameId) {
-            $.ajax({
+            return $.ajax({
                 method: 'GET',
                 url: 'https://forge-api.herokuapp.com/collaborators/existence',
                 headers: {
@@ -217,8 +217,8 @@ angular.module('questCreator')
                 data: {
                     game_id: gameId
                 },
-                dataType: 'json',
-                contentType: 'application/json',
+                // dataType: 'json',
+                // contentType: 'application/json',
                 success: function(response) {
                     console.log(response.requested);
                 },
@@ -331,6 +331,28 @@ angular.module('questCreator')
             });
         }
 
+        function requestAgain(gameId) {
+            $.ajax({
+                method: 'PATCH',
+                url: 'https://forge-api.herokuapp.com/collaborators/rerequest',
+                headers: {
+                    user_id: user.id,
+                    token: user.token
+                },
+                data: {
+                  game_id: gameId,
+                },
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function(response) {
+                    console.log(response);
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+
         return {
             get: getUser,
             set: setUser,
@@ -344,6 +366,7 @@ angular.module('questCreator')
             getCollaborations: getCollaborations,
             toggleAccepted: toggleAccepted,
             toggleRequested: toggleRequested,
+            requestAgain: requestAgain,
             archive: archiveGame,
             register: registerUser,
             signOut: signOut,
