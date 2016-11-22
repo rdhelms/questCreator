@@ -472,8 +472,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       avatar.info.pos.x -= gameWidth;
     } else if (bounds.bottom < 0) { // Character moves to the above scene
       self.currentScenePos[1]--;
-      if (self.currentScenePos[1] > self.allRows.length - 1) {
-        self.currentScenePos[1] = 0;
+      if (self.currentScenePos[1] < 0) {
+        self.currentScenePos[1] = self.allRows.length - 1;
       }
       updateLocation();
       avatar.info.pos.y += gameHeight;
