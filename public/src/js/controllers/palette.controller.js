@@ -3,7 +3,7 @@ angular.module('questCreator').controller('paletteCtrl', function (PaletteServic
   this.elements = [];
   this.currentType = PaletteService.getCurrentType();
 
-  this.allAssets = PaletteService.getAll();
+  // this.allAssets = PaletteService.getAll();
 
   this.assets = PaletteService.getCurrent();
 

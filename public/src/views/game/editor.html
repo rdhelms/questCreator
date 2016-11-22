@@ -19,7 +19,8 @@
               <h4>Palette</h4>
               <ul id="colors-menu">
                   <li class="tools">
-                      <button class="collision">Draw Collision</button>
+                      <button ng-show="editor.drawingCollision" ng-click="editor.drawingCollision = false" class="collision">Stop Drawing Collisions</button>
+                      <button ng-show="!editor.drawingCollision" ng-click="editor.drawingCollision = true" class="collision">Draw Collision</button>
                       <button class="eraser">Erase</button>
                   </li>
                   <li class="color">

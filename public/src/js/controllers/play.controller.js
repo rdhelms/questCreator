@@ -22,8 +22,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
   var avatar = null;
   var background = null;
-  var sceneObject = null;
-  var entity = null;
+  var objects = null;
+  var entities = null;
   var scene = null;
 
   var gameLoaded = false;
@@ -53,313 +53,6 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     drawBackground();
     $scope.$apply();
   });
-
-  function loadMainCharacter() {
-    // Testing creation of avatar
-    var avatarTest = {
-      name: 'Avatar Test',
-      info: {
-        // The x and y coordinate of the top left corner of the avatar
-        pos: {
-          x: 100,
-          y: 100
-        },
-        // The character's speed
-        speed: {
-          mag: 3,
-          x: 0,
-          y: 0
-        },
-        // The animate object contains all the possible character actions with all of the frames to be drawn for each action.
-        animate: {
-          // Key: possible action, Value: array of frames
-          walkLeft: [
-            // Each frame array element is an array of square objects to be drawn
-            // Frame 1 - walk left
-            [{
-              x: 100,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'blue'
-            }, {
-              x: 110,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'green'
-            }],
-            // Frame 2 - walk left
-            [{
-              x: 110,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'blue'
-            }, {
-              x: 100,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'green'
-            }]
-          ],
-          walkRight: [
-            // Frame 1 - walk right
-            [{
-              x: 150,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'blue'
-            }, {
-              x: 140,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'green'
-            }],
-            // Frame 2 - walk right
-            [{
-              x: 140,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'blue'
-            }, {
-              x: 150,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'green'
-            }]
-          ],
-          walkUp: [
-            // Frame 1 - walk up
-            [{
-              x: 100,
-              y: 110,
-              width: 30,
-              height: 30,
-              color: 'red'
-            }, {
-              x: 150,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'yellow'
-            }],
-            // Frame 2 - walk up
-            [{
-              x: 100,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'red'
-            }, {
-              x: 150,
-              y: 110,
-              width: 30,
-              height: 30,
-              color: 'yellow'
-            }]
-          ],
-          walkDown: [
-            // Frame 1 - walk down
-            [{
-              x: 100,
-              y: 140,
-              width: 30,
-              height: 30,
-              color: 'red'
-            }, {
-              x: 150,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'yellow'
-            }],
-            // Frame 2 - walk down
-            [{
-              x: 100,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'red'
-            }, {
-              x: 150,
-              y: 140,
-              width: 30,
-              height: 30,
-              color: 'yellow'
-            }]
-          ],
-          swimLeft: [
-            // Frame 1 - swim left
-            [{
-              x: 100,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'lightblue'
-            }, {
-              x: 150,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'lightblue'
-            }],
-            // Frame 2 - swim left
-            [{
-              x: 100,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'gray'
-            }, {
-              x: 150,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'gray'
-            }]
-          ],
-          swimRight: [
-            // Frame 1 - swim right
-            [{
-              x: 100,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'lightblue'
-            }, {
-              x: 150,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'lightblue'
-            }],
-            // Frame 2 - swim right
-            [{
-              x: 100,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'gray'
-            }, {
-              x: 150,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'gray'
-            }]
-          ],
-          swimUp: [
-            // Frame 1 - swim up
-            [{
-              x: 100,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'lightblue'
-            }, {
-              x: 150,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'lightblue'
-            }],
-            // Frame 2 - swim up
-            [{
-              x: 100,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'gray'
-            }, {
-              x: 150,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'gray'
-            }]
-          ],
-          swimDown: [
-            // Frame 1 - swim down
-            [{
-              x: 100,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'lightblue'
-            }, {
-              x: 150,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'lightblue'
-            }],
-            // Frame 2 - swim down
-            [{
-              x: 100,
-              y: 100,
-              width: 30,
-              height: 30,
-              color: 'gray'
-            }, {
-              x: 150,
-              y: 150,
-              width: 30,
-              height: 30,
-              color: 'gray'
-            }]
-          ]
-          // Other actions could go here
-        },
-        // The collision map is how the game can know whether the character has collided with another object or event trigger. It is an array of invisible (or gray for now) squares.
-        collisionMap: [
-          {
-            x: 100,
-            y: 180,
-            width: 80,
-            height: 10,
-            color: 'gray'
-          }, {
-            x: 100,
-            y: 185,
-            width: 80,
-            height: 10,
-            color: 'gray'
-          }
-        ]
-      },
-      current: false
-    };
-    var headerData = {
-      user_id: UserService.get().id,
-      token: UserService.get().token
-    };
-    // Avatar
-    $.ajax({
-      method: 'POST',
-      url: 'https://forge-api.herokuapp.com/characters/create',
-      headers: headerData,
-      data: JSON.stringify(avatarTest),
-      dataType: 'json',
-      contentType: 'application/json',
-      success: function(response) {
-        console.log(response);
-        avatar = new Avatar(response);
-        console.log(avatar);
-        avatar.info.currentFrame = avatar.info.animate.walkLeft[0];
-        avatarLoaded = true;
-        setInterval(checkAvatarAction, 75);
-      },
-      error: function(error) {
-        console.log(error);
-      }
-    });
-  }
 
   $('body').off('keyup').on('keyup', function(event) {
     var keyCode = event.which;
@@ -417,6 +110,312 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       }
     }
   });
+
+
+  function loadMainCharacter() {
+      // Testing creation of avatar
+      var avatarTest = {
+        name: 'Avatar Test',
+        info: {
+          // The x and y coordinate of the top left corner of the avatar
+          pos: {
+            x: 100,
+            y: 100
+          },
+          // The character's speed
+          speed: {
+            mag: 3,
+            x: 0,
+            y: 0
+          },
+          // The animate object contains all the possible character actions with all of the frames to be drawn for each action.
+          animate: {
+            // Key: possible action, Value: array of frames
+            walkLeft: [
+              // Each frame array element is an array of square objects to be drawn
+              // Frame 1 - walk left
+              [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'blue'
+              }, {
+                x: 110,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'green'
+              }],
+              // Frame 2 - walk left
+              [{
+                x: 110,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'blue'
+              }, {
+                x: 100,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'green'
+              }]
+            ],
+            walkRight: [
+              // Frame 1 - walk right
+              [{
+                x: 150,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'blue'
+              }, {
+                x: 140,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'green'
+              }],
+              // Frame 2 - walk right
+              [{
+                x: 140,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'blue'
+              }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'green'
+              }]
+            ],
+            walkUp: [
+              // Frame 1 - walk up
+              [{
+                x: 100,
+                y: 110,
+                width: 30,
+                height: 30,
+                color: 'red'
+              }, {
+                x: 150,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'yellow'
+              }],
+              // Frame 2 - walk up
+              [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'red'
+              }, {
+                x: 150,
+                y: 110,
+                width: 30,
+                height: 30,
+                color: 'yellow'
+              }]
+            ],
+            walkDown: [
+              // Frame 1 - walk down
+              [{
+                x: 100,
+                y: 140,
+                width: 30,
+                height: 30,
+                color: 'red'
+              }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'yellow'
+              }],
+              // Frame 2 - walk down
+              [{
+                x: 100,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'red'
+              }, {
+                x: 150,
+                y: 140,
+                width: 30,
+                height: 30,
+                color: 'yellow'
+              }]
+            ],
+            swimLeft: [
+              // Frame 1 - swim left
+              [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+              }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+              }],
+              // Frame 2 - swim left
+              [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'gray'
+              }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'gray'
+              }]
+            ],
+            swimRight: [
+              // Frame 1 - swim right
+              [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+              }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+              }],
+              // Frame 2 - swim right
+              [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'gray'
+              }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'gray'
+              }]
+            ],
+            swimUp: [
+              // Frame 1 - swim up
+              [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+              }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+              }],
+              // Frame 2 - swim up
+              [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'gray'
+              }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'gray'
+              }]
+            ],
+            swimDown: [
+              // Frame 1 - swim down
+              [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+              }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'lightblue'
+              }],
+              // Frame 2 - swim down
+              [{
+                x: 100,
+                y: 100,
+                width: 30,
+                height: 30,
+                color: 'gray'
+              }, {
+                x: 150,
+                y: 150,
+                width: 30,
+                height: 30,
+                color: 'gray'
+              }]
+            ]
+            // Other actions could go here
+          },
+          // The collision map is how the game can know whether the character has collided with another object or event trigger. It is an array of invisible (or gray for now) squares.
+          collisionMap: [
+            {
+              x: 100,
+              y: 180,
+              width: 80,
+              height: 10,
+              color: 'gray'
+            }, {
+              x: 100,
+              y: 185,
+              width: 80,
+              height: 10,
+              color: 'gray'
+            }
+          ]
+        },
+        current: false
+      };
+      var headerData = {
+        user_id: UserService.get().id,
+        token: UserService.get().token
+      };
+      // Avatar
+      $.ajax({
+        method: 'POST',
+        url: 'https://forge-api.herokuapp.com/characters/create',
+        headers: headerData,
+        data: JSON.stringify(avatarTest),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(response) {
+          avatar = new Avatar(response);
+          avatar.info.currentFrame = avatar.info.animate.walkLeft[0];
+          avatarLoaded = true;
+          setInterval(checkAvatarAction, 75);
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    }
 
   function checkTyping(phrase) {
     if (phrase.includes('look')) {
@@ -498,27 +497,30 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       var avatarRight = avatarSquare.x + avatarSquare.width + avatar.info.pos.x;
       var avatarTop = avatarSquare.y + avatar.info.pos.y;
       var avatarBottom = avatarSquare.y + avatarSquare.height + avatar.info.pos.y;
-      /*
-      background.info.collisionMap.forEach(function(bgSquare) {  // Loop through all the background's squares
-        var bgLeft = bgSquare.x;
-        var bgRight = bgSquare.x + bgSquare.width;
-        var bgTop = bgSquare.y;
-        var bgBottom = bgSquare.y + bgSquare.height;
-        // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current bg square (in those exact orders).
-        if (avatarLeft <= bgRight && avatarRight >= bgLeft && avatarTop <= bgBottom && avatarBottom >= bgTop) {
-          collision.found = true;
-          collision.type = 'wall';
-          if (avatar.info.speed.x > 0) {
-            collision.direction = 'right';
-          } else if (avatar.info.speed.x < 0) {
-            collision.direction = 'left';
-          } else if (avatar.info.speed.y < 0) {
-            collision.direction = 'up';
-          } else if (avatar.info.speed.y > 0) {
-            collision.direction = 'down';
+
+      if (background) {
+        background.info.collisionMap.forEach(function(bgSquare) {  // Loop through all the background's squares
+          var bgLeft = bgSquare.x;
+          var bgRight = bgSquare.x + bgSquare.width;
+          var bgTop = bgSquare.y;
+          var bgBottom = bgSquare.y + bgSquare.height;
+          // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current bg square (in those exact orders).
+          if (avatarLeft <= bgRight && avatarRight >= bgLeft && avatarTop <= bgBottom && avatarBottom >= bgTop) {
+            collision.found = true;
+            collision.type = 'wall';
+            if (avatar.info.speed.x > 0) {
+              collision.direction = 'right';
+            } else if (avatar.info.speed.x < 0) {
+              collision.direction = 'left';
+            } else if (avatar.info.speed.y < 0) {
+              collision.direction = 'up';
+            } else if (avatar.info.speed.y > 0) {
+              collision.direction = 'down';
+            }
           }
-        }
-      });
+        });
+      }
+      /*
       sceneObject.info.collisionMap.forEach(function(objSquare) {  // Loop through all the scene object's squares
         var objLeft = objSquare.x + sceneObject.info.pos.x;
         var objRight = objSquare.x + objSquare.width + sceneObject.info.pos.x;
@@ -669,6 +671,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     self.currentRow = self.allRows[self.currentScenePos[1]];
     self.currentScene = self.currentRow[self.currentScenePos[2]];
     background = self.currentScene.background;
+    objects = self.currentScene.objects;
   }
 
   function updateAvatar() {
@@ -694,15 +697,16 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     }
   }
 
-  var currentSceneObjFrameIndex = 0;
-  function checkSceneObjectAction() {
-    // Animate the object.
-    if (currentSceneObjFrameIndex > sceneObject.info.animate[sceneObject.allActions[0]].length - 1) {
-      currentSceneObjFrameIndex = 0;
-    }
-    sceneObject.info.currentFrame = sceneObject.info.animate[sceneObject.allActions[0]][currentSceneObjFrameIndex];
-    currentSceneObjFrameIndex++;
-  }
+  // Not currently animating objects
+  // var currentSceneObjFrameIndex = 0;
+  // function checkSceneObjectAction() {
+  //   // Animate the object.
+  //   if (currentSceneObjFrameIndex > sceneObject.info.animate[sceneObject.allActions[0]].length - 1) {
+  //     currentSceneObjFrameIndex = 0;
+  //   }
+  //   sceneObject.info.currentFrame = sceneObject.info.animate[sceneObject.allActions[0]][currentSceneObjFrameIndex];
+  //   currentSceneObjFrameIndex++;
+  // }
 
   var currentEntityFrameIndex = 0;
   function checkEntityAction() {
@@ -782,24 +786,26 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
   }
 
   function drawObjects() {
-    // Save the drawing context
-    gameCtx.save();
-    // Translate the canvas origin to be the top left of the sceneObject
-    gameCtx.translate(sceneObject.info.pos.x, sceneObject.info.pos.y);
-    // Draw the squares from the sceneObject's current frame
-    gameCtx.globalCompositeOperation = "destination-over";  // If object is behind character.
-    // gameCtx.globalCompositeOperation = "source-over";    // If object is in front of character.
-    sceneObject.info.currentFrame.forEach(function(square) {
-      gameCtx.fillStyle = square.color;
-      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+    objects.forEach(function(object) {
+      // Save the drawing context
+      gameCtx.save();
+      // Translate the canvas origin to be the top left of the object
+      gameCtx.translate(object.info.pos.x, object.info.pos.y);
+      // Draw the squares from the object's current frame
+      // gameCtx.globalCompositeOperation = "destination-over";  // If object is behind character.
+      gameCtx.globalCompositeOperation = "source-over";    // If object is in front of character.
+      object.info.image.forEach(function(square) {
+        gameCtx.fillStyle = square.color;
+        gameCtx.fillRect(square.x, square.y, square.width, square.height);
+      });
+      gameCtx.globalAlpha = 0.2;
+      // Draw the object's collision map (purely for testing)
+      object.info.collisionMap.forEach(function(square) {
+        gameCtx.fillStyle = square.color;
+        gameCtx.fillRect(square.x, square.y, square.width, square.height);
+      });
+      gameCtx.restore();
     });
-    gameCtx.globalAlpha = 0.2;
-    // Draw the sceneObject's collision map (purely for testing)
-    sceneObject.info.collisionMap.forEach(function(square) {
-      gameCtx.fillStyle = square.color;
-      gameCtx.fillRect(square.x, square.y, square.width, square.height);
-    });
-    gameCtx.restore();
   }
 
   function drawEntities() {
@@ -832,7 +838,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     updateLocation();
     loadMainCharacter();
     self.gameStarted = true;
-  }
+  };
 
   function runGame() {
     if (self.gameStarted) {
@@ -842,12 +848,12 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
         checkAvatarCollisions();
         updateAvatar();
         drawAvatar();
+        drawObjects();
+        drawBackground();
       }
       // checkEntityCollisions();
       // updateEntity();
       // drawEntities();
-      // drawObjects();
-      drawBackground();
     }
     requestAnimationFrame(runGame);
   }

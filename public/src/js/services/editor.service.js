@@ -146,8 +146,9 @@ angular.module('questCreator').service('EditorService', function (UserService, $
       });
     }
 
-    function saveBackground(imageArr, currentBackground) {
+    function saveBackground(imageArr, collisionArr, currentBackground) {
       currentBackground.info.image = imageArr;
+      currentBackground.info.collisionMap = collisionArr;
       var headerData = {
         user_id: UserService.get().id,
         token: UserService.get().token
