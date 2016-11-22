@@ -6,9 +6,23 @@
     .game-detail {
       width: 60%;
       display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      // justify-content: space-around;
+      flex-direction: column;
+      background-color: whitesmoke;
+      justify-content: space-around;
+      align-items: center;
+      border: black solid 4px;
+
+      .collab-button {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        button {
+          width: 150px;
+          height: 55px;
+          margin-top: 10px;
+        }
+      }
     }
 
     #play-splash {
