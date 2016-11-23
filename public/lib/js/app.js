@@ -279,6 +279,26 @@ angular.module('questCreator')
 });
 ;angular.module('questCreator').service('EditorService', function (UserService, $state) {
 
+    var drawingCopy = {
+      image: [],
+      collision: []
+    };
+
+    function copy(image, collision) {
+      drawingCopy = {
+        image: image,
+        collision: collision
+      };
+    }
+
+    function paste(type) {
+      if (type === 'image') {
+        return drawingCopy.image;
+      } else if (type === 'collision') {
+        return drawingCopy.collision;
+      }
+    }
+
     function getGame(name) {
       var nameWrapper = {
         name: name.toLowerCase()
@@ -543,8 +563,59 @@ angular.module('questCreator')
           x: 350,
           y: 250
         },
-        image: [],
-        collisionMap: []
+        animate: {
+          walkLeft: [
+            {
+              image: [],
+              collisionMap: []
+            }, {
+              image: [],
+              collisionMap: []
+            }, {
+              image: [],
+              collisionMap: []
+            }
+          ],
+          walkRight: [
+            {
+              image: [],
+              collisionMap: []
+            },
+            {
+              image: [],
+              collisionMap: []
+            }, {
+              image: [],
+              collisionMap: []
+            }
+          ],
+          walkUp: [
+            {
+              image: [],
+              collisionMap: []
+            },
+            {
+              image: [],
+              collisionMap: []
+            }, {
+              image: [],
+              collisionMap: []
+            }
+          ],
+          walkDown: [
+            {
+              image: [],
+              collisionMap: []
+            },
+            {
+              image: [],
+              collisionMap: []
+            }, {
+              image: [],
+              collisionMap: []
+            }
+          ]
+        }
       };
       var currentEntity = {
         name: name,
@@ -569,8 +640,10 @@ angular.module('questCreator')
       });
     }
 
-    function saveEntity(imageArr, currentEntity) {
-      currentEntity.info.image = imageArr;
+    function saveEntity(imageArr, collisionArr, currentEntity, currentAnimation, frameIndex) {
+      currentEntity.info.animate[currentAnimation][frameIndex].image = imageArr;
+      currentEntity.info.animate[currentAnimation][frameIndex].collisionMap = collisionArr;
+      currentEntity.published = true;
       var headerData = {
         user_id: UserService.get().id,
         token: UserService.get().token
@@ -601,7 +674,9 @@ angular.module('questCreator')
       createObject: createObject,
       saveObject: saveObject,
       createEntity: createEntity,
-      saveEntity: saveEntity
+      saveEntity: saveEntity,
+      copy: copy,
+      paste: paste
     };
 });
 ;angular.module('questCreator').service('GameService', function() {
@@ -712,21 +787,13 @@ angular.module('questCreator')
 
   function getAssetsByType(type) {
     currentType = type;
-    var url = '';
-    if (type === 'bg') {
-      url = 'backgrounds/all';
-    } else if (type === 'obj') {
-      url = 'obstacles/all';
-    } else if (type === 'ent'){
-      url = 'entities/all';
-    }
     return $.ajax({
       method: 'GET',
-      url: 'https://forge-api.herokuapp.com/' + url,
+      url: 'https://forge-api.herokuapp.com/' + type + '/all',
       headers: headerData,
       success: function(response) {
-        console.log(response);
         assets = response;
+        console.log(assets);
         return assets;
       },
       error: function(error) {
@@ -1003,7 +1070,7 @@ angular.module('questCreator')
             }
 
         function validateCollabRequest(gameId) {
-            $.ajax({
+            return $.ajax({
                 method: 'GET',
                 url: 'https://forge-api.herokuapp.com/collaborators/existence',
                 headers: {
@@ -1035,10 +1102,10 @@ angular.module('questCreator')
                 data: {
                     game_id: gameId
                 },
-                dataType: 'json',
-                contentType: 'application/json',
+                // dataType: 'json',
+                // contentType: 'application/json',
                 success: function(response) {
-                    console.log(response.requested);
+                    console.log(response);
                 },
                 error: function(error) {
                     console.log(error);
@@ -1054,13 +1121,13 @@ angular.module('questCreator')
                     user_id: user.id,
                     token: user.token
                 },
-                dataType: 'json',
-                contentType: 'application/json',
+                // dataType: 'json',
+                // contentType: 'application/json',
                 success: function(response) {
-                    console.log(response);
+                    console.log('success requests', response);
                 },
                 error: function(error) {
-                    console.log(error);
+                    console.log('error requests', error);
                 }
             });
         }
@@ -1076,10 +1143,10 @@ angular.module('questCreator')
                 dataType: 'json',
                 contentType: 'application/json',
                 success: function(response) {
-                    console.log(response);
+                    console.log('success collaborators', response);
                 },
                 error: function(error) {
-                    console.log(error);
+                    console.log('error collaborators', error);
                 }
             });
         }
@@ -1087,7 +1154,7 @@ angular.module('questCreator')
         function getCollaborations() {
             return $.ajax({
                 method: 'GET',
-                url: 'https://forge-api.herokuapp.com/collaborators/user/collaborators',
+                url: 'https://forge-api.herokuapp.com/users/collaborations',
                 headers: {
                     user_id: user.id,
                     token: user.token
@@ -1095,10 +1162,10 @@ angular.module('questCreator')
                 dataType: 'json',
                 contentType: 'application/json',
                 success: function(response) {
-                    console.log(response);
+                    console.log('success collaborations', response);
                 },
                 error: function(error) {
-                    console.log(error);
+                    console.log('error collaborations', error);
                 }
             });
         }
@@ -1115,8 +1182,8 @@ angular.module('questCreator')
                     game_id: gameId,
                     requester_id: requesterId
                 },
-                dataType: 'json',
-                contentType: 'application/json',
+                // dataType: 'json',
+                // contentType: 'application/json',
                 success: function(response) {
                     console.log(response);
                 },
@@ -1149,6 +1216,28 @@ angular.module('questCreator')
             });
         }
 
+        function requestAgain(gameId) {
+            $.ajax({
+                method: 'PATCH',
+                url: 'https://forge-api.herokuapp.com/collaborators/rerequest',
+                headers: {
+                    user_id: user.id,
+                    token: user.token
+                },
+                data: {
+                  game_id: gameId,
+                },
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function(response) {
+                    console.log(response);
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+
         return {
             get: getUser,
             set: setUser,
@@ -1162,6 +1251,7 @@ angular.module('questCreator')
             getCollaborations: getCollaborations,
             toggleAccepted: toggleAccepted,
             toggleRequested: toggleRequested,
+            requestAgain: requestAgain,
             archive: archiveGame,
             register: registerUser,
             signOut: signOut,
@@ -1873,20 +1963,23 @@ angular.module('questCreator')
     this.game = GameService.getGameDetail();
 
     this.sendCollabRequest = function (gameId) {
-      var request = UserService.validateCollabRequest(gameId);
-      //user has never requested collaboration
-      if (request.message){
-        UserService.sendCollabRequest(gameId);
-        alert('Your request has been sent.');
-      } else if (request.requested) {
-        //success from this call indicates the user has already requested collaborator status
-        alert('You have already requested to be a collaborator on this game. Be patient.');
-      } else if (!request.requested) {
-        alert('Okay...You have already requested to collaborate on this game and been turned down.  We will try again, but do not be annoying.');
-        UserService.toggleRequested(gameId);
-      } else {
-        alert('There was a problem sending this collaboration request.  Please try again later.');
-      }
+      console.log(gameId);
+      var request = UserService.validateCollabRequest(gameId).done(function (response) {
+        console.log(response);
+        if (response.message){
+          UserService.sendCollabRequest(gameId);
+          alert('Your request has been sent.');
+        } else if (response.requested && !response.accepted) {
+          alert('You have already requested to be a collaborator on this game. Be patient.');
+        } else if (!response.requested && !response.accepted) {
+          alert('Okay...You have already requested to collaborate on this game and been turned down.  We will try again, but do not be annoying.');
+          UserService.requestAgain(gameId);
+        } else if (response.requested && response.accepted) {
+          alert('You are already a collaborator.  Check your profile page to find and edit games for which you have been approved to collaborate.');
+        } else {
+          alert('There was a problem sending this collaboration request.  Please try again later.');
+        }
+      });
     };
 
     //This is for testing only
@@ -1942,18 +2035,20 @@ angular.module('questCreator')
   this.currentEntity = null;
   this.currentScene = null;
   this.currentSceneImg = {};
-  this.currentLargeView = 'background';
+  this.currentLargeView = 'map';
   this.currentSmallView = 'object';
   this.availableBackgrounds = [];
   this.availableObjects = [];
   this.availableEntities = [];
-  this.selectedAnimation = "Animations";
+  this.selectedAnimation = "walkLeft";
 
   this.currentColor = 'green';
   this.currentPixelSize = 15;
   this.drawingCollision = false;
+  this.erasing = false;
   this.selectingAssets = false;
-  this.frameindex = 0;
+  this.currentFrameIndex = 0;
+  this.modeledFrameIndex = 0; // For some reason ng-model is being wacky the first click
 
   //TESTING PLEASE REMOVE:
   this.dummyent = {
@@ -2907,12 +3002,11 @@ angular.module('questCreator')
       "updated_at": "2016-11-21T18:52:59.961Z",
       "$$hashKey": "object:105"
   }
-  this.availableEntities.push(this.dummyent);
+  // this.availableEntities.push(this.dummyent);
 
   this.goToPalette = function (type) {
     self.selectingAssets = true;
-    // PaletteService.getByType(type);
-    // $state.go('main.game.editor.palette');
+    PaletteService.getByType(type);
   };
 
   if (this.currentEditingGame.name === null) {
@@ -2926,10 +3020,10 @@ angular.module('questCreator')
   this.createNewGame = function (name) {
       PopupService.close();
       EditorService.createGame(name).done(function(game) {
-        console.log(game);
+        // console.log(game);
         self.currentEditingGame = game;
         EditorService.getGameAssets(game.id).done(function(assets) {
-          console.log(assets);
+          // console.log(assets);
           self.availableBackgrounds = assets.availableBackgrounds;
           self.availableObjects = assets.availableObstacles;
           self.availableEntities = assets.availableEntities;
@@ -2937,7 +3031,6 @@ angular.module('questCreator')
           $scope.$apply();
         });
       });
-      $('.create-game').hide();
       UserService.setGameEdit(name);
   };
 
@@ -2945,9 +3038,9 @@ angular.module('questCreator')
       PopupService.close();
       EditorService.getGame(self.currentEditingGame.name).done(function(game) {
         self.currentEditingGame = game;
-        console.log(self.currentEditingGame);
+        // console.log(self.currentEditingGame);
         EditorService.getGameAssets(game.id).done(function(assets) {
-          console.log(assets);
+          // console.log(assets);
           self.availableBackgrounds = assets.availableBackgrounds;
           self.availableObjects = assets.availableObstacles;
           self.availableEntities = assets.availableEntities;
@@ -2972,7 +3065,7 @@ angular.module('questCreator')
     var name = "New Background";
     var game_id = self.currentEditingGame.id;
     EditorService.createBackground(name, game_id).done(function(background) {
-      console.log(background);
+      // console.log(background);
       self.availableBackgrounds.push(background);
       self.currentBackground = background;
       $scope.$apply();
@@ -2980,7 +3073,7 @@ angular.module('questCreator')
   };
 
   this.editBackground = function(background) {
-    console.log(background);
+    // console.log(background);
     self.currentBackground = background;
     $scope.$broadcast('redrawBackground', background.info.image, background.info.collisionMap);
   };
@@ -2989,7 +3082,7 @@ angular.module('questCreator')
     var name = "New Object";
     var game_id = self.currentEditingGame.id;
     EditorService.createObject(name, game_id).done(function(object) {
-      console.log(object);
+      // console.log(object);
       self.availableObjects.push(object);
       self.currentObject = object;
       self.currentSmallView = 'object';
@@ -2998,7 +3091,7 @@ angular.module('questCreator')
   };
 
   this.editObject = function(object) {
-    console.log(object);
+    // console.log(object);
     self.currentObject = object;
     self.currentSmallView = 'object';
     $scope.$broadcast('redrawObject', object.info.image, object.info.collisionMap);
@@ -3017,10 +3110,13 @@ angular.module('questCreator')
   };
 
   this.editEntityFrame = function(entity) {
+    self.currentFrameIndex = self.modeledFrameIndex || 0;
     self.currentEntity = entity;
     self.currentSmallView = 'entity';
-    console.log("ent", entity);
-    $scope.$broadcast('redrawEntity', entity.info.animate[this.selectedAnimation][this.frameindex].image);
+    console.log("ent:", entity);
+    console.log("frame index:", self.currentFrameIndex);
+    console.log("selected frame:", entity.info.animate[self.selectedAnimation][self.currentFrameIndex]);
+    $scope.$broadcast('redrawEntity', entity.info.animate[self.selectedAnimation][self.currentFrameIndex].image, entity.info.animate[self.selectedAnimation][self.currentFrameIndex].collisionMap);
   };
 
   this.cancel = function () {
@@ -3081,6 +3177,7 @@ angular.module('questCreator')
   var pixelWidth = $scope.editor.currentPixelSize;
   var pixelHeight = $scope.editor.currentPixelSize;
   var undoBackgroundArray = [];   //Array to keep track of background objects that were undone.
+  var undoCollisionArray = [];
   // var undoObstacleArray = [];   //Array to keep track of obstacle objects that were undone.
   // var undoCharacterArray = [];   //Array to keep track of character objects that were undone.
   this.speedRange = 5;     // How fast mobile objects should move.
@@ -3103,6 +3200,7 @@ angular.module('questCreator')
   // this.allObstacleSquares = this.currentScene.staticArr || [];  // Array of all static objects in current scene
   // this.backgroundName = this.currentBackground.name || '';  // Current selected Background name
   // this.allBackgroundSquares = this.currentBackground.staticArr || []; // Array of all static objects in current background
+  this.allCollisionSquares = [];
   this.allBackgroundSquares = [];
 
   /*
@@ -3116,36 +3214,38 @@ angular.module('questCreator')
   *   @methods
   *     draw: draw the rectangle on the canvas using its position, size, and color.
   */
-  function Square(x, y, width, height, color) {
+  function Square(x, y, width, height, color, type) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
     this.color = color;
-    this.draw = function() {
-      self.draw.fillStyle = this.color;
-      if (window.innerWidth <= mobileWidth) { // Mobile size
-        self.draw.fillRect(this.x * mobileScaleX, this.y * mobileScaleY, this.width, this.height);
-      } else if (window.innerWidth <= tabletWidth) { // Tablet size
-        self.draw.fillRect(this.x * tabletScale, this.y / tabletScale, this.width, this.height);
-      } else {  // Desktop size
-        self.draw.fillRect(this.x, this.y, this.width, this.height);
-      }
-    }
+    this.type = type;
   }
 
-  $scope.$on('redrawEntity', function(event, imageArr) {
+  Square.prototype.draw = function() {
+    self.draw.fillStyle = this.color;
+    if (window.innerWidth <= mobileWidth) { // Mobile size
+      self.draw.fillRect(this.x * mobileScaleX, this.y * mobileScaleY, this.width, this.height);
+    } else if (window.innerWidth <= tabletWidth) { // Tablet size
+      self.draw.fillRect(this.x * tabletScale, this.y / tabletScale, this.width, this.height);
+    } else {  // Desktop size
+      self.draw.fillRect(this.x, this.y, this.width, this.height);
+    }
+  };
+
+  $scope.$on('redrawEntity', function(event, imageArr, collisionArray) {
     canvasWidth = self.myCanvas.width;
     canvasHeight = self.myCanvas.height;
     self.draw.clearRect(0, 0, canvasWidth, canvasHeight);
     self.allBackgroundSquares = [];
+    self.allCollisionSquares = [];
     var undoBackgroundArray = [];
+    var undoCollisionArray = [];
     self.allBackgroundSquares = imageArr;
-    for (var index = 0; index < self.allBackgroundSquares.length; index++) {
-      var square = self.allBackgroundSquares[index];
-      self.draw.fillStyle = square.color;
-      self.draw.fillRect(square.x, square.y, square.width, square.height);
-    }
+    self.allCollisionSquares = collisionArray;
+    drawBackgroundSquares();
+    drawCollisionSquares();
   });
 
   // /*
@@ -3246,28 +3346,74 @@ angular.module('questCreator')
       //   }
       //   moved = false;
       // }
-    if (moved && drawing.background) { // Create, draw, and record a new background object
+    if ($scope.editor.erasing) {
+      var newSquareX = mouseX - self.canvasPos.x;
+      var newSquareY = mouseY - self.canvasPos.y;
+      if (!$scope.editor.drawingCollision) {
+        var toRemove = [];
+        self.allBackgroundSquares.forEach(function(square) {
+          if ( Math.abs(square.x - newSquareX) < 10 && Math.abs(square.y - newSquareY) < 10 ) {
+            toRemove.push(self.allBackgroundSquares.indexOf(square));
+          }
+        });
+        toRemove.forEach(function(index) {
+          self.allBackgroundSquares.splice(index, 1);
+        });
+      } else if ($scope.editor.drawingCollision) {
+        var toRemove = [];
+        self.allCollisionSquares.forEach(function(square) {
+          if ( Math.abs(square.x - newSquareX) < 10 && Math.abs(square.y - newSquareY) < 10 ) {
+            toRemove.push(self.allBackgroundSquares.indexOf(square));
+          }
+        });
+        toRemove.forEach(function(index) {
+          self.allCollisionSquares.splice(index, 1);
+        });
+      }
+      self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+      drawBackgroundSquares();
+      drawCollisionSquares();
+    }
+    if (moved && drawing.background && !$scope.editor.erasing) { // Create, draw, and record a new background object
       var width = $scope.editor.currentPixelSize;
       var height = $scope.editor.currentPixelSize;
-      var color = $scope.editor.currentColor;
+      var color = $scope.editor.drawingCollision ? 'rgba(100, 100, 100, 0.5)' : $scope.editor.currentColor;
       if (moveType === 'mouse') {
         var newSquareX = mouseX - self.canvasPos.x;
         var newSquareY = mouseY - self.canvasPos.y;
         var exists = false;
-        self.allBackgroundSquares.forEach(function(square) {
-          if (square.x === newSquareX && square.y === newSquareY) {
-            exists = true;
-          }
-        });
+        if ($scope.editor.drawingCollision) {
+          self.allCollisionSquares.forEach(function(square) {
+            if (square.x === newSquareX && square.y === newSquareY) {
+              exists = true;
+            }
+          });
+        } else if (!$scope.editor.drawingCollision) {
+          self.allBackgroundSquares.forEach(function(square) {
+            if (square.x === newSquareX && square.y === newSquareY) {
+              exists = true;
+            }
+          });
+        }
         if (!exists) {
-          var newSquare = new Square(mouseX - self.canvasPos.x, mouseY - self.canvasPos.y, width, height, color);
+          var type = $scope.editor.drawingCollision ? 'collision' : 'normal';
+          var newSquare = new Square(mouseX - self.canvasPos.x, mouseY - self.canvasPos.y, width, height, color, type);
           newSquare.draw();
-          self.allBackgroundSquares.push(newSquare);
+          if ($scope.editor.drawingCollision) {
+            self.allCollisionSquares.push(newSquare);
+          } else {
+            self.allBackgroundSquares.push(newSquare);
+          }
         }
       } else if (moveType === 'touch') {
-        var newSquare = new Square(touchMoveEvent.clientX - width / 2 - self.canvasPos.x, touchMoveEvent.clientY - height / 2 - self.canvasPos.y, width, height, color);
+        var type = $scope.editor.drawingCollision ? 'collision' : 'normal';
+        var newSquare = new Square(touchMoveEvent.clientX - width / 2 - self.canvasPos.x, touchMoveEvent.clientY - height / 2 - self.canvasPos.y, width, height, color, type);
         newSquare.draw();
-        self.allBackgroundSquares.push(newSquare);
+        if ($scope.editor.drawingCollision) {
+          self.allCollisionSquares.push(newSquare);
+        } else {
+          self.allBackgroundSquares.push(newSquare);
+        }
       }
       moved = false;
     }
@@ -3435,7 +3581,15 @@ angular.module('questCreator')
   function drawBackgroundSquares() {
     for (var index = 0; index < self.allBackgroundSquares.length; index++) {
       var square = self.allBackgroundSquares[index];
-      square.draw();
+      self.draw.fillStyle = square.color;
+      self.draw.fillRect(square.x, square.y, square.width, square.height);
+    }
+  }
+  function drawCollisionSquares() {
+    for (var index = 0; index < self.allCollisionSquares.length; index++) {
+      var square = self.allCollisionSquares[index];
+      self.draw.fillStyle = square.color;
+      self.draw.fillRect(square.x, square.y, square.width, square.height);
     }
   }
 
@@ -3500,12 +3654,16 @@ angular.module('questCreator')
     //   var lastObj = self.allBackgroundSquares.pop();
     //   undoBackgroundArray.push(lastObj);
     // }
-    if (drawing.background && self.allBackgroundSquares.length > 0) {
+    if (!$scope.editor.drawingCollision && self.allBackgroundSquares.length > 0) {
       var lastObj = self.allBackgroundSquares.pop();
       undoBackgroundArray.push(lastObj);
+    } else if ($scope.editor.drawingCollision && self.allCollisionSquares.length > 0) {
+      var lastObj = self.allCollisionSquares.pop();
+      undoCollisionArray.push(lastObj);
     }
     self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
     drawBackgroundSquares();
+    drawCollisionSquares();
     // drawObstacleSquares();
     // drawMobileCircles();
   });
@@ -3522,12 +3680,16 @@ angular.module('questCreator')
     //   var lastObj = undoBackgroundArray.pop();
     //   self.allBackgroundSquares.push(lastObj);
     // }
-    if (drawing.background && undoBackgroundArray.length > 0) {
+    if (!$scope.editor.drawingCollision && undoBackgroundArray.length > 0) {
       var lastObj = undoBackgroundArray.pop();
       self.allBackgroundSquares.push(lastObj);
+    } else if ($scope.editor.drawingCollision && undoCollisionArray.length > 0) {
+      var lastObj = undoCollisionArray.pop();
+      self.allCollisionSquares.push(lastObj);
     }
     self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
     drawBackgroundSquares();
+    drawCollisionSquares();
     // drawObstacleSquares();
     // drawMobileCircles();
   });
@@ -3541,7 +3703,9 @@ angular.module('questCreator')
     // self.allMobileCircles = [];
     self.draw.clearRect(0, 0, canvasWidth, canvasHeight);
     self.allBackgroundSquares = [];
+    self.allCollisionSquares = [];
     var undoBackgroundArray = [];
+    var undoCollisionArray = [];
     // var undoObstacleArray = [];
     // var undoCharacterArray = [];
     // Scenes.selectScene({})
@@ -3595,8 +3759,8 @@ angular.module('questCreator')
   // 2) Create and store a new background object and make it the current Background.
   // 3) Finally, draw the Obstacles and Character.
   $('#saveEntity').click(function() {
-    EditorService.saveEntity(self.allBackgroundSquares, $scope.editor.currentEntity).done(function(entity) {
-      console.log(entity);
+    EditorService.saveEntity(self.allBackgroundSquares, self.allCollisionSquares, $scope.editor.currentEntity, $scope.editor.selectedAnimation, $scope.editor.currentFrameIndex).done(function(entity) {
+      console.log("After save:", entity);
     });
     // self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
     // drawBackgroundSquares();
@@ -3608,6 +3772,25 @@ angular.module('questCreator')
     // Backgrounds.selectBackground(newBackground);
     // drawObstacleSquares();
     // drawMobileCircles();
+  });
+
+  // Copy and Paste buttons
+  $('#copyEntity').click(function() {
+    EditorService.copy(self.allBackgroundSquares, self.allCollisionSquares);
+  });
+
+
+  $('#pasteEntity').click(function() {
+    if (!$scope.editor.drawingCollision) {
+      var copiedImage = EditorService.paste('image');
+      self.allBackgroundSquares.push.apply(self.allBackgroundSquares, copiedImage);
+    } else if ($scope.editor.drawingCollision) {
+      var copiedCollisionMap = EditorService.paste('collision');
+      self.allCollisionSquares.push.apply(self.allCollisionSquares, copiedCollisionMap);
+    }
+    self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+    drawBackgroundSquares();
+    drawCollisionSquares();
   });
 
   // // When the Publish Background button is clicked, post it to the database.
@@ -3711,19 +3894,15 @@ angular.module('questCreator')
     });
 
     $scope.createGame = function() {
-        var user;
-        UserService.get().then(function(userResponse) {
-          console.log(userResponse);
-          user = userResponse;
-          if (user.id) {
-              user.editGame = null;
-              UserService.set(user);
-              $state.go('main.game.editor.views');
-          } else {
-              alert('Please Sign In or Register.');
-              $scope.signIn();
-          }
-        });
+        var user = UserService.get();
+        if (user.id) {
+            user.editGame = null;
+            UserService.set(user);
+            $state.go('main.game.editor.views');
+        } else {
+            alert('Please Sign In or Register.');
+            $scope.signIn();
+        }
     };
 
     $scope.goToGameDetail = function(game) {
@@ -4533,11 +4712,9 @@ angular.module('questCreator')
   });
 });
 ;angular.module('questCreator').controller('paletteCtrl', function (PaletteService, $scope) {
-
+  var self = this;
   this.elements = [];
   this.currentType = PaletteService.getCurrentType();
-
-  // this.allAssets = PaletteService.getAll();
 
   this.assets = PaletteService.getCurrent();
 
@@ -4547,12 +4724,12 @@ angular.module('questCreator')
 
   this.goToEditor = function () {
     if (this.elements) {
-      var confirm = confirm('Do you wanna save the assets you chose before leaving this screen?');
-      if (confirm) {
+      var confirmed = confirm('Do you wanna save the assets you chose before leaving this screen?');
+      if (confirmed) {
         PaletteService.saveToPalette(this.elements);
       }
     }
-    $state.go('main.game.editor');
+    editor.selectingAssets = false;
   };
 
   this.addToPalette = function (element) {
@@ -4560,8 +4737,9 @@ angular.module('questCreator')
   };
 
   this.saveElements = function () {
-    //this function should get the current objects from the palette (preferably by type and probably from the editor service), concats that array with this.elements and sets the combined array back into the service from whence they came.
-    this.elements = [];
+    console.log(self.currentType);
+  // editor.
+  //   self.elements = [];
   };
 });
 ;angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, GameService, $state, $scope) {
@@ -4701,7 +4879,7 @@ angular.module('questCreator')
                 // The x and y coordinate of the top left corner of the avatar
                 pos: {
                     x: 100,
-                    y: 100
+                    y: 250
                 },
                 // The character's speed
                 speed: {
@@ -5162,42 +5340,42 @@ angular.module('questCreator')
                           height: bottom - top
                       };
                     }
-                object.info.collisionMap.forEach(function(objSquare) { // Loop through all the scene object's squares
-                    var objLeft = objSquare.x + object.info.pos.x;
-                    var objRight = objSquare.x + objSquare.width + object.info.pos.x;
-                    var objTop = objSquare.y + object.info.pos.y;
-                    var objBottom = objSquare.y + objSquare.height + object.info.pos.y;
-                    // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current scene object square (in those exact orders).
-                    if (avatarLeft <= objRight && avatarRight >= objLeft && avatarTop <= objBottom && avatarBottom >= objTop) {
-                        collision.found = true;
-                        collision.type = 'wall';
-                        if (avatar.info.speed.x > 0) {
-                            collision.direction = 'right';
-                        } else if (avatar.info.speed.x < 0) {
-                            collision.direction = 'left';
-                        } else if (avatar.info.speed.y < 0) {
-                            collision.direction = 'up';
-                        } else if (avatar.info.speed.y > 0) {
-                            collision.direction = 'down';
-                        }
-                    }
-                });
+                    object.info.collisionMap.forEach(function(objSquare) { // Loop through all the scene object's squares
+                      var objLeft = objSquare.x + object.info.pos.x;
+                      var objRight = objSquare.x + objSquare.width + object.info.pos.x;
+                      var objTop = objSquare.y + object.info.pos.y;
+                      var objBottom = objSquare.y + objSquare.height + object.info.pos.y;
+                      // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current scene object square (in those exact orders).
+                      if (avatarLeft <= objRight && avatarRight >= objLeft && avatarTop <= objBottom && avatarBottom >= objTop) {
+                          collision.found = true;
+                          collision.type = 'wall';
+                          if (avatar.info.speed.x > 0) {
+                              collision.direction = 'right';
+                          } else if (avatar.info.speed.x < 0) {
+                              collision.direction = 'left';
+                          } else if (avatar.info.speed.y < 0) {
+                              collision.direction = 'up';
+                          } else if (avatar.info.speed.y > 0) {
+                              collision.direction = 'down';
+                          }
+                      }
+                  });
               });
             }
           });
-          if (collision.found) {
-              switch (collision.type) {
-                  case 'wall':
-                      avatar.collide(collision.direction);
-                      break;
-              }
-              collision = {
-                  found: false,
-                  direction: 'none',
-                  type: 'none'
-              };
-          }
-      }
+        if (collision.found) {
+            switch (collision.type) {
+                case 'wall':
+                    avatar.collide(collision.direction);
+                    break;
+            }
+            collision = {
+                found: false,
+                direction: 'none',
+                type: 'none'
+            };
+        }
+    }
 
       /*
       entity.info.collisionMap.forEach(function(entitySquare) {  // Loop through all the scene object's squares
@@ -5223,12 +5401,17 @@ angular.module('questCreator')
       */
 
         function checkEntityCollisions() {
+          entities.forEach(function(entity) {
+            console.log(entity);
             var collision = {
                 found: false,
                 direction: 'none',
                 type: 'none'
             };
-            entity.info.collisionMap.forEach(function(entitySquare) { // Loop through all the entity squares
+            entity.info.currentFrameIndex = entity.info.currentFrameIndex || 0;
+            console.log(entity.info.animate[entity.action]);
+            entity.info.currentFrame = entity.info.animate[entity.action][entity.info.currentFrameIndex];
+            entity.info.currentFrame.collisionMap.forEach(function(entitySquare) { // Loop through all the entity squares
                 var entityLeft = entitySquare.x + entity.info.pos.x;
                 var entityRight = entitySquare.x + entitySquare.width + entity.info.pos.x;
                 var entityTop = entitySquare.y + entity.info.pos.y;
@@ -5294,7 +5477,6 @@ angular.module('questCreator')
                     }
                 });
             });
-
             if (collision.found) {
                 switch (collision.type) {
                     case 'wall':
@@ -5307,6 +5489,7 @@ angular.module('questCreator')
                     type: 'none'
                 };
             }
+          });
         }
 
         function updateLocation() {
@@ -5314,8 +5497,10 @@ angular.module('questCreator')
             self.allRows = self.currentMap.scenes;
             self.currentRow = self.allRows[self.currentScenePos[1]];
             self.currentScene = self.currentRow[self.currentScenePos[2]];
+            console.log(self.currentScene);
             background = self.currentScene.background;
             objects = self.currentScene.objects;
+            entities = self.currentScene.entities;
         }
 
         function updateAvatar() {
@@ -5352,8 +5537,8 @@ angular.module('questCreator')
         //   currentSceneObjFrameIndex++;
         // }
 
-        var currentEntityFrameIndex = 0;
         function checkEntityAction() {
+          entity.info.currentFrameIndex = entity.info.currentFrameIndex || 0;
             if (entity.action === 'stand' || entity.action === 'walkLeft' || entity.action === 'walkUp' || entity.action === 'walkRight' || entity.action === 'walkDown') {
                 switch (entity.action) {
                     case 'walkLeft':
@@ -5374,11 +5559,11 @@ angular.module('questCreator')
                         break;
                 }
                 // Animate the entity.
-                if (currentEntityFrameIndex > entity.info.animate[entity.action].length - 1) {
-                    currentEntityFrameIndex = 0;
+                if (entity.info.currentFrameIndex > entity.info.animate[entity.action].length - 1) {
+                    entity.info.currentFrameIndex = 0;
                 }
-                entity.info.currentFrame = entity.info.animate[entity.action][currentEntityFrameIndex];
-                currentEntityFrameIndex++;
+                entity.info.currentFrame = entity.info.animate[entity.action][entity.info.currentFrameIndex];
+                entity.info.currentFrameIndex++;
             }
         }
 
@@ -5429,46 +5614,50 @@ angular.module('questCreator')
             $scope.$apply();
         }
 
-        function drawObjects() {
-            objects.sort(function(objectA, objectB) {
-              if (!objectA.bounds) {
-                objectA.bounds.bottom = null;
-              }
-              if (!objectB.bounds) {
-                objectB.bounds.bottom = null;
-              }
-              if (objectA.bounds.bottom < objectB.bounds.bottom) {
-                return 1;
-              } else {
-                return -1;
-              }
-            });
+        function drawObjects(type) {
+            // objects.sort(function(objectA, objectB) {
+            //   if (!objectA.bounds) {
+            //     objectA.bounds.bottom = null;
+            //   }
+            //   if (!objectB.bounds) {
+            //     objectB.bounds.bottom = null;
+            //   }
+            //   if (objectA.bounds.bottom < objectB.bounds.bottom) {
+            //     return 1;
+            //   } else {
+            //     return -1;
+            //   }
+            // });
+            // console.log(objects);
             objects.forEach(function(object) {
+
                 // Save the drawing context
                 gameCtx.save();
                 // Translate the canvas origin to be the top left of the object
                 gameCtx.translate(object.info.pos.x, object.info.pos.y);
                 // If object has collision map bounds, check avatar location. Otherwise, draw behind character by default.
-                if (object.bounds) {
-                  if (avatar.bounds.top > object.bounds.bottom) {
-                    gameCtx.globalCompositeOperation = "destination-over";  // If object is behind character.
-                  } else {
-                    gameCtx.globalCompositeOperation = "source-over"; // If object is in front of character.
-                  }
-                } else {
-                  gameCtx.globalCompositeOperation = "destination-over";  // If object is behind character.
+                // if (object.bounds) {
+                //   if (avatar.bounds.top > object.bounds.bottom) {
+                //     gameCtx.globalCompositeOperation = "destination-over";  // If object is behind character.
+                //   } else {
+                //     gameCtx.globalCompositeOperation = "source-over"; // If object is in front of character.
+                //   }
+                // } else {
+                //   gameCtx.globalCompositeOperation = "destination-over";  // If object is behind character.
+                // }
+                if ( (avatar.bounds.top > object.bounds.bottom && type === 'background') || (avatar.bounds.top < object.bounds.bottom && type === 'foreground') ) {
+                  // Draw the squares from the object's current frame
+                  object.info.image.forEach(function(square) {
+                      gameCtx.fillStyle = square.color;
+                      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+                  });
+                  gameCtx.globalAlpha = 0.2;
+                  // Draw the object's collision map (purely for testing)
+                  object.info.collisionMap.forEach(function(square) {
+                      gameCtx.fillStyle = square.color;
+                      gameCtx.fillRect(square.x, square.y, square.width, square.height);
+                  });
                 }
-                // Draw the squares from the object's current frame
-                object.info.image.forEach(function(square) {
-                    gameCtx.fillStyle = square.color;
-                    gameCtx.fillRect(square.x, square.y, square.width, square.height);
-                });
-                gameCtx.globalAlpha = 0.2;
-                // Draw the object's collision map (purely for testing)
-                object.info.collisionMap.forEach(function(square) {
-                    gameCtx.fillStyle = square.color;
-                    gameCtx.fillRect(square.x, square.y, square.width, square.height);
-                });
                 gameCtx.restore();
             });
         }
@@ -5511,14 +5700,15 @@ angular.module('questCreator')
                 if (avatarLoaded) {
                     checkAvatarBounds();
                     checkAvatarCollisions();
+                    checkEntityCollisions();
                     updateAvatar();
+                    updateEntity();
+                    drawObjects('background');
                     drawAvatar();
-                    drawObjects();
+                    drawObjects('foreground');
+                    drawEntities();
                     drawBackground();
                 }
-                // checkEntityCollisions();
-                // updateEntity();
-                // drawEntities();
             }
             requestAnimationFrame(runGame);
         }
@@ -6426,6 +6616,7 @@ angular.module('questCreator')
     UserService.checkLogin().then(function(response) {
 
         $scope.games = null;
+        $scope.requests = null;
 
         $scope.user = UserService.get();
 
@@ -6436,17 +6627,36 @@ angular.module('questCreator')
         UserService.getUserGames().done(function(games) {
             $scope.games = games;
             $scope.$apply();
+            UserService.getCollabRequests().done(function(requests) {
+              for (var i = 0; i < requests.length; i++) {
+                for (var j = 0; j < games.length; j++) {
+                  if (requests[i].game_id === games[j].id) {
+                    requests[i].gameName = games[j].name;
+                  }
+                }
+              }
+              $scope.requests = requests;
+              $scope.$apply();
+            });
+            UserService.getCollaborators().done(function(collaborators) {
+              for (var i = collaborators.length - 1; i >= 0 ; i--) {
+                console.log(collaborators[i].id, $scope.user.id);
+                if (collaborators[i].id === $scope.user.id) {
+                  collaborators.splice(i, 1);
+                } else {}
+                for (var j = 0; j < games.length; j++) {
+                  if (collaborators[i].game_id === games[j].id) {
+                    collaborators[i].gameName = games[j].name;
+                  }
+                }
+
+              }
+              $scope.collaborators = collaborators;
+              $scope.$apply();
+            });
         });
 
-        UserService.getCollabRequests().done(function(requests) {
-            $scope.requests = requests;
-            $scope.$apply();
-        });
 
-        UserService.getCollaborators().done(function(collaborators) {
-            $scope.collaborators = collaborators;
-            $scope.$apply();
-        });
 
         UserService.getCollaborations().done(function(collaborations) {
             $scope.collaborations = collaborations;
@@ -6485,7 +6695,7 @@ angular.module('questCreator')
         };
 
         $scope.toggleCollab = function(info) {
-            UserService.toggleAccepted(info.game, info.requester);
+            UserService.toggleAccepted(info.game_id, info.id);
         };
 
         $scope.removeRequest = function(collab) {
@@ -6508,6 +6718,9 @@ angular.module('questCreator')
     entity: false
   };
 
+  this.selectedObject = null;
+  this.selectedEntity = null;
+
   this.selectBackground = function(background) {
     console.log(background);
     $scope.editor.currentScene.background = background;
@@ -6515,12 +6728,18 @@ angular.module('questCreator')
   }
 
   this.selectObject = function(object) {
+    if (!object) {
+      return;
+    }
     console.log(object);
     $scope.editor.currentScene.objects.push(object);
     self.selecting.object = false;
   }
 
   this.selectEntity = function(entity) {
+    if (!entity) {
+      return;
+    }
     // console.log(entity);
     console.log($scope.editor.currentScene.entities);
     $scope.editor.currentScene.entities.push(entity);
