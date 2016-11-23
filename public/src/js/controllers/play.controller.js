@@ -776,6 +776,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                     });
                 });
               }
+              /* Not checking for collisions with other entities
               if (entities) {
                 entities.forEach(function(otherEntity) {
                   // Don't check the entity with itself
@@ -832,6 +833,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                   }
                 });
               }
+              */
             });
             if (collision.found) {
                 switch (collision.type) {
@@ -1002,20 +1004,6 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     }
 
     function drawEntities(type) {
-      // objects.sort(function(objectA, objectB) {
-      //   if (!objectA.bounds) {
-      //     objectA.bounds.bottom = null;
-      //   }
-      //   if (!objectB.bounds) {
-      //     objectB.bounds.bottom = null;
-      //   }
-      //   if (objectA.bounds.bottom < objectB.bounds.bottom) {
-      //     return 1;
-      //   } else {
-      //     return -1;
-      //   }
-      // });
-      // console.log(objects);
       entities.forEach(function(entity) {
           entity.checkAction();
           // Save the drawing context
@@ -1080,9 +1068,9 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
             if (avatarLoaded) {
                 checkAvatarBounds();
                 checkAvatarCollisions();
-                // checkEntityCollisions();
+                checkEntityCollisions();
                 updateAvatar();
-                // updateEntities();
+                updateEntities();
                 drawEntities('background');
                 drawObjects('background');
                 drawAvatar();

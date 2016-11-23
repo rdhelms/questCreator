@@ -5,6 +5,7 @@ angular.module('questCreator').factory('Entity', function() {
     this.action = 'walkLeft';
     this.info = entity.info;
     this.info.speed = {
+      mag: 3,
       x: 0,
       y: 0
     };
@@ -25,20 +26,20 @@ angular.module('questCreator').factory('Entity', function() {
       if (self.action === 'stand' || self.action === 'walkLeft' || self.action === 'walkUp' || self.action === 'walkRight' || self.action === 'walkDown') {
           switch (self.action) {
               case 'walkLeft':
-                  self.info.speed.x = -1;
+                  self.info.speed.x = -self.info.speed.mag;
                   self.info.speed.y = 0;
                   break;
               case 'walkUp':
                   self.info.speed.x = 0;
-                  self.info.speed.y = -1;
+                  self.info.speed.y = -self.info.speed.mag;
                   break;
               case 'walkRight':
-                  self.info.speed.x = 1;
+                  self.info.speed.x = self.info.speed.mag;
                   self.info.speed.y = 0;
                   break;
               case 'walkDown':
                   self.info.speed.x = 0;
-                  self.info.speed.y = 1;
+                  self.info.speed.y = self.info.speed.mag;
                   break;
           }
           // Animate the entity.
@@ -59,8 +60,29 @@ angular.module('questCreator').factory('Entity', function() {
     this.info.speed.y = 0;
   }
 
+  Entity.prototype.wander = function() {
+    this.info.speed.x = 0;
+    this.info.speed.y = 0;
+    // Entities bounce instead of stopping.
+    var randomAction = (Math.floor(Math.random() * 4));
+    switch (randomAction) {
+      case 0:
+        this.action = 'walkLeft';
+        break;
+      case 1:
+        this.action = 'walkRight';
+        break;
+      case 2:
+        this.action = 'walkUp';
+        break;
+      case 3:
+        this.action = 'walkDown';
+        break;
+    }
+  }
+
   Entity.prototype.collide = function(direction) {
-    this.stop();
+    this.wander();
     switch (direction) {
       case 'left':
         this.info.pos.x += this.info.speed.mag;
