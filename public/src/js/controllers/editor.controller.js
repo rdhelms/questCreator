@@ -992,8 +992,7 @@ angular.module('questCreator')
 
   this.goToPalette = function (type) {
     self.selectingAssets = true;
-    // PaletteService.getByType(type);
-    // $state.go('main.game.editor.palette');
+    PaletteService.getByType(type);
   };
 
   if (this.currentEditingGame.name === null) {

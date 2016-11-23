@@ -33,21 +33,13 @@ angular.module('questCreator').service('PaletteService', function (UserService) 
 
   function getAssetsByType(type) {
     currentType = type;
-    var url = '';
-    if (type === 'bg') {
-      url = 'backgrounds/all';
-    } else if (type === 'obj') {
-      url = 'obstacles/all';
-    } else if (type === 'ent'){
-      url = 'entities/all';
-    }
     return $.ajax({
       method: 'GET',
-      url: 'https://forge-api.herokuapp.com/' + url,
+      url: 'https://forge-api.herokuapp.com/' + type + '/all',
       headers: headerData,
       success: function(response) {
-        console.log(response);
         assets = response;
+        console.log(assets);
         return assets;
       },
       error: function(error) {

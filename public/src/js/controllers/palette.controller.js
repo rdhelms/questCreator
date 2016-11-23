@@ -1,9 +1,7 @@
 angular.module('questCreator').controller('paletteCtrl', function (PaletteService, $scope) {
-
+  var self = this;
   this.elements = [];
   this.currentType = PaletteService.getCurrentType();
-
-  // this.allAssets = PaletteService.getAll();
 
   this.assets = PaletteService.getCurrent();
 
@@ -13,12 +11,12 @@ angular.module('questCreator').controller('paletteCtrl', function (PaletteServic
 
   this.goToEditor = function () {
     if (this.elements) {
-      var confirm = confirm('Do you wanna save the assets you chose before leaving this screen?');
-      if (confirm) {
+      var confirmed = confirm('Do you wanna save the assets you chose before leaving this screen?');
+      if (confirmed) {
         PaletteService.saveToPalette(this.elements);
       }
     }
-    $state.go('main.game.editor');
+    editor.selectingAssets = false;
   };
 
   this.addToPalette = function (element) {
@@ -26,7 +24,8 @@ angular.module('questCreator').controller('paletteCtrl', function (PaletteServic
   };
 
   this.saveElements = function () {
-    //this function should get the current objects from the palette (preferably by type and probably from the editor service), concats that array with this.elements and sets the combined array back into the service from whence they came.
-    this.elements = [];
+    console.log(self.currentType);
+  // editor.
+  //   self.elements = [];
   };
 });
