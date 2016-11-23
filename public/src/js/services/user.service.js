@@ -297,8 +297,6 @@ angular.module('questCreator')
                     game_id: gameId,
                     requester_id: requesterId
                 },
-                // dataType: 'json',
-                // contentType: 'application/json',
                 success: function(response) {
                     console.log(response);
                 },
@@ -309,6 +307,7 @@ angular.module('questCreator')
         }
 
         function toggleRequested(gameId, requesterId) {
+          console.log(gameId, requesterId);
             $.ajax({
                 method: 'PATCH',
                 url: 'https://forge-api.herokuapp.com/collaborators/update/requested',
@@ -320,8 +319,6 @@ angular.module('questCreator')
                   game_id: gameId,
                   requester_id: requesterId
                 },
-                dataType: 'json',
-                contentType: 'application/json',
                 success: function(response) {
                     console.log(response);
                 },

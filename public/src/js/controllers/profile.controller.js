@@ -28,7 +28,7 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
             UserService.getCollaborators().done(function(collaborators) {
               for (var i = collaborators.length - 1; i >= 0 ; i--) {
                 console.log(collaborators[i].id, $scope.user.id);
-                if (collaborators[i].id === $scope.user.id) {
+                if (collaborators[i].user_id === $scope.user.id) {
                   collaborators.splice(i, 1);
                 } else {}
                 for (var j = 0; j < games.length; j++) {
@@ -82,16 +82,16 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
         };
 
         $scope.toggleCollab = function(info) {
-            UserService.toggleAccepted(info.game_id, info.id);
+            UserService.toggleAccepted(info.game_id, info.user_id);
         };
 
         $scope.removeRequest = function(collab) {
-            UserService.toggleRequested(collab.game);
+            UserService.toggleRequested(collab.game_id, collab.user_id);
         };
 
         $scope.removeCollaborator = function(collaborator) {
-            UserService.toggleRequested(collaborator.game, collaborator.requester);
-            UserService.toggleAccepted(collaborator.game, collaborator.requester);
+            UserService.toggleRequested(collaborator.game_id, collaborator.user_id);
+            UserService.toggleAccepted(collaborator.game_id, collaborator.user_id);
         };
 
     });
