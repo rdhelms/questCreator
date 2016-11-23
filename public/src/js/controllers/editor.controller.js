@@ -10,6 +10,8 @@ angular.module('questCreator')
 
   var self = this;
 
+  this.dragCalls = 0;
+
   this.gameInfo = {};
   this.currentEditingGame = {
     name: UserService.getGameEdit(),
@@ -1119,22 +1121,26 @@ angular.module('questCreator')
   };
 
   //jquery UI Stuff
-
-  $('.asset').draggable({
-    helper: 'clone',
-    start: function(event, ui) {
-      $(ui.helper).addClass('grabbed');
-    },
-    stop: function(event, ui) {
-      $(ui.helper).css({'transition': 'transform ease 100ms'}).removeClass('grabbed');
-    }
-  });
-  $('#bg-canvas').droppable({
-    drop: function(event, ui) {
-      console.log('ui', ui);
-      var clone = $(ui.draggable).clone();
-      clone.draggable();
-      $(this).append(clone);
-    }
-  });
+  this.uiDrag = function() {
+    this.dragCalls++;
+    console.log("you called this function needlessly " + this.dragCalls + " times, ya jerk!");
+    $('.asset.available').draggable({
+      helper: 'clone',
+      start: function(event, ui) {
+        $(ui.helper).addClass('grabbed');
+      },
+      stop: function(event, ui) {
+        $(ui.helper).css({'transition': 'transform ease 100ms'}).removeClass('grabbed');
+      }
+    });
+    $('#scene-BG').droppable({
+      drop: function(event, ui) {
+        log("ui: ", ui);
+        log("event: ", event);
+        var clone = $(ui.draggable).clone();
+        clone.draggable();
+        $(this).append(clone);
+      }
+    });
+  };
 });

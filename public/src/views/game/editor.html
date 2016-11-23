@@ -26,6 +26,7 @@
             <div class="edit-canvas {{editor.currentLargeView}}" ng-class="{{editor.currentLargeView}}">
                 <ui-view ng-show="editor.currentLargeView === 'map'" name="maps"></ui-view>
                 <div ng-show="editor.currentSmallView === 'scene'" ng-style="editor.currentSceneImg" id="scene-BG"></div>
+                {{editor.uiDrag()}}
                 <ui-view ng-show="editor.currentLargeView === 'background'" name="backgrounds"></ui-view>
             </div>
             <!-- CONTROLS -->
@@ -53,22 +54,23 @@
               <li class="viewer" id="backgrounds">
                   <h4><a title="Click to browse backgrounds to add to your palette." ng-click="editor.goToPalette('backgrounds')">Backgrounds</a></h4>
                   <ul>
-                    <li ng-click="editor.createBackground()"> <div class="availableAsset"> + </div> </li>
-                    <li ng-repeat="background in editor.availableBackgrounds | orderBy:'-'" ng-click="editor.editBackground(background)"><div class="availableAsset"> {{background.name}} </div></li>
+                    <li ng-click="editor.createBackground()"> <div class="asset new"> + </div> </li>
+                    <li ng-repeat="background in editor.availableBackgrounds | orderBy:'-'" ng-click="editor.editBackground(background)"><div class="asset available"> {{background.name}} </div></li>
                   </ul>
               </li>
               <li class="viewer" id="game-objects">
                   <h4><a title="Click to browse game objects to add to your palette." ng-click="editor.goToPalette('obstacles')">Game Objects</a></h4>
                   <ul>
-                      <li ng-click="editor.createObject()"> <div class="availableAsset"> + </div> </li>
-                      <li ng-repeat="object in editor.availableObjects | orderBy:'-'" ng-click="editor.editObject(object)"><div class="availableAsset"> {{object.name}} </div></li>
+                      <li ng-click="editor.createObject()"> <div class="asset new"> + </div> </li>
+                      <li ng-repeat="object in editor.availableObjects | orderBy:'-'" ng-click="editor.editObject(object)"><div class="asset available"> {{object.name}} </div></li>
                   </ul>
               </li>
               <li class="viewer" id="entities">
                   <h4><a title="Click to browse entities to add to your palette." ng-click="editor.goToPalette('entities')">Entities</a></h4>
                   <ul>
-                      <li ng-click="editor.createEntity()"> <div class="availableAsset"> + </div> </li>
-                      <li ng-repeat="entity in editor.availableEntities | orderBy:'-'" ng-click="editor.editEntityFrame(entity)"><div class="availableAsset"> {{entity.name}} </div></li>
+                      <li ng-click="editor.createEntity()"> <div class="asset new"> + </div> </li>
+                      <li ng-repeat="entity in editor.availableEntities | orderBy:'-'" ng-click="editor.editEntityFrame(entity)"><div class="asset available"> {{entity.name}} </div></li>
+                      {{editor.uiDrag()}}
                   </ul>
               </li>
               <li class="viewer" id="scripts">

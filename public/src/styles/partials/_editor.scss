@@ -153,13 +153,13 @@
   }
 
   .edit-canvas {
-    height: 500px;
-    width: 700px;
+    box-sizing: content-box;
+    height: 508px;
+    width: 708px;
     flex: 1;
     display: flex;
     justify-content: center;
     border: 4px solid black;
-    margin: .5em;
 
     &.map {
       overflow: auto;
@@ -167,9 +167,9 @@
 
     &.scene {
       #scene-BG {
-        height: 100%;
-        width: 100%;
-        overflow: hidden;
+        height: calc(100% - 8px);
+        width: calc(100% - 8px);
+        overflow: visible;
       }
     }
 
@@ -375,7 +375,7 @@ canvas.asset {
   }
 }
 
-.availableAsset {
+.asset {
   height: 75px;
   width: 75px;
   border: 2px solid black;
