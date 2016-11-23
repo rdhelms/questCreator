@@ -96,11 +96,15 @@ angular.module('questCreator').controller('bgCtrl', function($state, $scope, Edi
     self.allCollisionSquares = collisionArray;
     drawBackgroundSquares();
     drawCollisionSquares();
+
+    //NOTE probably can edit this out eventually:
     var dataURL = self.myCanvas.toDataURL();
     $scope.editor.currentSceneImg = {
       'background': 'url("' + dataURL + '")'
     };
     console.log("??", $scope.editor.currentSceneImg);
+    //NOTE probably can edit this out eventually^
+
   });
 
   // /*
@@ -578,7 +582,7 @@ angular.module('questCreator').controller('bgCtrl', function($state, $scope, Edi
   // 2) Create and store a new background object and make it the current Background.
   // 3) Finally, draw the Obstacles and Character.
   $('#saveBackground').click(function() {
-    EditorService.saveBackground(self.allBackgroundSquares, self.allCollisionSquares, $scope.editor.currentBackground).done(function(background) {
+    EditorService.saveBackground(self.allBackgroundSquares, self.allCollisionSquares, $scope.editor.currentBackground, self.myCanvas.toDataURL()).done(function(background) {
       console.log(background);
     });
     // self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);

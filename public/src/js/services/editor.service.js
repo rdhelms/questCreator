@@ -139,7 +139,9 @@ angular.module('questCreator').service('EditorService', function (UserService, $
         description: game.description,
         info: game.info,
         published: true,
+        thumbnail: game.info.maps[0].scenes[0][0].background.thumbnail || null
       };
+      console.log(gameUpdateData);
       var headerData = {
         user_id: UserService.get().id,
         token: UserService.get().token
@@ -192,9 +194,10 @@ angular.module('questCreator').service('EditorService', function (UserService, $
       });
     }
 
-    function saveBackground(imageArr, collisionArr, currentBackground) {
+    function saveBackground(imageArr, collisionArr, currentBackground, thumbnail) {
       currentBackground.info.image = imageArr;
       currentBackground.info.collisionMap = collisionArr;
+      currentBackground.thumbnail = thumbnail;
       var headerData = {
         user_id: UserService.get().id,
         token: UserService.get().token
@@ -251,9 +254,10 @@ angular.module('questCreator').service('EditorService', function (UserService, $
       });
     }
 
-    function saveObject(imageArr, collisionArr, currentObject) {
+    function saveObject(imageArr, collisionArr, currentObject, thumbnail) {
       currentObject.info.image = imageArr;
       currentObject.info.collisionMap = collisionArr;
+      currentObject.thumbnail = thumbnail;
       var headerData = {
         user_id: UserService.get().id,
         token: UserService.get().token
@@ -361,9 +365,10 @@ angular.module('questCreator').service('EditorService', function (UserService, $
       });
     }
 
-    function saveEntity(imageArr, collisionArr, currentEntity, currentAnimation, frameIndex) {
+    function saveEntity(imageArr, collisionArr, currentEntity, currentAnimation, frameIndex, thumbnail) {
       currentEntity.info.animate[currentAnimation][frameIndex].image = imageArr;
       currentEntity.info.animate[currentAnimation][frameIndex].collisionMap = collisionArr;
+      currentEntity.thumbnail = thumbnail;
       currentEntity.published = true;
       var headerData = {
         user_id: UserService.get().id,

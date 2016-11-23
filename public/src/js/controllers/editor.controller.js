@@ -22,7 +22,9 @@ angular.module('questCreator')
   this.currentObject = null;
   this.currentEntity = null;
   this.currentScene = null;
+  //NOTE probably can remove:
   this.currentSceneImg = {};
+  //NOTE probably can remove^
   this.currentLargeView = 'map';
   this.currentSmallView = 'object';
   this.availableBackgrounds = [];

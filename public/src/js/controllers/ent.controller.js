@@ -609,7 +609,7 @@ angular.module('questCreator').controller('entCtrl', function($state, $scope, Ed
   // 2) Create and store a new background object and make it the current Background.
   // 3) Finally, draw the Obstacles and Character.
   $('#saveEntity').click(function() {
-    EditorService.saveEntity(self.allBackgroundSquares, self.allCollisionSquares, $scope.editor.currentEntity, $scope.editor.selectedAnimation, $scope.editor.currentFrameIndex).done(function(entity) {
+    EditorService.saveEntity(self.allBackgroundSquares, self.allCollisionSquares, $scope.editor.currentEntity, $scope.editor.selectedAnimation, $scope.editor.currentFrameIndex, self.myCanvas.toDataURL()).done(function(entity) {
       console.log("After save:", entity);
     });
     // self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
