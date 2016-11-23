@@ -146,6 +146,7 @@
     this.action = 'walkLeft';
     this.info = entity.info;
     this.info.speed = {
+      mag: 3,
       x: 0,
       y: 0
     };
@@ -166,20 +167,20 @@
       if (self.action === 'stand' || self.action === 'walkLeft' || self.action === 'walkUp' || self.action === 'walkRight' || self.action === 'walkDown') {
           switch (self.action) {
               case 'walkLeft':
-                  self.info.speed.x = -1;
+                  self.info.speed.x = -self.info.speed.mag;
                   self.info.speed.y = 0;
                   break;
               case 'walkUp':
                   self.info.speed.x = 0;
-                  self.info.speed.y = -1;
+                  self.info.speed.y = -self.info.speed.mag;
                   break;
               case 'walkRight':
-                  self.info.speed.x = 1;
+                  self.info.speed.x = self.info.speed.mag;
                   self.info.speed.y = 0;
                   break;
               case 'walkDown':
                   self.info.speed.x = 0;
-                  self.info.speed.y = 1;
+                  self.info.speed.y = self.info.speed.mag;
                   break;
           }
           // Animate the entity.
@@ -200,8 +201,29 @@
     this.info.speed.y = 0;
   }
 
+  Entity.prototype.wander = function() {
+    this.info.speed.x = 0;
+    this.info.speed.y = 0;
+    // Entities bounce instead of stopping.
+    var randomAction = (Math.floor(Math.random() * 4));
+    switch (randomAction) {
+      case 0:
+        this.action = 'walkLeft';
+        break;
+      case 1:
+        this.action = 'walkRight';
+        break;
+      case 2:
+        this.action = 'walkUp';
+        break;
+      case 3:
+        this.action = 'walkDown';
+        break;
+    }
+  }
+
   Entity.prototype.collide = function(direction) {
-    this.stop();
+    this.wander();
     switch (direction) {
       case 'left':
         this.info.pos.x += this.info.speed.mag;
@@ -839,7 +861,6 @@ angular.module('questCreator')
   }
 
   function getAssetsByType(type) {
-    console.log(headerData);
     currentType = type;
     return $.ajax({
       method: 'GET',
@@ -847,7 +868,6 @@ angular.module('questCreator')
       headers: headerData,
       success: function(response) {
         assets = response;
-        console.log(assets);
         return assets;
       },
       error: function(error) {
@@ -861,9 +881,10 @@ angular.module('questCreator')
       method: 'GET',
       url: 'https://forge-api.herokuapp.com/' + currentType + '/search',
       headers: headerData,
-      data: tag,
+      data: {
+        name: tag
+      },
       success: function(response) {
-        console.log(response);
         assets = response;
         return assets;
       },
@@ -3862,18 +3883,20 @@ angular.module('questCreator')
         });
 
         self.searchByTag = function(tag) {
-            PaletteService.getByTag(tag);
+            PaletteService.getByTag(tag).done(function (response) {
+              self.assets = response;
+              $scope.$apply();
+            });
         };
 
         self.goToEditor = function() {
-            console.log('exiting');
-            if (self.elements) {
+            if (self.elements.length > 0) {
                 var confirmed = confirm('Do you wanna save the assets you chose before leaving this screen?');
                 if (confirmed) {
                     PaletteService.saveToPalette(self.elements);
                 }
             }
-            editor.selectingAssets = false;
+            $scope.editor.selectingAssets = false;
         };
 
         self.addToPalette = function(element) {
@@ -3881,15 +3904,19 @@ angular.module('questCreator')
         };
 
         self.saveElements = function() {
-          console.log($scope.editor.availableBackgrounds);
+          var currentObjects = null;
           if (self.currentType === 'backgrounds') {
-            return $scope.editor.availableBackgrounds.push(self.elements);
+            currentObjects =  $scope.editor.availableBackgrounds.concat(self.elements);
+            $scope.editor.availableBackgrounds = currentObjects;
           } else if (self.currentType === 'obstacles') {
-            return $scope.editor.availableObjects.push(self.elements);
+            currentObjects = $scope.editor.availableObjects.concat(self.elements);
+            $scope.editor.availableObjects = currentObjects;
           } else if (self.currentType === 'entities') {
-            return $scope.editor.availableEntities.push(self.elements);
+            currentObjects = $scope.editor.availableEntities.concat(self.elements);
+            $scope.editor.availableEntities = currentObjects;
           }
-          console.log($scope.editor.availableBackgrounds);
+          console.log(currentObjects);
+
           self.elements = [];
           return self.elements;
         };
@@ -4673,6 +4700,7 @@ angular.module('questCreator')
                     });
                 });
               }
+              /* Not checking for collisions with other entities
               if (entities) {
                 entities.forEach(function(otherEntity) {
                   // Don't check the entity with itself
@@ -4729,6 +4757,7 @@ angular.module('questCreator')
                   }
                 });
               }
+              */
             });
             if (collision.found) {
                 switch (collision.type) {
@@ -4899,20 +4928,6 @@ angular.module('questCreator')
     }
 
     function drawEntities(type) {
-      // objects.sort(function(objectA, objectB) {
-      //   if (!objectA.bounds) {
-      //     objectA.bounds.bottom = null;
-      //   }
-      //   if (!objectB.bounds) {
-      //     objectB.bounds.bottom = null;
-      //   }
-      //   if (objectA.bounds.bottom < objectB.bounds.bottom) {
-      //     return 1;
-      //   } else {
-      //     return -1;
-      //   }
-      // });
-      // console.log(objects);
       entities.forEach(function(entity) {
           entity.checkAction();
           // Save the drawing context
@@ -4929,7 +4944,7 @@ angular.module('questCreator')
           // } else {
           //   gameCtx.globalCompositeOperation = "destination-over";  // If entity is behind character.
           // }
-          if (entity.bounds) {  
+          if (entity.bounds) {
             if ( (avatar.bounds.top > entity.bounds.bottom && type === 'background') || (avatar.bounds.top < entity.bounds.bottom && type === 'foreground') ) {
               // Draw the squares from the entity's current frame
               entity.info.currentFrame.image.forEach(function(square) {
@@ -4977,9 +4992,9 @@ angular.module('questCreator')
             if (avatarLoaded) {
                 checkAvatarBounds();
                 checkAvatarCollisions();
-                // checkEntityCollisions();
+                checkEntityCollisions();
                 updateAvatar();
-                // updateEntities();
+                updateEntities();
                 drawEntities('background');
                 drawObjects('background');
                 drawAvatar();
