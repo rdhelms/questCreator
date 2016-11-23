@@ -75,24 +75,26 @@
         flex-direction: column;
 
         button {
-          padding: 2em;
+          height: 100px;
+          width: 140px;
           &:hover {
             cursor: pointer;
           }
         }
 
-        input {
-          box-shadow: none;
-          border: none;
-          text-decoration: underline;
-          text-align: center;
-          text-overflow: ellipsis;
-          &:active {
-            background: whitesmoke;
-            color: black;
-          }
-        }
       }
+    }
+  }
+  
+  input {
+    box-shadow: none;
+    border: none;
+    text-decoration: underline;
+    text-align: center;
+    text-overflow: ellipsis;
+    &:active {
+      background: whitesmoke;
+      color: black;
     }
   }
 }
@@ -337,12 +339,6 @@ canvas.asset {
     display: flex;
     flex-direction: column;
 
-    .asset {
-      &:hover {
-        cursor: pointer;
-      }
-    }
-
 //dummy stuff:
   ul {
     overflow-x: auto;
@@ -381,6 +377,16 @@ canvas.asset {
   border: 2px solid black;
   font-size: 15px;
   word-wrap: break-word;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.asset-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 75px;
 }
 
 .grabbed {
