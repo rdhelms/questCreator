@@ -32,6 +32,7 @@ angular.module('questCreator').service('PaletteService', function (UserService) 
   }
 
   function getAssetsByType(type) {
+    console.log(headerData);
     currentType = type;
     return $.ajax({
       method: 'GET',
@@ -43,7 +44,7 @@ angular.module('questCreator').service('PaletteService', function (UserService) 
         return assets;
       },
       error: function(error) {
-        alert('There was a problem loading the ' + currentType +'s');
+        alert('There was a problem loading the ' + currentType + '.');
       }
     });
   }

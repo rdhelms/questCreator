@@ -2,24 +2,24 @@
   <button ng-click="palette.goToEditor()" type="button">Return To Editing</button>
   <label for="asset-search">Search {{ palette.currentType }} By Keyword:</label>
   <input type="text" ng-model="searchText" placeholder="Enter 1 word to search by...">
-
+  <p>Click on {{palette.currentType}} to add them to your Palette</p>
   <div class="format-container">
 
   <section id="assets-results">
-    <div ng-click="palette.addToPalette(element)" ng-repeat="asset in palette.assets" class="asset">
-      <canvas class="asset-canvas" width="130" height="170"></canvas>
+    <div ng-repeat="asset in palette.assets" ng-click="palette.addToPalette(asset)" class="asset">
+      <img src="{{ asset.thumbnail }}" alt="">
       <p>{{ asset.name }}</p>
       <p>{{ asset.tags }}</p>
     </div>
   </section>
 
   <section id="assets-palette">
-    <div ng-if="palette.elements" class="palette-buttons">
+    <div ng-if="palette.elements.length > 0" class="palette-buttons">
       <button ng-click="palette.saveElements()" type="button">Save These to Your Palette</button>
     </div>
 
-    <div ng-repeat="element in palette.elements" class="palette-element">
-      <canvas width="130" height="170"></canvas>
+    <div ng-repeat="element in palette.elements" class="element">
+      <img src="{{ element.thumbnail }}" alt="">
       <p>{{ element.name }}</p>
       <p>{{ element.tags }}</p>
     </div>

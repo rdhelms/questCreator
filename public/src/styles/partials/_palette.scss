@@ -24,8 +24,9 @@
       background-color: whitesmoke;
       border: black solid 2px;
       font-size: .7em;
+      margin: 5px;
 
-      canvas: {
+      img {
         background-color: $darkgrey;
         border: 1px black solid;
       }
@@ -34,7 +35,22 @@
 
   #assets-palette {
     width: 40%;
-    overflow-y: scroll;
+    overflow-y: auto;
     height: 75vh;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+
+    .element {
+      background-color: whitesmoke;
+      border: black solid 2px;
+      font-size: .7em;
+      margin: 5px;
+
+      img {
+        background-color: $darkgrey;
+        border: 1px black solid;
+      }
+    }
   }
 }

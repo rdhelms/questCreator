@@ -2,6 +2,7 @@ angular.module('questCreator').controller('paletteCtrl', function(PaletteService
 
     var self = this;
     this.elements = [];
+    this.currentType = '';
 
     $scope.$on('paletteInit', function(event, type) {
 
@@ -9,6 +10,7 @@ angular.module('questCreator').controller('paletteCtrl', function(PaletteService
             self.assets = response;
             $scope.$apply();
             self.currentType = PaletteService.getCurrentType();
+            $scope.$apply();
         });
 
         self.searchByTag = function(tag) {
@@ -26,12 +28,22 @@ angular.module('questCreator').controller('paletteCtrl', function(PaletteService
             editor.selectingAssets = false;
         };
 
-        this.addToPalette = function(element) {
-            this.elements.push(element);
+        self.addToPalette = function(element) {
+            self.elements.push(element);
         };
 
-        this.saveElements = function() {
-            console.log(self.currentType);
+        self.saveElements = function() {
+          console.log($scope.editor.availableBackgrounds);
+          if (self.currentType === 'backgrounds') {
+            return $scope.editor.availableBackgrounds.push(self.elements);
+          } else if (self.currentType === 'obstacles') {
+            return $scope.editor.availableObjects.push(self.elements);
+          } else if (self.currentType === 'entities') {
+            return $scope.editor.availableEntities.push(self.elements);
+          }
+          console.log($scope.editor.availableBackgrounds);
+          self.elements = [];
+          return self.elements;
         };
     });
 });
