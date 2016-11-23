@@ -9,19 +9,15 @@ angular.module('questCreator').controller('landingCtrl', function($state, $scope
     });
 
     $scope.createGame = function() {
-        var user;
-        UserService.get().then(function(userResponse) {
-          console.log(userResponse);
-          user = userResponse;
-          if (user.id) {
-              user.editGame = null;
-              UserService.set(user);
-              $state.go('main.game.editor.views');
-          } else {
-              alert('Please Sign In or Register.');
-              $scope.signIn();
-          }
-        });
+        var user = UserService.get();
+        if (user.id) {
+            user.editGame = null;
+            UserService.set(user);
+            $state.go('main.game.editor.views');
+        } else {
+            alert('Please Sign In or Register.');
+            $scope.signIn();
+        }
     };
 
     $scope.goToGameDetail = function(game) {
