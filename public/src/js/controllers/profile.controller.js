@@ -3,6 +3,7 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
     UserService.checkLogin().then(function(response) {
 
         $scope.games = null;
+        $scope.requests = null;
 
         $scope.user = UserService.get();
 
@@ -13,17 +14,36 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
         UserService.getUserGames().done(function(games) {
             $scope.games = games;
             $scope.$apply();
+            UserService.getCollabRequests().done(function(requests) {
+              for (var i = 0; i < requests.length; i++) {
+                for (var j = 0; j < games.length; j++) {
+                  if (requests[i].game_id === games[j].id) {
+                    requests[i].gameName = games[j].name;
+                  }
+                }
+              }
+              $scope.requests = requests;
+              $scope.$apply();
+            });
+            UserService.getCollaborators().done(function(collaborators) {
+              for (var i = collaborators.length - 1; i >= 0 ; i--) {
+                console.log(collaborators[i].id, $scope.user.id);
+                if (collaborators[i].id === $scope.user.id) {
+                  collaborators.splice(i, 1);
+                } else {}
+                for (var j = 0; j < games.length; j++) {
+                  if (collaborators[i].game_id === games[j].id) {
+                    collaborators[i].gameName = games[j].name;
+                  }
+                }
+
+              }
+              $scope.collaborators = collaborators;
+              $scope.$apply();
+            });
         });
 
-        UserService.getCollabRequests().done(function(requests) {
-            $scope.requests = requests;
-            $scope.$apply();
-        });
 
-        UserService.getCollaborators().done(function(collaborators) {
-            $scope.collaborators = collaborators;
-            $scope.$apply();
-        });
 
         UserService.getCollaborations().done(function(collaborations) {
             $scope.collaborations = collaborations;
@@ -62,7 +82,7 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
         };
 
         $scope.toggleCollab = function(info) {
-            UserService.toggleAccepted(info.game, info.requester);
+            UserService.toggleAccepted(info.game_id, info.id);
         };
 
         $scope.removeRequest = function(collab) {

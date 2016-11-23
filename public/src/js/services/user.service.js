@@ -220,7 +220,7 @@ angular.module('questCreator')
                 // dataType: 'json',
                 // contentType: 'application/json',
                 success: function(response) {
-                    console.log(response.requested);
+                    console.log(response);
                 },
                 error: function(error) {
                     console.log(error);
@@ -236,13 +236,13 @@ angular.module('questCreator')
                     user_id: user.id,
                     token: user.token
                 },
-                dataType: 'json',
-                contentType: 'application/json',
+                // dataType: 'json',
+                // contentType: 'application/json',
                 success: function(response) {
-                    console.log(response);
+                    console.log('success requests', response);
                 },
                 error: function(error) {
-                    console.log(error);
+                    console.log('error requests', error);
                 }
             });
         }
@@ -258,10 +258,10 @@ angular.module('questCreator')
                 dataType: 'json',
                 contentType: 'application/json',
                 success: function(response) {
-                    console.log(response);
+                    console.log('success collaborators', response);
                 },
                 error: function(error) {
-                    console.log(error);
+                    console.log('error collaborators', error);
                 }
             });
         }
@@ -269,7 +269,7 @@ angular.module('questCreator')
         function getCollaborations() {
             return $.ajax({
                 method: 'GET',
-                url: 'https://forge-api.herokuapp.com/collaborators/user/collaborators',
+                url: 'https://forge-api.herokuapp.com/users/collaborations',
                 headers: {
                     user_id: user.id,
                     token: user.token
@@ -277,10 +277,10 @@ angular.module('questCreator')
                 dataType: 'json',
                 contentType: 'application/json',
                 success: function(response) {
-                    console.log(response);
+                    console.log('success collaborations', response);
                 },
                 error: function(error) {
-                    console.log(error);
+                    console.log('error collaborations', error);
                 }
             });
         }
@@ -297,8 +297,8 @@ angular.module('questCreator')
                     game_id: gameId,
                     requester_id: requesterId
                 },
-                dataType: 'json',
-                contentType: 'application/json',
+                // dataType: 'json',
+                // contentType: 'application/json',
                 success: function(response) {
                     console.log(response);
                 },

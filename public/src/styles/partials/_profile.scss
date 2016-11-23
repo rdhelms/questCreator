@@ -12,6 +12,7 @@
 
         .user-info {
           display: flex;
+          flex-direction: column;
           img {
             width: 150px;
             height: 150px;
@@ -19,6 +20,14 @@
 
           .info {
             padding: .5rem;
+          }
+
+          .requests {
+            font-size: .7em;
+            }
+
+          .collaborators {
+            font-size: .7em;
           }
         }
 
