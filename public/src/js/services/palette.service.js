@@ -32,7 +32,6 @@ angular.module('questCreator').service('PaletteService', function (UserService) 
   }
 
   function getAssetsByType(type) {
-    console.log(headerData);
     currentType = type;
     return $.ajax({
       method: 'GET',
@@ -40,7 +39,6 @@ angular.module('questCreator').service('PaletteService', function (UserService) 
       headers: headerData,
       success: function(response) {
         assets = response;
-        console.log(assets);
         return assets;
       },
       error: function(error) {
@@ -54,9 +52,10 @@ angular.module('questCreator').service('PaletteService', function (UserService) 
       method: 'GET',
       url: 'https://forge-api.herokuapp.com/' + currentType + '/search',
       headers: headerData,
-      data: tag,
+      data: {
+        name: tag
+      },
       success: function(response) {
-        console.log(response);
         assets = response;
         return assets;
       },

@@ -14,18 +14,20 @@ angular.module('questCreator').controller('paletteCtrl', function(PaletteService
         });
 
         self.searchByTag = function(tag) {
-            PaletteService.getByTag(tag);
+            PaletteService.getByTag(tag).done(function (response) {
+              self.assets = response;
+              $scope.$apply();
+            });
         };
 
         self.goToEditor = function() {
-            console.log('exiting');
-            if (self.elements) {
+            if (self.elements.length > 0) {
                 var confirmed = confirm('Do you wanna save the assets you chose before leaving this screen?');
                 if (confirmed) {
                     PaletteService.saveToPalette(self.elements);
                 }
             }
-            editor.selectingAssets = false;
+            $scope.editor.selectingAssets = false;
         };
 
         self.addToPalette = function(element) {
@@ -33,15 +35,19 @@ angular.module('questCreator').controller('paletteCtrl', function(PaletteService
         };
 
         self.saveElements = function() {
-          console.log($scope.editor.availableBackgrounds);
+          var currentObjects = null;
           if (self.currentType === 'backgrounds') {
-            return $scope.editor.availableBackgrounds.push(self.elements);
+            currentObjects =  $scope.editor.availableBackgrounds.concat(self.elements);
+            $scope.editor.availableBackgrounds = currentObjects;
           } else if (self.currentType === 'obstacles') {
-            return $scope.editor.availableObjects.push(self.elements);
+            currentObjects = $scope.editor.availableObjects.concat(self.elements);
+            $scope.editor.availableObjects = currentObjects;
           } else if (self.currentType === 'entities') {
-            return $scope.editor.availableEntities.push(self.elements);
+            currentObjects = $scope.editor.availableEntities.concat(self.elements);
+            $scope.editor.availableEntities = currentObjects;
           }
-          console.log($scope.editor.availableBackgrounds);
+          console.log(currentObjects);
+
           self.elements = [];
           return self.elements;
         };
