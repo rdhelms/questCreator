@@ -8,8 +8,8 @@
         <!-- TAB NAVIGATOR -->
           <ul class="tab-nav">
               <li class="tab" ng-class="{'active': editor.currentLargeView === 'map'}" ng-click="editor.currentLargeView = 'map'"><h5>Map</h5></li>
-              <li class="tab" ng-class="{'active': editor.currentLargeView === 'scene'}" ng-click="editor.currentLargeView = 'scene'"><h5>{{editor.currentScene.name || "Scene"}}</h5></li>
-              <li class="tab" ng-class="{'active': editor.currentLargeView === 'background'}" ng-click="editor.currentLargeView = 'background'"><h5>{{editor.currentBackground.name || "Background"}}</h5></li>
+              <li class="tab" ng-class="{'active': editor.currentLargeView === 'scene'}" ng-click="editor.currentLargeView = 'scene'; editor.currentSmallView = 'scene'"><h5>Scene</h5><p>{{editor.currentScene.name || "..."}}</p></li>
+              <li class="tab" ng-class="{'active': editor.currentLargeView === 'background'}" ng-click="editor.currentLargeView = 'background'; editor.currentSmallView = false;"><h5>Background</h5><p>{{editor.currentBackground.name || "..."}}</p></li>
           </ul>
           <!-- GENERAL EDITOR VIEW TEMPLATE -->
           <section class="editor-contents" id="scene">
@@ -25,13 +25,16 @@
             <!-- EDIT SPACE -->
             <div class="edit-canvas {{editor.currentLargeView}}" ng-class="{{editor.currentLargeView}}">
                 <ui-view ng-show="editor.currentLargeView === 'map'" name="maps"></ui-view>
-                <ui-view ng-show="editor.currentLargeView === 'scene'" name="scenes" ng-style="editor.currentSceneImg"></ui-view>
+                <div ng-show="editor.currentSmallView === 'scene'" ng-style="editor.currentSceneImg" id="scene-BG"></div>
                 <ui-view ng-show="editor.currentLargeView === 'background'" name="backgrounds"></ui-view>
             </div>
             <!-- CONTROLS -->
             <ul class="editor-controls">
                 <li><button id="clearBackground" ng-disabled="editor.currentLargeView !== 'background'">Clear</button></li>
-                <li><button id="saveBackground" ng-disabled="editor.currentLargeView !== 'background'"><div>Save {{editor.currentBackground.name || "Background"}}</div></button></li>
+                <li><button id="saveBackground">
+                  <div ng-if="editor.currentLargeView !== 'scene'">Save {{editor.currentBackground.name || "Background"}}</div>
+                  <div ng-hide="editor.currentSmallView !== 'scene'">Save {{editor.currentScene.name || "Scene"}}</div>
+                </button></li>
                 <li><button id="undoBackground" ng-disabled="editor.currentLargeView !== 'background'">Undo</button></li>
                 <li><button id="redoBackground" ng-disabled="editor.currentLargeView !== 'background'">Redo</button></li>
             </ul>
@@ -39,9 +42,7 @@
 
           <!-- TOOLBAR -->
           <section id="tool-bar">
-            <ng-include ng-hide="editor.currentLargeView === 'scene'" src="'./src/views/game/editor/tools/palette.html'"></ng-include>
-            <ng-include ng-if="editor.currentLargeView === 'scene'" src="'./src/views/game/editor/tools/scene-tools.html'"></ng-include>
-
+            <ng-include src="'./src/views/game/editor/tools/palette.html'"></ng-include>
           </section>
       </section>
 
@@ -84,6 +85,7 @@
               <ui-view name="objects" ng-show="editor.currentSmallView === 'object'"></ui-view>
               <ui-view name="entities" ng-show="editor.currentSmallView === 'entity'"></ui-view>
               <ui-view name="scripts" ng-show="editor.currentSmallView === 'script'"></ui-view>
+              <ui-view name="scenes" ng-show="editor.currentSmallView === 'scene'"></ui-view>
           </section>
       </aside>
 

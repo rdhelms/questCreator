@@ -23,7 +23,7 @@ angular.module('questCreator')
   this.currentEntity = null;
   this.currentScene = null;
   this.currentSceneImg = {};
-  this.currentLargeView = 'background';
+  this.currentLargeView = 'map';
   this.currentSmallView = 'object';
   this.availableBackgrounds = [];
   this.availableObjects = [];
@@ -1018,7 +1018,6 @@ angular.module('questCreator')
           $scope.$apply();
         });
       });
-      $('.create-game').hide();
       UserService.setGameEdit(name);
   };
 
