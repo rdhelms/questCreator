@@ -1080,9 +1080,9 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
             if (avatarLoaded) {
                 checkAvatarBounds();
                 checkAvatarCollisions();
-                checkEntityCollisions();
+                // checkEntityCollisions();
                 updateAvatar();
-                updateEntities();
+                // updateEntities();
                 drawEntities('background');
                 drawObjects('background');
                 drawAvatar();
