@@ -7,6 +7,9 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
     entity: false
   };
 
+  this.selectedObject = null;
+  this.selectedEntity = null;
+
   this.selectBackground = function(background) {
     console.log(background);
     $scope.editor.currentScene.background = background;
@@ -14,12 +17,18 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
   }
 
   this.selectObject = function(object) {
+    if (!object) {
+      return;
+    }
     console.log(object);
     $scope.editor.currentScene.objects.push(object);
     self.selecting.object = false;
   }
 
   this.selectEntity = function(entity) {
+    if (!entity) {
+      return;
+    }
     // console.log(entity);
     console.log($scope.editor.currentScene.entities);
     $scope.editor.currentScene.entities.push(entity);

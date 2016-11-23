@@ -1,4 +1,4 @@
-<p class="objectEditorTitle"> {{editor.currentObject.name}} </p>
+<input class="objectEditorTitle" type="text" ng-model="editor.currentObject.name" ng-click="editor.selectText($event)" blur-on-enter></input>
 <div ng-show="editor.currentObject" class="edit-canvas"><canvas id="obj-canvas" height="200" width="200"></canvas></div>
 <ul class="editor-controls">
     <li><button id="clearObject">Clear</button></li>
