@@ -35,6 +35,7 @@ angular.module('questCreator')
   this.selectedAnimation = "walkLeft";
 
   this.currentColor = 'green';
+  this.inputColor;
   this.currentPixelSize = 15;
   this.drawingCollision = false;
   this.erasing = false;
@@ -999,6 +1000,18 @@ angular.module('questCreator')
   this.goToPalette = function (type) {
     self.selectingAssets = true;
     $scope.$broadcast('paletteInit', {type: type});
+  };
+
+  this.selectColor = function() {
+      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(self.inputColor);
+      var rgb = result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+      } : null;
+      self.currentColor = 'rgb(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ')';
+      console.log(self.currentColor);
+      console.log(self.inputColor);  
   };
 
   if (this.currentEditingGame.name === null) {

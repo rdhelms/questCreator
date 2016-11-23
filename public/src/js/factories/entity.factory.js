@@ -1,36 +1,78 @@
 angular.module('questCreator').factory('Entity', function() {
-  function Entity(entityInfo) {
-    this.name = entityInfo.name;
-    this.obj = entityInfo.obj;
-    this.game_id = entityInfo.game_id;
-    this.action = 'walkRight';
+  function Entity(entity) {
+    this.name = entity.name;
+    this.game_id = entity.game_id;
+    this.action = 'walkLeft';
+    this.info = entity.info;
+    this.info.speed = {
+      x: 0,
+      y: 0
+    };
+    this.info.currentFrameIndex = 0;
+    this.info.currentFrame = this.info.animate[this.action][this.info.currentFrameIndex];
+    this.animateDelay = 20;
+    this.animateTime = 0;
   };
 
   Entity.prototype.updatePos = function() {
-    this.obj.pos.x += this.obj.speed.x;
-    this.obj.pos.y += this.obj.speed.y;
+    this.info.pos.x += this.info.speed.x;
+    this.info.pos.y += this.info.speed.y;
+  }
+
+  Entity.prototype.checkAction = function() {
+    var self = this;
+    if (self.animateTime > self.animateDelay) {
+      if (self.action === 'stand' || self.action === 'walkLeft' || self.action === 'walkUp' || self.action === 'walkRight' || self.action === 'walkDown') {
+          switch (self.action) {
+              case 'walkLeft':
+                  self.info.speed.x = -1;
+                  self.info.speed.y = 0;
+                  break;
+              case 'walkUp':
+                  self.info.speed.x = 0;
+                  self.info.speed.y = -1;
+                  break;
+              case 'walkRight':
+                  self.info.speed.x = 1;
+                  self.info.speed.y = 0;
+                  break;
+              case 'walkDown':
+                  self.info.speed.x = 0;
+                  self.info.speed.y = 1;
+                  break;
+          }
+          // Animate the entity.
+          self.info.currentFrame = self.info.animate[self.action][self.info.currentFrameIndex];
+          self.info.currentFrameIndex++;
+          if (self.info.currentFrameIndex > self.info.animate[self.action].length - 1) {
+              self.info.currentFrameIndex = 0;
+          }
+      }
+      self.animateTime = 0;
+    }
+    self.animateTime++;
   }
 
   Entity.prototype.stop = function() {
-    this.action = 'stand';
-    this.obj.speed.x = 0;
-    this.obj.speed.y = 0;
+    this.action = 'walkRight';
+    this.info.speed.x = 0;
+    this.info.speed.y = 0;
   }
 
   Entity.prototype.collide = function(direction) {
     this.stop();
     switch (direction) {
       case 'left':
-        this.obj.pos.x += this.obj.speed.mag;
+        this.info.pos.x += this.info.speed.mag;
         break;
       case 'right':
-        this.obj.pos.x -= this.obj.speed.mag;
+        this.info.pos.x -= this.info.speed.mag;
         break;
       case 'up':
-        this.obj.pos.y += this.obj.speed.mag;
+        this.info.pos.y += this.info.speed.mag;
         break;
       case 'down':
-        this.obj.pos.y -= this.obj.speed.mag;
+        this.info.pos.y -= this.info.speed.mag;
         break;
     }
   }
