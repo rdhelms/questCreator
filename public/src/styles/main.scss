@@ -108,6 +108,12 @@ button {
   }
 }
 
+.search-button {
+    background-image: url('../images/magnifying-glass.gif');
+    height: 35px;
+    width: 35px;
+    background-size: cover;
+}
 
 body {
   background: $lightgrey;

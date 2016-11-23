@@ -10,7 +10,7 @@
             </li>
             <li>
                 <label for="created">Date Created:</label>
-                <a ng-click="detail.userGames">{{ detail.game.created_at }}</a>
+                <a ng-click="detail.userGames">{{ detail.game.created_at | date:'MMM d - h:mm a' }}</a>
             </li>
             <li>
                 <label for="players">Players:</label>
