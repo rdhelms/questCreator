@@ -8,8 +8,8 @@
         <!-- TAB NAVIGATOR -->
           <ul class="tab-nav">
               <li class="tab" ng-class="{'active': editor.currentLargeView === 'map'}" ng-click="editor.currentLargeView = 'map'"><h5>Map</h5></li>
-              <li class="tab" ng-class="{'active': editor.currentLargeView === 'scene'}" ng-click="editor.currentLargeView = 'scene'"><h5>{{editor.currentScene.name || "Scene"}}</h5></li>
-              <li class="tab" ng-class="{'active': editor.currentLargeView === 'background'}" ng-click="editor.currentLargeView = 'background'"><h5>{{editor.currentBackground.name || "Background"}}</h5></li>
+              <li class="tab" ng-class="{'active': editor.currentLargeView === 'scene'}" ng-click="editor.currentLargeView = 'scene'; editor.currentSmallView = 'scene'"><h5>Scene</h5><p>{{editor.currentScene.name || "..."}}</p></li>
+              <li class="tab" ng-class="{'active': editor.currentLargeView === 'background'}" ng-click="editor.currentLargeView = 'background'; editor.currentSmallView = false;"><h5>Background</h5><p>{{editor.currentBackground.name || "..."}}</p></li>
           </ul>
           <!-- GENERAL EDITOR VIEW TEMPLATE -->
           <section class="editor-contents" id="scene">

@@ -32,9 +32,11 @@
     padding: .3em 0;
     text-align: center;
     border-bottom: 4px solid black;
+    overflow: hidden;
 
-    h5 {
+    p {
       white-space: nowrap;
+      text-overflow: ellipsis;
       overflow: hidden;
     }
 
@@ -164,11 +166,15 @@
     }
 
     &.scene {
-      // idk
+      #scene-BG {
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+      }
     }
 
     &.background {
-      // idk
+      overflow: hidden;
     }
 
     @include radial-gradient (
@@ -207,12 +213,10 @@
 #tool-bar {
   flex: 1;
   border: 4px black solid;
-  display: flex;
-  flex-direction: column;
+  padding: .5rem;
 
   #colors-menu {
     flex: 1;
-    height: 100%;
     display: flex;
     justify-content: space-around;
     align-items: center;
