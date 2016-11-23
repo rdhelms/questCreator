@@ -3,6 +3,8 @@
   <label for="asset-search">Search {{ palette.currentType }} By Keyword:</label>
   <input type="text" ng-model="searchText" placeholder="Enter 1 word to search by...">
 
+  <div class="format-container">
+
   <section id="assets-results">
     <div ng-click="palette.addToPalette(element)" ng-repeat="asset in palette.assets" class="asset">
       <canvas class="asset-canvas" width="130" height="170"></canvas>
@@ -22,4 +24,5 @@
       <p>{{ element.tags }}</p>
     </div>
   </section>
+</div>
 </div>

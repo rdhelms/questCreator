@@ -2,8 +2,39 @@
   z-index: 10;
   position: absolute;
   border: 4px solid black;
-  background-color: pink;
+  background-color: $lightgrey;
   width: 85vw;
   height: 83vh;
   box-shadow: 8px 8px 0 0 red;
+
+  .format-container {
+    display: flex;
+
+  }
+
+  #assets-results {
+    overflow-y: scroll;
+    width: 60%;
+    height: 75vh;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+
+    .asset {
+      background-color: whitesmoke;
+      border: black solid 2px;
+      font-size: .7em;
+
+      canvas: {
+        background-color: $darkgrey;
+        border: 1px black solid;
+      }
+    }
+  }
+
+  #assets-palette {
+    width: 40%;
+    overflow-y: scroll;
+    height: 75vh;
+  }
 }

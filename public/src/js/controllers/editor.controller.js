@@ -989,12 +989,12 @@ angular.module('questCreator')
       "created_at": "2016-11-21T18:50:12.509Z",
       "updated_at": "2016-11-21T18:52:59.961Z",
       "$$hashKey": "object:105"
-  }
+  };
   // this.availableEntities.push(this.dummyent);
 
   this.goToPalette = function (type) {
     self.selectingAssets = true;
-    PaletteService.getByType(type);
+    $scope.$broadcast('paletteInit', {type: type});
   };
 
   if (this.currentEditingGame.name === null) {
