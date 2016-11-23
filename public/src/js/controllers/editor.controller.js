@@ -28,13 +28,15 @@ angular.module('questCreator')
   this.availableBackgrounds = [];
   this.availableObjects = [];
   this.availableEntities = [];
-  this.selectedAnimation = "Animations";
+  this.selectedAnimation = "walkLeft";
 
   this.currentColor = 'green';
   this.currentPixelSize = 15;
   this.drawingCollision = false;
+  this.erasing = false;
   this.selectingAssets = false;
-  this.frameindex = 0;
+  this.currentFrameIndex = 0;
+  this.modeledFrameIndex = 0; // For some reason ng-model is being wacky the first click
 
   //TESTING PLEASE REMOVE:
   this.dummyent = {
@@ -988,7 +990,7 @@ angular.module('questCreator')
       "updated_at": "2016-11-21T18:52:59.961Z",
       "$$hashKey": "object:105"
   }
-  this.availableEntities.push(this.dummyent);
+  // this.availableEntities.push(this.dummyent);
 
   this.goToPalette = function (type) {
     self.selectingAssets = true;
@@ -1006,10 +1008,10 @@ angular.module('questCreator')
   this.createNewGame = function (name) {
       PopupService.close();
       EditorService.createGame(name).done(function(game) {
-        console.log(game);
+        // console.log(game);
         self.currentEditingGame = game;
         EditorService.getGameAssets(game.id).done(function(assets) {
-          console.log(assets);
+          // console.log(assets);
           self.availableBackgrounds = assets.availableBackgrounds;
           self.availableObjects = assets.availableObstacles;
           self.availableEntities = assets.availableEntities;
@@ -1024,9 +1026,9 @@ angular.module('questCreator')
       PopupService.close();
       EditorService.getGame(self.currentEditingGame.name).done(function(game) {
         self.currentEditingGame = game;
-        console.log(self.currentEditingGame);
+        // console.log(self.currentEditingGame);
         EditorService.getGameAssets(game.id).done(function(assets) {
-          console.log(assets);
+          // console.log(assets);
           self.availableBackgrounds = assets.availableBackgrounds;
           self.availableObjects = assets.availableObstacles;
           self.availableEntities = assets.availableEntities;
@@ -1051,7 +1053,7 @@ angular.module('questCreator')
     var name = "New Background";
     var game_id = self.currentEditingGame.id;
     EditorService.createBackground(name, game_id).done(function(background) {
-      console.log(background);
+      // console.log(background);
       self.availableBackgrounds.push(background);
       self.currentBackground = background;
       $scope.$apply();
@@ -1059,7 +1061,7 @@ angular.module('questCreator')
   };
 
   this.editBackground = function(background) {
-    console.log(background);
+    // console.log(background);
     self.currentBackground = background;
     $scope.$broadcast('redrawBackground', background.info.image, background.info.collisionMap);
   };
@@ -1068,7 +1070,7 @@ angular.module('questCreator')
     var name = "New Object";
     var game_id = self.currentEditingGame.id;
     EditorService.createObject(name, game_id).done(function(object) {
-      console.log(object);
+      // console.log(object);
       self.availableObjects.push(object);
       self.currentObject = object;
       self.currentSmallView = 'object';
@@ -1077,7 +1079,7 @@ angular.module('questCreator')
   };
 
   this.editObject = function(object) {
-    console.log(object);
+    // console.log(object);
     self.currentObject = object;
     self.currentSmallView = 'object';
     $scope.$broadcast('redrawObject', object.info.image, object.info.collisionMap);
@@ -1096,10 +1098,13 @@ angular.module('questCreator')
   };
 
   this.editEntityFrame = function(entity) {
+    self.currentFrameIndex = self.modeledFrameIndex || 0;
     self.currentEntity = entity;
     self.currentSmallView = 'entity';
-    console.log("ent", entity);
-    $scope.$broadcast('redrawEntity', entity.info.animate[this.selectedAnimation][this.frameindex].image);
+    console.log("ent:", entity);
+    console.log("frame index:", self.currentFrameIndex);
+    console.log("selected frame:", entity.info.animate[self.selectedAnimation][self.currentFrameIndex]);
+    $scope.$broadcast('redrawEntity', entity.info.animate[self.selectedAnimation][self.currentFrameIndex].image, entity.info.animate[self.selectedAnimation][self.currentFrameIndex].collisionMap);
   };
 
   this.cancel = function () {

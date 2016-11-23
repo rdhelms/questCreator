@@ -329,6 +329,7 @@ canvas.asset {
   flex-wrap: wrap;
   justify-content: space-between;
   height: 40%;
+  max-width: 600px;
 
   .viewer {
     width: 50%;

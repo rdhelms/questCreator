@@ -1,5 +1,25 @@
 angular.module('questCreator').service('EditorService', function (UserService, $state) {
 
+    var drawingCopy = {
+      image: [],
+      collision: []
+    };
+
+    function copy(image, collision) {
+      drawingCopy = {
+        image: image,
+        collision: collision
+      };
+    }
+
+    function paste(type) {
+      if (type === 'image') {
+        return drawingCopy.image;
+      } else if (type === 'collision') {
+        return drawingCopy.collision;
+      }
+    }
+
     function getGame(name) {
       var nameWrapper = {
         name: name.toLowerCase()
@@ -264,8 +284,59 @@ angular.module('questCreator').service('EditorService', function (UserService, $
           x: 350,
           y: 250
         },
-        image: [],
-        collisionMap: []
+        animate: {
+          walkLeft: [
+            {
+              image: [],
+              collisionMap: []
+            }, {
+              image: [],
+              collisionMap: []
+            }, {
+              image: [],
+              collisionMap: []
+            }
+          ],
+          walkRight: [
+            {
+              image: [],
+              collisionMap: []
+            },
+            {
+              image: [],
+              collisionMap: []
+            }, {
+              image: [],
+              collisionMap: []
+            }
+          ],
+          walkUp: [
+            {
+              image: [],
+              collisionMap: []
+            },
+            {
+              image: [],
+              collisionMap: []
+            }, {
+              image: [],
+              collisionMap: []
+            }
+          ],
+          walkDown: [
+            {
+              image: [],
+              collisionMap: []
+            },
+            {
+              image: [],
+              collisionMap: []
+            }, {
+              image: [],
+              collisionMap: []
+            }
+          ]
+        }
       };
       var currentEntity = {
         name: name,
@@ -290,8 +361,10 @@ angular.module('questCreator').service('EditorService', function (UserService, $
       });
     }
 
-    function saveEntity(imageArr, currentEntity) {
-      currentEntity.info.image = imageArr;
+    function saveEntity(imageArr, collisionArr, currentEntity, currentAnimation, frameIndex) {
+      currentEntity.info.animate[currentAnimation][frameIndex].image = imageArr;
+      currentEntity.info.animate[currentAnimation][frameIndex].collisionMap = collisionArr;
+      currentEntity.published = true;
       var headerData = {
         user_id: UserService.get().id,
         token: UserService.get().token
@@ -322,6 +395,8 @@ angular.module('questCreator').service('EditorService', function (UserService, $
       createObject: createObject,
       saveObject: saveObject,
       createEntity: createEntity,
-      saveEntity: saveEntity
+      saveEntity: saveEntity,
+      copy: copy,
+      paste: paste
     };
 });

@@ -3,7 +3,8 @@
     <li class="tools">
         <button ng-show="editor.drawingCollision" ng-click="editor.drawingCollision = false" class="collision">Stop Drawing Collisions</button>
         <button ng-show="!editor.drawingCollision" ng-click="editor.drawingCollision = true" class="collision">Draw Collision</button>
-        <button class="eraser">Erase</button>
+        <button ng-show="!editor.erasing" ng-click="editor.erasing = true" class="eraser">Erase</button>
+        <button ng-show="editor.erasing" ng-click="editor.erasing = false" class="eraser">Draw</button>
     </li>
     <li class="color">
     </li>

@@ -27,6 +27,7 @@ angular.module('questCreator').controller('entCtrl', function($state, $scope, Ed
   var pixelWidth = $scope.editor.currentPixelSize;
   var pixelHeight = $scope.editor.currentPixelSize;
   var undoBackgroundArray = [];   //Array to keep track of background objects that were undone.
+  var undoCollisionArray = [];
   // var undoObstacleArray = [];   //Array to keep track of obstacle objects that were undone.
   // var undoCharacterArray = [];   //Array to keep track of character objects that were undone.
   this.speedRange = 5;     // How fast mobile objects should move.
@@ -49,6 +50,7 @@ angular.module('questCreator').controller('entCtrl', function($state, $scope, Ed
   // this.allObstacleSquares = this.currentScene.staticArr || [];  // Array of all static objects in current scene
   // this.backgroundName = this.currentBackground.name || '';  // Current selected Background name
   // this.allBackgroundSquares = this.currentBackground.staticArr || []; // Array of all static objects in current background
+  this.allCollisionSquares = [];
   this.allBackgroundSquares = [];
 
   /*
@@ -62,36 +64,38 @@ angular.module('questCreator').controller('entCtrl', function($state, $scope, Ed
   *   @methods
   *     draw: draw the rectangle on the canvas using its position, size, and color.
   */
-  function Square(x, y, width, height, color) {
+  function Square(x, y, width, height, color, type) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
     this.color = color;
-    this.draw = function() {
-      self.draw.fillStyle = this.color;
-      if (window.innerWidth <= mobileWidth) { // Mobile size
-        self.draw.fillRect(this.x * mobileScaleX, this.y * mobileScaleY, this.width, this.height);
-      } else if (window.innerWidth <= tabletWidth) { // Tablet size
-        self.draw.fillRect(this.x * tabletScale, this.y / tabletScale, this.width, this.height);
-      } else {  // Desktop size
-        self.draw.fillRect(this.x, this.y, this.width, this.height);
-      }
-    }
+    this.type = type;
   }
 
-  $scope.$on('redrawEntity', function(event, imageArr) {
+  Square.prototype.draw = function() {
+    self.draw.fillStyle = this.color;
+    if (window.innerWidth <= mobileWidth) { // Mobile size
+      self.draw.fillRect(this.x * mobileScaleX, this.y * mobileScaleY, this.width, this.height);
+    } else if (window.innerWidth <= tabletWidth) { // Tablet size
+      self.draw.fillRect(this.x * tabletScale, this.y / tabletScale, this.width, this.height);
+    } else {  // Desktop size
+      self.draw.fillRect(this.x, this.y, this.width, this.height);
+    }
+  };
+
+  $scope.$on('redrawEntity', function(event, imageArr, collisionArray) {
     canvasWidth = self.myCanvas.width;
     canvasHeight = self.myCanvas.height;
     self.draw.clearRect(0, 0, canvasWidth, canvasHeight);
     self.allBackgroundSquares = [];
+    self.allCollisionSquares = [];
     var undoBackgroundArray = [];
+    var undoCollisionArray = [];
     self.allBackgroundSquares = imageArr;
-    for (var index = 0; index < self.allBackgroundSquares.length; index++) {
-      var square = self.allBackgroundSquares[index];
-      self.draw.fillStyle = square.color;
-      self.draw.fillRect(square.x, square.y, square.width, square.height);
-    }
+    self.allCollisionSquares = collisionArray;
+    drawBackgroundSquares();
+    drawCollisionSquares();
   });
 
   // /*
@@ -192,28 +196,74 @@ angular.module('questCreator').controller('entCtrl', function($state, $scope, Ed
       //   }
       //   moved = false;
       // }
-    if (moved && drawing.background) { // Create, draw, and record a new background object
+    if ($scope.editor.erasing) {
+      var newSquareX = mouseX - self.canvasPos.x;
+      var newSquareY = mouseY - self.canvasPos.y;
+      if (!$scope.editor.drawingCollision) {
+        var toRemove = [];
+        self.allBackgroundSquares.forEach(function(square) {
+          if ( Math.abs(square.x - newSquareX) < 10 && Math.abs(square.y - newSquareY) < 10 ) {
+            toRemove.push(self.allBackgroundSquares.indexOf(square));
+          }
+        });
+        toRemove.forEach(function(index) {
+          self.allBackgroundSquares.splice(index, 1);
+        });
+      } else if ($scope.editor.drawingCollision) {
+        var toRemove = [];
+        self.allCollisionSquares.forEach(function(square) {
+          if ( Math.abs(square.x - newSquareX) < 10 && Math.abs(square.y - newSquareY) < 10 ) {
+            toRemove.push(self.allBackgroundSquares.indexOf(square));
+          }
+        });
+        toRemove.forEach(function(index) {
+          self.allCollisionSquares.splice(index, 1);
+        });
+      }
+      self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+      drawBackgroundSquares();
+      drawCollisionSquares();
+    }
+    if (moved && drawing.background && !$scope.editor.erasing) { // Create, draw, and record a new background object
       var width = $scope.editor.currentPixelSize;
       var height = $scope.editor.currentPixelSize;
-      var color = $scope.editor.currentColor;
+      var color = $scope.editor.drawingCollision ? 'rgba(100, 100, 100, 0.5)' : $scope.editor.currentColor;
       if (moveType === 'mouse') {
         var newSquareX = mouseX - self.canvasPos.x;
         var newSquareY = mouseY - self.canvasPos.y;
         var exists = false;
-        self.allBackgroundSquares.forEach(function(square) {
-          if (square.x === newSquareX && square.y === newSquareY) {
-            exists = true;
-          }
-        });
+        if ($scope.editor.drawingCollision) {
+          self.allCollisionSquares.forEach(function(square) {
+            if (square.x === newSquareX && square.y === newSquareY) {
+              exists = true;
+            }
+          });
+        } else if (!$scope.editor.drawingCollision) {
+          self.allBackgroundSquares.forEach(function(square) {
+            if (square.x === newSquareX && square.y === newSquareY) {
+              exists = true;
+            }
+          });
+        }
         if (!exists) {
-          var newSquare = new Square(mouseX - self.canvasPos.x, mouseY - self.canvasPos.y, width, height, color);
+          var type = $scope.editor.drawingCollision ? 'collision' : 'normal';
+          var newSquare = new Square(mouseX - self.canvasPos.x, mouseY - self.canvasPos.y, width, height, color, type);
           newSquare.draw();
-          self.allBackgroundSquares.push(newSquare);
+          if ($scope.editor.drawingCollision) {
+            self.allCollisionSquares.push(newSquare);
+          } else {
+            self.allBackgroundSquares.push(newSquare);
+          }
         }
       } else if (moveType === 'touch') {
-        var newSquare = new Square(touchMoveEvent.clientX - width / 2 - self.canvasPos.x, touchMoveEvent.clientY - height / 2 - self.canvasPos.y, width, height, color);
+        var type = $scope.editor.drawingCollision ? 'collision' : 'normal';
+        var newSquare = new Square(touchMoveEvent.clientX - width / 2 - self.canvasPos.x, touchMoveEvent.clientY - height / 2 - self.canvasPos.y, width, height, color, type);
         newSquare.draw();
-        self.allBackgroundSquares.push(newSquare);
+        if ($scope.editor.drawingCollision) {
+          self.allCollisionSquares.push(newSquare);
+        } else {
+          self.allBackgroundSquares.push(newSquare);
+        }
       }
       moved = false;
     }
@@ -381,7 +431,15 @@ angular.module('questCreator').controller('entCtrl', function($state, $scope, Ed
   function drawBackgroundSquares() {
     for (var index = 0; index < self.allBackgroundSquares.length; index++) {
       var square = self.allBackgroundSquares[index];
-      square.draw();
+      self.draw.fillStyle = square.color;
+      self.draw.fillRect(square.x, square.y, square.width, square.height);
+    }
+  }
+  function drawCollisionSquares() {
+    for (var index = 0; index < self.allCollisionSquares.length; index++) {
+      var square = self.allCollisionSquares[index];
+      self.draw.fillStyle = square.color;
+      self.draw.fillRect(square.x, square.y, square.width, square.height);
     }
   }
 
@@ -446,12 +504,16 @@ angular.module('questCreator').controller('entCtrl', function($state, $scope, Ed
     //   var lastObj = self.allBackgroundSquares.pop();
     //   undoBackgroundArray.push(lastObj);
     // }
-    if (drawing.background && self.allBackgroundSquares.length > 0) {
+    if (!$scope.editor.drawingCollision && self.allBackgroundSquares.length > 0) {
       var lastObj = self.allBackgroundSquares.pop();
       undoBackgroundArray.push(lastObj);
+    } else if ($scope.editor.drawingCollision && self.allCollisionSquares.length > 0) {
+      var lastObj = self.allCollisionSquares.pop();
+      undoCollisionArray.push(lastObj);
     }
     self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
     drawBackgroundSquares();
+    drawCollisionSquares();
     // drawObstacleSquares();
     // drawMobileCircles();
   });
@@ -468,12 +530,16 @@ angular.module('questCreator').controller('entCtrl', function($state, $scope, Ed
     //   var lastObj = undoBackgroundArray.pop();
     //   self.allBackgroundSquares.push(lastObj);
     // }
-    if (drawing.background && undoBackgroundArray.length > 0) {
+    if (!$scope.editor.drawingCollision && undoBackgroundArray.length > 0) {
       var lastObj = undoBackgroundArray.pop();
       self.allBackgroundSquares.push(lastObj);
+    } else if ($scope.editor.drawingCollision && undoCollisionArray.length > 0) {
+      var lastObj = undoCollisionArray.pop();
+      self.allCollisionSquares.push(lastObj);
     }
     self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
     drawBackgroundSquares();
+    drawCollisionSquares();
     // drawObstacleSquares();
     // drawMobileCircles();
   });
@@ -487,7 +553,9 @@ angular.module('questCreator').controller('entCtrl', function($state, $scope, Ed
     // self.allMobileCircles = [];
     self.draw.clearRect(0, 0, canvasWidth, canvasHeight);
     self.allBackgroundSquares = [];
+    self.allCollisionSquares = [];
     var undoBackgroundArray = [];
+    var undoCollisionArray = [];
     // var undoObstacleArray = [];
     // var undoCharacterArray = [];
     // Scenes.selectScene({})
@@ -541,8 +609,8 @@ angular.module('questCreator').controller('entCtrl', function($state, $scope, Ed
   // 2) Create and store a new background object and make it the current Background.
   // 3) Finally, draw the Obstacles and Character.
   $('#saveEntity').click(function() {
-    EditorService.saveEntity(self.allBackgroundSquares, $scope.editor.currentEntity).done(function(entity) {
-      console.log(entity);
+    EditorService.saveEntity(self.allBackgroundSquares, self.allCollisionSquares, $scope.editor.currentEntity, $scope.editor.selectedAnimation, $scope.editor.currentFrameIndex).done(function(entity) {
+      console.log("After save:", entity);
     });
     // self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
     // drawBackgroundSquares();
@@ -554,6 +622,25 @@ angular.module('questCreator').controller('entCtrl', function($state, $scope, Ed
     // Backgrounds.selectBackground(newBackground);
     // drawObstacleSquares();
     // drawMobileCircles();
+  });
+
+  // Copy and Paste buttons
+  $('#copyEntity').click(function() {
+    EditorService.copy(self.allBackgroundSquares, self.allCollisionSquares);
+  });
+
+
+  $('#pasteEntity').click(function() {
+    if (!$scope.editor.drawingCollision) {
+      var copiedImage = EditorService.paste('image');
+      self.allBackgroundSquares.push.apply(self.allBackgroundSquares, copiedImage);
+    } else if ($scope.editor.drawingCollision) {
+      var copiedCollisionMap = EditorService.paste('collision');
+      self.allCollisionSquares.push.apply(self.allCollisionSquares, copiedCollisionMap);
+    }
+    self.draw.clearRect(0, 0, self.myCanvas.width, self.myCanvas.height);
+    drawBackgroundSquares();
+    drawCollisionSquares();
   });
 
   // // When the Publish Background button is clicked, post it to the database.
