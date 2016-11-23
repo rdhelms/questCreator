@@ -22,9 +22,12 @@
 
     .asset {
       background-color: whitesmoke;
+      background-size: cover;
       border: black solid 2px;
       font-size: .7em;
       margin: 5px;
+      width: 140px;
+      height: 100px;
 
       img {
         background-color: $darkgrey;
@@ -42,10 +45,13 @@
     justify-content: space-around;
 
     .element {
+      background-size: cover;
       background-color: whitesmoke;
       border: black solid 2px;
       font-size: .7em;
       margin: 5px;
+      width: 140px;
+      height: 100px;
 
       img {
         background-color: $darkgrey;

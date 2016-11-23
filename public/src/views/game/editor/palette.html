@@ -1,28 +1,29 @@
 <div class="palette-container">
-  <button ng-click="palette.goToEditor()" type="button">Return To Editing</button>
-  <label for="asset-search">Search {{ palette.currentType }} By Keyword:</label>
-  <input type="text" ng-model="searchText" placeholder="Enter 1 word to search by...">
-  <p>Click on {{palette.currentType}} to add them to your Palette</p>
-  <div class="format-container">
+    <button ng-click="palette.goToEditor()" type="button">Return To Editing</button>
+    <form class="asset-search" ng-submit="palette.searchByTag(searchText)">
+        <label for="asset-search">Search {{ palette.currentType }} By Keyword:</label>
+        <input type="text" ng-model="searchText" placeholder="Enter 1 word to search by...">
+        <input type="submit" class="search-button" value="">
+    </form>
+    <p>Click on {{palette.currentType}} to add them to your Palette</p>
+    <div class="format-container">
 
-  <section id="assets-results">
-    <div ng-repeat="asset in palette.assets" ng-click="palette.addToPalette(asset)" class="asset">
-      <img src="{{ asset.thumbnail }}" alt="">
-      <p>{{ asset.name }}</p>
-      <p>{{ asset.tags }}</p>
-    </div>
-  </section>
+        <section id="assets-results">
+            <div ng-repeat="asset in palette.assets" ng-click="palette.addToPalette(asset)" style="background-image: url('{{asset.thumbnail}}')" class="asset">
+                <p>{{ asset.name }}</p>
+                <p>{{ asset.tags }}</p>
+            </div>
+        </section>
 
-  <section id="assets-palette">
-    <div ng-if="palette.elements.length > 0" class="palette-buttons">
-      <button ng-click="palette.saveElements()" type="button">Save These to Your Palette</button>
-    </div>
+        <section id="assets-palette">
+            <div ng-if="palette.elements.length > 0" class="palette-buttons">
+                <button ng-click="palette.saveElements()" type="button">Save These to Your Palette</button>
+            </div>
 
-    <div ng-repeat="element in palette.elements" class="element">
-      <img src="{{ element.thumbnail }}" alt="">
-      <p>{{ element.name }}</p>
-      <p>{{ element.tags }}</p>
+            <div ng-click="pallete.removeFromPalette" ng-repeat="element in palette.elements" style="background-image: url('{{ element.thumbnail }}')" class="element">
+                <p>{{ element.name }}</p>
+                <p>{{ element.tags }}</p>
+            </div>
+        </section>
     </div>
-  </section>
-</div>
 </div>
