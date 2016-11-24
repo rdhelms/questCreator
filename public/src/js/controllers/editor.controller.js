@@ -42,6 +42,7 @@ angular.module('questCreator')
   this.selectingAssets = false;
   this.currentFrameIndex = 0;
   this.modeledFrameIndex = 0; // For some reason ng-model is being wacky the first click
+  this.dragIndex = null;
 
   this.goToPalette = function (type) {
     self.selectingAssets = true;
@@ -200,10 +201,27 @@ angular.module('questCreator')
     };
   }
 
+  this.dragPositionAsset = function(index, type){
+    console.log("in");
+    self.dragIndex = {
+      index: index,
+      type: type
+    };
+  }
+
   //jquery UI Stuff
   this.uiDrag = function() {
     this.dragCalls++;
-    console.log("you called this function needlessly " + this.dragCalls + " times, ya jerk!");
+    // console.log("you called this function needlessly " + this.dragCalls + " times, ya jerk!");
+    $('.asset-in-scene').draggable({
+      start: function(event, ui) {
+        $(ui.helper).addClass('grabbed');
+      },
+      stop: function(event, ui) {
+        $(ui.helper).css({'transition': 'transform ease 100ms'}).removeClass('grabbed');
+      }
+    });
+
     $('.asset.available').draggable({
       helper: 'clone',
       start: function(event, ui) {
@@ -215,11 +233,16 @@ angular.module('questCreator')
     });
     $('#scene-BG').droppable({
       drop: function(event, ui) {
-        log("ui: ", ui);
-        log("event: ", event);
-        var clone = $(ui.draggable).clone();
-        clone.draggable();
-        $(this).append(clone);
+        console.log(self.dragIndex);
+        var type = self.dragIndex.type;
+        var index = self.dragIndex.index;
+        console.log($scope.editor.currentScene);
+        console.log("left: ", ui.position.left);
+        console.log("top: ", ui.position.top);
+        $scope.editor.currentScene[type][index].info.pos.x = ui.position.left;
+        $scope.editor.currentScene[type][index].info.pos.y = ui.position.top;
+        console.log($scope.editor.currentScene);
+        $scope.$apply();
       }
     });
   };

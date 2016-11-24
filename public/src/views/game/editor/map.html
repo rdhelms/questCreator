@@ -2,7 +2,7 @@
   <ul class="fullMap" ng-repeat="mapObj in editor.currentEditingGame.info.maps"> <input ng-model="mapObj.name" ng-click="editor.selectText($event)" blur-on-enter>
     <ul class="mapRow" ng-repeat="row in mapObj.scenes">
       <li ng-repeat="scene in row" class="mapColumn">
-        <button class="scene-button" ng-click="map.editScene(scene)" ng-style="editor.setThumbnail(scene.background)"></button>
+        <button class="scene-button" ng-click="map.editScene(scene); editor.currentLargeView = 'scene'; editor.currentSmallView = 'scene';" ng-style="editor.setThumbnail(scene.background)"></button>
         <input ng-model="scene.name" ng-click="editor.selectText($event)" blur-on-enter></input>
       </li>
       <button ng-if="editor.currentEditingGame.info.maps.indexOf(mapObj) > 0" ng-click="map.createScene(mapObj, mapObj.scenes.indexOf(row))" class="newSceneBtn">+</button>

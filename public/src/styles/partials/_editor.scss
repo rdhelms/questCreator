@@ -408,6 +408,21 @@ canvas.asset {
   width: 75px;
 }
 
+.ui-draggable {
+  cursor: grab;
+  cursor: -webkit-grab;
+
+  &:active {
+    cursor: grabbing;
+    cursor: -webkit-grabbing;
+  }
+
+  &:hover {
+    background: rgba(203,208,202,.2); //$lightgrey
+    // background: rgba(89,83,88,.2); //$darkgrey
+  }
+}
+
 .grabbed {
   transition: transform ease 100ms;
   transform: scale(1.2);
