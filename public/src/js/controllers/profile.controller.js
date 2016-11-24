@@ -62,13 +62,13 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
             $state.go('main.game.editor.views');
         };
 
-        $scope.archiveGame = function(game) {
+        $scope.archiveGame = function(game, index) {
             var agree = confirm("Are you sure you wanna archive '" + game.name + "'? That means no one will be able to play it and all player information will be lost. You will NOT be able to retrieve this later");
             if (agree) {
-                UserService.archive(game.id);
-                UserService.getUserGames().done(function(games) {
-                    $scope.games = games;
-                    $scope.$apply();
+              console.log('before', $scope.games);
+                UserService.archive(game.id).done(function (response) {
+                  $scope.games.splice(index,1);
+                  $scope.$apply();
                 });
             }
         };

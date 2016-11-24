@@ -8,7 +8,7 @@
                 <label for="joined">Another Stat:<li>Something Impressive</li></label>
             </ul>
 
-            <div ng-if="requests" class="requests">
+            <div ng-if="requests.length > 0" class="requests">
                 <a ng-click="showRequests()">Requests to collaborate</a>
                 <table>
                   <tr>
@@ -26,7 +26,7 @@
                 </table>
             </div>
 
-            <div ng-if="collaborators" class="collaborators">
+            <div ng-if="collaborators.length > 0" class="collaborators">
                 <a ng-click="showCollaborators()">Currently Approved Collaborators:</a>
                 <table>
                   <tr>
@@ -67,7 +67,7 @@
 
     <aside class="games-created">
         <button ng-click="createGame()">Create a New Game</button>
-        <div ng-if="games" class="make-some">
+        <div ng-if="!games" class="make-some">
             <h1>You Should Totally Make Some Games!</h1>
         </div>
         <h1 ng-if="games">You Did This:</h1>
@@ -91,7 +91,7 @@
             </ul>
             <div class="buttons">
               <button type="button" ng-click="editGame(game.name)">Edit</button>
-              <button type="button" ng-click="archiveGame(game)">Archive</button>
+              <button type="button" ng-click="archiveGame(game, $index)">Archive</button>
             </div>
         </div>
 

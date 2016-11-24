@@ -44,7 +44,7 @@ angular.module('questCreator')
         }
 
         function archiveGame(gameId) {
-            $.ajax({
+            return $.ajax({
                 method: 'DELETE',
                 url: 'https://forge-api.herokuapp.com/games/archive',
                 data: {
@@ -55,7 +55,7 @@ angular.module('questCreator')
                     token: user.token
                 },
                 success: function(response) {
-                    alert('Your game has been archived. If you ever want to see it again, click "Archived Games" below the list of your games. Carry on.');
+                    alert('Your game has been archived. Carry on.');
                 },
                 error: function(error) {
                     alert('There was a problem archiving this game. Please try again.');
