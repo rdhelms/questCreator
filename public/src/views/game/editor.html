@@ -1,102 +1,130 @@
 <section id="editor">
-  <ui-view class= "asset-search" name="palette" ng-show="editor.selectingAssets"> </ui-view>
+    <ui-view class="asset-search" name="palette" ng-show="editor.selectingAssets"> </ui-view>
 
-  <div id="editor-view">
+    <div id="editor-view">
 
-      <!-- SCENE EDITOR -->
-      <section id="scene-editor">
-        <!-- TAB NAVIGATOR -->
-          <ul class="tab-nav">
-              <li class="tab" ng-class="{'active': editor.currentLargeView === 'map'}" ng-click="editor.currentLargeView = 'map'"><h5>Map</h5></li>
-              <li class="tab" ng-class="{'active': editor.currentLargeView === 'scene'}" ng-click="editor.currentLargeView = 'scene'; editor.currentSmallView = 'scene'"><h5>Scene</h5><p>{{editor.currentScene.name || "..."}}</p></li>
-              <li class="tab" ng-class="{'active': editor.currentLargeView === 'background'}" ng-click="editor.currentLargeView = 'background'; editor.currentSmallView = false;"><h5>Background</h5><p>{{editor.currentBackground.name || "..."}}</p></li>
-          </ul>
-          <!-- GENERAL EDITOR VIEW TEMPLATE -->
-          <section class="editor-contents" id="scene">
+        <!-- SCENE EDITOR -->
+        <section id="scene-editor">
+            <!-- TAB NAVIGATOR -->
+            <ul class="tab-nav">
+                <li class="tab" ng-class="{'active': editor.currentLargeView === 'map'}" ng-click="editor.currentLargeView = 'map'">
+                    <h5>Map</h5></li>
+                <li class="tab" ng-class="{'active': editor.currentLargeView === 'scene'}" ng-click="editor.currentLargeView = 'scene'; editor.currentSmallView = 'scene'">
+                    <h5>Scene</h5>
+                    <p>{{editor.currentScene.name || "..."}}</p>
+                </li>
+                <li class="tab" ng-class="{'active': editor.currentLargeView === 'background'}" ng-click="editor.currentLargeView = 'background'; editor.currentSmallView = false;">
+                    <h5>Background</h5>
+                    <p>{{editor.currentBackground.name || "..."}}</p>
+                </li>
+            </ul>
+            <!-- GENERAL EDITOR VIEW TEMPLATE -->
+            <section class="editor-contents" id="scene">
 
-            <!-- HEADER -->
-            <div class="edit-header">
-              <p ng-hide="editor.currentLargeView === 'map'">{{editor.currentLargeView | capitalize}} name:</p>
-              <p ng-show="editor.currentLargeView === 'map'">Maps:</p>
-              <input type="text" ng-model="editor.currentBackground.name" ng-click="editor.selectText($event)" blur-on-enter ng-show="editor.currentLargeView === 'background'">
-              <input type="text" ng-model="editor.currentScene.name" ng-click="editor.selectText($event)" blur-on-enter ng-show="editor.currentLargeView === 'scene'">
-              <!-- <input type="text" class="currentColor" ng-model="bg.currentColor" value="{{editor.currentColor}}" ng-hide="true"> -->
-            </div>
-            <!-- EDIT SPACE -->
-            <div class="edit-canvas {{editor.currentLargeView}}" ng-class="{{editor.currentLargeView}}">
-                <ui-view ng-show="editor.currentLargeView === 'map'" name="maps"></ui-view>
-                <div ng-show="editor.currentSmallView === 'scene'" ng-hide="editor.currentLargeView === 'map' || editor.currentLargeView === 'background'" ng-style="editor.setThumbnail(editor.currentScene.background)" id="scene-BG"></div>
-                {{editor.uiDrag()}}
-                <ui-view ng-show="editor.currentLargeView === 'background'" name="backgrounds"></ui-view>
-            </div>
-            <!-- CONTROLS -->
-            <ul class="editor-controls">
-                <li><button id="clearBackground" ng-disabled="editor.currentLargeView !== 'background'">Clear</button></li>
-                <li><button id="saveBackground">
+                <!-- HEADER -->
+                <div class="edit-header">
+                    <p ng-hide="editor.currentLargeView === 'map'">{{editor.currentLargeView | capitalize}} name:</p>
+                    <p ng-show="editor.currentLargeView === 'map'">Maps:</p>
+                    <input type="text" ng-model="editor.currentBackground.name" ng-click="editor.selectText($event)" blur-on-enter ng-show="editor.currentLargeView === 'background'">
+                    <input type="text" ng-model="editor.currentScene.name" ng-click="editor.selectText($event)" blur-on-enter ng-show="editor.currentLargeView === 'scene'">
+                    <!-- <input type="text" class="currentColor" ng-model="bg.currentColor" value="{{editor.currentColor}}" ng-hide="true"> -->
+                </div>
+                <!-- EDIT SPACE -->
+                <div class="edit-canvas {{editor.currentLargeView}}" ng-class="{{editor.currentLargeView}}">
+                    <ui-view ng-show="editor.currentLargeView === 'map'" name="maps"></ui-view>
+                    <div ng-show="editor.currentSmallView === 'scene'" ng-hide="editor.currentLargeView === 'map' || editor.currentLargeView === 'background'" ng-style="editor.setThumbnail(editor.currentScene.background)" id="scene-BG"></div>
+                    {{editor.uiDrag()}}
+                    <ui-view ng-show="editor.currentLargeView === 'background'" name="backgrounds"></ui-view>
+                </div>
+                <!-- CONTROLS -->
+                <ul class="editor-controls">
+                    <li><button id="clearBackground" ng-disabled="editor.currentLargeView !== 'background'">Clear</button></li>
+                    <li><button id="saveBackground">
                   <div ng-if="editor.currentLargeView !== 'scene'">Save {{editor.currentBackground.name || "Background"}}</div>
                   <div ng-hide="editor.currentSmallView !== 'scene'">Save {{editor.currentScene.name || "Scene"}}</div>
                 </button></li>
-                <li><button id="undoBackground" ng-disabled="editor.currentLargeView !== 'background'">Undo</button></li>
-                <li><button id="redoBackground" ng-disabled="editor.currentLargeView !== 'background'">Redo</button></li>
+                    <li><button id="undoBackground" ng-disabled="editor.currentLargeView !== 'background'">Undo</button></li>
+                    <li><button id="redoBackground" ng-disabled="editor.currentLargeView !== 'background'">Redo</button></li>
+                </ul>
+            </section>
+
+            <!-- TOOLBAR -->
+            <section id="tool-bar">
+                <ng-include src="'./src/views/game/editor/tools/palette.html'"></ng-include>
+            </section>
+        </section>
+
+
+        <!-- ASSET BAR -->
+        <aside id="asset-bar">
+            <ul class="assets">
+                <li class="viewer" id="backgrounds">
+                    <h4>Backgrounds</h4>
+                    <input type="button" class="search-button" title="Click to browse backgrounds to add to your palette." ng-click="editor.goToPalette('backgrounds')">
+                    <ul>
+                        <li ng-click="editor.createBackground()">
+                            <div class="asset new"></div>
+                            <div class="asset-name">+</div>
+                        </li>
+                        <li ng-repeat="background in editor.availableBackgrounds | orderBy:'-'" ng-click="editor.editBackground(background)">
+                            <div class="asset available {{background.name | nospace}}" ng-style="editor.setThumbnail(background)"></div>
+                            <div class="asset-name">{{background.name}}</div>
+                        </li>
+                    </ul>
+                </li>
+                <li class="viewer" id="game-objects">
+                    <h4>Game Objects</h4>
+                    <input type="button" class="search-button" title="Click to browse game objects to add to your palette." ng-click="editor.goToPalette('obstacles')">
+                    <ul>
+                        <li ng-click="editor.createObject()">
+                            <div class="asset new"></div>
+                            <div class="asset-name">+</div>
+                        </li>
+                        <li ng-repeat="object in editor.availableObjects | orderBy:'-'" ng-click="editor.editObject(object)">
+                            <div class="asset available {{object.name | nospace}}" ng-style="editor.setThumbnail(object)"></div>
+                            <div class="asset-name">{{object.name}}</div>
+                        </li>
+                    </ul>
+                </li>
+                <li class="viewer" id="entities">
+                    <h4>Entities</h4>
+                    <input type="button" class="search-button" title="Click to browse entities to add to your palette." ng-click="editor.goToPalette('entities')">
+                    <ul>
+                        <li ng-click="editor.createEntity()">
+                            <div class="asset new"></div>
+                            <div class="asset-name">+</div>
+                        </li>
+                        <li ng-repeat="entity in editor.availableEntities | orderBy:'-'" ng-click="editor.editEntityFrame(entity)">
+                            <div class="asset available {{entity.name | nospace}}" ng-style="editor.setThumbnail(entity)"></div>
+                            <div class="asset-name">{{entity.name}}</div>
+                        </li>
+                        {{editor.uiDrag()}}
+                    </ul>
+                </li>
+                <li class="viewer" id="scripts">
+                    <h4>Scripts</h4>
+                    <ul>
+                        <li><canvas class="asset script"></canvas></li>
+                        <li><canvas class="asset script"></canvas></li>
+                        <li><canvas class="asset script"></canvas></li>
+                        <li><canvas class="asset script"></canvas></li>
+                    </ul>
+                </li>
             </ul>
-          </section>
+            <section class="editor-contents" id="asset">
+                <ui-view name="objects" ng-show="editor.currentSmallView === 'object'"></ui-view>
+                <ui-view name="entities" ng-show="editor.currentSmallView === 'entity'"></ui-view>
+                <ui-view name="scripts" ng-show="editor.currentSmallView === 'script'"></ui-view>
+                <ui-view name="scenes" ng-show="editor.currentSmallView === 'scene'"></ui-view>
+            </section>
+        </aside>
 
-          <!-- TOOLBAR -->
-          <section id="tool-bar">
-            <ng-include src="'./src/views/game/editor/tools/palette.html'"></ng-include>
-          </section>
-      </section>
+    </div>
 
-
-      <!-- ASSET BAR -->
-      <aside id="asset-bar">
-          <ul class="assets">
-              <li class="viewer" id="backgrounds">
-                  <h4><a title="Click to browse backgrounds to add to your palette." ng-click="editor.goToPalette('backgrounds')">Backgrounds</a></h4>
-                  <ul>
-                    <li ng-click="editor.createBackground()"> <div class="asset new"></div><div class="asset-name">+</div></li>
-                    <li ng-repeat="background in editor.availableBackgrounds | orderBy:'-'" ng-click="editor.editBackground(background)"><div class="asset available {{background.name | nospace}}" ng-style="editor.setThumbnail(background)"></div><div class="asset-name">{{background.name}}</div></li>
-                  </ul>
-              </li>
-              <li class="viewer" id="game-objects">
-                  <h4><a title="Click to browse game objects to add to your palette." ng-click="editor.goToPalette('obstacles')">Game Objects</a></h4>
-                  <ul>
-                      <li ng-click="editor.createObject()"> <div class="asset new"></div><div class="asset-name">+</div></li>
-                      <li ng-repeat="object in editor.availableObjects | orderBy:'-'" ng-click="editor.editObject(object)"><div class="asset available {{object.name | nospace}}" ng-style="editor.setThumbnail(object)"></div><div class="asset-name">{{object.name}}</div></li>
-                  </ul>
-              </li>
-              <li class="viewer" id="entities">
-                  <h4><a title="Click to browse entities to add to your palette." ng-click="editor.goToPalette('entities')">Entities</a></h4>
-                  <ul>
-                      <li ng-click="editor.createEntity()"> <div class="asset new"></div><div class="asset-name">+</div></li>
-                      <li ng-repeat="entity in editor.availableEntities | orderBy:'-'" ng-click="editor.editEntityFrame(entity)"><div class="asset available {{entity.name | nospace}}" ng-style="editor.setThumbnail(entity)"></div><div class="asset-name">{{entity.name}}</div></li>
-                      {{editor.uiDrag()}}
-                  </ul>
-              </li>
-              <li class="viewer" id="scripts">
-                  <h4>Scripts</h4>
-                  <ul>
-                      <li><canvas class="asset script"></canvas></li>
-                      <li><canvas class="asset script"></canvas></li>
-                      <li><canvas class="asset script"></canvas></li>
-                      <li><canvas class="asset script"></canvas></li>
-                  </ul>
-              </li>
-          </ul>
-          <section class="editor-contents" id="asset">
-              <ui-view name="objects" ng-show="editor.currentSmallView === 'object'"></ui-view>
-              <ui-view name="entities" ng-show="editor.currentSmallView === 'entity'"></ui-view>
-              <ui-view name="scripts" ng-show="editor.currentSmallView === 'script'"></ui-view>
-              <ui-view name="scenes" ng-show="editor.currentSmallView === 'scene'"></ui-view>
-          </section>
-      </aside>
-
-  </div>
-
-  <footer id="editor-footer">
-    <ul>
-      <li><button ng-click="editor.saveGame()" class="saveGame big"> SAVE </button></li>
-      <li><button ng-click="editor.publishGame()" class="publishGame big"> PUBLISH </button></li>
-    </ul>
-  </footer>
+    <footer id="editor-footer">
+        <ul>
+            <li><button ng-click="editor.saveGame()" class="saveGame big"> SAVE </button></li>
+            <li><button ng-click="editor.publishGame()" class="publishGame big"> PUBLISH </button></li>
+        </ul>
+    </footer>
 </section>

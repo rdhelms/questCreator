@@ -60,7 +60,7 @@ angular.module('questCreator').service('PaletteService', function (UserService) 
         return assets;
       },
       error: function(error) {
-        alert('There was a problem loading the ' + currentType +'s matching your search for ' + tag);
+        alert('There was a problem loading the ' + currentType +' matching your search for ' + tag);
       }
     });
   }
