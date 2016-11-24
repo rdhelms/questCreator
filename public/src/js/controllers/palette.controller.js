@@ -7,6 +7,7 @@ angular.module('questCreator').controller('paletteCtrl', function(PaletteService
     $scope.$on('paletteInit', function(event, type) {
 
         PaletteService.getByType(type.type).then(function(response) {
+          console.log(response);
             self.assets = response;
             $scope.$apply();
             self.currentType = PaletteService.getCurrentType();
