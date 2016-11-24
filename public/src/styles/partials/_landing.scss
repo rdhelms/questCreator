@@ -4,22 +4,21 @@
     overflow-x: hidden;
 
     main {
-      flex: 3;
-      padding: 2rem;
-
-      #game-results {
-        background: $medgrey;
+        flex: 3;
         padding: 2rem;
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: space-around;
-        height: 90%;
-        overflow-y: auto;
-        border: 4px black solid;
-      }
-    }
 
+        #game-results {
+            background: $medgrey;
+            padding: 2rem;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            height: 90%;
+            overflow-y: auto;
+            border: 4px black solid;
+        }
+    }
 
     #create-splash {
         margin: 2rem;
@@ -32,14 +31,14 @@
 
         h1 {
             font-size: 3em;
-        }
+           }
 
         button {
             overflow: hidden;
             position: relative;
 
             &::after {
-              @include sheen();
+                @include sheen();
             }
         }
     }
@@ -60,22 +59,22 @@
         font-size: 0.75em;
 
         li {
-          color: grey;
-          display: flex;
-          justify-content: flex-start;
-          padding: .5em;
+            color: grey;
+            display: flex;
+            justify-content: flex-start;
+            padding: 0.5em;
 
-          &:nth-child(odd) {
-            background: whitesmoke;
-          }
+            &:nth-child(odd) {
+                background: whitesmoke;
+            }
 
-          &:nth-child(even) {
-            background: $lightgrey;
-          }
+            &:nth-child(even) {
+                background: $lightgrey;
+            }
 
-          span {
-            color: black;
-          }
+            span {
+                color: black;
+            }
         }
     }
 }
