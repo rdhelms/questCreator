@@ -233,15 +233,10 @@ angular.module('questCreator')
     });
     $('#scene-BG').droppable({
       drop: function(event, ui) {
-        console.log(self.dragIndex);
         var type = self.dragIndex.type;
         var index = self.dragIndex.index;
-        console.log($scope.editor.currentScene);
-        console.log("left: ", ui.position.left);
-        console.log("top: ", ui.position.top);
         $scope.editor.currentScene[type][index].info.pos.x = ui.position.left;
         $scope.editor.currentScene[type][index].info.pos.y = ui.position.top;
-        console.log($scope.editor.currentScene);
         $scope.$apply();
       }
     });
