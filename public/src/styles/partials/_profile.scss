@@ -1,105 +1,155 @@
 .profile-container {
-  padding-top: 1.6rem;
+    padding-top: 1.6rem;
     display: flex;
 
     .left-screen {
-      padding: 1rem;
-      width: 65%;
-      display: flex;
-      // flex-direction: column;
-      align-items: space-around;
-      background-color: $lightgrey;
+        padding: 1rem;
+        width: 65%;
+        display: flex;
+        // flex-direction: column;
+        align-items: space-around;
+        background-color: $lightgrey;
 
         .user-info {
-          display: flex;
-          flex-direction: column;
-          img {
-            width: 150px;
-            height: 150px;
-          }
+            display: flex;
+            flex-direction: column;
 
-          .info {
-            padding: .5rem;
-          }
-
-          .requests {
-            font-size: .7em;
+            img {
+                width: 150px;
+                height: 150px;
             }
 
-          .collaborators {
-            font-size: .7em;
-          }
+            .info {
+                padding: 0.5rem;
+            }
+
+            .collab-controls {
+                display: flex;
+            }
+
+            .requests {
+                font-size: 0.7em;
+
+                .requestArrow,
+                .requestCounter {
+                    width: 45px;
+                    height: 40px;
+                    box-shadow: none;
+                    background-image: url('../images/pixel-arrow.png');
+                    background-size: cover;
+                    -webkit-transition: 300ms ease all;
+                    -moz-transition: 300ms ease all;
+                    -o-transition: 300ms ease all;
+                    transition: 300ms ease all;
+                }
+
+                .requestArrow {
+                    -webkit-transform: rotate(180deg);
+                }
+
+                .requestCounter {
+                    -webkit-transform: rotate(0deg);
+                }
+            }
+
+            .collaborators {
+                font-size: 0.7em;
+
+                .collabArrow,
+                .collabCounter {
+                    box-shadow: none;
+                    width: 45px;
+                    height: 40px;
+                    background-image: url('../images/pixel-arrow.png');
+                    background-size: cover;
+                    -webkit-transition: 300ms ease all;
+                    -moz-transition: 300ms ease all;
+                    -o-transition: 300ms ease all;
+                    transition: 300ms ease all;
+                }
+
+                .collabArrow {
+                    -webkit-transform: rotate(180deg);
+                }
+
+                .collabCounter {
+                    -webkit-transform: rotate(0deg);
+                }
+            }
         }
 
         .canvas-tools {
-          background-color: $darkgrey;
-          border: 3px black solid;
+            background-color: $darkgrey;
+            border: 3px black solid;
         }
 
         .avatar-creator {
-          display: flex;
-          canvas {
-            background: whitesmoke;
-          }
+            display: flex;
+
+            canvas {
+                background: whitesmoke;
+            }
+
             #animate-preview {
-              height: 200px;
-              width: 145px;
+                height: 200px;
+                width: 145px;
             }
 
             .frame-overview {
-              width: 217px;
-              height: 223px;
-              display: flex;
-              flex-wrap: wrap;
+                width: 217px;
+                height: 223px;
+                display: flex;
+                flex-wrap: wrap;
 
-              canvas {
-                background-color: whitesmoke;
-                margin: 2px;
-              }
+                canvas {
+                    background-color: whitesmoke;
+                    margin: 2px;
+                }
             }
         }
     }
 
     .games-created {
-      padding-top: 1.6rem;
-      padding-left: 7px;
-      width: 35%;
-      height: 100vh;
-      background: $medgrey;
-      overflow: scroll;
-      border-left: black solid 5px;
-      // display: flex;
-      // flex-direction: column;
-      // justify-content: center;
-      // align-items: space-around;
+        padding-top: 1.6rem;
+        padding-left: 7px;
+        width: 35%;
+        height: 100vh;
+        background: $medgrey;
+        overflow: scroll;
+        border-left: black solid 5px;
+        // display: flex;
+        // flex-direction: column;
+        // justify-content: center;
+        // align-items: space-around;
+        .user-games {
+            border: 5px solid black;
+            padding: 5px;
+            background-color: whitesmoke;
+            margin: 5px 0;
 
-      .user-games {
-        border: 5px solid black;
-        padding: 5px;
-        background-color: whitesmoke;
-        margin: 5px 0;
-
-        img {
-          width: 100%;
+            img {
+                width: 100%;
+            }
         }
-      }
 
-      button {
-        margin: 7px;
-        height: 70px;
-        width: 250px;
-        &:hover {
-          background: black;
-          color: whitesmoke;
-        }
-      }
+        button {
+            margin: 7px;
+            height: 70px;
+            width: 250px;
 
-      ul  {
-        display: flex;
-        li {
-          display: flex;
-          flex-direction: column;
+            &:hover {
+                background: black;
+                color: whitesmoke;
+            }
         }
-      }
+
+        ul {
+            display: flex;
+
+            li {
+                display: flex;
+                flex-direction: column;
+            }
+        }
     }
 }
