@@ -20,7 +20,7 @@
                 <button ng-click="palette.saveElements()" type="button">Save These to Your Palette</button>
             </div>
 
-            <div ng-click="pallete.removeFromPalette" ng-repeat="element in palette.elements" style="background-image: url('{{ element.thumbnail }}')" class="element">
+            <div ng-click="pallete.removeFromPalette(element)" ng-repeat="element in palette.elements" style="background-image: url('{{ element.thumbnail }}')" class="element">
                 <p>{{ element.name }}</p>
                 <p>{{ element.tags }}</p>
             </div>

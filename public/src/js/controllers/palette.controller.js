@@ -24,7 +24,7 @@ angular.module('questCreator').controller('paletteCtrl', function(PaletteService
             if (self.elements.length > 0) {
                 var confirmed = confirm('Do you wanna save the assets you chose before leaving this screen?');
                 if (confirmed) {
-                    PaletteService.saveToPalette(self.elements);
+                    self.saveElements();
                 }
             }
             $scope.editor.selectingAssets = false;
@@ -46,10 +46,13 @@ angular.module('questCreator').controller('paletteCtrl', function(PaletteService
             currentObjects = $scope.editor.availableEntities.concat(self.elements);
             $scope.editor.availableEntities = currentObjects;
           }
-          console.log(currentObjects);
-
           self.elements = [];
           return self.elements;
         };
+
+        self.removeFromPalette = function (element) {
+
+        };
+
     });
 });
