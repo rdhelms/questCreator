@@ -57,7 +57,7 @@ angular.module('questCreator')
       } : null;
       self.currentColor = 'rgb(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ')';
       console.log(self.currentColor);
-      console.log(self.inputColor);  
+      console.log(self.inputColor);
   };
 
   if (this.currentEditingGame.name === null) {
@@ -179,7 +179,7 @@ angular.module('questCreator')
         "background-size": "contain",
         "background-position": "center",
         "background-repeat": "no-repeat"
-      };      
+      };
     }
   }
 

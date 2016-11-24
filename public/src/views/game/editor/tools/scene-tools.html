@@ -1,8 +1,8 @@
 <p ng-show="editor.currentScene === null"> First pick a scene from a map! </p>
-<section id="scene-editor" ng-show="editor.currentScene !== null">
-  <h4>{{editor.currentScene.name}} Properties</h4>
+<section id="scene-assets" ng-show="editor.currentScene !== null">
+  <h4>{{editor.currentScene.name}} Assets</h4>
 
-  <ul id="colors-menu">
+  <ul>
 <!-- BACKGROUND -->
     <li>
       <span class="select" tabindex="1">
@@ -29,11 +29,12 @@
       <ul id="scene-assets objects">
         <li ng-repeat="object in editor.currentScene.objects track by $index" ng-show="editor.currentScene.objects.length > 0">
           <h5 class="scene-asset object">{{object.name}}:</h5>
-          <div class="object-positioner" ng-show="object">
+          <div class="asset-positioner" ng-show="object">
             <label>X</label>
             <input ng-model="object.info.pos.x" placeholder="350" type="number">
             <label>Y</label>
             <input ng-model="object.info.pos.y" placeholder="250" type="number">
+            <button ng-click="scene.removeAsset(object, 'objects')">X</button>
           </div>
         </li>
         <li ng-show="editor.currentScene.objects.length === 0">
@@ -57,11 +58,12 @@
       <ul id="scene-assets entities">
         <li ng-repeat="entity in editor.currentScene.entities track by $index" ng-show="editor.currentScene.entities.length > 0">
           <h5 class="scene-asset entity">{{entity.name}}:</h5>
-          <div class="entity-positioner" ng-show="entity">
+          <div class="asset-positioner" ng-show="entity">
             <label>X</label>
             <input ng-model="entity.info.pos.x" placeholder="350" type="number">
             <label>Y</label>
             <input ng-model="entity.info.pos.y" placeholder="250" type="number">
+            <button ng-click="scene.removeAsset(entity, 'entities')">X</button>
           </div>
         </li>
         <li ng-show="editor.currentScene.entities.length === 0">
