@@ -326,6 +326,23 @@ angular.module('questCreator')
     }
 });
 ;angular.module('questCreator')
+.directive('draggable', function () {
+    return {
+        restrict: 'A',
+        link: function (scope, element, attrs) {
+            element.draggable({
+                cursor: "move",
+                stop: function (event, ui) {
+                  $(element).css('position', 'absolute');
+                  scope.$eval(attrs.xpos + '=' + ui.position.left);
+                  scope.$eval(attrs.ypos + '=' + ui.position.top);
+                  scope.$apply();
+                }
+            });
+        }
+    };
+});
+;angular.module('questCreator')
 .directive('popup', function(){
   return {
     scope: {
@@ -739,6 +756,26 @@ angular.module('questCreator')
       });
     }
 
+    // NOTE I HAVE NO IDEA IF THIS WORKS, NOT TESTED YET:
+    // --TOUPS
+
+    function deleteEntity(currentEntity){
+      return $.ajax({
+        method: 'DELETE',
+        url: 'https://forge-api.herokuapp.com/entities/delete',
+        headers: headerData,
+        data: JSON.stringify(currentEntity),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(response) {
+          return response;
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      })
+    }
+
     return {
       getGame: getGame,
       getGameAssets: getGameAssets,
@@ -750,6 +787,7 @@ angular.module('questCreator')
       saveObject: saveObject,
       createEntity: createEntity,
       saveEntity: saveEntity,
+      deleteEntity: deleteEntity,
       copy: copy,
       paste: paste
     };
@@ -2145,7 +2183,7 @@ angular.module('questCreator')
       } : null;
       self.currentColor = 'rgb(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ')';
       console.log(self.currentColor);
-      console.log(self.inputColor);  
+      console.log(self.inputColor);
   };
 
   if (this.currentEditingGame.name === null) {
@@ -2267,7 +2305,7 @@ angular.module('questCreator')
         "background-size": "contain",
         "background-position": "center",
         "background-repeat": "no-repeat"
-      };      
+      };
     }
   }
 
@@ -5193,7 +5231,7 @@ angular.module('questCreator')
 
     });
 });
-;angular.module('questCreator').controller('sceneCtrl', function(socket, $state, $scope) {
+;angular.module('questCreator').controller('sceneCtrl', function(socket, $state, $scope, $compile) {
   var self = this;
 
   this.selecting = {
@@ -5217,6 +5255,7 @@ angular.module('questCreator')
     }
     console.log(object);
     $scope.editor.currentScene.objects.push(object);
+    this.placeAsset(object, 'object');
     self.selecting.object = false;
   }
 
@@ -5228,13 +5267,51 @@ angular.module('questCreator')
     console.log($scope.editor.currentScene.entities);
     $scope.editor.currentScene.entities.push(entity);
     console.log($scope.editor.currentScene.entities);
+    this.placeAsset(entity, 'entity');
     self.selecting.entity = false;
+  }
+
+  this.removeAsset = function(asset, type){
+    if (!asset) {
+      return;
+    }
+
+    var assetType = asset;
+
+
+    var assetIndex = $scope.editor.currentScene[type].findIndex(function (element){
+      console.log("current index's gameID: ", element.game_id);
+      return asset.game_id === element.game_id;
+    });
+
+    $scope.editor.currentScene[type].splice(assetIndex, 1);
   }
 
   this.saveScene = function(scene) {
     console.log("Turns out saving is unnecessary here. Here's the game as proof.");
     console.log($scope.editor.currentEditingGame);
   }
+
+  this.placeAsset = function(asset, type) {
+    console.log("placin");
+    // var position = {
+    //   'top': "{{"+type+ ".info.pos.x}}",
+    //   'left': "{{"+type+ ".info.pos.y}}",
+    //   'position': 'absolute'
+    // };
+    // var attributes = {
+    //   'src': url,
+    //   'ng-style': position
+    // };
+    var url = asset.thumbnail;
+    var html = '<img src="'+url+'" draggable">';
+    var template = angular.element(html);
+    var linkFn = $compile(template);
+    var element = linkFn($scope);
+    $(element).appendTo('#scene-BG');
+    $scope.apply;
+    // console.log(placeholder);
+  };
 
 
 });

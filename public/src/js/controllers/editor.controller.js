@@ -192,6 +192,14 @@ angular.module('questCreator')
     $event.target.select();
   };
 
+  this.positionAsset = function(asset){
+    return {
+      'top': asset.info.pos.y,
+      'left': asset.info.pos.x,
+      'position': 'absolute'
+    };
+  }
+
   //jquery UI Stuff
   this.uiDrag = function() {
     this.dragCalls++;

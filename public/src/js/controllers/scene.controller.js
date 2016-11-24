@@ -1,4 +1,4 @@
-angular.module('questCreator').controller('sceneCtrl', function(socket, $state, $scope) {
+angular.module('questCreator').controller('sceneCtrl', function(socket, $state, $scope, $compile) {
   var self = this;
 
   this.selecting = {
@@ -22,6 +22,7 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
     }
     console.log(object);
     $scope.editor.currentScene.objects.push(object);
+    this.placeAsset(object, 'object');
     self.selecting.object = false;
   }
 
@@ -33,6 +34,7 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
     console.log($scope.editor.currentScene.entities);
     $scope.editor.currentScene.entities.push(entity);
     console.log($scope.editor.currentScene.entities);
+    this.placeAsset(entity, 'entity');
     self.selecting.entity = false;
   }
 
@@ -56,6 +58,27 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
     console.log("Turns out saving is unnecessary here. Here's the game as proof.");
     console.log($scope.editor.currentEditingGame);
   }
+
+  this.placeAsset = function(asset, type) {
+    console.log("placin");
+    var position = {
+      'top': "{{"+type+ ".info.pos.x}}",
+      'left': "{{"+type+ ".info.pos.y}}",
+      'position': 'absolute'
+    };
+    // var attributes = {
+    //   'src': url,
+    //   'ng-style': position
+    // };
+    var url = asset.thumbnail;
+    var html = '<img src="'+url+'" draggable">';
+    var template = angular.element(html);
+    var linkFn = $compile(template);
+    var element = linkFn($scope);
+    $(element).appendTo('#scene-BG');
+    $scope.apply;
+    // console.log(placeholder);
+  };
 
 
 });

@@ -32,7 +32,10 @@
                 <!-- EDIT SPACE -->
                 <div class="edit-canvas {{editor.currentLargeView}}" ng-class="{{editor.currentLargeView}}">
                     <ui-view ng-show="editor.currentLargeView === 'map'" name="maps"></ui-view>
-                    <div ng-show="editor.currentSmallView === 'scene'" ng-hide="editor.currentLargeView === 'map' || editor.currentLargeView === 'background'" ng-style="editor.setThumbnail(editor.currentScene.background)" id="scene-BG"></div>
+                    <div ng-show="editor.currentSmallView === 'scene'" ng-hide="editor.currentLargeView === 'map' || editor.currentLargeView === 'background'" ng-style="editor.setThumbnail(editor.currentScene.background)" id="scene-BG">
+                      <img ng-repeat="object in editor.currentScene.objects track by $index" src="{{object.thumbnail}}" ng-style="editor.positionAsset(object)">
+                      <img ng-repeat="entity in editor.currentScene.entities track by $index" src="{{entity.thumbnail}}" ng-style="editor.positionAsset(entity)">
+                    </div>
                     {{editor.uiDrag()}}
                     <ui-view ng-show="editor.currentLargeView === 'background'" name="backgrounds"></ui-view>
                 </div>

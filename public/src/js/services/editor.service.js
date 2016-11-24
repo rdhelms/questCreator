@@ -390,6 +390,26 @@ angular.module('questCreator').service('EditorService', function (UserService, $
       });
     }
 
+    // NOTE I HAVE NO IDEA IF THIS WORKS, NOT TESTED YET:
+    // --TOUPS
+
+    function deleteEntity(currentEntity){
+      return $.ajax({
+        method: 'DELETE',
+        url: 'https://forge-api.herokuapp.com/entities/delete',
+        headers: headerData,
+        data: JSON.stringify(currentEntity),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(response) {
+          return response;
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      })
+    }
+
     return {
       getGame: getGame,
       getGameAssets: getGameAssets,
@@ -401,6 +421,7 @@ angular.module('questCreator').service('EditorService', function (UserService, $
       saveObject: saveObject,
       createEntity: createEntity,
       saveEntity: saveEntity,
+      deleteEntity: deleteEntity,
       copy: copy,
       paste: paste
     };
