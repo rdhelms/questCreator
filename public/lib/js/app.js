@@ -3924,6 +3924,9 @@ angular.module('questCreator')
 });
 ;angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, GameService, $state, $scope) {
     var self = this;
+    var playerInfo = {
+        userId: UserService.get().id,
+    };
     var gameCanvas = document.getElementById('play-canvas');
     var gameCtx = gameCanvas.getContext('2d');
     var gameWidth = 700;
@@ -4806,15 +4809,15 @@ angular.module('questCreator')
     }
 
     // NOTE: these frame index variables should probably belong to the individual avatar, object, or entity in the factory
-    var currentAvatarFrameIndex = 0;
+    // var currentAvatarFrameIndex = 0;
     function checkAvatarAction() {
       avatar.info.currentFrameIndex = avatar.info.currentFrameIndex || 0;
         if (avatar.action === 'walkLeft' || avatar.action === 'walkUp' || avatar.action === 'walkRight' || avatar.action === 'walkDown') {
-            if (currentAvatarFrameIndex > avatar.info.animate[avatar.action].length - 1) {
-                currentAvatarFrameIndex = 0;
+            if (avatar.info.currentFrameIndex > avatar.info.animate[avatar.action].length - 1) {
+                avatar.info.currentFrameIndex = 0;
             }
-            avatar.info.currentFrame = avatar.info.animate[avatar.action][currentAvatarFrameIndex];
-            currentAvatarFrameIndex++;
+            avatar.info.currentFrame = avatar.info.animate[avatar.action][avatar.info.currentFrameIndex];
+            avatar.info.currentFrameIndex++;
         } else {
             // Do nothing, or set frame to a given specific frame.
             // avatar.info.currentFrame = avatar.info.animate.walkLeft[0];
@@ -5007,785 +5010,36 @@ angular.module('questCreator')
     }
     requestAnimationFrame(runGame);
 
-        // // Testing creation of scene
-        // var sceneTest = {
-        //   name: 'Scene Test 3',
-        //   description: 'This is the opening scene for my game.',
-        //   info: {},
-        //   game_id: 1,
-        //   map_id: 1
-        // };
-        //
-        // // Testing creation of map
-        // var mapTest = {
-        //   game_id: 1,
-        //   name: 'Map Test 2',
-        //   description: 'This is the main map for my game',
-        //   info: {
-        //     canvasElems: [{
-        //       x: 100,
-        //       y: 100,
-        //       width: 30,
-        //       height: 30,
-        //       color: 'blue'
-        //     }],
-        //     collisionMap: [{
-        //       x: 300,
-        //       y: 300,
-        //       width: 30,
-        //       height: 30,
-        //       color: 'red'
-        //     }]
-        //   }
-        // };
-
-        // // returns all games a user has created.
-        // $.ajax({
-        //   method: 'GET',
-        //   url: 'https://forge-api.herokuapp.com/games/user-games',
-        //   headers: headerData,
-        //   success: function(response) {
-        //     console.log(response);
-        //   },
-        //   error: function(error) {
-        //     console.log(error);
-        //   }
-        // });
-
-        // // Gets a specific game by name
-        // var gameToGetInfo = {
-        //   name: 'potter quest'
-        // };
-        // $.ajax({
-        //   method: 'GET',
-        //   url: 'https://forge-api.herokuapp.com/games/load',
-        //   data: gameToGetInfo,
-        //   success: function(response) {
-        //     console.log(response);
-        //   },
-        //   error: function(error) {
-        //     console.log(error);
-        //   }
-        // });
-
-        // // Step 1: Create Game (POST request to database)
-        // var gameInfo = {};
-        // var currentEditingGame = {
-        //   name: 'Potter Quest 11', // Game ID in database is 16
-        //   description: '',
-        //   info: gameInfo,
-        //   tags: [],
-        //   published: false
-        // };
-        // // POST empty Game to database
-        // $('.createGameBtn').click(function() {
-        //   var headerData = {
-        //     user_id: UserService.get().id,
-        //     token: UserService.get().token
-        //   };
-        //   $.ajax({
-        //     method: 'POST',
-        //     url: 'https://forge-api.herokuapp.com/games/create',
-        //     headers: headerData,
-        //     data: JSON.stringify(currentEditingGame),
-        //     dataType: 'json',
-        //     contentType: 'application/json',
-        //     success: function(response) {
-        //       console.log(response);
-        //       currentEditingGame.id = response.id;
-        //     },
-        //     error: function(error) {
-        //       console.log(error);
-        //     }
-        //   });
-        // })
-        //
-        // // Step 2: Create Background (POST request)
-        // var backgroundInfo = {
-        //   image: [],
-        //   collisionMap: []
-        // };
-        // var currentBackground = {
-        //   name: 'Cupboard',   // ID in database is 123
-        //   info: backgroundInfo,
-        //   tags: [],
-        //   published: true
-        // };
-        // $('.createBgBtn').click(function() {
-        //   currentBackground.game_id = currentEditingGame.id;
-        //   var headerData = {
-        //     user_id: UserService.get().id,
-        //     token: UserService.get().token
-        //   };
-        //   // Background
-        //   $.ajax({
-        //     method: 'POST',
-        //     url: 'https://forge-api.herokuapp.com/backgrounds/create',
-        //     headers: headerData,
-        //     data: JSON.stringify(currentBackground),
-        //     dataType: 'json',
-        //     contentType: 'application/json',
-        //     success: function(response) {
-        //       console.log(response);
-        //       currentBackground.id = response.id;
-        //       // background = new Background(response);
-        //       // backgroundLoaded = true;
-        //     },
-        //     error: function(error) {
-        //       console.log(error);
-        //     }
-        //   });
-        // });
-        //
-        // // Step 3: Draw Background picture (stored in front end)
-        // $('.drawImgBgBtn').click(function() {
-        //   console.log("Drawing Background Image");
-        //   backgroundInfo.image = [{
-        //           x: 0,
-        //           y: 0,
-        //           width: 700,
-        //           height: 500,
-        //           color: 'beige'
-        //         }, {
-        //           x: 150,
-        //           y: 150,
-        //           width: 50,
-        //           height: 50,
-        //           color: 'yellow'
-        //         }];
-        // })
-        //
-        // // Step 4: Draw Background collision map (stored in front end)
-        // $('.drawColBgBtn').click(function() {
-        //   console.log("Drawing Background Collision Map");
-        //   backgroundInfo.collisionMap = [{
-        //           type: 'wall',
-        //           x: 150,
-        //           y: 200,
-        //           width: 50,
-        //           height: 20,
-        //           color: 'gray'
-        //         }];
-        // });
-        //
-        // // Step 5: Save Background (PUT request to database)
-        // $('.saveBgBtn').click(function() {
-        //   currentBackground.info = backgroundInfo;
-        //   var headerData = {
-        //     user_id: UserService.get().id,
-        //     token: UserService.get().token
-        //   };
-        //   // Background
-        //   $.ajax({
-        //     method: 'PUT',
-        //     url: 'https://forge-api.herokuapp.com/backgrounds/update',
-        //     headers: headerData,
-        //     data: JSON.stringify(currentBackground),
-        //     dataType: 'json',
-        //     contentType: 'application/json',
-        //     success: function(response) {
-        //       console.log(response);
-        //       // background = new Background(response);
-        //       // backgroundLoaded = true;
-        //     },
-        //     error: function(error) {
-        //       console.log(error);
-        //     }
-        //   });
-        // });
-        //
-        // // Step 6: Create Object
-        // var sceneObjectInfo = {
-        //   pos: {
-        //     x: 350,
-        //     y: 250
-        //   },
-        //   image: [],
-        //   collisionMap: []
-        // };
-        // var currentSceneObject = {
-        //   name: 'Light Bulb',
-        //   info: sceneObjectInfo,
-        //   tags: [],
-        //   published: false
-        // };
-        // $('.createObjBtn').click(function() {
-        //   currentSceneObject.game_id = currentEditingGame.id;
-        //   var headerData = {
-        //     user_id: UserService.get().id,
-        //     token: UserService.get().token
-        //   };
-        //   // Object
-        //   $.ajax({
-        //     method: 'POST',
-        //     url: 'https://forge-api.herokuapp.com/obstacles/create',
-        //     headers: headerData,
-        //     data: JSON.stringify(currentSceneObject),
-        //     dataType: 'json',
-        //     contentType: 'application/json',
-        //     success: function(response) {
-        //       console.log(response);
-        //       currentSceneObject.id = response.id;
-        //       // sceneObject = new SceneObject(response);
-        //       // sceneObject.allActions = Object.keys(sceneObject.obj.animate);
-        //       // sceneObject.action = sceneObject.allActions[0]; // The first action
-        //       // sceneObject.obj.currentFrame = sceneObject.obj.animate[sceneObject.action][0]; // The first frame of the first action, whatever it is.
-        //       // sceneObjectLoaded = true;
-        //       // setInterval(checkSceneObjectAction, 75);
-        //     },
-        //     error: function(error) {
-        //       console.log(error);
-        //     }
-        //   });
-        // });
-        //
-        // // Not currently animating objects
-        // // // Step X: Create Object Action
-        // // sceneObjectObj.animate.wave = [];
-        //
-        // // Step 7: Draw Object picture
-        // $('.drawImgObjBtn').click(function() {
-        //   console.log("Drawing Object Image");
-        //   sceneObjectInfo.image = [
-        //         {
-        //           x: 0,
-        //           y: 0,
-        //           width: 10,
-        //           height: 100,
-        //           color: 'brown'
-        //         }, {
-        //           x: 0,
-        //           y: 0,
-        //           width: 50,
-        //           height: 10,
-        //           color: 'red'
-        //         }, {
-        //           x: 50,
-        //           y: 10,
-        //           width: 50,
-        //           height: 10,
-        //           color: 'red'
-        //         }];
-        // });
-        //
-        // // Step 9: Draw Object collision map
-        // $('.drawColObjBtn').click(function() {
-        //   console.log("Drawing Object Collision Map");
-        //   sceneObjectInfo.collisionMap = [
-        //     {
-        //       x: -10,
-        //       y: 100,
-        //       width: 10,
-        //       height: 10,
-        //       color: 'gray'
-        //     }, {
-        //       x: 0,
-        //       y: 100,
-        //       width: 10,
-        //       height: 10,
-        //       color: 'gray'
-        //     }, {
-        //       x: 0,
-        //       y: 100,
-        //       width: 10,
-        //       height: 10,
-        //       color: 'gray'
-        //     }
-        //   ];
-        // });
-        //
-        // // Step 10: Save Object (PUT Request)
-        // $('.saveObjBtn').click(function() {
-        //   currentSceneObject.info = sceneObjectInfo;
-        //   var headerData = {
-        //     user_id: UserService.get().id,
-        //     token: UserService.get().token
-        //   };
-        //   // Object
-        //   $.ajax({
-        //     method: 'PUT',
-        //     url: 'https://forge-api.herokuapp.com/obstacles/update',
-        //     headers: headerData,
-        //     data: JSON.stringify(currentSceneObject),
-        //     dataType: 'json',
-        //     contentType: 'application/json',
-        //     success: function(response) {
-        //       console.log(response);
-        //       // sceneObject = new SceneObject(response);
-        //       // sceneObject.allActions = Object.keys(sceneObject.obj.animate);
-        //       // sceneObject.action = sceneObject.allActions[0]; // The first action
-        //       // sceneObject.obj.currentFrame = sceneObject.obj.animate[sceneObject.action][0]; // The first frame of the first action, whatever it is.
-        //       // sceneObjectLoaded = true;
-        //       // setInterval(checkSceneObjectAction, 75);
-        //     },
-        //     error: function(error) {
-        //       console.log(error);
-        //     }
-        //   });
-        // });
-        //
-        // // Step 11: Create Entity
-        // var entityInfo = {
-        //   pos: {
-        //     x: 350,
-        //     y: 250
-        //   },
-        //   speed: {
-        //     mag: 3,
-        //     x: 0,
-        //     y: 0
-        //   },
-        //   animate: {},
-        //   collisionMap: []
-        // };
-        // var currentEntity = {
-        //   name: 'Rat',
-        //   info: entityInfo,
-        //   tags: [],
-        //   published: false
-        // };
-        // $('.createEntityBtn').click(function() {
-        //   currentEntity.game_id = currentEditingGame.id;
-        //   var headerData = {
-        //     user_id: UserService.get().id,
-        //     token: UserService.get().token
-        //   };
-        //   // Entity
-        //   $.ajax({
-        //     method: 'POST',
-        //     url: 'https://forge-api.herokuapp.com/entities/create',
-        //     headers: headerData,
-        //     data: JSON.stringify(currentEntity),
-        //     dataType: 'json',
-        //     contentType: 'application/json',
-        //     success: function(response) {
-        //       console.log(response);
-        //       currentEntity.id = response.id;
-        //       // entity = new Entity(response);
-        //       // console.log(entity);
-        //       // entity.obj.currentFrame = entity.obj.animate[entity.action][0];
-        //       // entityLoaded = true;
-        //       // setInterval(checkEntityAction, 75);
-        //     },
-        //     error: function(error) {
-        //       console.log(error);
-        //     }
-        //   });
-        // });
-        //
-        // // Step 12: Draw Entity picture frames per Action
-        // $('.drawImgEntityBtn').click(function() {
-        //   console.log("Drawing Entity Image Frames");
-        //   entityInfo.animate = {
-        //     stand: [
-        //       [{
-        //         x: 100,
-        //         y: 100,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'orange'
-        //       }, {
-        //         x: 150,
-        //         y: 100,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'purple'
-        //       }],
-        //       [{
-        //         x: 110,
-        //         y: 100,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'orange'
-        //       }, {
-        //         x: 140,
-        //         y: 100,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'purple'
-        //       }]
-        //     ],
-        //     walkLeft: [
-        //       [{
-        //         x: 100,
-        //         y: 100,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'purple'
-        //       }, {
-        //         x: 110,
-        //         y: 150,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'orange'
-        //       }],
-        //       [{
-        //         x: 110,
-        //         y: 100,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'purple'
-        //       }, {
-        //         x: 100,
-        //         y: 150,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'orange'
-        //       }]
-        //     ],
-        //     walkRight: [
-        //       [{
-        //         x: 150,
-        //         y: 100,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'purple'
-        //       }, {
-        //         x: 140,
-        //         y: 150,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'orange'
-        //       }],
-        //       [{
-        //         x: 140,
-        //         y: 100,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'purple'
-        //       }, {
-        //         x: 150,
-        //         y: 150,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'orange'
-        //       }]
-        //     ],
-        //     walkUp: [
-        //       [{
-        //         x: 100,
-        //         y: 110,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'purple'
-        //       }, {
-        //         x: 150,
-        //         y: 100,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'orange'
-        //       }],
-        //       [{
-        //         x: 100,
-        //         y: 100,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'purple'
-        //       }, {
-        //         x: 150,
-        //         y: 110,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'orange'
-        //       }]
-        //     ],
-        //     walkDown: [
-        //       [{
-        //         x: 100,
-        //         y: 140,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'purple'
-        //       }, {
-        //         x: 150,
-        //         y: 150,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'orange'
-        //       }],
-        //       [{
-        //         x: 100,
-        //         y: 150,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'purple'
-        //       }, {
-        //         x: 150,
-        //         y: 140,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'orange'
-        //       }]
-        //     ],
-        //     swimLeft: [
-        //       [{
-        //         x: 100,
-        //         y: 100,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'lightblue'
-        //       }, {
-        //         x: 150,
-        //         y: 150,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'lightblue'
-        //       }],
-        //       [{
-        //         x: 100,
-        //         y: 100,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'gray'
-        //       }, {
-        //         x: 150,
-        //         y: 150,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'gray'
-        //       }]
-        //     ],
-        //     swimRight: [
-        //       [{
-        //         x: 100,
-        //         y: 100,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'lightblue'
-        //       }, {
-        //         x: 150,
-        //         y: 150,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'lightblue'
-        //       }],
-        //       [{
-        //         x: 100,
-        //         y: 100,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'gray'
-        //       }, {
-        //         x: 150,
-        //         y: 150,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'gray'
-        //       }]
-        //     ],
-        //     swimUp: [
-        //       [{
-        //         x: 100,
-        //         y: 100,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'lightblue'
-        //       }, {
-        //         x: 150,
-        //         y: 150,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'lightblue'
-        //       }],
-        //       [{
-        //         x: 100,
-        //         y: 100,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'gray'
-        //       }, {
-        //         x: 150,
-        //         y: 150,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'gray'
-        //       }]
-        //     ],
-        //     swimDown: [
-        //       [{
-        //         x: 100,
-        //         y: 100,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'lightblue'
-        //       }, {
-        //         x: 150,
-        //         y: 150,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'lightblue'
-        //       }],
-        //       [{
-        //         x: 100,
-        //         y: 100,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'gray'
-        //       }, {
-        //         x: 150,
-        //         y: 150,
-        //         width: 30,
-        //         height: 30,
-        //         color: 'gray'
-        //       }]
-        //     ]
-        //   };
-        // });
-        //
-        // // Step 13: Draw Entity collision map per Action
-        // $('.drawColEntityBtn').click(function() {
-        //   console.log("Drawing Entity Collision Map");
-        //   entityInfo.collisionMap = [
-        //     {
-        //       x: 100,
-        //       y: 180,
-        //       width: 80,
-        //       height: 10,
-        //       color: 'gray'
-        //     }, {
-        //       x: 100,
-        //       y: 185,
-        //       width: 80,
-        //       height: 10,
-        //       color: 'gray'
-        //     }
-        //   ];
-        // });
-        //
-        // // Step 14: Save Entity
-        // $('.saveEntityBtn').click(function() {
-        //   currentEntity.info = entityInfo;
-        //   var headerData = {
-        //     user_id: UserService.get().id,
-        //     token: UserService.get().token
-        //   };
-        //   // Entity
-        //   $.ajax({
-        //     method: 'PUT',
-        //     url: 'https://forge-api.herokuapp.com/entities/update',
-        //     headers: headerData,
-        //     data: JSON.stringify(currentEntity),
-        //     dataType: 'json',
-        //     contentType: 'application/json',
-        //     success: function(response) {
-        //       console.log(response);
-        //       // entity = new Entity(response);
-        //       // console.log(entity);
-        //       // entity.obj.currentFrame = entity.obj.animate[entity.action][0];
-        //       // entityLoaded = true;
-        //       // setInterval(checkEntityAction, 75);
-        //     },
-        //     error: function(error) {
-        //       console.log(error);
-        //     }
-        //   });
-        // });
-        //
-        // // Step 15: Create Event
-        // // Step 16: Specify Event trigger and response
-        // // Step 17: Save Event
-        //
-        // // Step 18: Create Scene
-        // // Step 19: Add Background to Scene
-        // // Step 20: Add Objects and Entities to Scene
-        // // Step 21: Set coordinates of Objects and Entities
-        // // sceneObjectObj = {
-        // //   x: 150,
-        // //   y: 100
-        // // },
-        // // entityObj.pos = {
-        // //   x: 50,
-        // //   y: 220
-        // // };
-        //
-        // // Step 22: Add events to Scene
-        // // Step 23: Save Scene
-        // // Step 24: Create Map
-        // // Step 25: Specify Scene coordinates within Map
-        // // Step 26: Save Map
-        // // Step 27: Save Game
-
-        // Updating an asset (background, object, entity)
-        /*
-    1) User selects an existing public asset
-    2) User draws on canvas and sets metadata.
-    3) User clicks "save" button. All info is sent to database in PATCH request
-    4) Info for saved asset also gets added to list of "current game assets" available to be placed into scenes.
-  */
-
-        // Updating a scene
-        /*
-    1) In the scene editor, user has available visible assets that have already been made and saved to the list of current game assets.
-    2) Clicking on an asset will add that asset to the particular scene within the game object (and the scene preview will continually be looping through the game object to preview the game)
-    3) Clicking the "save scene" button will update the game object with the most recent x,y positions of all the assets in the scene.
-  */
-
-        // Updating a map
-        /*
-    1) The list of maps will be visible.
-    2) Clicking on a map will show all scenes for that map.
-    3) Clicking on a scene will add it to the current map.
-    4) The coordinates of the scene can be edited numerically. (x, y)
-    5) Clicking the "save map" button will update the game object with the most recent arrangement of scenes.
-  */
-
-        // Updating a game
-        /*
-    1) Clicking the "save game" button will send a PATCH request to the database.
-  */
-
-        // // Scene
-        // $('.createSceneBtn').click(function() {
-        //   var headerData = {
-        //     user_id: UserService.get().id,
-        //     token: UserService.get().token
-        //   };
-        //   $.ajax({
-        //     method: 'POST',
-        //     url: 'https://forge-api.herokuapp.com/scenes/create',
-        //     headers: headerData,
-        //     data: JSON.stringify(sceneTest),
-        //     dataType: 'json',
-        //     contentType: 'application/json',
-        //     success: function(response) {
-        //       console.log(response);
-        //     },
-        //     error: function(error) {
-        //       console.log(error);
-        //     }
-        //   });
-        // });
-        //
-        // // Map
-        // $('.createMapBtn').click(function() {
-        //   var headerData = {
-        //     user_id: UserService.get().id,
-        //     token: UserService.get().token
-        //   };
-        //   $.ajax({
-        //     method: 'POST',
-        //     url: 'https://forge-api.herokuapp.com/maps/create',
-        //     headers: headerData,
-        //     data: JSON.stringify(mapTest),
-        //     dataType: 'json',
-        //     contentType: 'application/json',
-        //     success: function(response) {
-        //       console.log(response);
-        //     },
-        //     error: function(error) {
-        //       console.log(error);
-        //     }
-        //   });
-        // })
-
-        /*
   // Socket functionality
   var socketId;
-  var charInfo;
   var allPlayers = [];
 
+  // Tell server I've come to the landing page
   socket.emit('game joined');
 
+  // Get my socket id from the Node server and send my player information to existing players. Then send updates after.
+  var loopHandle;
+  socket.off('create character');
+  socket.on('create character', function(id) {  // Use this immediate response from the server to get my own socket id
+    socketId = id;
+    var charInfo = {   // My player info
+
+    };
+    allPlayers.push(charInfo); // Put myself in the array of players?
+    socket.emit('send new player', charInfo); // Send my player information to other users
+    loopHandle = setInterval(function() { // Send frequent updates to other players
+      playerUpdate = {  // My updated info to be sent to all other players
+      }
+      allPlayers.forEach(function(player, index) {  // Update myself in the array?
+        if (player.id === id) {
+          allPlayers[index] = playerUpdate;
+        }
+      });
+      socket.emit('player update', playerUpdate);
+    }, 20);
+  });
+
+  // Receive an existing player's information if I just join a game
   socket.off('old player found');
   socket.on('old player found', function(oldCharInfo) {
     console.log("Found old player");
@@ -5793,6 +5047,7 @@ angular.module('questCreator')
     allPlayers.push(oldCharInfo);
   });
 
+  // Receive a new player's information if I'm already playing when they join
   socket.off('new player joining');
   socket.on('new player joining', function(newCharInfo) {
     var response = {
@@ -5801,15 +5056,17 @@ angular.module('questCreator')
     };
     // Add new player to array of players
     allPlayers.push(newCharInfo);
-    // Send response from old player to new player
+    // Send my response back to the new player to let them know I was already here.
     socket.emit('send old player', response);
   });
 
+  // Update an existing player's information (received at constant interval from every player)
   socket.off('updating player');
   socket.on('updating player', function(playerUpdate) {
-    // Find the player who is being updated, and update their details
+    // Find the player who is being updated in the array, and update their details
   });
 
+  // Notify me if a player leaves the game
   socket.off('player left');
   socket.on('player left', function(playerId) {
     console.log("Player left!");
@@ -5820,90 +5077,24 @@ angular.module('questCreator')
     });
   });
 
-  var loopHandle;
-  socket.off('create character');
-  socket.on('create character', function(id) {
-    socketId = id;
-    var x = Math.round( Math.random() * gameWidth);
-    var y = Math.round( Math.random() * gameHeight);
-    var speedX = 0;
-    var speedY = 0;
-    var r = Math.round( Math.random() * 255 );
-    var g = Math.round( Math.random() * 255 );
-    var b = Math.round( Math.random() * 255 );
-    var color = 'rgb(' + r + ', ' + g + ',' + b + ')';
-    var newCharInfo = {
-      id: id,
-      x: x,
-      y: y,
-      speedX: speedX,
-      speedY: speedY,
-      color: color
-    };
-    allPlayers.push(newCharInfo);
-    charInfo = newCharInfo;
-    socket.emit('send new player', charInfo);   // Send this player to other users
-    gameCtx.fillStyle = color;
-    gameCtx.fillRect(x,y,100,100);
-    loopHandle = setInterval(function() {
-      x += speedX;
-      y += speedY;
-      charUpdate = {
-        id: id,
-        x: x,
-        y: y,
-        speedX: speedX,
-        speedY: speedY,
-        color: color
-      }
-      // Update the x and y position of the current player
-      allPlayers.forEach(function(player, index) {
-        if (player.id === id) {
-          allPlayers[index] = charUpdate;
-        }
-      });
-      socket.emit('player update', charUpdate);
-      redrawGame();
-    }, 20);
-    $('body').off().on('keydown', function(event) {
-      var keyCode = event.keyCode;
-      if (keyCode === 37) {
-        speedX += -1;
-      } else if (keyCode === 38) {
-        speedY += -1;
-      } else if (keyCode === 39) {
-        speedX += 1;
-      } else if (keyCode === 40) {
-        speedY += 1;
-      }
-    });
-  });
-
-  function redrawGame() {
-    gameCtx.clearRect(0, 0, gameWidth, gameHeight);
-    allPlayers.forEach(function(player) {
-      gameCtx.fillStyle = player.color;
-      gameCtx.fillRect(player.x, player.y, 100, 100);
-    });
-  }
-
   $scope.$on("$destroy", function(){
-    socket.emit('game left');
+    socket.emit('game left'); // Let others know that I left the game if the controller ceases (closing browser, etc)
     clearInterval(loopHandle);
   });
 
-  // Chat messages
+  // Send a text message to the server, to be broadcast to everyone.
   $('.chat-submit').submit(function(){
     socket.emit('chat message', $('.message').val());
     $('.message').val('');
-    return false;
+    return false;   // Prevent default page refresh
   });
+  // Receieve any broadcast message, and display it in the chat window.
   socket.off('chat message');
   socket.on('chat message', function(msg){
-    $('.chat-messages').append($('<li>').text(msg));
+    $('.chat-messages').append($('<li>').text(playerInfo.userId + ': ' + msg));
   });
-  */
-    });
+
+});
 ;angular.module('questCreator').controller('profileCtrl', function(socket, $state, $scope, UserService) {
 
     UserService.checkLogin().then(function(response) {
