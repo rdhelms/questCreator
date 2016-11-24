@@ -9,8 +9,13 @@
             </ul>
 
             <div ng-if="requests.length > 0" class="requests">
-                <a ng-click="showRequests()">Requests to collaborate</a>
-                <table>
+              <section class="collab-controls">
+                <p>Requests to collaborate</p>
+                <button ng-click="showRequests()" ng-animate="{enter: 'requestArrow', leave: 'requestCounter'}" ng-class="{true: 'requestArrow', false: 'requestCounter'}[requestActive]"></button>
+                <p ng-model="requests.length">{{ requests.length }}</p>
+              </section>
+
+                <table ng-show="showReqs">
                   <tr>
                     <th>Game:</th>
                     <th>Requested By:</th>
@@ -21,14 +26,19 @@
                     <td>{{ request.gameName | capitalize }}</td>
                     <td>{{ request.username }}</td>
                     <td><input ng-model="request.accepted" ng-change="toggleCollab(request)" type="checkbox" ></td>
-                    <td><button ng-click="removeRequest(request)" type="button" name="button"></button></td>
+                    <td><button ng-click="removeRequest(request, $index)" type="button" name="button"></button></td>
                   </tr>
                 </table>
             </div>
 
             <div ng-if="collaborators.length > 0" class="collaborators">
-                <a ng-click="showCollaborators()">Currently Approved Collaborators:</a>
-                <table>
+              <section class="collab-controls">
+                <p>Current Collaborators</p>
+                <button ng-click="showCollaborators()" ng-animate="{enter: 'collabArrow', leave: 'collabCounter'}" ng-class="{true: 'collabArrow', false: 'collabCounter'}[collabActive]"></button>
+                <p ng-model="collaborators.length">{{ collaborators.length }}</p>
+              </section>
+
+                <table ng-show="showCollabs">
                   <tr>
                     <th>Game:</th>
                     <th>Collaborator:</th>
@@ -39,28 +49,15 @@
                     <td>{{ collaborator.gameName | capitalize }}</td>
                     <td>{{ collaborator.username }}</td>
                     <td><input ng-model="collaborator.accepted" ng-change= "toggleCollab(collaborator)" type="checkbox" value="{{ collaborator.accepted }}"></td>
-                    <td><button ng-click="removeCollaborator(collaborator)" type="button" name="button"></button></td>
+                    <td><button ng-click="removeCollaborator(collaborator, $index)" type="button" name="button"></button></td>
                   </tr>
                 </table>
             </div>
         </section>
 
-        <section class="canvas-tools">
-          <p>
-            Canvas Tools:
-          </p>
-        </section>
-
         <section class="avatar-creator">
-            <canvas id="animate-preview" width="145" height="200"></canvas>
             <div>
                 <h1>Avatar Editor:</h1>
-                <!-- <div class="frame-overview">
-                    <a ng-repeat="frame in avatarTest" href="">
-                        <canvas id="canvas" width="50" height="70"></canvas>
-                    </a>
-                </div>
-                <canvas id="avatar-canvas" width="500" height="700"></canvas> -->
             </div>
         </section>
     </div>
@@ -72,7 +69,7 @@
         </div>
         <h1 ng-if="games">You Did This:</h1>
         <div ng-if="games" class="user-games" ng-repeat="game in games">
-            <!-- <img src="{{ game.thumbnail }}" alt="Game thumbnail"/> -->
+            <img src="{{ game.thumbnail }}" alt="Game thumbnail"/>
             <ul>
                 <li>
                     <label for="game-name">Game Name:</label>
@@ -97,21 +94,20 @@
 
         <h1 ng-if="collaborations">You're a Collaborator On:</h1>
         <div ng-if="collaborations" class="user-games" ng-repeat="collaboration in collaborations">
-            <!-- <img src="{{ game.thumbnail }}" alt="Game thumbnail"/> -->
             <ul>
                 <li>
                     <label for="game-name">Game Name:</label>
                     {{ collaboration.name | capitalize }}</li>
                 <li>
                     <label for="creator">Created By:</label>
-                    <p>{{ collaboration.user_id }}</p>
+                    <p>{{ collaboration.username }}</p>
                 </li>
                 <li>
                     <label for="created">Date Created:</label>
                     <p>{{ collaboration.created_at | date:'MMM d - h:mm a' }}</p>
                 </li>
                 <li>
-                    <label for="players">Players:</label>
+                    <label for="players">Collaborators:</label>
                     <p>{{ collaboration.players }}</p>
                 </li>
             </ul>
