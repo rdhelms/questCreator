@@ -5,7 +5,7 @@
       <canvas id="play-canvas" width=700 height=500></canvas>
       <div class="typing"> </div>
       <div class="dialog"> </div>
-      <button ng-show="!play.gameStarted" ng-click="play.startGame()" class="playBtn">PLAY GAME</button>
+      <button ng-show="!play.gameStarted && play.gameLoaded" ng-click="play.startGame()" class="playBtn">PLAY GAME</button>
     </div>
     <p>Press spacebar to type command</p>
     <p>Current Map: {{play.currentMap.name}}</p>
