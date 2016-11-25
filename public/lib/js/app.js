@@ -61,7 +61,7 @@
                 templateUrl: './src/views/game/editor/ent.html',
                 controller: 'entCtrl as ent'
               },
-              'scripts': {
+              'events': {
                 templateUrl: './src/views/game/editor/scripts.html',
                 controller: 'scriptsCtrl as scripts'
               }
@@ -95,35 +95,39 @@
     this.name = avatarInfo.name;
     this.info = avatarInfo.info;
     this.user_id = avatarInfo.user_id;
-    this.current = avatarInfo.current;
     this.action = 'stand';
+    this.speed = {
+      mag: 3,
+      x: 0,
+      y: 0
+    };
   };
 
   Avatar.prototype.updatePos = function() {
-    this.info.pos.x += this.info.speed.x;
-    this.info.pos.y += this.info.speed.y;
+    this.info.pos.x += this.speed.x;
+    this.info.pos.y += this.speed.y;
   }
 
   Avatar.prototype.stop = function() {
     this.action = 'stand';
-    this.info.speed.x = 0;
-    this.info.speed.y = 0;
+    this.speed.x = 0;
+    this.speed.y = 0;
   }
 
   Avatar.prototype.collide = function(direction) {
     this.stop();
     switch (direction) {
       case 'left':
-        this.info.pos.x += this.info.speed.mag;
+        this.info.pos.x += this.speed.mag;
         break;
       case 'right':
-        this.info.pos.x -= this.info.speed.mag;
+        this.info.pos.x -= this.speed.mag;
         break;
       case 'up':
-        this.info.pos.y += this.info.speed.mag;
+        this.info.pos.y += this.speed.mag;
         break;
       case 'down':
-        this.info.pos.y -= this.info.speed.mag;
+        this.info.pos.y -= this.speed.mag;
         break;
     }
   }
@@ -760,6 +764,71 @@ angular.module('questCreator')
       })
     }
 
+    function createEvent(name, type, game_id) {
+      var headerData = {
+        user_id: UserService.get().id,
+        token: UserService.get().token
+      };
+      var eventInfo = {};
+      // Event categories:
+      // -typing
+      // -eventually more here
+      switch (type) {
+        case 'typing':
+          eventInfo = {
+            requirements: [],
+            words: [],
+            response: []
+          };
+          break;
+      }
+      var newEvent = {
+        name: name,
+        category: type,
+        info: eventInfo,
+        tags: [],
+        published: false,
+        game_id: game_id
+      };
+      return $.ajax({
+        method: 'POST',
+        url: 'https://forge-api.herokuapp.com/events/create',
+        headers: headerData,
+        data: JSON.stringify(newEvent),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(response) {
+          console.log(response);
+          return response;
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    }
+
+    function saveEvent(eventUpdate) {
+      var headerData = {
+        user_id: UserService.get().id,
+        token: UserService.get().token
+      };
+      return $.ajax({
+        method: 'PUT',
+        url: 'https://forge-api.herokuapp.com/obstacles/update',
+        headers: headerData,
+        data: JSON.stringify(eventUpdate),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(response) {
+          console.log(response);
+          return response;
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    }
+
     return {
       getGame: getGame,
       getGameAssets: getGameAssets,
@@ -772,6 +841,8 @@ angular.module('questCreator')
       createEntity: createEntity,
       saveEntity: saveEntity,
       deleteEntity: deleteEntity,
+      createEvent: createEvent,
+      saveEvent: saveEvent,
       copy: copy,
       paste: paste
     };
@@ -1330,6 +1401,68 @@ angular.module('questCreator')
             });
         }
 
+        function getPlayerAvatar() {
+          return $.ajax({
+              method: 'GET',
+              url: 'https://forge-api.herokuapp.com/users/avatar',
+              headers: {
+                  user_id: user.id,
+                  token: user.token
+              },
+              dataType: 'json',
+              contentType: 'application/json',
+              success: function(response) {
+                  return response;
+              },
+              error: function(error) {
+                  console.log(error);
+              }
+          });
+        }
+
+        function getAvatars() {
+          return $.ajax({
+              method: 'GET',
+              url: 'https://forge-api.herokuapp.com/entities/user',
+              headers: {
+                  user_id: user.id,
+                  token: user.token
+              },
+              dataType: 'json',
+              contentType: 'application/json',
+              success: function(response) {
+                console.log(response);
+                  return response;
+              },
+              error: function(error) {
+                  console.log(error);
+              }
+          });
+        }
+
+        function updateAvatar(current, id) {
+          console.log(current, id);
+          $.ajax({
+              method: 'PATCH',
+              url: 'https://forge-api.herokuapp.com/entities/make-current',
+              headers: {
+                  user_id: user.id,
+                  token: user.token
+              },
+              data: {
+                current: current,
+                id: id
+              },
+              success: function(response) {
+                console.log(response);
+                  return response;
+              },
+              error: function(error) {
+                  console.log(error);
+              }
+          });
+        }
+
         return {
             get: getUser,
             set: setUser,
@@ -1344,6 +1477,9 @@ angular.module('questCreator')
             toggleAccepted: toggleAccepted,
             toggleRequested: toggleRequested,
             requestAgain: requestAgain,
+            getAvatars: getAvatars,
+            updateAvatar: updateAvatar,
+            getPlayerAvatar: getPlayerAvatar,
             archive: archiveGame,
             register: registerUser,
             signOut: signOut,
@@ -2140,6 +2276,7 @@ angular.module('questCreator')
   this.availableBackgrounds = [];
   this.availableObjects = [];
   this.availableEntities = [];
+  this.availableEvents = [];
   this.selectedAnimation = "walkLeft";
 
   this.currentColor = 'green';
@@ -2149,9 +2286,11 @@ angular.module('questCreator')
   this.erasing = false;
   this.selectingAssets = false;
   this.currentFrameIndex = 0;
-  this.modeledFrameIndex = 0; // For some reason ng-model is being wacky the first click
+  this.modeledFrameIndex = 0; // For some reason ng-model is being wacky for the first click of navigating entity frames. This is the duct tape solution.
   this.dragIndex = null;
   this.dragAsset = null;
+
+  this.currentEvent = null;
 
   this.goToPalette = function (type) {
     self.selectingAssets = true;
@@ -2159,6 +2298,7 @@ angular.module('questCreator')
   };
 
   this.selectColor = function() {
+      // Convert hex color to rgb
       var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(self.inputColor);
       var rgb = result ? {
           r: parseInt(result[1], 16),
@@ -2188,6 +2328,7 @@ angular.module('questCreator')
           self.availableBackgrounds = assets.availableBackgrounds;
           self.availableObjects = assets.availableObstacles;
           self.availableEntities = assets.availableEntities;
+          self.availableEvents = assets.availableEvents;
           self.currentBackground = self.availableBackgrounds[0] || null;
           $scope.$apply();
         });
@@ -2201,10 +2342,11 @@ angular.module('questCreator')
         self.currentEditingGame = game;
         // console.log(self.currentEditingGame);
         EditorService.getGameAssets(game.id).done(function(assets) {
-          // console.log(assets);
+          console.log(assets);
           self.availableBackgrounds = assets.availableBackgrounds;
           self.availableObjects = assets.availableObstacles;
           self.availableEntities = assets.availableEntities;
+          self.availableEvents = assets.availableEvents;
           $scope.$apply();
         });
       });
@@ -2278,6 +2420,24 @@ angular.module('questCreator')
     console.log("frame index:", self.currentFrameIndex);
     console.log("selected frame:", entity.info.animate[self.selectedAnimation][self.currentFrameIndex]);
     $scope.$broadcast('redrawEntity', entity.info.animate[self.selectedAnimation][self.currentFrameIndex].image, entity.info.animate[self.selectedAnimation][self.currentFrameIndex].collisionMap);
+  };
+
+  this.createEvent = function(type) {
+    var name = "New Event";
+    var game_id = self.currentEditingGame.id;
+    EditorService.createEvent(name, type, game_id).done(function(event) {
+      console.log(event);
+      self.availableEvents.push(event);
+      self.currentEvent = event;
+      self.currentSmallView = 'event';
+      $scope.$apply();
+    });
+  };
+
+  this.editEvent = function(event) {
+    console.log(event);
+    self.currentEvent = event;
+    self.currentSmallView = 'event';
   };
 
   this.setThumbnail = function(asset){
@@ -4062,34 +4222,34 @@ angular.module('questCreator')
                 avatar.action = (avatar.action === 'walkLeft')
                     ? 'stand'
                     : 'walkLeft';
-                avatar.info.speed.x = (avatar.info.speed.x === -1 * avatar.info.speed.mag)
+                avatar.speed.x = (avatar.speed.x === -1 * avatar.speed.mag)
                     ? 0
-                    : -1 * avatar.info.speed.mag;
-                avatar.info.speed.y = 0;
+                    : -1 * avatar.speed.mag;
+                avatar.speed.y = 0;
             } else if (keyCode === 38) {
                 avatar.action = (avatar.action === 'walkUp')
                     ? 'stand'
                     : 'walkUp';
-                avatar.info.speed.x = 0;
-                avatar.info.speed.y = (avatar.info.speed.y === -1 * avatar.info.speed.mag)
+                avatar.speed.x = 0;
+                avatar.speed.y = (avatar.speed.y === -1 * avatar.speed.mag)
                     ? 0
-                    : -1 * avatar.info.speed.mag;
+                    : -1 * avatar.speed.mag;
             } else if (keyCode === 39) {
                 avatar.action = (avatar.action === 'walkRight')
                     ? 'stand'
                     : 'walkRight';
-                avatar.info.speed.x = (avatar.info.speed.x === avatar.info.speed.mag)
+                avatar.speed.x = (avatar.speed.x === avatar.speed.mag)
                     ? 0
-                    : avatar.info.speed.mag;
-                avatar.info.speed.y = 0;
+                    : avatar.speed.mag;
+                avatar.speed.y = 0;
             } else if (keyCode === 40) {
                 avatar.action = (avatar.action === 'walkDown')
                     ? 'stand'
                     : 'walkDown';
-                avatar.info.speed.x = 0;
-                avatar.info.speed.y = (avatar.info.speed.y === avatar.info.speed.mag)
+                avatar.speed.x = 0;
+                avatar.speed.y = (avatar.speed.y === avatar.speed.mag)
                     ? 0
-                    : avatar.info.speed.mag;
+                    : avatar.speed.mag;
             }
         });
 
@@ -4182,11 +4342,11 @@ angular.module('questCreator')
     }
 
     function checkAvatarBounds() {
-        var left = avatar.info.collisionMap[0].x;
-        var right = avatar.info.collisionMap[0].x + avatar.info.collisionMap[0].width;
-        var top = avatar.info.collisionMap[0].y;
-        var bottom = avatar.info.collisionMap[0].y + avatar.info.collisionMap[0].height;
-        avatar.info.collisionMap.forEach(function(square) {
+        var left = avatar.info.currentFrame.collisionMap[0].x;
+        var right = avatar.info.currentFrame.collisionMap[0].x + avatar.info.currentFrame.collisionMap[0].width;
+        var top = avatar.info.currentFrame.collisionMap[0].y;
+        var bottom = avatar.info.currentFrame.collisionMap[0].y + avatar.info.currentFrame.collisionMap[0].height;
+        avatar.info.currentFrame.collisionMap.forEach(function(square) {
             if (square.x < left) {
                 left = square.x;
             }
@@ -4245,7 +4405,7 @@ angular.module('questCreator')
             direction: 'none',
             type: 'none'
         };
-        avatar.info.collisionMap.forEach(function(avatarSquare) { // Loop through all the avatar squares
+        avatar.info.currentFrame.collisionMap.forEach(function(avatarSquare) { // Loop through all the avatar squares
             var avatarLeft = avatarSquare.x + avatar.info.pos.x;
             var avatarRight = avatarSquare.x + avatarSquare.width + avatar.info.pos.x;
             var avatarTop = avatarSquare.y + avatar.info.pos.y;
@@ -4260,13 +4420,13 @@ angular.module('questCreator')
                     if (avatarLeft <= bgRight && avatarRight >= bgLeft && avatarTop <= bgBottom && avatarBottom >= bgTop) {
                         collision.found = true;
                         collision.type = 'wall';
-                        if (avatar.info.speed.x > 0) {
+                        if (avatar.speed.x > 0) {
                             collision.direction = 'right';
-                        } else if (avatar.info.speed.x < 0) {
+                        } else if (avatar.speed.x < 0) {
                             collision.direction = 'left';
-                        } else if (avatar.info.speed.y < 0) {
+                        } else if (avatar.speed.y < 0) {
                             collision.direction = 'up';
-                        } else if (avatar.info.speed.y > 0) {
+                        } else if (avatar.speed.y > 0) {
                             collision.direction = 'down';
                         }
                     }
@@ -4312,13 +4472,13 @@ angular.module('questCreator')
                       if (avatarLeft <= objRight && avatarRight >= objLeft && avatarTop <= objBottom && avatarBottom >= objTop) {
                           collision.found = true;
                           collision.type = 'wall';
-                          if (avatar.info.speed.x > 0) {
+                          if (avatar.speed.x > 0) {
                               collision.direction = 'right';
-                          } else if (avatar.info.speed.x < 0) {
+                          } else if (avatar.speed.x < 0) {
                               collision.direction = 'left';
-                          } else if (avatar.info.speed.y < 0) {
+                          } else if (avatar.speed.y < 0) {
                               collision.direction = 'up';
-                          } else if (avatar.info.speed.y > 0) {
+                          } else if (avatar.speed.y > 0) {
                               collision.direction = 'down';
                           }
                       }
@@ -4365,13 +4525,13 @@ angular.module('questCreator')
                     if (avatarLeft <= entRight && avatarRight >= entLeft && avatarTop <= entBottom && avatarBottom >= entTop) {
                         collision.found = true;
                         collision.type = 'wall';
-                        if (avatar.info.speed.x > 0) {
+                        if (avatar.speed.x > 0) {
                             collision.direction = 'right';
-                        } else if (avatar.info.speed.x < 0) {
+                        } else if (avatar.speed.x < 0) {
                             collision.direction = 'left';
-                        } else if (avatar.info.speed.y < 0) {
+                        } else if (avatar.speed.y < 0) {
                             collision.direction = 'up';
-                        } else if (avatar.info.speed.y > 0) {
+                        } else if (avatar.speed.y > 0) {
                             collision.direction = 'down';
                         }
                     }
@@ -4625,13 +4785,13 @@ angular.module('questCreator')
         // Translate the canvas origin to be the top left of the avatarToDraw
         gameCtx.translate(avatarToDraw.info.pos.x, avatarToDraw.info.pos.y);
         // Draw the squares from the avatarToDraw's current frame
-        avatarToDraw.info.currentFrame.forEach(function(square) {
+        avatarToDraw.info.currentFrame.image.forEach(function(square) {
             gameCtx.fillStyle = square.color;
             gameCtx.fillRect(square.x, square.y, square.width, square.height);
         });
         gameCtx.globalAlpha = 0.2;
         // Draw the avatarToDraw's collision map (purely for testing)
-        avatarToDraw.info.collisionMap.forEach(function(square) {
+        avatarToDraw.info.currentFrame.collisionMap.forEach(function(square) {
             gameCtx.fillStyle = square.color;
             gameCtx.fillRect(square.x, square.y, square.width, square.height);
         });
@@ -4843,48 +5003,16 @@ angular.module('questCreator')
     });
 
     function loadMainCharacter() {
-        var headerData = {
-            user_id: UserService.get().id,
-            token: UserService.get().token
-        };
-        // Avatar
-        $.ajax({
-            method: 'GET',
-            url: 'https://forge-api.herokuapp.com/characters/all',
-            headers: headerData,
-            success: function(response) {
-                var currentAvatar = response[0];
-                avatar = new Avatar(currentAvatar);
-                avatar.info.pos.x = startPos.x;
-                avatar.info.pos.y = startPos.y;
-                avatar.info.currentFrame = avatar.info.animate.walkLeft[0];
-                avatarLoaded = true;
-                fullPlayer.avatar = avatar;
-                socket.emit('game joined', fullPlayer);
-                setInterval(checkAvatarAction, 75);
-            },
-            error: function(error) {
-                console.log(error);
-            }
+        UserService.getPlayerAvatar().done(function(playerAvatar) {
+          avatar = new Avatar(playerAvatar);
+          avatar.info.pos.x = startPos.x;
+          avatar.info.pos.y = startPos.y;
+          avatar.info.currentFrame = avatar.info.animate.walkLeft[0];
+          avatarLoaded = true;
+          fullPlayer.avatar = avatar;
+          socket.emit('game joined', fullPlayer);
+          setInterval(checkAvatarAction, 75);
         });
-        // // Avatar
-        // $.ajax({
-        //     method: 'POST',
-        //     url: 'https://forge-api.herokuapp.com/characters/create',
-        //     headers: headerData,
-        //     data: JSON.stringify(avatarTest),
-        //     dataType: 'json',
-        //     contentType: 'application/json',
-        //     success: function(response) {
-        //         avatar = new Avatar(response);
-        //         avatar.info.currentFrame = avatar.info.animate.walkLeft[0];
-        //         avatarLoaded = true;
-        //         setInterval(checkAvatarAction, 75);
-        //     },
-        //     error: function(error) {
-        //         console.log(error);
-        //     }
-        // });
     }
 
 
@@ -4996,319 +5124,6 @@ angular.module('questCreator')
     socket.emit('game left', leavingPlayer);
   });
 });
-
-// Testing creation of avatar
-// var avatarTest = {
-//     name: 'Avatar Test',
-//     info: {
-//         // The x and y coordinate of the top left corner of the avatar
-//         pos: {
-//             x: 100,
-//             y: 250
-//         },
-//         // The character's speed
-//         speed: {
-//             mag: 3,
-//             x: 0,
-//             y: 0
-//         },
-//         // The animate object contains all the possible character actions with all of the frames to be drawn for each action.
-//         animate: {
-//             // Key: possible action, Value: array of frames
-//             walkLeft: [
-//                 // Each frame array element is an array of square objects to be drawn
-//                 // Frame 1 - walk left
-//                 [
-//                     {
-//                         x: 100,
-//                         y: 100,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'blue'
-//                     }, {
-//                         x: 110,
-//                         y: 150,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'green'
-//                     }
-//                 ],
-//                 // Frame 2 - walk left
-//                 [
-//                     {
-//                         x: 110,
-//                         y: 100,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'blue'
-//                     }, {
-//                         x: 100,
-//                         y: 150,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'green'
-//                     }
-//                 ]
-//             ],
-//             walkRight: [
-//                 // Frame 1 - walk right
-//                 [
-//                     {
-//                         x: 150,
-//                         y: 100,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'blue'
-//                     }, {
-//                         x: 140,
-//                         y: 150,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'green'
-//                     }
-//                 ],
-//                 // Frame 2 - walk right
-//                 [
-//                     {
-//                         x: 140,
-//                         y: 100,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'blue'
-//                     }, {
-//                         x: 150,
-//                         y: 150,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'green'
-//                     }
-//                 ]
-//             ],
-//             walkUp: [
-//                 // Frame 1 - walk up
-//                 [
-//                     {
-//                         x: 100,
-//                         y: 110,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'red'
-//                     }, {
-//                         x: 150,
-//                         y: 100,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'yellow'
-//                     }
-//                 ],
-//                 // Frame 2 - walk up
-//                 [
-//                     {
-//                         x: 100,
-//                         y: 100,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'red'
-//                     }, {
-//                         x: 150,
-//                         y: 110,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'yellow'
-//                     }
-//                 ]
-//             ],
-//             walkDown: [
-//                 // Frame 1 - walk down
-//                 [
-//                     {
-//                         x: 100,
-//                         y: 140,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'red'
-//                     }, {
-//                         x: 150,
-//                         y: 150,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'yellow'
-//                     }
-//                 ],
-//                 // Frame 2 - walk down
-//                 [
-//                     {
-//                         x: 100,
-//                         y: 150,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'red'
-//                     }, {
-//                         x: 150,
-//                         y: 140,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'yellow'
-//                     }
-//                 ]
-//             ],
-//             swimLeft: [
-//                 // Frame 1 - swim left
-//                 [
-//                     {
-//                         x: 100,
-//                         y: 100,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'lightblue'
-//                     }, {
-//                         x: 150,
-//                         y: 150,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'lightblue'
-//                     }
-//                 ],
-//                 // Frame 2 - swim left
-//                 [
-//                     {
-//                         x: 100,
-//                         y: 100,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'gray'
-//                     }, {
-//                         x: 150,
-//                         y: 150,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'gray'
-//                     }
-//                 ]
-//             ],
-//             swimRight: [
-//                 // Frame 1 - swim right
-//                 [
-//                     {
-//                         x: 100,
-//                         y: 100,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'lightblue'
-//                     }, {
-//                         x: 150,
-//                         y: 150,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'lightblue'
-//                     }
-//                 ],
-//                 // Frame 2 - swim right
-//                 [
-//                     {
-//                         x: 100,
-//                         y: 100,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'gray'
-//                     }, {
-//                         x: 150,
-//                         y: 150,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'gray'
-//                     }
-//                 ]
-//             ],
-//             swimUp: [
-//                 // Frame 1 - swim up
-//                 [
-//                     {
-//                         x: 100,
-//                         y: 100,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'lightblue'
-//                     }, {
-//                         x: 150,
-//                         y: 150,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'lightblue'
-//                     }
-//                 ],
-//                 // Frame 2 - swim up
-//                 [
-//                     {
-//                         x: 100,
-//                         y: 100,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'gray'
-//                     }, {
-//                         x: 150,
-//                         y: 150,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'gray'
-//                     }
-//                 ]
-//             ],
-//             swimDown: [
-//                 // Frame 1 - swim down
-//                 [
-//                     {
-//                         x: 100,
-//                         y: 100,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'lightblue'
-//                     }, {
-//                         x: 150,
-//                         y: 150,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'lightblue'
-//                     }
-//                 ],
-//                 // Frame 2 - swim down
-//                 [
-//                     {
-//                         x: 100,
-//                         y: 100,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'gray'
-//                     }, {
-//                         x: 150,
-//                         y: 150,
-//                         width: 30,
-//                         height: 30,
-//                         color: 'gray'
-//                     }
-//                 ]
-//             ]
-//             // Other actions could go here
-//         },
-//         // The collision map is how the game can know whether the character has collided with another object or event trigger. It is an array of invisible (or gray for now) squares.
-//         collisionMap: [
-//             {
-//                 x: 100,
-//                 y: 180,
-//                 width: 80,
-//                 height: 10,
-//                 color: 'gray'
-//             }, {
-//                 x: 100,
-//                 y: 185,
-//                 width: 80,
-//                 height: 10,
-//                 color: 'gray'
-//             }
-//         ]
-//     },
-//     current: false
-// };
 ;angular.module('questCreator').controller('profileCtrl', function(socket, $state, $scope, UserService) {
 
     $scope.showReqs = false;
@@ -5317,6 +5132,8 @@ angular.module('questCreator')
     $scope.collabActive = false;
     $scope.games = null;
     $scope.requests = null;
+    $scope.avatars = null;
+    $scope.large = null;
 
     UserService.checkLogin().then(function(response) {
 
@@ -5362,6 +5179,15 @@ angular.module('questCreator')
           });
           UserService.getCollaborators().done(function(collaborators) {
             filterCollaborators(collaborators, games);
+        });
+
+        UserService.getAvatars().done(function (avatars) {
+            $scope.avatars = avatars;
+            for (var i = 0; i < avatars.length; i++) {
+              if (avatars[i].current)
+              $scope.large = avatars[i];
+              $scope.$apply();
+            }
         });
 });
 
@@ -5430,6 +5256,25 @@ angular.module('questCreator')
                 $scope.collaborators.splice(index, 1);
                 $scope.$apply();
             });
+        };
+
+        $scope.highlightAvatar = function (avatar, index) {
+          $scope.large = avatar;
+        };
+
+        $scope.updateDefault = function () {
+          if ($scope.large) {
+            for (var i = 0; i < $scope.avatars.length; i++) {
+              if ($scope.avatars[i].current && $scope.avatars[i].id !== $scope.large.id) {
+                $scope.avatars[i].current = false;
+                UserService.updateAvatar(false, $scope.avatars[i].id);
+              }
+              if ($scope.avatars[i].id === $scope.large.id) {
+                $scope.avatars[i].current = $scope.large.current;
+              }
+            }
+            UserService.updateAvatar($scope.large.current, $scope.large.id);
+          }
         };
 
     });
@@ -5501,7 +5346,30 @@ angular.module('questCreator')
 
 });
 ;angular.module('questCreator').controller('scriptsCtrl', function($state) {
-
+  this.possibleRequirements = [
+    {
+      type: 'Inventory',
+      value: ''
+    },
+    {
+      type: 'Achievement',
+      value: 0
+    },
+    {
+      type: 'Location',
+      value: [1, 0, 0, 350, 250]
+    }
+  ];
+  this.possibleResults = [
+    {
+      type: 'Inventory',
+      value: ''
+    },
+    {
+      type: 'Achievement',
+      value: ''
+    }
+  ];
 });
 ;if (false) {
 
@@ -5520,6 +5388,319 @@ angular.module('questCreator')
     console.log(self.thumbnail);
   }
   */
+
+  // Testing creation of avatar
+  // var avatarTest = {
+  //     name: 'Avatar Test',
+  //     info: {
+  //         // The x and y coordinate of the top left corner of the avatar
+  //         pos: {
+  //             x: 100,
+  //             y: 250
+  //         },
+  //         // The character's speed
+  //         speed: {
+  //             mag: 3,
+  //             x: 0,
+  //             y: 0
+  //         },
+  //         // The animate object contains all the possible character actions with all of the frames to be drawn for each action.
+  //         animate: {
+  //             // Key: possible action, Value: array of frames
+  //             walkLeft: [
+  //                 // Each frame array element is an array of square objects to be drawn
+  //                 // Frame 1 - walk left
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'blue'
+  //                     }, {
+  //                         x: 110,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'green'
+  //                     }
+  //                 ],
+  //                 // Frame 2 - walk left
+  //                 [
+  //                     {
+  //                         x: 110,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'blue'
+  //                     }, {
+  //                         x: 100,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'green'
+  //                     }
+  //                 ]
+  //             ],
+  //             walkRight: [
+  //                 // Frame 1 - walk right
+  //                 [
+  //                     {
+  //                         x: 150,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'blue'
+  //                     }, {
+  //                         x: 140,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'green'
+  //                     }
+  //                 ],
+  //                 // Frame 2 - walk right
+  //                 [
+  //                     {
+  //                         x: 140,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'blue'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'green'
+  //                     }
+  //                 ]
+  //             ],
+  //             walkUp: [
+  //                 // Frame 1 - walk up
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 110,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'red'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'yellow'
+  //                     }
+  //                 ],
+  //                 // Frame 2 - walk up
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'red'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 110,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'yellow'
+  //                     }
+  //                 ]
+  //             ],
+  //             walkDown: [
+  //                 // Frame 1 - walk down
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 140,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'red'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'yellow'
+  //                     }
+  //                 ],
+  //                 // Frame 2 - walk down
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'red'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 140,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'yellow'
+  //                     }
+  //                 ]
+  //             ],
+  //             swimLeft: [
+  //                 // Frame 1 - swim left
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'lightblue'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'lightblue'
+  //                     }
+  //                 ],
+  //                 // Frame 2 - swim left
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'gray'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'gray'
+  //                     }
+  //                 ]
+  //             ],
+  //             swimRight: [
+  //                 // Frame 1 - swim right
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'lightblue'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'lightblue'
+  //                     }
+  //                 ],
+  //                 // Frame 2 - swim right
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'gray'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'gray'
+  //                     }
+  //                 ]
+  //             ],
+  //             swimUp: [
+  //                 // Frame 1 - swim up
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'lightblue'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'lightblue'
+  //                     }
+  //                 ],
+  //                 // Frame 2 - swim up
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'gray'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'gray'
+  //                     }
+  //                 ]
+  //             ],
+  //             swimDown: [
+  //                 // Frame 1 - swim down
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'lightblue'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'lightblue'
+  //                     }
+  //                 ],
+  //                 // Frame 2 - swim down
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'gray'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'gray'
+  //                     }
+  //                 ]
+  //             ]
+  //             // Other actions could go here
+  //         },
+  //         // The collision map is how the game can know whether the character has collided with another object or event trigger. It is an array of invisible (or gray for now) squares.
+  //         collisionMap: [
+  //             {
+  //                 x: 100,
+  //                 y: 180,
+  //                 width: 80,
+  //                 height: 10,
+  //                 color: 'gray'
+  //             }, {
+  //                 x: 100,
+  //                 y: 185,
+  //                 width: 80,
+  //                 height: 10,
+  //                 color: 'gray'
+  //             }
+  //         ]
+  //     },
+  //     current: false
+  // };
 
   var headerData = {
     user_id: UserService.get().id,
