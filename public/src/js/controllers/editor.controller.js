@@ -43,6 +43,7 @@ angular.module('questCreator')
   this.currentFrameIndex = 0;
   this.modeledFrameIndex = 0; // For some reason ng-model is being wacky the first click
   this.dragIndex = null;
+  this.dragAsset = null;
 
   this.goToPalette = function (type) {
     self.selectingAssets = true;
@@ -202,9 +203,15 @@ angular.module('questCreator')
   }
 
   this.dragPositionAsset = function(index, type){
-    console.log("in");
     self.dragIndex = {
       index: index,
+      type: type
+    };
+  }
+
+  this.dragAvailableAsset = function(asset, type){
+    self.dragAsset = {
+      asset: asset,
       type: type
     };
   }
@@ -223,7 +230,11 @@ angular.module('questCreator')
     });
 
     $('.asset.available').draggable({
-      helper: 'clone',
+      helper: function(){
+        var url = self.dragAsset.asset.thumbnail;
+        console.log(url);
+        return $('<img>').attr('src', url);
+      },
       start: function(event, ui) {
         $(ui.helper).addClass('grabbed');
       },
@@ -233,11 +244,26 @@ angular.module('questCreator')
     });
     $('#scene-BG').droppable({
       drop: function(event, ui) {
-        var type = self.dragIndex.type;
-        var index = self.dragIndex.index;
-        $scope.editor.currentScene[type][index].info.pos.x = ui.position.left;
-        $scope.editor.currentScene[type][index].info.pos.y = ui.position.top;
-        $scope.$apply();
+        // If already in scene editor view:
+        if (ui.draggable[0].className.toString().includes('-in-scene')){
+          var type = self.dragIndex.type;
+          var index = self.dragIndex.index;
+          $scope.editor.currentScene[type][index].info.pos.x = ui.position.left;
+          $scope.editor.currentScene[type][index].info.pos.y = ui.position.top;
+          $scope.$apply();
+        }
+        // If dragging from available assets bar
+        else if (ui.draggable[0].className.toString().includes('available')) {
+          var type = self.dragAsset.type;
+          var asset = self.dragAsset.asset;
+          var offset = $('#scene-BG').offset();
+          console.log("event: ", event);
+          console.log("ui: ", ui);
+          asset.info.pos.x = event.pageX - offset.left;
+          asset.info.pos.y = event.pageY - offset.top;
+          $scope.editor.currentScene[type].push(asset);
+          $scope.$apply();
+        }
       }
     });
   };

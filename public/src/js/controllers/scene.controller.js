@@ -30,7 +30,6 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
     if (!entity) {
       return;
     }
-    // console.log(entity);
     console.log($scope.editor.currentScene.entities);
     $scope.editor.currentScene.entities.push(entity);
     console.log($scope.editor.currentScene.entities);
@@ -66,10 +65,6 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
       'left': "{{"+type+ ".info.pos.y}}",
       'position': 'absolute'
     };
-    // var attributes = {
-    //   'src': url,
-    //   'ng-style': position
-    // };
     var url = asset.thumbnail;
     var html = '<img src="'+url+'" draggable">';
     var template = angular.element(html);
@@ -77,7 +72,6 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
     var element = linkFn($scope);
     $(element).appendTo('#scene-BG');
     $scope.apply;
-    // console.log(placeholder);
   };
 
 
