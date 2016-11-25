@@ -340,6 +340,7 @@
 }
 
 #asset-bar {
+  max-width: 600px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -377,7 +378,6 @@ canvas.asset {
   flex-wrap: wrap;
   justify-content: space-between;
   height: 40%;
-  max-width: 600px;
 
   .viewer {
     width: 50%;
@@ -385,17 +385,23 @@ canvas.asset {
     display: flex;
     flex-direction: column;
 
-//dummy stuff:
-  ul {
-    overflow-x: auto;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    flex: 1;
-    li {
-      margin: 0 15px;
+    .viewer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-  }
+
+//dummy stuff:
+    ul {
+      overflow-x: auto;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      flex: 1;
+      li {
+        margin: 0 15px;
+      }
+    }
 //end dummy stuff
 
     &:nth-child(2n){
@@ -423,9 +429,24 @@ canvas.asset {
   border: 2px solid black;
   font-size: 15px;
   word-wrap: break-word;
+
   &:hover {
     cursor: pointer;
   }
+
+  &.new {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+
+    &:after {
+      @include sheen();
+    }
+  }
+
+}
 
 .asset-in-scene {
 
@@ -454,6 +475,10 @@ canvas.asset {
   overflow: hidden;
   text-overflow: ellipsis;
   width: 75px;
+
+  &.new {
+    text-align: center;
+  }
 }
 
 .ui-draggable {
