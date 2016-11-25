@@ -52,6 +52,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     this.currentScene = null;
     this.currentScenePos = [0, 0, 0];
     this.gameLoaded = false;
+    var events = null;
 
     this.gameStarted = false;
 
@@ -130,11 +131,51 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
 
     function checkTyping(phrase) {
-        if (phrase.includes('look')) {
-            responding.phrase = "This is a description of your current scene. I hope it's helpful.";
-        } else {
-            responding.phrase = "I don't understand that.";
+      // phrase = "look window";
+      // events = {
+      //   typing: [
+      //     {
+      //       words: [ ['look'], ['window'] ],
+      //       response: [
+      //         {
+      //           type: 'text',
+      //           value: "You are standing in Uncle Vernon's and Aunt Petunia's kitchen."
+      //         }
+      //       ]
+      //     },
+      //     {
+      //       words: [ ['look'] ],
+      //       response: [
+      //         {
+      //           type: 'text',
+      //           value: 'The window looks out to the very small back yard.'
+      //         }
+      //       ]
+      //     }
+      //   ]
+      // };
+      var existingMatch = false;
+      events.typing.forEach(function(typingEvent) {
+        if (!existingMatch) {
+          var matchFound = true;
+          typingEvent.words.forEach(function(wordSet) {
+              var possibleMatch = false;
+              wordSet.forEach(function(word) {
+                if ( phrase.includes(word) ) {
+                  possibleMatch = true;
+                }
+              });
+              if (!possibleMatch) {
+                matchFound = false;
+                responding.phrase = 'I have literally no idea what you just said.';
+              }
+          });
+          if (matchFound) {
+            existingMatch = true;
+            responding.phrase = typingEvent.response[0].value;
+          }
         }
+      });
         $('.dialog').text(responding.phrase).show();
         responding.show = true;
         pause = true;
@@ -316,10 +357,10 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                     };
                   }
                   entity.info.currentFrame.collisionMap.forEach(function(entSquare) { // Loop through all the scene entity's squares
-                    var entLeft = entSquare.x + entity.info.pos.x;
-                    var entRight = entSquare.x + entSquare.width + entity.info.pos.x;
-                    var entTop = entSquare.y + entity.info.pos.y;
-                    var entBottom = entSquare.y + entSquare.height + entity.info.pos.y;
+                    var entLeft = (entSquare.x + entity.info.pos.x) * entity.scale;
+                    var entRight = (entSquare.x + entSquare.width + entity.info.pos.x) * entity.scale;
+                    var entTop = (entSquare.y + entity.info.pos.y) * entity.scale;
+                    var entBottom = (entSquare.y + entSquare.height + entity.info.pos.y) * entity.scale;
                     // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current scene object square (in those exact orders).
                     if (avatarLeft <= entRight && avatarRight >= entLeft && avatarTop <= entBottom && avatarBottom >= entTop) {
                         collision.found = true;
@@ -362,10 +403,10 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
               type: 'none'
           };
           entity.info.currentFrame.collisionMap.forEach(function(entitySquare) { // Loop through all the entity squares
-              var entityLeft = entitySquare.x + entity.info.pos.x;
-              var entityRight = entitySquare.x + entitySquare.width + entity.info.pos.x;
-              var entityTop = entitySquare.y + entity.info.pos.y;
-              var entityBottom = entitySquare.y + entitySquare.height + entity.info.pos.y;
+              var entityLeft = (entitySquare.x + entity.info.pos.x) * entity.scale;
+              var entityRight = (entitySquare.x + entitySquare.width + entity.info.pos.x) * entity.scale;
+              var entityTop = (entitySquare.y + entity.info.pos.y) * entity.scale;
+              var entityBottom = (entitySquare.y + entitySquare.height + entity.info.pos.y) * entity.scale;
               if (background) {
                   background.info.collisionMap.forEach(function(bgSquare) { // Loop through all the background's squares
                       var bgLeft = bgSquare.x;
@@ -523,6 +564,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
         self.currentRow = self.allRows[self.currentScenePos[1]];
         self.currentScene = self.currentRow[self.currentScenePos[2]];
         background = self.currentScene.background;
+        // Expected location of events
+        // events = self.currentScene.events;
         objects = self.currentScene.objects;
         loadEntities();
     }
@@ -632,6 +675,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     }
 
     function drawObjects(type) {
+      if (objects) {
         // objects.sort(function(objectA, objectB) {
         //   if (!objectA.bounds) {
         //     objectA.bounds.bottom = null;
@@ -691,27 +735,44 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
             }
             gameCtx.restore();
         });
+      }
     }
 
     function drawEntities(type) {
-      entities.forEach(function(entity) {
-          entity.checkAction();
-          // Save the drawing context
-          gameCtx.save();
-          // Translate the canvas origin to be the top left of the entity
-          gameCtx.translate(entity.info.pos.x, entity.info.pos.y);
-          // If entity has collision map bounds, check avatar location. Otherwise, draw behind character by default.
-          // if (entity.bounds) {
-          //   if (avatar.bounds.top > entity.bounds.bottom) {
-          //     gameCtx.globalCompositeOperation = "destination-over";  // If entity is behind character.
-          //   } else {
-          //     gameCtx.globalCompositeOperation = "source-over"; // If entity is in front of character.
-          //   }
-          // } else {
-          //   gameCtx.globalCompositeOperation = "destination-over";  // If entity is behind character.
-          // }
-          if (entity.bounds) {
-            if ( (avatar.bounds.top > entity.bounds.bottom && type === 'background') || (avatar.bounds.top < entity.bounds.bottom && type === 'foreground') ) {
+      // Check for entities existence
+      if (entities) {
+        entities.forEach(function(entity) {
+            entity.checkAction();
+            // Save the drawing context
+            gameCtx.save();
+            // Translate the canvas origin to be the top left of the entity
+            gameCtx.translate(entity.info.pos.x, entity.info.pos.y);
+            gameCtx.scale(entity.scale, entity.scale);
+            // If entity has collision map bounds, check avatar location. Otherwise, draw behind character by default.
+            // if (entity.bounds) {
+            //   if (avatar.bounds.top > entity.bounds.bottom) {
+            //     gameCtx.globalCompositeOperation = "destination-over";  // If entity is behind character.
+            //   } else {
+            //     gameCtx.globalCompositeOperation = "source-over"; // If entity is in front of character.
+            //   }
+            // } else {
+            //   gameCtx.globalCompositeOperation = "destination-over";  // If entity is behind character.
+            // }
+            if (entity.bounds) {
+              if ( (avatar.bounds.top > entity.bounds.bottom && type === 'background') || (avatar.bounds.top < entity.bounds.bottom && type === 'foreground') ) {
+                // Draw the squares from the entity's current frame
+                entity.info.currentFrame.image.forEach(function(square) {
+                    gameCtx.fillStyle = square.color;
+                    gameCtx.fillRect(square.x, square.y, square.width, square.height);
+                });
+                gameCtx.globalAlpha = 0.2;
+                // Draw the entity's collision map (purely for testing)
+                entity.info.currentFrame.collisionMap.forEach(function(square) {
+                    gameCtx.fillStyle = square.color;
+                    gameCtx.fillRect(square.x, square.y, square.width, square.height);
+                });
+              }
+            } else if (type === 'background'){
               // Draw the squares from the entity's current frame
               entity.info.currentFrame.image.forEach(function(square) {
                   gameCtx.fillStyle = square.color;
@@ -724,21 +785,9 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                   gameCtx.fillRect(square.x, square.y, square.width, square.height);
               });
             }
-          } else if (type === 'background'){
-            // Draw the squares from the entity's current frame
-            entity.info.currentFrame.image.forEach(function(square) {
-                gameCtx.fillStyle = square.color;
-                gameCtx.fillRect(square.x, square.y, square.width, square.height);
-            });
-            gameCtx.globalAlpha = 0.2;
-            // Draw the entity's collision map (purely for testing)
-            entity.info.currentFrame.collisionMap.forEach(function(square) {
-                gameCtx.fillStyle = square.color;
-                gameCtx.fillRect(square.x, square.y, square.width, square.height);
-            });
-          }
-          gameCtx.restore();
-      });
+            gameCtx.restore();
+        });
+      }
     }
 
     function clearCanvas() {
@@ -754,6 +803,34 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
         self.currentRow = self.allRows[0];
         self.currentScene = self.currentRow[0];
         background = self.currentScene.background;
+        objects = self.currentScene.objects;
+        loadEntities();
+        // Expected location of events
+        // events = self.currentScene.events;
+        events = {
+          typing: [
+            {
+              words: [ ['look'], ['window'] ],
+              response: [
+                {
+                  type: 'text',
+                  value: 'The window looks out to the very small back yard.'
+                }
+              ]
+            },
+            {
+              words: [ ['look'] ],
+              response: [
+                {
+                  type: 'text',
+                  value: "You are standing in Uncle Vernon's and Aunt Petunia's kitchen."
+                }
+              ]
+            }
+          ]
+        };
+        drawEntities('background');
+        drawObjects('background');
         drawBackground();
         startPos = {    // Eventually will come from game object
           map: 1,
@@ -824,6 +901,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
     function runGame() {
       // Any loading animation would happen here
+      // Play button and appears when game is loaded and disappears when clicked
         if (self.gameStarted) {
             clearCanvas();
             if (avatarLoaded) {
