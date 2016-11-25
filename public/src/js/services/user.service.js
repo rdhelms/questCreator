@@ -348,6 +348,49 @@ angular.module('questCreator')
             });
         }
 
+        function getAvatars() {
+          return $.ajax({
+              method: 'GET',
+              url: 'https://forge-api.herokuapp.com/entities/user',
+              headers: {
+                  user_id: user.id,
+                  token: user.token
+              },
+              dataType: 'json',
+              contentType: 'application/json',
+              success: function(response) {
+                console.log(response);
+                  return response;
+              },
+              error: function(error) {
+                  console.log(error);
+              }
+          });
+        }
+
+        function updateAvatar(current, id) {
+          console.log(current, id);
+          $.ajax({
+              method: 'PATCH',
+              url: 'https://forge-api.herokuapp.com/entities/make-current',
+              headers: {
+                  user_id: user.id,
+                  token: user.token
+              },
+              data: {
+                current: current,
+                id: id
+              },
+              success: function(response) {
+                console.log(response);
+                  return response;
+              },
+              error: function(error) {
+                  console.log(error);
+              }
+          });
+        }
+
         return {
             get: getUser,
             set: setUser,
@@ -362,6 +405,8 @@ angular.module('questCreator')
             toggleAccepted: toggleAccepted,
             toggleRequested: toggleRequested,
             requestAgain: requestAgain,
+            getAvatars: getAvatars,
+            updateAvatar: updateAvatar,
             archive: archiveGame,
             register: registerUser,
             signOut: signOut,
