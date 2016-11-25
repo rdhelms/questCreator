@@ -6,6 +6,8 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
     $scope.collabActive = false;
     $scope.games = null;
     $scope.requests = null;
+    $scope.avatars = null;
+    $scope.large = null;
 
     UserService.checkLogin().then(function(response) {
 
@@ -51,6 +53,15 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
           });
           UserService.getCollaborators().done(function(collaborators) {
             filterCollaborators(collaborators, games);
+        });
+
+        UserService.getAvatars().done(function (avatars) {
+            $scope.avatars = avatars;
+            for (var i = 0; i < avatars.length; i++) {
+              if (avatars[i].current)
+              $scope.large = avatars[i];
+              $scope.$apply();
+            }
         });
 });
 
@@ -119,6 +130,25 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
                 $scope.collaborators.splice(index, 1);
                 $scope.$apply();
             });
+        };
+
+        $scope.highlightAvatar = function (avatar, index) {
+          $scope.large = avatar;
+        };
+
+        $scope.updateDefault = function () {
+          if ($scope.large) {
+            for (var i = 0; i < $scope.avatars.length; i++) {
+              if ($scope.avatars[i].current && $scope.avatars[i].id !== $scope.large.id) {
+                $scope.avatars[i].current = false;
+                UserService.updateAvatar(false, $scope.avatars[i].id);
+              }
+              if ($scope.avatars[i].id === $scope.large.id) {
+                $scope.avatars[i].current = $scope.large.current;
+              }
+            }
+            UserService.updateAvatar($scope.large.current, $scope.large.id);
+          }
         };
 
     });

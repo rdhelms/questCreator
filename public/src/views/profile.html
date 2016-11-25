@@ -9,55 +9,71 @@
             </ul>
 
             <div ng-if="requests.length > 0" class="requests">
-              <section class="collab-controls">
-                <p>Requests to collaborate</p>
-                <button ng-click="showRequests()" ng-animate="{enter: 'requestArrow', leave: 'requestCounter'}" ng-class="{true: 'requestArrow', false: 'requestCounter'}[requestActive]"></button>
-                <p ng-model="requests.length">{{ requests.length }}</p>
-              </section>
+                <section class="collab-controls">
+                    <p>Requests to collaborate</p>
+                    <button ng-click="showRequests()" ng-animate="{enter: 'requestArrow', leave: 'requestCounter'}" ng-class="{true: 'requestArrow', false: 'requestCounter'}[requestActive]"></button>
+                    <p ng-model="requests.length">{{ requests.length }}</p>
+                </section>
 
                 <table ng-show="showReqs">
-                  <tr>
-                    <th>Game:</th>
-                    <th>Requested By:</th>
-                    <th>Approved:</th>
-                    <th>Remove</th>
-                  </tr>
-                  <tr ng-repeat="request in requests">
-                    <td>{{ request.gameName | capitalize }}</td>
-                    <td>{{ request.username }}</td>
-                    <td><input ng-model="request.accepted" ng-change="toggleCollab(request)" type="checkbox" ></td>
-                    <td><button ng-click="removeRequest(request, $index)" type="button" name="button"></button></td>
-                  </tr>
+                    <tr>
+                        <th>Game:</th>
+                        <th>Requested By:</th>
+                        <th>Approved:</th>
+                        <th>Remove</th>
+                    </tr>
+                    <tr ng-repeat="request in requests">
+                        <td>{{ request.gameName | capitalize }}</td>
+                        <td>{{ request.username }}</td>
+                        <td><input ng-model="request.accepted" ng-change="toggleCollab(request)" type="checkbox"></td>
+                        <td><button ng-click="removeRequest(request, $index)" type="button" name="button"></button></td>
+                    </tr>
                 </table>
             </div>
 
             <div ng-if="collaborators.length > 0" class="collaborators">
-              <section class="collab-controls">
-                <p>Current Collaborators</p>
-                <button ng-click="showCollaborators()" ng-animate="{enter: 'collabArrow', leave: 'collabCounter'}" ng-class="{true: 'collabArrow', false: 'collabCounter'}[collabActive]"></button>
-                <p ng-model="collaborators.length">{{ collaborators.length }}</p>
-              </section>
+                <section class="collab-controls">
+                    <p>Current Collaborators</p>
+                    <button ng-click="showCollaborators()" ng-animate="{enter: 'collabArrow', leave: 'collabCounter'}" ng-class="{true: 'collabArrow', false: 'collabCounter'}[collabActive]"></button>
+                    <p ng-model="collaborators.length">{{ collaborators.length }}</p>
+                </section>
 
                 <table ng-show="showCollabs">
-                  <tr>
-                    <th>Game:</th>
-                    <th>Collaborator:</th>
-                    <th>Approved:</th>
-                    <th>Remove</th>
-                  </tr>
-                  <tr ng-repeat="collaborator in collaborators">
-                    <td>{{ collaborator.gameName | capitalize }}</td>
-                    <td>{{ collaborator.username }}</td>
-                    <td><input ng-model="collaborator.accepted" ng-change= "toggleCollab(collaborator)" type="checkbox" value="{{ collaborator.accepted }}"></td>
-                    <td><button ng-click="removeCollaborator(collaborator, $index)" type="button" name="button"></button></td>
-                  </tr>
+                    <tr>
+                        <th>Game:</th>
+                        <th>Collaborator:</th>
+                        <th>Approved:</th>
+                        <th>Remove</th>
+                    </tr>
+                    <tr ng-repeat="collaborator in collaborators">
+                        <td>{{ collaborator.gameName | capitalize }}</td>
+                        <td>{{ collaborator.username }}</td>
+                        <td><input ng-model="collaborator.accepted" ng-change="toggleCollab(collaborator)" type="checkbox" value="{{ collaborator.accepted }}"></td>
+                        <td><button ng-click="removeCollaborator(collaborator, $index)" type="button" name="button"></button></td>
+                    </tr>
                 </table>
             </div>
         </section>
 
-        <section class="avatar-creator">
-            <div>
-                <h1>Avatar Editor:</h1>
+        <section class="avatar-selector">
+            <h1>Avatars:</h1>
+            <ul class="avatar-preview">
+                <li class="avatar" ng-model="avatars" ng-click="highlightAvatar(avatar, $index)" ng-repeat="avatar in avatars">
+                    <img class="avatar-thumbnail" src="{{ avatar.thumbnail }}" alt="Avatar thumbnail">
+                    <p>{{ avatar.name }}</p>
+                </li>
+            </ul>
+            <div style="background-image: url('{{ large.thumbnail }}')" class="avatar-large">
+                <div class="large-info">
+                    <p>{{ large.name }}</p>
+                    <!-- <ul ng-if="large.tags.length > 0" class="tags">
+                        <li  ng-repeat="tag in large.tags">{{ tag }}</li>
+                    </ul> -->
+                </div>
+                <div ng-if="large" class="current-checkbox">
+                    <label for="avatar-current">Default</label>
+                    <input ng-disabled="!large" ng-model="large.current" type="checkbox" ng-change="updateDefault()" value="{{ large.current }}">
+                </div>
             </div>
         </section>
     </div>
@@ -69,13 +85,12 @@
         </div>
         <h1 ng-if="games">You Did This:</h1>
         <div ng-if="games" class="user-games" ng-repeat="game in games">
-            <img src="{{ game.thumbnail }}" alt="Game thumbnail"/>
+            <img src="{{ game.thumbnail }}" alt="Game thumbnail" />
             <ul>
                 <li>
-                    <label for="game-name">Game Name:</label>
-                    {{ game.name | capitalize }}</li>
+                    <label for="game-name">Game Name:</label> {{ game.name | capitalize }}</li>
                 <li>
-                  <label for="published">Published:</label>{{ game.published ? 'Y' : 'N' }}
+                    <label for="published">Published:</label>{{ game.published ? 'Y' : 'N' }}
                 </li>
                 <li>
                     <label for="created">Date Created:</label>
@@ -87,8 +102,8 @@
                 </li>
             </ul>
             <div class="buttons">
-              <button type="button" ng-click="editGame(game.name)">Edit</button>
-              <button type="button" ng-click="archiveGame(game, $index)">Archive</button>
+                <button type="button" ng-click="editGame(game.name)">Edit</button>
+                <button type="button" ng-click="archiveGame(game, $index)">Archive</button>
             </div>
         </div>
 
@@ -96,8 +111,7 @@
         <div ng-if="collaborations" class="user-games" ng-repeat="collaboration in collaborations">
             <ul>
                 <li>
-                    <label for="game-name">Game Name:</label>
-                    {{ collaboration.name | capitalize }}</li>
+                    <label for="game-name">Game Name:</label> {{ collaboration.name | capitalize }}</li>
                 <li>
                     <label for="creator">Created By:</label>
                     <p>{{ collaboration.username }}</p>
@@ -112,7 +126,7 @@
                 </li>
             </ul>
             <div class="buttons">
-              <button type="button" ng-click="editGame(collaboration.name)">Edit</button>
+                <button type="button" ng-click="editGame(collaboration.name)">Edit</button>
             </div>
         </div>
 
