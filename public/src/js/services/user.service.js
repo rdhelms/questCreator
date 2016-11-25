@@ -348,6 +348,25 @@ angular.module('questCreator')
             });
         }
 
+        function getPlayerAvatar() {
+          return $.ajax({
+              method: 'GET',
+              url: 'https://forge-api.herokuapp.com/users/avatar',
+              headers: {
+                  user_id: user.id,
+                  token: user.token
+              },
+              dataType: 'json',
+              contentType: 'application/json',
+              success: function(response) {
+                  return response;
+              },
+              error: function(error) {
+                  console.log(error);
+              }
+          });
+        }
+
         function getAvatars() {
           return $.ajax({
               method: 'GET',
@@ -407,6 +426,7 @@ angular.module('questCreator')
             requestAgain: requestAgain,
             getAvatars: getAvatars,
             updateAvatar: updateAvatar,
+            getPlayerAvatar: getPlayerAvatar,
             archive: archiveGame,
             register: registerUser,
             signOut: signOut,

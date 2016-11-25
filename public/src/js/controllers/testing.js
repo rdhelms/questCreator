@@ -16,6 +16,319 @@ if (false) {
   }
   */
 
+  // Testing creation of avatar
+  // var avatarTest = {
+  //     name: 'Avatar Test',
+  //     info: {
+  //         // The x and y coordinate of the top left corner of the avatar
+  //         pos: {
+  //             x: 100,
+  //             y: 250
+  //         },
+  //         // The character's speed
+  //         speed: {
+  //             mag: 3,
+  //             x: 0,
+  //             y: 0
+  //         },
+  //         // The animate object contains all the possible character actions with all of the frames to be drawn for each action.
+  //         animate: {
+  //             // Key: possible action, Value: array of frames
+  //             walkLeft: [
+  //                 // Each frame array element is an array of square objects to be drawn
+  //                 // Frame 1 - walk left
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'blue'
+  //                     }, {
+  //                         x: 110,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'green'
+  //                     }
+  //                 ],
+  //                 // Frame 2 - walk left
+  //                 [
+  //                     {
+  //                         x: 110,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'blue'
+  //                     }, {
+  //                         x: 100,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'green'
+  //                     }
+  //                 ]
+  //             ],
+  //             walkRight: [
+  //                 // Frame 1 - walk right
+  //                 [
+  //                     {
+  //                         x: 150,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'blue'
+  //                     }, {
+  //                         x: 140,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'green'
+  //                     }
+  //                 ],
+  //                 // Frame 2 - walk right
+  //                 [
+  //                     {
+  //                         x: 140,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'blue'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'green'
+  //                     }
+  //                 ]
+  //             ],
+  //             walkUp: [
+  //                 // Frame 1 - walk up
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 110,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'red'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'yellow'
+  //                     }
+  //                 ],
+  //                 // Frame 2 - walk up
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'red'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 110,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'yellow'
+  //                     }
+  //                 ]
+  //             ],
+  //             walkDown: [
+  //                 // Frame 1 - walk down
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 140,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'red'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'yellow'
+  //                     }
+  //                 ],
+  //                 // Frame 2 - walk down
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'red'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 140,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'yellow'
+  //                     }
+  //                 ]
+  //             ],
+  //             swimLeft: [
+  //                 // Frame 1 - swim left
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'lightblue'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'lightblue'
+  //                     }
+  //                 ],
+  //                 // Frame 2 - swim left
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'gray'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'gray'
+  //                     }
+  //                 ]
+  //             ],
+  //             swimRight: [
+  //                 // Frame 1 - swim right
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'lightblue'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'lightblue'
+  //                     }
+  //                 ],
+  //                 // Frame 2 - swim right
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'gray'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'gray'
+  //                     }
+  //                 ]
+  //             ],
+  //             swimUp: [
+  //                 // Frame 1 - swim up
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'lightblue'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'lightblue'
+  //                     }
+  //                 ],
+  //                 // Frame 2 - swim up
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'gray'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'gray'
+  //                     }
+  //                 ]
+  //             ],
+  //             swimDown: [
+  //                 // Frame 1 - swim down
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'lightblue'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'lightblue'
+  //                     }
+  //                 ],
+  //                 // Frame 2 - swim down
+  //                 [
+  //                     {
+  //                         x: 100,
+  //                         y: 100,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'gray'
+  //                     }, {
+  //                         x: 150,
+  //                         y: 150,
+  //                         width: 30,
+  //                         height: 30,
+  //                         color: 'gray'
+  //                     }
+  //                 ]
+  //             ]
+  //             // Other actions could go here
+  //         },
+  //         // The collision map is how the game can know whether the character has collided with another object or event trigger. It is an array of invisible (or gray for now) squares.
+  //         collisionMap: [
+  //             {
+  //                 x: 100,
+  //                 y: 180,
+  //                 width: 80,
+  //                 height: 10,
+  //                 color: 'gray'
+  //             }, {
+  //                 x: 100,
+  //                 y: 185,
+  //                 width: 80,
+  //                 height: 10,
+  //                 color: 'gray'
+  //             }
+  //         ]
+  //     },
+  //     current: false
+  // };
+
   var headerData = {
     user_id: UserService.get().id,
     token: UserService.get().token
