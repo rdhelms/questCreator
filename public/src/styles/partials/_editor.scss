@@ -306,6 +306,16 @@
           height: 40%;
           width: 40%;
           margin: 5%;
+          position: relative;
+
+          .color-input {
+            position: absolute;
+            width: 1rem;
+            height: 1rem;
+            &:hover {
+              cursor: crosshair;
+            }
+          }
 
           &:nth-child(1){
             background: skyblue;
