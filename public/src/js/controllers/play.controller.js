@@ -1,7 +1,7 @@
 angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, GameService, $state, $scope) {
     var self = this;
     var playerInfo = {
-        userId: UserService.get().id,
+        id: UserService.get().id,
     };
     var gameCanvas = document.getElementById('play-canvas');
     var gameCtx = gameCanvas.getContext('2d');
@@ -33,7 +33,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     var avatarLoaded = false;
     var entitiesLoaded = false;
 
-    this.gameToPlay = GameService.getGameDetail().name;
+    this.gameName = GameService.getGameDetail().name;
     var gameInfo = null;
     var allMaps = null;
     this.currentMap = null;
@@ -45,8 +45,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
     this.gameStarted = false;
 
-    var currentGame = GameService.loadGame(self.gameToPlay).done(function(response) {
+    var currentGame = GameService.loadGame(self.gameName).done(function(response) {
         self.gameLoaded = true;
+        // Tell the server that I joined this game
+        var newPlayer = {
+          id: playerInfo.id,
+          game: self.gameName
+        };
+        socket.emit('game joined', newPlayer);
         gameInfo = response.info;
         allMaps = gameInfo.maps;
         self.currentMap = allMaps[0];
@@ -121,7 +127,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
             if (!responding.show && !inventory.show && $('.active').length === 0) { // Resume the game if all windows have been closed
                 pause = false;
             }
-        } else if (keyCode === 32) {
+        } else if (keyCode === 32 && !$(".message").is(":focus")) {
             // Space
             if (!typing.show) {
                 typing.phrase = '>';
@@ -989,7 +995,21 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
             // } else {
             //   gameCtx.globalCompositeOperation = "destination-over";  // If object is behind character.
             // }
-            if ( (avatar.bounds.top > object.bounds.bottom && type === 'background') || (avatar.bounds.top < object.bounds.bottom && type === 'foreground') ) {
+            if (object.bounds) {
+              if ( (avatar.bounds.top > object.bounds.bottom && type === 'background') || (avatar.bounds.top < object.bounds.bottom && type === 'foreground') ) {
+                // Draw the squares from the object's current frame
+                object.info.image.forEach(function(square) {
+                    gameCtx.fillStyle = square.color;
+                    gameCtx.fillRect(square.x, square.y, square.width, square.height);
+                });
+                gameCtx.globalAlpha = 0.2;
+                // Draw the object's collision map (purely for testing)
+                object.info.collisionMap.forEach(function(square) {
+                    gameCtx.fillStyle = square.color;
+                    gameCtx.fillRect(square.x, square.y, square.width, square.height);
+                });
+              }
+            } else if (type === 'background'){
               // Draw the squares from the object's current frame
               object.info.image.forEach(function(square) {
                   gameCtx.fillStyle = square.color;
@@ -1090,84 +1110,53 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
   var socketId;
   var allPlayers = [];
 
-  // Tell server I've come to the landing page
-  socket.emit('game joined');
+  // Get my own information
+  socket.off('self info');
+  socket.on('self info', function(id) {
+    console.log("ID:", id);
+  });
 
-  // Get my socket id from the Node server and send my player information to existing players. Then send updates after.
-  var loopHandle;
-  socket.off('create character');
-  socket.on('create character', function(id) {  // Use this immediate response from the server to get my own socket id
-    socketId = id;
-    var charInfo = {   // My player info
+  // Notify me in the chat window that another player joined the game.
+  socket.off('new player');
+  socket.on('new player', function(newPlayer) {
+    console.log("New player:", newPlayer);
+    var msg = "Player " + newPlayer.id + ' is playing ' + newPlayer.game;
+    $('.chat-messages').append($('<li>').text(msg));
+  });
 
+  // When I submit a chat message, send it to the server along with the game I'm playing
+  $('.chat-submit').submit(function(){
+    var msgInfo = {
+      msg: playerInfo.id + ': ' + $('.message').val(),
+      gameName: self.gameName
     };
-    allPlayers.push(charInfo); // Put myself in the array of players?
-    socket.emit('send new player', charInfo); // Send my player information to other users
-    loopHandle = setInterval(function() { // Send frequent updates to other players
-      playerUpdate = {  // My updated info to be sent to all other players
-      }
-      allPlayers.forEach(function(player, index) {  // Update myself in the array?
-        if (player.id === id) {
-          allPlayers[index] = playerUpdate;
-        }
-      });
-      socket.emit('player update', playerUpdate);
-    }, 20);
+    socket.emit('chat message', msgInfo);
+    $('.message').val('');
+    return false;   // Prevent default page refresh
   });
 
-  // Receive an existing player's information if I just join a game
-  socket.off('old player found');
-  socket.on('old player found', function(oldCharInfo) {
-    console.log("Found old player");
-    // Add old player to array of players
-    allPlayers.push(oldCharInfo);
-  });
-
-  // Receive a new player's information if I'm already playing when they join
-  socket.off('new player joining');
-  socket.on('new player joining', function(newCharInfo) {
-    var response = {
-      oldCharInfo: charInfo,
-      id: newCharInfo.id
-    };
-    // Add new player to array of players
-    allPlayers.push(newCharInfo);
-    // Send my response back to the new player to let them know I was already here.
-    socket.emit('send old player', response);
-  });
-
-  // Update an existing player's information (received at constant interval from every player)
-  socket.off('updating player');
-  socket.on('updating player', function(playerUpdate) {
-    // Find the player who is being updated in the array, and update their details
+  // When a message has been received, display it on the screen
+  socket.off('chat message');
+  socket.on('chat message', function(msg){
+    $('.chat-messages').append($('<li>').text(msg));
   });
 
   // Notify me if a player leaves the game
   socket.off('player left');
-  socket.on('player left', function(playerId) {
-    console.log("Player left!");
-    allPlayers.forEach(function(player, index) {
-      if (player.id === playerId) {
-        //Remove player from array here
-      }
-    });
+  socket.on('player left', function(leavingPlayer) {
+    console.log("Player " + leavingPlayer.id + " left!");
+    var msg = "Player " + leavingPlayer.id + ' left ' + leavingPlayer.game;
+    $('.chat-messages').append($('<li>').text(msg));
   });
 
+  // Let others know that I left the game if the controller ceases (closing browser, etc)
   $scope.$on("$destroy", function(){
-    socket.emit('game left'); // Let others know that I left the game if the controller ceases (closing browser, etc)
-    clearInterval(loopHandle);
+    var leavingPlayer = {
+      id: playerInfo.id,
+      game: self.gameName
+    };
+    socket.emit('game left', leavingPlayer);
   });
 
-  // Send a text message to the server, to be broadcast to everyone.
-  $('.chat-submit').submit(function(){
-    socket.emit('chat message', $('.message').val());
-    $('.message').val('');
-    return false;   // Prevent default page refresh
-  });
-  // Receieve any broadcast message, and display it in the chat window.
-  socket.off('chat message');
-  socket.on('chat message', function(msg){
-    $('.chat-messages').append($('<li>').text(playerInfo.userId + ': ' + msg));
-  });
 
 });
