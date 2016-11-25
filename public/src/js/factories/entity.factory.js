@@ -13,6 +13,7 @@ angular.module('questCreator').factory('Entity', function() {
     this.info.currentFrame = this.info.animate[this.action][this.info.currentFrameIndex];
     this.animateDelay = 20;
     this.animateTime = 0;
+    this.scale = 1;
   };
 
   Entity.prototype.updatePos = function() {
