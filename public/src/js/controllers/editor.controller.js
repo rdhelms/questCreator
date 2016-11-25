@@ -211,7 +211,7 @@ angular.module('questCreator')
   };
 
   this.setThumbnail = function(asset){
-    if (asset === undefined) {
+    if (asset === undefined || !asset.thumbnail) {
       return {"background": "none"};
     } else {
       return {

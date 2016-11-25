@@ -139,7 +139,7 @@ angular.module('questCreator').service('EditorService', function (UserService, $
         description: game.description,
         info: game.info,
         published: true,
-        thumbnail: game.info.maps[0].scenes[0][0].background.thumbnail || null
+        thumbnail: game.info.maps[0].scenes[0][0].background.thumbnail
       };
       console.log(gameUpdateData);
       var headerData = {
