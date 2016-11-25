@@ -57,6 +57,7 @@
 
                 .collabArrow,
                 .collabCounter {
+                    background-color: $lightgrey;
                     box-shadow: none;
                     width: 45px;
                     height: 40px;
@@ -83,27 +84,82 @@
             border: 3px black solid;
         }
 
-        .avatar-creator {
+        .avatar-selector {
             display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            padding-left: 25px;
 
-            canvas {
-                background: whitesmoke;
-            }
-
-            #animate-preview {
-                height: 200px;
-                width: 145px;
-            }
-
-            .frame-overview {
-                width: 217px;
-                height: 223px;
+            .avatar-preview {
                 display: flex;
-                flex-wrap: wrap;
+                justify-content: center;
+                align-items: space-around;
+                overflow: auto;
+                padding: 10px;
+                border: black solid 4px;
+                width: 100%;
+                max-width: 675px;
+                background-color: $medgrey;
 
-                canvas {
+                .avatar {
+                    border: 2px solid black;
+                    text-overflow: ellipsis;
                     background-color: whitesmoke;
-                    margin: 2px;
+
+                    .avatar-thumbnail {
+                        width: 150px;
+                        height: 150px;
+                    }
+
+                    p {
+                      text-align: center;
+                    }                    
+                }
+            }
+
+            .avatar-large {
+                display: flex;
+                justify-content: space-between;
+                background-color: whitesmoke;
+                background-size: cover;
+                width: 675px;
+                height: 675px;
+                border: black solid 4px;
+
+                p {
+                    padding: 20px;
+                    font-size: 3em;
+                    color: pink;
+                    -webkit-text-stroke: 2px red;
+                    font-style: italic;
+                    text-shadow: 4px 4px 8px rgba(150, 150, 150, 0.77);
+                }
+
+                .current-checkbox {
+                  text-shadow: 4px 4px 8px rgba(150, 150, 150, 0.77);
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-around;
+                    align-items: flex-end;
+                    height: 80px;
+
+                    label {
+                      color: $darkgrey;
+                    }
+
+                  input[type=checkbox] {
+                    margin-right: 25px;
+                    border: 4px black solid;
+                    -ms-transform: scale(3);
+                    -moz-transform: scale(3);
+                    -webkit-transform: scale(3);
+                    -o-transform: scale(3);
+                    padding: 10px;
+
+                    &::after {
+                      background-color: black;
+                    }
+                  }
                 }
             }
         }
