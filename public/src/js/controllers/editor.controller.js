@@ -254,10 +254,13 @@ angular.module('questCreator')
     };
   }
 
+  this.removeAsset = function(index, type){
+    self.currentScene[type].splice(index, 1);
+  };
+
   //jquery UI Stuff
   this.uiDrag = function() {
     this.dragCalls++;
-    // console.log("you called this function needlessly " + this.dragCalls + " times, ya jerk!");
     $('.asset-in-scene').draggable({
       start: function(event, ui) {
         $(ui.helper).addClass('grabbed');

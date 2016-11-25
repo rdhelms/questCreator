@@ -399,6 +399,27 @@ canvas.asset {
   &:hover {
     cursor: pointer;
   }
+
+.asset-in-scene {
+
+
+  span {
+    display: none;
+    position: absolute;
+    color: red;
+    background: whitesmoke;
+    opacity: .5;
+
+    &:hover {
+      opacity: 1;
+      background: $darkgrey;
+      cursor: pointer;
+    }
+  }
+
+  &:hover > span {
+    display: inline-block;
+  }
 }
 
 .asset-name {

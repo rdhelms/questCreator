@@ -33,8 +33,14 @@
                 <div class="edit-canvas {{editor.currentLargeView}}" ng-class="{{editor.currentLargeView}}">
                     <ui-view ng-show="editor.currentLargeView === 'map'" name="maps"></ui-view>
                     <div ng-show="editor.currentSmallView === 'scene'" ng-hide="editor.currentLargeView === 'map' || editor.currentLargeView === 'background'" ng-style="editor.setThumbnail(editor.currentScene.background)" id="scene-BG">
-                      <img class="asset-in-scene" ng-repeat="object in editor.currentScene.objects track by $index" src="{{object.thumbnail}}" ng-style="editor.positionAsset(object)" ng-mousedown="editor.dragPositionAsset($index, 'objects')">
-                      <img class="asset-in-scene" ng-repeat="entity in editor.currentScene.entities track by $index" src="{{entity.thumbnail}}" ng-style="editor.positionAsset(entity)" ng-mousedown="editor.dragPositionAsset($index, 'entities')">
+                      <span class="asset-in-scene" ng-repeat="object in editor.currentScene.objects track by $index" ng-style="editor.positionAsset(object)">
+                        <span ng-click="editor.removeAsset($index, 'objects')">x</span>
+                        <img src="{{object.thumbnail}}" ng-mousedown="editor.dragPositionAsset($index, 'objects')">
+                      </span>
+                      <span class="asset-in-scene" ng-repeat="entity in editor.currentScene.entities track by $index" ng-style="editor.positionAsset(entity)">
+                        <span ng-click="editor.removeAsset($index, 'entities')">x</span>
+                        <img src="{{entity.thumbnail}}" ng-mousedown="editor.dragPositionAsset($index, 'entities')">
+                      </span>
                     </div>
                     {{editor.uiDrag()}}
                     <ui-view ng-show="editor.currentLargeView === 'background'" name="backgrounds"></ui-view>
