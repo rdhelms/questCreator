@@ -84,7 +84,7 @@
                             <div class="asset-name">+</div>
                         </li>
                         <li ng-repeat="object in editor.availableObjects | orderBy:'-'" ng-click="editor.editObject(object)">
-                            <div class="asset available {{object.name | nospace}}" ng-style="editor.setThumbnail(object)"></div>
+                            <div class="asset available {{object.name | nospace}}" ng-style="editor.setThumbnail(object)" ng-mousedown="editor.dragAvailableAsset(object, 'objects')"></div>
                             <div class="asset-name">{{object.name}}</div>
                         </li>
                     </ul>
@@ -98,7 +98,7 @@
                             <div class="asset-name">+</div>
                         </li>
                         <li ng-repeat="entity in editor.availableEntities | orderBy:'-'" ng-click="editor.editEntityFrame(entity)">
-                            <div class="asset available {{entity.name | nospace}}" ng-style="editor.setThumbnail(entity)"></div>
+                            <div class="asset available {{entity.name | nospace}}" ng-style="editor.setThumbnail(entity)" ng-mousedown="editor.dragAvailableAsset(entity, 'entities')"></div>
                             <div class="asset-name">{{entity.name}}</div>
                         </li>
                         {{editor.uiDrag()}}
