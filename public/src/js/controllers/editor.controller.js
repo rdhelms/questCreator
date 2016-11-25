@@ -32,6 +32,7 @@ angular.module('questCreator')
   this.availableBackgrounds = [];
   this.availableObjects = [];
   this.availableEntities = [];
+  this.availableEvents = [];
   this.selectedAnimation = "walkLeft";
 
   this.currentColor = 'green';
@@ -41,9 +42,11 @@ angular.module('questCreator')
   this.erasing = false;
   this.selectingAssets = false;
   this.currentFrameIndex = 0;
-  this.modeledFrameIndex = 0; // For some reason ng-model is being wacky the first click
+  this.modeledFrameIndex = 0; // For some reason ng-model is being wacky for the first click of navigating entity frames. This is the duct tape solution.
   this.dragIndex = null;
   this.dragAsset = null;
+
+  this.currentEvent = null;
 
   this.goToPalette = function (type) {
     self.selectingAssets = true;
@@ -51,6 +54,7 @@ angular.module('questCreator')
   };
 
   this.selectColor = function() {
+      // Convert hex color to rgb
       var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(self.inputColor);
       var rgb = result ? {
           r: parseInt(result[1], 16),
@@ -80,6 +84,7 @@ angular.module('questCreator')
           self.availableBackgrounds = assets.availableBackgrounds;
           self.availableObjects = assets.availableObstacles;
           self.availableEntities = assets.availableEntities;
+          self.availableEvents = assets.availableEvents;
           self.currentBackground = self.availableBackgrounds[0] || null;
           $scope.$apply();
         });
@@ -93,10 +98,11 @@ angular.module('questCreator')
         self.currentEditingGame = game;
         // console.log(self.currentEditingGame);
         EditorService.getGameAssets(game.id).done(function(assets) {
-          // console.log(assets);
+          console.log(assets);
           self.availableBackgrounds = assets.availableBackgrounds;
           self.availableObjects = assets.availableObstacles;
           self.availableEntities = assets.availableEntities;
+          self.availableEvents = assets.availableEvents;
           $scope.$apply();
         });
       });
@@ -170,6 +176,24 @@ angular.module('questCreator')
     console.log("frame index:", self.currentFrameIndex);
     console.log("selected frame:", entity.info.animate[self.selectedAnimation][self.currentFrameIndex]);
     $scope.$broadcast('redrawEntity', entity.info.animate[self.selectedAnimation][self.currentFrameIndex].image, entity.info.animate[self.selectedAnimation][self.currentFrameIndex].collisionMap);
+  };
+
+  this.createEvent = function(type) {
+    var name = "New Event";
+    var game_id = self.currentEditingGame.id;
+    EditorService.createEvent(name, type, game_id).done(function(event) {
+      console.log(event);
+      self.availableEvents.push(event);
+      self.currentEvent = event;
+      self.currentSmallView = 'event';
+      $scope.$apply();
+    });
+  };
+
+  this.editEvent = function(event) {
+    console.log(event);
+    self.currentEvent = event;
+    self.currentSmallView = 'event';
   };
 
   this.setThumbnail = function(asset){

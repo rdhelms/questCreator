@@ -410,6 +410,71 @@ angular.module('questCreator').service('EditorService', function (UserService, $
       })
     }
 
+    function createEvent(name, type, game_id) {
+      var headerData = {
+        user_id: UserService.get().id,
+        token: UserService.get().token
+      };
+      var eventInfo = {};
+      // Event categories:
+      // -typing
+      // -eventually more here
+      switch (type) {
+        case 'typing':
+          eventInfo = {
+            requirements: [],
+            words: [],
+            response: []
+          };
+          break;
+      }
+      var newEvent = {
+        name: name,
+        category: type,
+        info: eventInfo,
+        tags: [],
+        published: false,
+        game_id: game_id
+      };
+      return $.ajax({
+        method: 'POST',
+        url: 'https://forge-api.herokuapp.com/events/create',
+        headers: headerData,
+        data: JSON.stringify(newEvent),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(response) {
+          console.log(response);
+          return response;
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    }
+
+    function saveEvent(eventUpdate) {
+      var headerData = {
+        user_id: UserService.get().id,
+        token: UserService.get().token
+      };
+      return $.ajax({
+        method: 'PUT',
+        url: 'https://forge-api.herokuapp.com/obstacles/update',
+        headers: headerData,
+        data: JSON.stringify(eventUpdate),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(response) {
+          console.log(response);
+          return response;
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    }
+
     return {
       getGame: getGame,
       getGameAssets: getGameAssets,
@@ -422,6 +487,8 @@ angular.module('questCreator').service('EditorService', function (UserService, $
       createEntity: createEntity,
       saveEntity: saveEntity,
       deleteEntity: deleteEntity,
+      createEvent: createEvent,
+      saveEvent: saveEvent,
       copy: copy,
       paste: paste
     };

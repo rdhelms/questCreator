@@ -105,19 +105,23 @@
                     </ul>
                 </li>
                 <li class="viewer" id="scripts">
-                    <h4>Scripts</h4>
+                    <h4>Events</h4>
                     <ul>
-                        <li><canvas class="asset script"></canvas></li>
-                        <li><canvas class="asset script"></canvas></li>
-                        <li><canvas class="asset script"></canvas></li>
-                        <li><canvas class="asset script"></canvas></li>
+                        <li ng-click="editor.createEvent('typing')">
+                            <div class="asset new"></div>
+                            <div class="asset-name">+</div>
+                        </li>
+                        <li ng-repeat="event in editor.availableEvents | orderBy:'-'" ng-click="editor.editEvent(event)">
+                            <div class="asset available {{event.name | nospace}} {{event.type}}" ng-mousedown="editor.dragAvailableAsset(event, 'events')"></div>
+                            <div class="asset-name">{{event.name}}</div>
+                        </li>
                     </ul>
                 </li>
             </ul>
             <section class="editor-contents" id="asset">
                 <ui-view name="objects" ng-show="editor.currentSmallView === 'object'"></ui-view>
                 <ui-view name="entities" ng-show="editor.currentSmallView === 'entity'"></ui-view>
-                <ui-view name="scripts" ng-show="editor.currentSmallView === 'script'"></ui-view>
+                <ui-view name="events" ng-show="editor.currentSmallView === 'event'"></ui-view>
                 <ui-view name="scenes" ng-show="editor.currentSmallView === 'scene'"></ui-view>
             </section>
         </aside>

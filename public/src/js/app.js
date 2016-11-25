@@ -61,7 +61,7 @@
                 templateUrl: './src/views/game/editor/ent.html',
                 controller: 'entCtrl as ent'
               },
-              'scripts': {
+              'events': {
                 templateUrl: './src/views/game/editor/scripts.html',
                 controller: 'scriptsCtrl as scripts'
               }
