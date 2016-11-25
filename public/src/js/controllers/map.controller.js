@@ -7,12 +7,11 @@ angular.module('questCreator').controller('mapCtrl', function($state, $scope) {
   // Scene pos should be [x,y,z], where x=mapIndex, y=rowIndex, z=columnIndex
 
   this.createMap = function() {
-    var name = "new map";
-    var sceneName = "new scene";
-    console.log("Creating a map!", name);
+    var name = "New Map";
+    var sceneName = "New Scene (1, 1)";
     var newScene = {
       name: sceneName,
-      background: null,
+      background: undefined,
       objects: [],
       entities: []
     };
@@ -25,11 +24,24 @@ angular.module('questCreator').controller('mapCtrl', function($state, $scope) {
     $scope.editor.currentEditingGame.info.maps.push(newMap);
   }
 
+  this.sceneNamer = function(coord) {
+    if ([address].filter(function(asset){return asset.name.includes(name.toLowerCase())})){
+      var num = 1;
+      [address].forEach(function(value){
+        num = (value.name.includes(name.toLowerCase())) ? num + 1 : num;
+      });
+      name = name + " " + num;
+    }
+    return name;
+  };
+
+  this.initScene = null;
+
   this.createMapRow = function(mapObj) {
-    var name = "new scene";
+    var name = "New Scene ("+self.initScene[0]+", "+self.initScene[1]+")";
     var newScene = {
       name: name,
-      background: null,
+      background: undefined,
       objects: [],
       entities: []
     };
@@ -37,19 +49,17 @@ angular.module('questCreator').controller('mapCtrl', function($state, $scope) {
   }
 
   this.createScene = function(mapObj, rowNum) {
-    var name = "new scene";
+    var name = "New Scene ("+self.initScene[0]+", "+self.initScene[1]+")";
     var newScene = {
       name: name,
-      background: null,
+      background: undefined,
       objects: [],
       entities: []
     };
-    console.log("Creating a scene!", mapObj, rowNum, name);
     $scope.editor.currentEditingGame.info.maps[$scope.editor.currentEditingGame.info.maps.indexOf(mapObj)].scenes[rowNum].push(newScene);
   }
 
   this.editScene = function(scene) {
-    console.log(scene);
     $scope.editor.currentScene = scene;
     $scope.editor.currentLargeView = 'scene';
   }

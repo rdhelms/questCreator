@@ -120,9 +120,21 @@ angular.module('questCreator')
     this.saveGame();
   };
 
+  this.assetNamer = function(name, address) {
+    if (self[address].filter(function(asset){return asset.name.includes(name.toLowerCase())})){
+      var num = 1;
+      self[address].forEach(function(value){
+        num = (value.name.includes(name.toLowerCase())) ? num + 1 : num;
+      });
+      name = name + " " + num;
+    }
+    return name;
+  };
+
   this.createBackground = function() {
     var name = "New Background";
     var game_id = self.currentEditingGame.id;
+    name = self.assetNamer(name, 'availableBackgrounds');
     EditorService.createBackground(name, game_id).done(function(background) {
       // console.log(background);
       self.availableBackgrounds.push(background);
@@ -140,6 +152,7 @@ angular.module('questCreator')
   this.createObject = function() {
     var name = "New Object";
     var game_id = self.currentEditingGame.id;
+    name = self.assetNamer(name, 'availableObjects');
     EditorService.createObject(name, game_id).done(function(object) {
       // console.log(object);
       self.availableObjects.push(object);
@@ -159,6 +172,7 @@ angular.module('questCreator')
   this.createEntity = function() {
     var name = "New Entity";
     var game_id = self.currentEditingGame.id;
+    name = self.assetNamer(name, 'availableEntities');
     EditorService.createEntity(name, game_id).done(function(entity) {
       console.log("ent", entity);
       self.availableEntities.push(entity);

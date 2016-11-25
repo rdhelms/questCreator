@@ -1,13 +1,23 @@
 <div class="map-container">
   <ul class="fullMap" ng-repeat="mapObj in editor.currentEditingGame.info.maps"> <input ng-model="mapObj.name" ng-click="editor.selectText($event)" blur-on-enter>
-    <ul class="mapRow" ng-repeat="row in mapObj.scenes">
-      <li ng-repeat="scene in row" class="mapColumn">
-        <button class="scene-button" ng-click="map.editScene(scene); editor.currentLargeView = 'scene'; editor.currentSmallView = 'scene';" ng-style="editor.setThumbnail(scene.background)"></button>
-        <input ng-model="scene.name" ng-click="editor.selectText($event)" blur-on-enter></input>
-      </li>
-      <button ng-if="editor.currentEditingGame.info.maps.indexOf(mapObj) > 0" ng-click="map.createScene(mapObj, mapObj.scenes.indexOf(row))" class="newSceneBtn">+</button>
+<!-- REPEAT 1 -->
+    <ul class="mapRowWrapper" ng-repeat="row in mapObj.scenes track by $index">
+  <!-- REPEAT 2 -->
+      <div class="mapRow">
+        <li ng-repeat="scene in row track by $index" class="mapColumnWrapper">
+      <!-- REPEAT 3 -->
+          <div class="mapColumn">
+            <button class="scene-button" ng-click="map.editScene(scene); editor.currentLargeView = 'scene'; editor.currentSmallView = 'scene';" ng-style="editor.setThumbnail(scene.background)"></button>
+            <input ng-model="scene.name" ng-click="editor.selectText($event)" blur-on-enter placeholder="New Scene ({{$index + 1 || 1}}, {{$parent.$index + 1 || $index + 1}})"></input>
+          </div>
+          <button ng-hide="editor.currentEditingGame.info.maps.indexOf(mapObj) === 0" ng-if="$last" ng-click="map.initScene=[row.length + 1, $parent.$parent.$index + 1]; map.createScene(mapObj, mapObj.scenes.indexOf(row))" class="newSceneBtn">+</button>
+      <!-- REPEAT 3 END -->
+        </li>
+      </div>
+      <button ng-hide="editor.currentEditingGame.info.maps.indexOf(mapObj) === 0" ng-if="$last" ng-click="map.initScene=[1, $index + 2]; map.createMapRow(mapObj)" class="newSceneBtn row">+</button>
+  <!-- REPEAT 2 END -->
     </ul>
-    <button ng-if="editor.currentEditingGame.info.maps.indexOf(mapObj) > 0" ng-click="map.createMapRow(mapObj)" class="newSceneBtn">+</button>
   </ul>
   <button ng-click="map.createMap()" class="newMapBtn">Add Another Map</button>
+<!-- REPEAT 3 END -->
 </div>
