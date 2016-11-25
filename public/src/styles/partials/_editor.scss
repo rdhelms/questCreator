@@ -15,7 +15,7 @@
   }
 
   h4 {
-    margin: 0 auto;
+    text-align: center;
     padding: .3rem 0 0 .3rem;
   }
 }
@@ -65,23 +65,40 @@
     align-items: baseline;
     margin: 10px 0;
 
-    .mapRow {
+    .mapRowWrapper {
       display: flex;
-      align-items: baseline;
+      flex-direction: column;
+      align-items: flex-start;
 
-      .mapColumn {
-        margin: 0 10px;
+      .mapRow {
         display: flex;
-        flex-direction: column;
+        align-items: baseline;
 
-        button {
-          height: 100px;
-          width: 140px;
-          &:hover {
-            cursor: pointer;
+        .mapColumnWrapper {
+          display: flex;
+          align-items: center;
+
+          .mapColumn {
+            margin: 0 10px;
+            display: flex;
+            flex-direction: column;
+
+            .scene-button {
+              height: 100px;
+              width: 140px;
+              &:hover {
+                cursor: pointer;
+              }
+            }
           }
         }
+      }
 
+      .newSceneBtn {
+        margin-left: 70px;
+        &.row {
+          margin: 50px 70px;
+        }
       }
     }
   }
