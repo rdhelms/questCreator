@@ -1157,6 +1157,4 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     };
     socket.emit('game left', leavingPlayer);
   });
-
-
 });

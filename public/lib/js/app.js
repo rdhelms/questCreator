@@ -1025,7 +1025,7 @@ angular.module('questCreator')
         }
 
         function archiveGame(gameId) {
-            $.ajax({
+            return $.ajax({
                 method: 'DELETE',
                 url: 'https://forge-api.herokuapp.com/games/archive',
                 data: {
@@ -1036,7 +1036,7 @@ angular.module('questCreator')
                     token: user.token
                 },
                 success: function(response) {
-                    alert('Your game has been archived. If you ever want to see it again, click "Archived Games" below the list of your games. Carry on.');
+                    alert('Your game has been archived. Carry on.');
                 },
                 error: function(error) {
                     alert('There was a problem archiving this game. Please try again.');
@@ -1217,8 +1217,6 @@ angular.module('questCreator')
                     user_id: user.id,
                     token: user.token
                 },
-                // dataType: 'json',
-                // contentType: 'application/json',
                 success: function(response) {
                     console.log('success requests', response);
                 },
@@ -1267,7 +1265,7 @@ angular.module('questCreator')
         }
 
         function toggleAccepted(gameId, requesterId) {
-            $.ajax({
+            return $.ajax({
                 method: 'PATCH',
                 url: 'https://forge-api.herokuapp.com/collaborators/update/accepted',
                 headers: {
@@ -1289,7 +1287,7 @@ angular.module('questCreator')
 
         function toggleRequested(gameId, requesterId) {
           console.log(gameId, requesterId);
-            $.ajax({
+            return $.ajax({
                 method: 'PATCH',
                 url: 'https://forge-api.herokuapp.com/collaborators/update/requested',
                 headers: {
@@ -2151,6 +2149,7 @@ angular.module('questCreator')
   this.selectingAssets = false;
   this.currentFrameIndex = 0;
   this.modeledFrameIndex = 0; // For some reason ng-model is being wacky the first click
+  this.dragIndex = null;
 
   this.goToPalette = function (type) {
     self.selectingAssets = true;
@@ -2309,10 +2308,27 @@ angular.module('questCreator')
     };
   }
 
+  this.dragPositionAsset = function(index, type){
+    console.log("in");
+    self.dragIndex = {
+      index: index,
+      type: type
+    };
+  }
+
   //jquery UI Stuff
   this.uiDrag = function() {
     this.dragCalls++;
-    console.log("you called this function needlessly " + this.dragCalls + " times, ya jerk!");
+    // console.log("you called this function needlessly " + this.dragCalls + " times, ya jerk!");
+    $('.asset-in-scene').draggable({
+      start: function(event, ui) {
+        $(ui.helper).addClass('grabbed');
+      },
+      stop: function(event, ui) {
+        $(ui.helper).css({'transition': 'transform ease 100ms'}).removeClass('grabbed');
+      }
+    });
+
     $('.asset.available').draggable({
       helper: 'clone',
       start: function(event, ui) {
@@ -2324,11 +2340,11 @@ angular.module('questCreator')
     });
     $('#scene-BG').droppable({
       drop: function(event, ui) {
-        log("ui: ", ui);
-        log("event: ", event);
-        var clone = $(ui.draggable).clone();
-        clone.draggable();
-        $(this).append(clone);
+        var type = self.dragIndex.type;
+        var index = self.dragIndex.index;
+        $scope.editor.currentScene[type][index].info.pos.x = ui.position.left;
+        $scope.editor.currentScene[type][index].info.pos.y = ui.position.top;
+        $scope.$apply();
       }
     });
   };
@@ -3905,6 +3921,7 @@ angular.module('questCreator')
     $scope.$on('paletteInit', function(event, type) {
 
         PaletteService.getByType(type.type).then(function(response) {
+          console.log(response);
             self.assets = response;
             $scope.$apply();
             self.currentType = PaletteService.getCurrentType();
@@ -5113,15 +5130,17 @@ angular.module('questCreator')
     };
     socket.emit('game left', leavingPlayer);
   });
-
-
 });
 ;angular.module('questCreator').controller('profileCtrl', function(socket, $state, $scope, UserService) {
 
-    UserService.checkLogin().then(function(response) {
+    $scope.showReqs = false;
+    $scope.showCollabs = false;
+    $scope.requestActive = false;
+    $scope.collabActive = false;
+    $scope.games = null;
+    $scope.requests = null;
 
-        $scope.games = null;
-        $scope.requests = null;
+    UserService.checkLogin().then(function(response) {
 
         $scope.user = UserService.get();
 
@@ -5129,38 +5148,44 @@ angular.module('questCreator')
             return new Date(date);
         };
 
-        UserService.getUserGames().done(function(games) {
-            $scope.games = games;
-            $scope.$apply();
-            UserService.getCollabRequests().done(function(requests) {
-              for (var i = 0; i < requests.length; i++) {
-                for (var j = 0; j < games.length; j++) {
-                  if (requests[i].game_id === games[j].id) {
-                    requests[i].gameName = games[j].name;
-                  }
+        function getGameName(requests, games) {
+                for (var i = 0; i < requests.length; i++) {
+                    for (var j = 0; j < games.length; j++) {
+                        if (requests[i].game_id === games[j].id) {
+                            requests[i].gameName = games[j].name;
+                        }
+                    }
                 }
-              }
-              $scope.requests = requests;
-              $scope.$apply();
-            });
-            UserService.getCollaborators().done(function(collaborators) {
-              for (var i = collaborators.length - 1; i >= 0 ; i--) {
-                console.log(collaborators[i].id, $scope.user.id);
+                $scope.requests = requests;
+                $scope.$apply();
+        }
+
+        function filterCollaborators(collaborators, games) {
+            for (var i = collaborators.length - 1; i >= 0; i--) {
                 if (collaborators[i].user_id === $scope.user.id) {
-                  collaborators.splice(i, 1);
-                } else {}
-                for (var j = 0; j < games.length; j++) {
-                  if (collaborators[i].game_id === games[j].id) {
-                    collaborators[i].gameName = games[j].name;
-                  }
+                    collaborators.splice(i, 1);
+                } else {
+                    for (var j = 0; j < games.length; j++) {
+                        if (collaborators[i].game_id === games[j].id) {
+                            collaborators[i].gameName = games[j].name;
+                        }
+                    }
                 }
+                $scope.collaborators = collaborators;
+                $scope.$apply();
+            }
+        }
 
-              }
-              $scope.collaborators = collaborators;
-              $scope.$apply();
-            });
+        UserService.getUserGames().done(function(games) {
+          $scope.games = games;
+          $scope.$apply();
+          UserService.getCollabRequests().done(function(requests) {
+            getGameName(requests, games);
+          });
+          UserService.getCollaborators().done(function(collaborators) {
+            filterCollaborators(collaborators, games);
         });
-
+});
 
 
         UserService.getCollaborations().done(function(collaborations) {
@@ -5180,36 +5205,53 @@ angular.module('questCreator')
             $state.go('main.game.editor.views');
         };
 
-        $scope.archiveGame = function(game) {
+        $scope.archiveGame = function(game, index) {
             var agree = confirm("Are you sure you wanna archive '" + game.name + "'? That means no one will be able to play it and all player information will be lost. You will NOT be able to retrieve this later");
             if (agree) {
-                UserService.archive(game.id);
-                UserService.getUserGames().done(function(games) {
-                    $scope.games = games;
+                console.log('before', $scope.games);
+                UserService.archive(game.id).done(function(response) {
+                    $scope.games.splice(index, 1);
                     $scope.$apply();
                 });
             }
         };
 
         $scope.showCollaborators = function() {
-
+            $scope.collabActive = !$scope.collabActive;
+            $scope.showCollabs = !$scope.showCollabs;
         };
 
         $scope.showRequests = function() {
-
+            $scope.requestActive = !$scope.requestActive;
+            $scope.showReqs = !$scope.showReqs;
         };
 
         $scope.toggleCollab = function(info) {
             UserService.toggleAccepted(info.game_id, info.user_id);
+            var games = $scope.games;
+            UserService.getCollabRequests().done(function(requests) {
+              getGameName(requests, games);
+            });
+            UserService.getCollaborators().done(function(collaborators) {
+              filterCollaborators(collaborators, games);
+          });
         };
 
-        $scope.removeRequest = function(collab) {
-            UserService.toggleRequested(collab.game_id, collab.user_id);
+        $scope.removeRequest = function(collab, index) {
+            UserService.toggleRequested(collab.game_id, collab.user_id).done(function(response) {
+                $scope.requests.splice(index, 1);
+                $scope.$apply();
+            });
         };
 
-        $scope.removeCollaborator = function(collaborator) {
-            UserService.toggleRequested(collaborator.game_id, collaborator.user_id);
-            UserService.toggleAccepted(collaborator.game_id, collaborator.user_id);
+        $scope.removeCollaborator = function(collaborator, index) {
+            if (collaborator.requested) {
+                UserService.toggleRequested(collaborator.game_id, collaborator.user_id);
+            }
+            UserService.toggleAccepted(collaborator.game_id, collaborator.user_id).done(function(response) {
+                $scope.collaborators.splice(index, 1);
+                $scope.$apply();
+            });
         };
 
     });
