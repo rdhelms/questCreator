@@ -13,7 +13,7 @@
                     <h5>Scene</h5>
                     <p>{{editor.currentScene.name || "..."}}</p>
                 </li>
-                <li class="tab" ng-class="{'active': editor.currentLargeView === 'background'}" ng-click="editor.currentLargeView = 'background'; editor.currentSmallView = false;">
+                <li class="tab" ng-class="{'active': editor.currentLargeView === 'background'}" ng-click="editor.currentLargeView = 'background'">
                     <h5>Background</h5>
                     <p>{{editor.currentBackground.name || "..."}}</p>
                 </li>
@@ -32,9 +32,15 @@
                 <!-- EDIT SPACE -->
                 <div class="edit-canvas {{editor.currentLargeView}}" ng-class="{{editor.currentLargeView}}">
                     <ui-view ng-show="editor.currentLargeView === 'map'" name="maps"></ui-view>
-                    <div ng-show="editor.currentSmallView === 'scene'" ng-hide="editor.currentLargeView === 'map' || editor.currentLargeView === 'background'" ng-style="editor.setThumbnail(editor.currentScene.background)" id="scene-BG">
-                      <img class="asset-in-scene" ng-repeat="object in editor.currentScene.objects track by $index" src="{{object.thumbnail}}" ng-style="editor.positionAsset(object)" ng-mousedown="editor.dragPositionAsset($index, 'objects')">
-                      <img class="asset-in-scene" ng-repeat="entity in editor.currentScene.entities track by $index" src="{{entity.thumbnail}}" ng-style="editor.positionAsset(entity)" ng-mousedown="editor.dragPositionAsset($index, 'entities')">
+                    <div ng-show="editor.currentLargeView === 'scene'" ng-hide="editor.currentLargeView === 'map' || editor.currentLargeView === 'background'" ng-style="editor.setThumbnail(editor.currentScene.background)" id="scene-BG">
+                      <span class="asset-in-scene" ng-repeat="object in editor.currentScene.objects track by $index" ng-style="editor.positionAsset(object)">
+                        <span ng-click="editor.removeAsset($index, 'objects')">x</span>
+                        <img src="{{object.thumbnail}}" ng-mousedown="editor.dragPositionAsset($index, 'objects')">
+                      </span>
+                      <span class="asset-in-scene" ng-repeat="entity in editor.currentScene.entities track by $index" ng-style="editor.positionAsset(entity)">
+                        <span ng-click="editor.removeAsset($index, 'entities')">x</span>
+                        <img src="{{entity.thumbnail}}" ng-mousedown="editor.dragPositionAsset($index, 'entities')">
+                      </span>
                     </div>
                     {{editor.uiDrag()}}
                     <ui-view ng-show="editor.currentLargeView === 'background'" name="backgrounds"></ui-view>
@@ -42,10 +48,13 @@
                 <!-- CONTROLS -->
                 <ul class="editor-controls">
                     <li><button id="clearBackground" ng-disabled="editor.currentLargeView !== 'background'">Clear</button></li>
-                    <li><button id="saveBackground">
-                  <div ng-if="editor.currentLargeView !== 'scene'">Save {{editor.currentBackground.name || "Background"}}</div>
-                  <div ng-hide="editor.currentSmallView !== 'scene'">Save {{editor.currentScene.name || "Scene"}}</div>
-                </button></li>
+                    <li>
+                      <button id="saveBackground">
+                        <div ng-show="editor.currentLargeView === 'background'" ng-hide="editor.currentLargeView === 'map' || editor.currentLargeView ==='scene'">Save {{editor.currentBackground.name || "Background"}}</div>
+                        <div ng-show="editor.currentSmallView === 'scene'" ng-hide="editor.currentLargeView === 'map' || editor.currentLargeView === 'background'">Save {{editor.currentScene.name || "Scene"}}</div>
+                        <div ng-show="editor.currentLargeView === 'map'" ng-hide="editor.currentLargeView === 'scene' || editor.currentLargeView === 'background'">Save</div>
+                      </button>
+                    </li>
                     <li><button id="undoBackground" ng-disabled="editor.currentLargeView !== 'background'">Undo</button></li>
                     <li><button id="redoBackground" ng-disabled="editor.currentLargeView !== 'background'">Redo</button></li>
                 </ul>
@@ -62,12 +71,16 @@
         <aside id="asset-bar">
             <ul class="assets">
                 <li class="viewer" id="backgrounds">
-                    <h4>Backgrounds</h4>
-                    <input type="button" class="search-button" title="Click to browse backgrounds to add to your palette." ng-click="editor.goToPalette('backgrounds')">
+                    <div class="viewer-header">
+                      <h4>Backgrounds</h4>
+                      <input type="button" class="search-button" title="Click to browse backgrounds to add to your palette." ng-click="editor.goToPalette('backgrounds')">
+                    </div>
                     <ul>
                         <li ng-click="editor.createBackground()">
-                            <div class="asset new"></div>
-                            <div class="asset-name">+</div>
+                            <div class="asset new">
+                              <div class="asset-name new">+</div>
+                            </div>
+                            <div class="asset-name new">...</div>
                         </li>
                         <li ng-repeat="background in editor.availableBackgrounds | orderBy:'-'" ng-click="editor.editBackground(background)">
                             <div class="asset available {{background.name | nospace}}" ng-style="editor.setThumbnail(background)"></div>
@@ -76,12 +89,16 @@
                     </ul>
                 </li>
                 <li class="viewer" id="game-objects">
-                    <h4>Game Objects</h4>
-                    <input type="button" class="search-button" title="Click to browse game objects to add to your palette." ng-click="editor.goToPalette('obstacles')">
+                    <div class="viewer-header">
+                      <h4>Game Objects</h4>
+                      <input type="button" class="search-button" title="Click to browse game objects to add to your palette." ng-click="editor.goToPalette('obstacles')">
+                    </div>
                     <ul>
                         <li ng-click="editor.createObject()">
-                            <div class="asset new"></div>
-                            <div class="asset-name">+</div>
+                            <div class="asset new">
+                              <div class="asset-name new">+</div>
+                            </div>
+                            <div class="asset-name new">...</div>
                         </li>
                         <li ng-repeat="object in editor.availableObjects | orderBy:'-'" ng-click="editor.editObject(object)">
                             <div class="asset available {{object.name | nospace}}" ng-style="editor.setThumbnail(object)" ng-mousedown="editor.dragAvailableAsset(object, 'objects')"></div>
@@ -90,12 +107,16 @@
                     </ul>
                 </li>
                 <li class="viewer" id="entities">
-                    <h4>Entities</h4>
-                    <input type="button" class="search-button" title="Click to browse entities to add to your palette." ng-click="editor.goToPalette('entities')">
+                    <div class="viewer-header">
+                      <h4>Entities</h4>
+                      <input type="button" class="search-button" title="Click to browse entities to add to your palette." ng-click="editor.goToPalette('entities')">
+                    </div>
                     <ul>
                         <li ng-click="editor.createEntity()">
-                            <div class="asset new"></div>
-                            <div class="asset-name">+</div>
+                            <div class="asset new">
+                              <div class="asset-name new">+</div>
+                            </div>
+                            <div class="asset-name new">...</div>
                         </li>
                         <li ng-repeat="entity in editor.availableEntities | orderBy:'-'" ng-click="editor.editEntityFrame(entity)">
                             <div class="asset available {{entity.name | nospace}}" ng-style="editor.setThumbnail(entity)" ng-mousedown="editor.dragAvailableAsset(entity, 'entities')"></div>
@@ -105,7 +126,10 @@
                     </ul>
                 </li>
                 <li class="viewer" id="scripts">
-                    <h4>Events</h4>
+                    <div class="viewer-header">
+                      <h4>Events</h4>
+                      <input type="button" class="search-button" title="Click to browse entities to add to your palette." ng-click="editor.goToPalette('entities')" disabled>
+                    </div>
                     <ul>
                         <li ng-click="editor.createEvent('typing')">
                             <div class="asset new"></div>

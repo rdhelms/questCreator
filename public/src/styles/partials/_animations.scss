@@ -6,3 +6,15 @@
     background-position: 800px 0px;
   }
 }
+
+@keyframes ellipses {
+  0% {
+    content: '.';
+  }
+  33.33% {
+    content: '..';
+  }
+  66.66% {
+    content: '...';
+  }
+}
