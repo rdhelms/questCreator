@@ -1,4 +1,4 @@
-angular.module('questCreator').service('EditorService', function (UserService, $state) {
+angular.module('questCreator').service('EditorService', function (UserService, $state, PopupService) {
 
     var drawingCopy = {
       image: [],
@@ -23,7 +23,7 @@ angular.module('questCreator').service('EditorService', function (UserService, $
     function getGame(name) {
       var nameWrapper = {
         name: name.toLowerCase()
-      }
+      };
       return $.ajax({
         method: 'GET',
         url: 'https://forge-api.herokuapp.com/games/load',
@@ -32,7 +32,7 @@ angular.module('questCreator').service('EditorService', function (UserService, $
           return response;
         },
         error: function(error) {
-          alert('There was a problem loading this game');
+          PopupService.open('fail-game-load');
         }
       });
     }
@@ -96,14 +96,14 @@ angular.module('questCreator').service('EditorService', function (UserService, $
         contentType: 'application/json',
         success: function(response) {
           game = response;
-          createBackground('Title Screen', game.id)
+          createBackground('Title Screen', game.id);
           createCollaborator(game.id).done(function(response) {
             console.log(response);
           });
           return game;
         },
         error: function(error) {
-          alert('There was a problem creating this game. Please try again.');
+          PopupService.openTemp('fail-game-create');
           $state.go('main.landing');
         }
       });
@@ -407,7 +407,7 @@ angular.module('questCreator').service('EditorService', function (UserService, $
         error: function(error) {
           console.log(error);
         }
-      })
+      });
     }
 
     function createEvent(name, type, game_id) {

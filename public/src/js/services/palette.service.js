@@ -1,4 +1,4 @@
-angular.module('questCreator').service('PaletteService', function (UserService) {
+angular.module('questCreator').service('PaletteService', function (UserService, PopupService) {
 
   var currentType = '';
 
@@ -26,7 +26,7 @@ angular.module('questCreator').service('PaletteService', function (UserService) 
               return response;
           },
           error: function(error) {
-              alert('There was a problem loading the assets');
+              PopupService.openTemp('fail-assets-load');
           }
       });
   }
@@ -42,7 +42,7 @@ angular.module('questCreator').service('PaletteService', function (UserService) 
         return assets;
       },
       error: function(error) {
-        alert('There was a problem loading the ' + currentType + '.');
+        PopupService.openTemp('fail-assets-load');
       }
     });
   }
@@ -60,7 +60,7 @@ angular.module('questCreator').service('PaletteService', function (UserService) 
         return assets;
       },
       error: function(error) {
-        alert('There was a problem loading the ' + currentType +' matching your search for ' + tag);
+        PopupService.openTemp('fail-assets-load');
       }
     });
   }

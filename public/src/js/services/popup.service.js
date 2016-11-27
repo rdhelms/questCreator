@@ -2,14 +2,12 @@ angular.module('questCreator')
 .service('PopupService', function ($templateRequest, PopupFactory, $rootScope) {
 
   var path = './src/views/popups/';
-  var pathTemp = './src/views/temps/';
 
   var templates = {
     'welcome': {
       title: 'Welcome!',
       content: 'welcome.html'
     },
-
     'user-register': {
       title: 'Hey, you\'re new!',
       content: 'user-register.html'
@@ -22,9 +20,66 @@ angular.module('questCreator')
       title: 'Name your game:',
       content: 'create-game.html'
     },
-  };
-
-  var templatesTemp = {
+    'signin-to-continue': {
+      title: 'Please...',
+      content: 'signin-to-continue.html'
+    },
+    'fail-user-load': {
+      title: 'Oops!',
+      content: 'fail-user-load.html'
+    },
+    'fail-user-games': {
+      title: 'Oops!',
+      content: 'fail-user-games.html'
+    },
+    'fail-collab-load': {
+      title: 'Oops!',
+      content: 'fail-collab-load.html'
+    },
+    'fail-game-load': {
+      title: 'Oops!',
+      content: 'fail-game-load.html'
+    },
+    'fail-games-load': {
+      title: 'Oops!',
+      content: 'fail-games-load.html'
+    },
+    'fail-game-create': {
+      title: 'Oops!',
+      content: 'fail-game-create.html'
+    },
+    'fail-request-collab': {
+      title: 'Oops!',
+      content: 'fail-request-collab.html'
+    },
+    'fail-assets-load': {
+      title: 'Oops!',
+      content: 'fail-assets-load.html'
+    },
+    'fail-game-archive': {
+      title: 'Oops!',
+      content: 'fail-game-archive.html'
+    },
+    'alert-request-sent': {
+      title: 'Delivered:',
+      content: 'alert-request-sent.html'
+    },
+    'alert-request-resent': {
+      title: 'Delivered:',
+      content: 'alert-request-resent.html'
+    },
+    'alert-already-requested': {
+      title: 'Chill:',
+      content: 'alert-already-requested.html'
+    },
+    'alert-already-collab': {
+      title: 'Wait a minute...',
+      content: 'alert-already-collab.html'
+    },
+    'alert-game-archived': {
+      title: 'Done',
+      content: 'alert-game-archived.html'
+    },
   };
 
   function templateSelector(name, scope) {
@@ -45,7 +100,6 @@ angular.module('questCreator')
       setTimeout(function () {
         close();
       }, 1500);
-      // $rootScope.$$childHead.popupTemp = false;
   }
 
   function close() {

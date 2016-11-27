@@ -55,10 +55,10 @@ angular.module('questCreator')
                     token: user.token
                 },
                 success: function(response) {
-                    alert('Your game has been archived. Carry on.');
+                    PopupService.openTemp('alert-game-archived');
                 },
                 error: function(error) {
-                    alert('There was a problem archiving this game. Please try again.');
+                    PopupService.openTemp('fail-game-archive');
                 }
             });
         }
@@ -134,7 +134,7 @@ angular.module('questCreator')
                         } else if (error.status === 0) {
                             // Do nothing
                         } else {
-                            alert('There was a problem logging in. Please try again');
+                            PopupService.openTemp('fail-user-load');
                             signOut();
                         }
                     }
@@ -154,11 +154,10 @@ angular.module('questCreator')
                 },
                 success: function(response) {
                     user.id = response.id;
-                    // $('#register-form').css('display', 'none');
                     PopupService.open('user-register');
                 },
                 error: function(error) {
-                    alert('There was a problem logging in. Please try again');
+                  PopupService.openTemp('fail-user-load');
                     signOut();
                 }
             });
@@ -176,7 +175,7 @@ angular.module('questCreator')
                     return response;
                 },
                 error: function(error) {
-                    alert('There was a problem loading the profile. Please try again.');
+                    PopupService.openTemp('fail-user-games');
                 }
             });
             }
@@ -214,8 +213,6 @@ angular.module('questCreator')
                 data: {
                     game_id: gameId
                 },
-                // dataType: 'json',
-                // contentType: 'application/json',
                 success: function(response) {
                     // console.log(response);
                 },
@@ -237,7 +234,7 @@ angular.module('questCreator')
                     // console.log('success requests', response);
                 },
                 error: function(error) {
-                    console.log('error requests', error);
+                    PopupService.openTemp('fail-collab-load');
                 }
             });
         }
@@ -256,7 +253,7 @@ angular.module('questCreator')
                     // console.log('success collaborators', response);
                 },
                 error: function(error) {
-                    console.log('error collaborators', error);
+                  PopupService.openTemp('fail-collab-load');
                 }
             });
         }
@@ -275,7 +272,7 @@ angular.module('questCreator')
                     // console.log('success collaborations', response);
                 },
                 error: function(error) {
-                    console.log('error collaborations', error);
+                  PopupService.openTemp('fail-collab-load');
                 }
             });
         }

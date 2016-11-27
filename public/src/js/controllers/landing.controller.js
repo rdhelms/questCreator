@@ -1,7 +1,6 @@
-angular.module('questCreator').controller('landingCtrl', function($state, $scope, UserService, GameService) {
+angular.module('questCreator').controller('landingCtrl', function($state, $scope, UserService, GameService, PopupService) {
 
     this.searching = false;
-
     var self = this;
 
     this.allGames = GameService.getGames().done(function(response) {
@@ -15,8 +14,8 @@ angular.module('questCreator').controller('landingCtrl', function($state, $scope
             UserService.set(user);
             $state.go('main.game.editor.views');
         } else {
-            alert('Please Sign In or Register.');
-            $scope.signIn();
+            PopupService.openTemp('signin-to-continue');
+              $scope.signIn();
         }
     };
 

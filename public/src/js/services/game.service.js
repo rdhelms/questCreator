@@ -1,4 +1,4 @@
-angular.module('questCreator').service('GameService', function() {
+angular.module('questCreator').service('GameService', function(PopupService) {
 
     var gameDetail = {};
 
@@ -15,7 +15,7 @@ angular.module('questCreator').service('GameService', function() {
               return response;
           },
           error: function(error) {
-              alert('There was a problem loading this game');
+              PopupService.open('fail-game-load');
           }
       });
     }
@@ -29,7 +29,7 @@ angular.module('questCreator').service('GameService', function() {
                 return response;
             },
             error: function(error) {
-                alert('There was a problem loading the games');
+                PopupService.openTemp('fail-games-load');
             }
         });
     }
@@ -49,14 +49,11 @@ angular.module('questCreator').service('GameService', function() {
         data: {
           name: keyword
         },
-        // dataType: 'json',
-        // contentType: 'application/json',
         success: function(response) {
-          console.log(response);
           return response;
         },
         error: function(error) {
-          alert('There was a problem loading the games');
+          PopupService.openTemp('fail-games-load');
         }
       });
     }

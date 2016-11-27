@@ -74,11 +74,11 @@ angular.module('questCreator')
     PopupService.open('edit-game', $scope);
   }
 
-  this.cancelCreate = function () {
-    console.log("here");
-    $state.go('main.landing');
+  this.cancel = function () {
     PopupService.close();
+    $state.go('main.profile');
   };
+
 
   this.createNewGame = function (name) {
       PopupService.close();
@@ -227,11 +227,6 @@ angular.module('questCreator')
         "background-repeat": "no-repeat"
       };
     }
-  };
-
-  this.cancel = function () {
-    PopupService.close();
-    $state.go('main.profile');
   };
 
   this.selectText = function($event){

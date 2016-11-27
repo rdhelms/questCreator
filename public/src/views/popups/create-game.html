@@ -1,5 +1,7 @@
-<form ng-submit="editor.createNewGame(newGameName)">
-    <input autofocus type="text" ng-model="newGameName" placeholder="Game Name">
-    <input type="submit" value="Start Imagining">
-    <input ng-click="editor.cancelCreate()" type="button" value="Cancel">
+<form class="popup-form" ng-submit="editor.createNewGame(newGameName)">
+    <input class="popup-text-input" autofocus type="text" ng-model="newGameName" placeholder="Game Name">
+    <div class="popup-buttons">
+      <input type="submit" value="Start Imagining">
+      <input ng-click="editor.cancel()" type="button" value="Cancel">      
+    </div>
 </form>

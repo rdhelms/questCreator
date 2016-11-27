@@ -1,4 +1,4 @@
-angular.module('questCreator').controller('detailCtrl', function ($state, GameService, UserService) {
+angular.module('questCreator').controller('detailCtrl', function ($state, GameService, UserService, PopupService) {
 
     this.playGame = function (name) {
         $state.go('main.game.play');
@@ -7,21 +7,19 @@ angular.module('questCreator').controller('detailCtrl', function ($state, GameSe
     this.game = GameService.getGameDetail();
 
     this.sendCollabRequest = function (gameId) {
-      console.log(gameId);
       var request = UserService.validateCollabRequest(gameId).done(function (response) {
-        console.log(response);
         if (response.message){
           UserService.sendCollabRequest(gameId);
-          alert('Your request has been sent.');
+          PopupService.openTemp('alert-request-sent');
         } else if (response.requested && !response.accepted) {
-          alert('You have already requested to be a collaborator on this game. Be patient.');
+          PopupService.openTemp('alert-already-requested');
         } else if (!response.requested && !response.accepted) {
-          alert('Okay...You have already requested to collaborate on this game and been turned down.  We will try again, but do not be annoying.');
+          PopupService.open('alert-request-resent');
           UserService.requestAgain(gameId);
         } else if (response.requested && response.accepted) {
-          alert('You are already a collaborator.  Check your profile page to find and edit games for which you have been approved to collaborate.');
+          PopupService.open('alert-already-collab');
         } else {
-          alert('There was a problem sending this collaboration request.  Please try again later.');
+          PopupService.openTemp('fail-request-collab');
         }
       });
     };

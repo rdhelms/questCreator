@@ -1,6 +1,8 @@
-<form ng-submit="main.register(username)" id="register-form">
-  <label for="register">Choose a User Name</label>
-  <input ng-model="username" class="username" type="text" placeholder="User Name">
-  <input ng-click="main.cancel()" type="button" value="Cancel">
-  <input type="submit" value="Register">
+<form class="popup-form" ng-submit="main.register(username)" id="register-form">
+  <label class="popup-label" for="register">Choose a User Name</label>
+  <input ng-model="username" class="popup-text-input" type="text" placeholder="User Name">
+  <div class="popup-buttons">
+    <input ng-click="main.cancelRegister()" type="button" value="Cancel">
+    <input type="submit" value="Register">
+  </div>
 </form>

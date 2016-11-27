@@ -12,7 +12,7 @@ angular.module('questCreator')
       if (UserService.get().id) {
         $state.go('main.profile');
       } else {
-        alert ("You must login to see your profile page.");
+        PopupService.openTemp('signin-to-continue');
         $scope.signIn();
       }
     };
@@ -45,9 +45,18 @@ angular.module('questCreator')
     };
 
     //If the user chooses not to register, they can cancel out of the process.
-    this.cancel = function () {
-        $('#user-popup').css('display', 'none');
+    this.cancelRegister = function () {
+        PopupService.close();
+        $state.go('main.landing');
         UserService.signOut();
     };
 
+    this.cancel = function () {
+        PopupService.close();
+        $state.go('main.landing');
+    };
+
+    this.okay = function () {
+        PopupService.close();
+    };
 });

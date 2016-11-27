@@ -274,18 +274,20 @@
   return Map;
 });
 ;angular.module('questCreator')
-.factory('PopupFactory', function ($compile) {
+.factory('PopupFactory', function ($compile, $q) {
 
   function create(content, title, scope) {
+    // var defer = $q.defer();
     var popup = $('<popup>')
       .attr({
         'popup-title': '\"'+ title +'\"'
-        }
+      }
       )
       .append(content);
     popup = $compile(popup)(scope);
     $(popup).prependTo('body');
-  };
+    // return defer.promise;
+  }
 
   return {
     new: create
@@ -342,17 +344,17 @@ angular.module('questCreator')
     link: function (scope, element, attrs) {
       scope.kill = function(){
         $('#overlay').remove();
-      }
+      };
     },
     templateUrl: './src/views/popup.html',
     controller: function($scope) {
       $scope.killPopUp = function(){
         $scope.kill();
-      }
+      };
     }
   };
 });
-;angular.module('questCreator').service('EditorService', function (UserService, $state) {
+;angular.module('questCreator').service('EditorService', function (UserService, $state, PopupService) {
 
     var drawingCopy = {
       image: [],
@@ -377,7 +379,7 @@ angular.module('questCreator')
     function getGame(name) {
       var nameWrapper = {
         name: name.toLowerCase()
-      }
+      };
       return $.ajax({
         method: 'GET',
         url: 'https://forge-api.herokuapp.com/games/load',
@@ -386,7 +388,7 @@ angular.module('questCreator')
           return response;
         },
         error: function(error) {
-          alert('There was a problem loading this game');
+          PopupService.open('fail-game-load');
         }
       });
     }
@@ -450,14 +452,14 @@ angular.module('questCreator')
         contentType: 'application/json',
         success: function(response) {
           game = response;
-          createBackground('Title Screen', game.id)
+          createBackground('Title Screen', game.id);
           createCollaborator(game.id).done(function(response) {
             console.log(response);
           });
           return game;
         },
         error: function(error) {
-          alert('There was a problem creating this game. Please try again.');
+          PopupService.openTemp('fail-game-create');
           $state.go('main.landing');
         }
       });
@@ -493,7 +495,7 @@ angular.module('questCreator')
         description: game.description,
         info: game.info,
         published: true,
-        thumbnail: game.info.maps[0].scenes[0][0].background.thumbnail || null
+        thumbnail: game.info.maps[0].scenes[0][0].background.thumbnail
       };
       console.log(gameUpdateData);
       var headerData = {
@@ -761,7 +763,7 @@ angular.module('questCreator')
         error: function(error) {
           console.log(error);
         }
-      })
+      });
     }
 
     function createEvent(name, type, game_id) {
@@ -847,7 +849,7 @@ angular.module('questCreator')
       paste: paste
     };
 });
-;angular.module('questCreator').service('GameService', function() {
+;angular.module('questCreator').service('GameService', function(PopupService) {
 
     var gameDetail = {};
 
@@ -864,7 +866,7 @@ angular.module('questCreator')
               return response;
           },
           error: function(error) {
-              alert('There was a problem loading this game');
+              PopupService.open('fail-game-load');
           }
       });
     }
@@ -878,7 +880,7 @@ angular.module('questCreator')
                 return response;
             },
             error: function(error) {
-                alert('There was a problem loading the games');
+                PopupService.openTemp('fail-games-load');
             }
         });
     }
@@ -898,14 +900,11 @@ angular.module('questCreator')
         data: {
           name: keyword
         },
-        // dataType: 'json',
-        // contentType: 'application/json',
         success: function(response) {
-          console.log(response);
           return response;
         },
         error: function(error) {
-          alert('There was a problem loading the games');
+          PopupService.openTemp('fail-games-load');
         }
       });
     }
@@ -920,7 +919,7 @@ angular.module('questCreator')
         searchGames: searchGames
     };
 });
-;angular.module('questCreator').service('PaletteService', function (UserService) {
+;angular.module('questCreator').service('PaletteService', function (UserService, PopupService) {
 
   var currentType = '';
 
@@ -948,7 +947,7 @@ angular.module('questCreator')
               return response;
           },
           error: function(error) {
-              alert('There was a problem loading the assets');
+              PopupService.openTemp('fail-assets-load');
           }
       });
   }
@@ -964,7 +963,7 @@ angular.module('questCreator')
         return assets;
       },
       error: function(error) {
-        alert('There was a problem loading the ' + currentType + '.');
+        PopupService.openTemp('fail-assets-load');
       }
     });
   }
@@ -982,7 +981,7 @@ angular.module('questCreator')
         return assets;
       },
       error: function(error) {
-        alert('There was a problem loading the ' + currentType +' matching your search for ' + tag);
+        PopupService.openTemp('fail-assets-load');
       }
     });
   }
@@ -1017,24 +1016,99 @@ angular.module('questCreator')
       title: 'Name your game:',
       content: 'create-game.html'
     },
-  }
+    'signin-to-continue': {
+      title: 'Please...',
+      content: 'signin-to-continue.html'
+    },
+    'fail-user-load': {
+      title: 'Oops!',
+      content: 'fail-user-load.html'
+    },
+    'fail-user-games': {
+      title: 'Oops!',
+      content: 'fail-user-games.html'
+    },
+    'fail-collab-load': {
+      title: 'Oops!',
+      content: 'fail-collab-load.html'
+    },
+    'fail-game-load': {
+      title: 'Oops!',
+      content: 'fail-game-load.html'
+    },
+    'fail-games-load': {
+      title: 'Oops!',
+      content: 'fail-games-load.html'
+    },
+    'fail-game-create': {
+      title: 'Oops!',
+      content: 'fail-game-create.html'
+    },
+    'fail-request-collab': {
+      title: 'Oops!',
+      content: 'fail-request-collab.html'
+    },
+    'fail-assets-load': {
+      title: 'Oops!',
+      content: 'fail-assets-load.html'
+    },
+    'fail-game-archive': {
+      title: 'Oops!',
+      content: 'fail-game-archive.html'
+    },
+    'alert-request-sent': {
+      title: 'Delivered:',
+      content: 'alert-request-sent.html'
+    },
+    'alert-request-resent': {
+      title: 'Delivered:',
+      content: 'alert-request-resent.html'
+    },
+    'alert-already-requested': {
+      title: 'Chill:',
+      content: 'alert-already-requested.html'
+    },
+    'alert-already-collab': {
+      title: 'Wait a minute...',
+      content: 'alert-already-collab.html'
+    },
+    'alert-game-archived': {
+      title: 'Done',
+      content: 'alert-game-archived.html'
+    },
+  };
 
   function templateSelector(name, scope) {
     scope = scope || $rootScope.$$childHead;
     var template = path + templates[name].content;
     var content = $('<ng-include>').attr('src', '\''+ template+ '\'');
     // Creates new popup on the page in specified scope:
+    $rootScope.$$childHead.popupTemp = false;
     PopupFactory.new(content, templates[name].title, scope);
+  }
+
+  function templateSelectorTemp(name, scope) {
+    scope = scope || $rootScope.$$childHead;
+    var template = path + templates[name].content;
+    var content = $('<ng-include>').attr('src', '\''+ template+ '\'');
+    $rootScope.$$childHead.popupTemp = true;
+    PopupFactory.new(content, templates[name].title, scope);
+      setTimeout(function () {
+        close();
+      }, 1500);
   }
 
   function close() {
     $('#overlay').remove();
   }
 
+
+
   return {
     open: templateSelector,
+    openTemp: templateSelectorTemp,
     close: close
-  }
+  };
 });
 ;angular.module('questCreator').service('socket', function() {
   var socket = io();
@@ -1108,10 +1182,10 @@ angular.module('questCreator')
                     token: user.token
                 },
                 success: function(response) {
-                    alert('Your game has been archived. Carry on.');
+                    PopupService.openTemp('alert-game-archived');
                 },
                 error: function(error) {
-                    alert('There was a problem archiving this game. Please try again.');
+                    PopupService.openTemp('fail-game-archive');
                 }
             });
         }
@@ -1128,7 +1202,6 @@ angular.module('questCreator')
                 scope: 'profile'
             }).then(function() {
                 auth2 = gapi.auth2.getAuthInstance(); // Store authInstance for easier accessibility
-                console.log("Session authorized");
                 auth2.isSignedIn.listen(updateSignInStatus);
                 updateSignInStatus(auth2.isSignedIn.get());
             });
@@ -1138,12 +1211,10 @@ angular.module('questCreator')
             if (isSignedIn) {
                 $('#login').hide();
                 $('#logout').show();
-                console.log("Signed In!");
                 getLogin();
             } else {
                 $('#login').show();
                 $('#logout').hide();
-                console.log("Signed Out!");
             }
         }
 
@@ -1180,7 +1251,7 @@ angular.module('questCreator')
                         user.joined = response.created_at;
                         user.username = response.username;
                         user.id = response.id;
-                        PopupService.open('welcome');
+                        PopupService.openTemp('welcome');
                         loggedIn = true;
                     },
                     error: function(error) {
@@ -1190,7 +1261,7 @@ angular.module('questCreator')
                         } else if (error.status === 0) {
                             // Do nothing
                         } else {
-                            alert('There was a problem logging in. Please try again');
+                            PopupService.openTemp('fail-user-load');
                             signOut();
                         }
                     }
@@ -1210,11 +1281,10 @@ angular.module('questCreator')
                 },
                 success: function(response) {
                     user.id = response.id;
-                    // $('#register-form').css('display', 'none');
                     PopupService.open('user-register');
                 },
                 error: function(error) {
-                    alert('There was a problem logging in. Please try again');
+                  PopupService.openTemp('fail-user-load');
                     signOut();
                 }
             });
@@ -1232,7 +1302,7 @@ angular.module('questCreator')
                     return response;
                 },
                 error: function(error) {
-                    alert('There was a problem loading the profile. Please try again.');
+                    PopupService.openTemp('fail-user-games');
                 }
             });
             }
@@ -1270,10 +1340,8 @@ angular.module('questCreator')
                 data: {
                     game_id: gameId
                 },
-                // dataType: 'json',
-                // contentType: 'application/json',
                 success: function(response) {
-                    console.log(response);
+                    // console.log(response);
                 },
                 error: function(error) {
                     console.log(error);
@@ -1290,10 +1358,10 @@ angular.module('questCreator')
                     token: user.token
                 },
                 success: function(response) {
-                    console.log('success requests', response);
+                    // console.log('success requests', response);
                 },
                 error: function(error) {
-                    console.log('error requests', error);
+                    PopupService.openTemp('fail-collab-load');
                 }
             });
         }
@@ -1309,10 +1377,10 @@ angular.module('questCreator')
                 dataType: 'json',
                 contentType: 'application/json',
                 success: function(response) {
-                    console.log('success collaborators', response);
+                    // console.log('success collaborators', response);
                 },
                 error: function(error) {
-                    console.log('error collaborators', error);
+                  PopupService.openTemp('fail-collab-load');
                 }
             });
         }
@@ -1328,10 +1396,10 @@ angular.module('questCreator')
                 dataType: 'json',
                 contentType: 'application/json',
                 success: function(response) {
-                    console.log('success collaborations', response);
+                    // console.log('success collaborations', response);
                 },
                 error: function(error) {
-                    console.log('error collaborations', error);
+                  PopupService.openTemp('fail-collab-load');
                 }
             });
         }
@@ -1349,7 +1417,7 @@ angular.module('questCreator')
                     requester_id: requesterId
                 },
                 success: function(response) {
-                    console.log(response);
+                    // console.log(response);
                 },
                 error: function(error) {
                     console.log(error);
@@ -1371,7 +1439,7 @@ angular.module('questCreator')
                   requester_id: requesterId
                 },
                 success: function(response) {
-                    console.log(response);
+                    // console.log(response);
                 },
                 error: function(error) {
                     console.log(error);
@@ -1393,7 +1461,7 @@ angular.module('questCreator')
                 dataType: 'json',
                 contentType: 'application/json',
                 success: function(response) {
-                    console.log(response);
+                    // console.log(response);
                 },
                 error: function(error) {
                     console.log(error);
@@ -1431,7 +1499,7 @@ angular.module('questCreator')
               dataType: 'json',
               contentType: 'application/json',
               success: function(response) {
-                console.log(response);
+                // console.log(response);
                   return response;
               },
               error: function(error) {
@@ -1454,7 +1522,7 @@ angular.module('questCreator')
                 id: id
               },
               success: function(response) {
-                console.log(response);
+                // console.log(response);
                   return response;
               },
               error: function(error) {
@@ -2186,7 +2254,7 @@ angular.module('questCreator')
     $('#messages').append($('<li>').text(msg));
   });
 });
-;angular.module('questCreator').controller('detailCtrl', function ($state, GameService, UserService) {
+;angular.module('questCreator').controller('detailCtrl', function ($state, GameService, UserService, PopupService) {
 
     this.playGame = function (name) {
         $state.go('main.game.play');
@@ -2195,21 +2263,19 @@ angular.module('questCreator')
     this.game = GameService.getGameDetail();
 
     this.sendCollabRequest = function (gameId) {
-      console.log(gameId);
       var request = UserService.validateCollabRequest(gameId).done(function (response) {
-        console.log(response);
         if (response.message){
           UserService.sendCollabRequest(gameId);
-          alert('Your request has been sent.');
+          PopupService.openTemp('alert-request-sent');
         } else if (response.requested && !response.accepted) {
-          alert('You have already requested to be a collaborator on this game. Be patient.');
+          PopupService.openTemp('alert-already-requested');
         } else if (!response.requested && !response.accepted) {
-          alert('Okay...You have already requested to collaborate on this game and been turned down.  We will try again, but do not be annoying.');
+          PopupService.open('alert-request-resent');
           UserService.requestAgain(gameId);
         } else if (response.requested && response.accepted) {
-          alert('You are already a collaborator.  Check your profile page to find and edit games for which you have been approved to collaborate.');
+          PopupService.open('alert-already-collab');
         } else {
-          alert('There was a problem sending this collaboration request.  Please try again later.');
+          PopupService.openTemp('fail-request-collab');
         }
       });
     };
@@ -2318,6 +2384,12 @@ angular.module('questCreator')
     PopupService.open('edit-game', $scope);
   }
 
+  this.cancel = function () {
+    PopupService.close();
+    $state.go('main.profile');
+  };
+
+
   this.createNewGame = function (name) {
       PopupService.close();
       EditorService.createGame(name).done(function(game) {
@@ -2364,9 +2436,21 @@ angular.module('questCreator')
     this.saveGame();
   };
 
+  this.assetNamer = function(name, address) {
+    if (self[address].filter(function(asset){return asset.name.includes(name.toLowerCase());})){
+      var num = 1;
+      self[address].forEach(function(value){
+        num = (value.name.includes(name.toLowerCase())) ? num + 1 : num;
+      });
+      name = name + " " + num;
+    }
+    return name;
+  };
+
   this.createBackground = function() {
     var name = "New Background";
     var game_id = self.currentEditingGame.id;
+    name = self.assetNamer(name, 'availableBackgrounds');
     EditorService.createBackground(name, game_id).done(function(background) {
       // console.log(background);
       self.availableBackgrounds.push(background);
@@ -2384,6 +2468,7 @@ angular.module('questCreator')
   this.createObject = function() {
     var name = "New Object";
     var game_id = self.currentEditingGame.id;
+    name = self.assetNamer(name, 'availableObjects');
     EditorService.createObject(name, game_id).done(function(object) {
       // console.log(object);
       self.availableObjects.push(object);
@@ -2403,6 +2488,7 @@ angular.module('questCreator')
   this.createEntity = function() {
     var name = "New Entity";
     var game_id = self.currentEditingGame.id;
+    name = self.assetNamer(name, 'availableEntities');
     EditorService.createEntity(name, game_id).done(function(entity) {
       console.log("ent", entity);
       self.availableEntities.push(entity);
@@ -2441,7 +2527,7 @@ angular.module('questCreator')
   };
 
   this.setThumbnail = function(asset){
-    if (asset === undefined) {
+    if (asset === undefined || !asset.thumbnail) {
       return {"background": "none"};
     } else {
       return {
@@ -2451,11 +2537,6 @@ angular.module('questCreator')
         "background-repeat": "no-repeat"
       };
     }
-  }
-
-  this.cancel = function () {
-    PopupService.close();
-    $state.go('main.profile');
   };
 
   this.selectText = function($event){
@@ -2468,26 +2549,29 @@ angular.module('questCreator')
       'left': asset.info.pos.x,
       'position': 'absolute'
     };
-  }
+  };
 
   this.dragPositionAsset = function(index, type){
     self.dragIndex = {
       index: index,
       type: type
     };
-  }
+  };
 
   this.dragAvailableAsset = function(asset, type){
     self.dragAsset = {
       asset: asset,
       type: type
     };
-  }
+  };
+
+  this.removeAsset = function(index, type){
+    self.currentScene[type].splice(index, 1);
+  };
 
   //jquery UI Stuff
   this.uiDrag = function() {
     this.dragCalls++;
-    // console.log("you called this function needlessly " + this.dragCalls + " times, ya jerk!");
     $('.asset-in-scene').draggable({
       start: function(event, ui) {
         $(ui.helper).addClass('grabbed');
@@ -3271,10 +3355,9 @@ angular.module('questCreator')
 });
 ;angular.module('questCreator').controller('gameCtrl', function(socket, $state, $scope) {
 });
-;angular.module('questCreator').controller('landingCtrl', function($state, $scope, UserService, GameService) {
+;angular.module('questCreator').controller('landingCtrl', function($state, $scope, UserService, GameService, PopupService) {
 
     this.searching = false;
-
     var self = this;
 
     this.allGames = GameService.getGames().done(function(response) {
@@ -3288,8 +3371,8 @@ angular.module('questCreator')
             UserService.set(user);
             $state.go('main.game.editor.views');
         } else {
-            alert('Please Sign In or Register.');
-            $scope.signIn();
+            PopupService.openTemp('signin-to-continue');
+              $scope.signIn();
         }
     };
 
@@ -3315,6 +3398,7 @@ angular.module('questCreator')
 ;angular.module('questCreator')
     .controller('mainCtrl', function(socket, $state, UserService, PopupService, $scope) {
 
+    $scope.popupTemp = false;
     //When the user clicks "Home" on the nav bar view is changed to landing
     this.goHome = function () {
         $state.go('main.landing');
@@ -3325,7 +3409,7 @@ angular.module('questCreator')
       if (UserService.get().id) {
         $state.go('main.profile');
       } else {
-        alert ("You must login to see your profile page.");
+        PopupService.openTemp('signin-to-continue');
         $scope.signIn();
       }
     };
@@ -3358,11 +3442,20 @@ angular.module('questCreator')
     };
 
     //If the user chooses not to register, they can cancel out of the process.
-    this.cancel = function () {
-        $('#user-popup').css('display', 'none');
+    this.cancelRegister = function () {
+        PopupService.close();
+        $state.go('main.landing');
         UserService.signOut();
     };
 
+    this.cancel = function () {
+        PopupService.close();
+        $state.go('main.landing');
+    };
+
+    this.okay = function () {
+        PopupService.close();
+    };
 });
 ;angular.module('questCreator').controller('mapCtrl', function($state, $scope) {
   var self = this;
@@ -3373,12 +3466,11 @@ angular.module('questCreator')
   // Scene pos should be [x,y,z], where x=mapIndex, y=rowIndex, z=columnIndex
 
   this.createMap = function() {
-    var name = "new map";
-    var sceneName = "new scene";
-    console.log("Creating a map!", name);
+    var name = "New Map";
+    var sceneName = "New Scene (1, 1)";
     var newScene = {
       name: sceneName,
-      background: null,
+      background: undefined,
       objects: [],
       entities: []
     };
@@ -3391,11 +3483,24 @@ angular.module('questCreator')
     $scope.editor.currentEditingGame.info.maps.push(newMap);
   }
 
+  this.sceneNamer = function(coord) {
+    if ([address].filter(function(asset){return asset.name.includes(name.toLowerCase())})){
+      var num = 1;
+      [address].forEach(function(value){
+        num = (value.name.includes(name.toLowerCase())) ? num + 1 : num;
+      });
+      name = name + " " + num;
+    }
+    return name;
+  };
+
+  this.initScene = null;
+
   this.createMapRow = function(mapObj) {
-    var name = "new scene";
+    var name = "New Scene ("+self.initScene[0]+", "+self.initScene[1]+")";
     var newScene = {
       name: name,
-      background: null,
+      background: undefined,
       objects: [],
       entities: []
     };
@@ -3403,19 +3508,17 @@ angular.module('questCreator')
   }
 
   this.createScene = function(mapObj, rowNum) {
-    var name = "new scene";
+    var name = "New Scene ("+self.initScene[0]+", "+self.initScene[1]+")";
     var newScene = {
       name: name,
-      background: null,
+      background: undefined,
       objects: [],
       entities: []
     };
-    console.log("Creating a scene!", mapObj, rowNum, name);
     $scope.editor.currentEditingGame.info.maps[$scope.editor.currentEditingGame.info.maps.indexOf(mapObj)].scenes[rowNum].push(newScene);
   }
 
   this.editScene = function(scene) {
-    console.log(scene);
     $scope.editor.currentScene = scene;
     $scope.editor.currentLargeView = 'scene';
   }
@@ -4159,6 +4262,19 @@ angular.module('questCreator')
     });
 });
 ;angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, GameService, $state, $scope) {
+    $scope.settings = {
+          "play": { "x": 0, "y": 0, "w": 31, "h": 30, "show": true},
+          "next": { "x": 32, "y": 0, "w": 17, "h": 11, "show": true},
+          "art": { "x": 50, "y": 0, "w": 100, "h": 100, "show": true},
+          "currenttitle": { "x": 201, "y": 0, "w": 300, "h": 30,
+            "styles": { "font-family": "PCSenior;src:url('fonts/pc_senior/pcsenior.ttf')", "color": "pink"}
+          }
+    };
+    $scope.musicControl = function(){
+      var $playerWindow = $('#bandcamp-music')[0].contentWindow;
+      $playerWindow.play();
+    };
+
     var fullPlayer = {
       id: null,
       game: null,
@@ -4176,20 +4292,16 @@ angular.module('questCreator')
     var gameWidth = 700;
     var gameHeight = 500;
     this.warning = '';
-    var typing = {
+    this.typing = {
         show: false,
         phrase: ''
     };
-    var responding = {
+    this.responding = {
         show: false,
         phrase: ''
     };
-    var inventory = {
-        show: false,
-        contents: ''
-    }
+    this.showingInventory = false;
     var pause = false;
-    var startTime = new Date();
 
     var avatar = null;
     var background = null;
@@ -4212,133 +4324,201 @@ angular.module('questCreator')
     this.currentScene = null;
     this.currentScenePos = [0, 0, 0];
     this.gameLoaded = false;
-    var events = null;
+    this.events = null;
+    this.allSavedGames = [];
+    this.saveInfo = {
+      name: '',
+      score: 0,
+      time: 0,
+      inventory: [],
+      achievements: [],
+      scenePos: [1, 0, 0],
+      pos: {
+        x: 350,
+        y: 250
+      }
+    };
+    this.startTime = new Date();
+    this.timeDiff = 0;
+    this.displayTime = '';
 
     this.gameStarted = false;
 
+    this.saveGame = function() {
+      self.saveInfo.time = self.timeDiff;
+      self.saveInfo.pos = avatar.info.pos;
+      var newSave = angular.copy(self.saveInfo);
+      self.allSavedGames.push(newSave);
+      // Call to POST save game to database here
+      self.saveInfo.name = '';
+    }
+
+    this.restoreGame = function(savedGame) {
+      self.saveInfo = savedGame;
+      self.startTime = Date.now() - (savedGame.time * 1000);
+      self.currentScenePos = savedGame.scenePos;
+      updateLocation();
+      avatar.info.pos = savedGame.pos;
+    }
+
     $('body').off('keyup').on('keyup', function(event) {
             var keyCode = event.which;
+            if (keyCode === 8) {
+              // Backspace
+              if (self.typing.phrase.length > 1) {
+                self.typing.phrase = self.typing.phrase.substring(0, self.typing.phrase.length - 1);
+              } else {
+                self.typing.phrase = '';
+                self.typing.show = false;
+              }
+            }
+            if (keyCode === 27) {
+              // Escape
+              if ( $('.option.active').length === 0 ) {
+                $('.fileOption').addClass('active');
+                $('.save').addClass('active');
+                self.pause = true;
+              } else {
+                $('.option.active').removeClass('active');
+                $('.save').removeClass('active');
+                self.pause = false;
+                runGame();
+              }
+            }
             if (keyCode === 37) {
-                avatar.action = (avatar.action === 'walkLeft')
-                    ? 'stand'
-                    : 'walkLeft';
-                avatar.speed.x = (avatar.speed.x === -1 * avatar.speed.mag)
-                    ? 0
-                    : -1 * avatar.speed.mag;
-                avatar.speed.y = 0;
+                if (self.pause && $('.fileOption.active').length === 0) {
+                  $('.option.active').toggleClass('active').prev('.option').toggleClass('active');
+                }
+                if (!self.pause) {
+                  avatar.action = (avatar.action === 'walkLeft') ? 'stand' : 'walkLeft';
+                  avatar.speed.x = (avatar.speed.x === -1 * avatar.speed.mag) ? 0 : -1 * avatar.speed.mag;
+                  avatar.speed.y = 0;
+                }
             } else if (keyCode === 38) {
-                avatar.action = (avatar.action === 'walkUp')
-                    ? 'stand'
-                    : 'walkUp';
-                avatar.speed.x = 0;
-                avatar.speed.y = (avatar.speed.y === -1 * avatar.speed.mag)
-                    ? 0
-                    : -1 * avatar.speed.mag;
+                if (self.pause && $('.fileOption.active').length === 1 && $('.save.active').length === 0) {
+                   $('.fileOptions li.active').toggleClass('active').prev('li').toggleClass('active');
+                }
+                if (!self.pause) {
+                  avatar.action = (avatar.action === 'walkUp') ? 'stand' : 'walkUp';
+                  avatar.speed.x = 0;
+                  avatar.speed.y = (avatar.speed.y === -1 * avatar.speed.mag) ? 0 : -1 * avatar.speed.mag;
+                }
             } else if (keyCode === 39) {
-                avatar.action = (avatar.action === 'walkRight')
-                    ? 'stand'
-                    : 'walkRight';
-                avatar.speed.x = (avatar.speed.x === avatar.speed.mag)
-                    ? 0
-                    : avatar.speed.mag;
-                avatar.speed.y = 0;
+                if (self.pause && $('.timeOption.active').length === 0) {
+                  $('.option.active').toggleClass('active').next('.option').toggleClass('active');
+                }
+                if (!self.pause) {
+                  avatar.action = (avatar.action === 'walkRight') ? 'stand' : 'walkRight';
+                  avatar.speed.x = (avatar.speed.x === avatar.speed.mag) ? 0 : avatar.speed.mag;
+                  avatar.speed.y = 0;
+                }
             } else if (keyCode === 40) {
-                avatar.action = (avatar.action === 'walkDown')
-                    ? 'stand'
-                    : 'walkDown';
-                avatar.speed.x = 0;
-                avatar.speed.y = (avatar.speed.y === avatar.speed.mag)
-                    ? 0
-                    : avatar.speed.mag;
+                if (self.pause && $('.fileOption.active').length === 1 && $('.restore.active').length === 0) {
+                  $('.fileOptions li.active').toggleClass('active').next('li').toggleClass('active');
+                }
+                if (!self.pause) {
+                  avatar.action = (avatar.action === 'walkDown') ? 'stand' : 'walkDown';
+                  avatar.speed.x = 0;
+                  avatar.speed.y = (avatar.speed.y === avatar.speed.mag) ? 0 : avatar.speed.mag;
+                }
+            } else if (keyCode === 191) {
+              // Forward slash
+              if (!self.pause && !self.typing.show && !self.responding.show  && $('.active').length === 0 && !$(".message").is(":focus")) {
+                self.pause = true;
+                self.showingInventory = true;
+              }
             }
         });
 
     $('body').off('keypress').on('keypress', function(event) {
             var keyCode = event.which;
-            if (typing.show && keyCode >= 32 && keyCode <= 220 && !responding.show && $('.active').length === 0) {
+            if (self.typing.show && keyCode >= 32 && keyCode <= 220 && !self.responding.show && $('.active').length === 0) {
                 pause = true;
                 var char = String.fromCharCode(keyCode);
-                typing.phrase += char;
-                $('.typing').text(typing.phrase);
+                self.typing.phrase += char;
             } else if (keyCode === 13) {
                 // Enter
-                if (typing.show) { // If the user is finishing typing
-                    typing.show = false;
-                    $('.typing').hide();
-                    var userPhrase = typing.phrase;
-                    typing.phrase = '';
+                if (self.typing.show) { // If the user is finishing typing
+                    self.typing.show = false;
+                    var userPhrase = self.typing.phrase;
+                    self.typing.phrase = '';
                     checkTyping(userPhrase);
-                } else if (responding.show) { // If the user is finished reading a response
-                    responding.show = false;
-                    $('.dialog').hide();
-                    responding.phrase = '';
-                } else if (inventory.show) { // If the user is finished looking at inventory
-                    // $('.inventoryContainer').hide();
-                    // this.inventory.show = false;
+                } else if (self.responding.show) { // If the user is finished reading a response
+                    self.responding.show = false;
+                    self.responding.phrase = '';
+                } else if (self.showingInventory) { // If the user is finished looking at inventory
+                    self.showingInventory = false;
+                } else if ($('.invOption.active').length === 1) {
+                  self.showingInventory = true;
+                  $('.option.active').removeClass('active');
+                  runGame(); // once
+                } else if ($('.save.active').length === 1) {
+                  self.savingGame = true;
+                  $('.fileOption').removeClass('active');
+                  $('.save.active').removeClass('active');
+                  runGame(); // once
+                } else if ($('.restore.active').length === 1) {
+                  self.restoringGame = true;
+                  $('.fileOption').removeClass('active');
+                  $('.restore.active').removeClass('active');
+                  runGame(); // once
                 }
-                if (!responding.show && !inventory.show && $('.active').length === 0) { // Resume the game if all windows have been closed
-                    pause = false;
+                if (!self.responding.show && !self.showingInventory && $('.active').length === 0) { // Resume the game if all windows have been closed
+                    self.pause = false;
+                    runGame();
                 }
-            } else if (keyCode === 32 && !$(".message").is(":focus")) {
-                // Space
-                if (!typing.show) {
-                    typing.phrase = '>';
-                    typing.show = true;
-                    $('.typing').text(typing.phrase).show();
-                }
+            } else if (keyCode === 32 && !$(".message").is(":focus") && !self.savingGame && !self.restoringGame && !self.showingInventory && !self.typing.show) {
+                self.typing.phrase = ':';
+                self.typing.show = true;
             }
         });
 
-
     function checkTyping(phrase) {
-      // phrase = "look window";
-      // events = {
-      //   typing: [
-      //     {
-      //       words: [ ['look'], ['window'] ],
-      //       response: [
-      //         {
-      //           type: 'text',
-      //           value: "You are standing in Uncle Vernon's and Aunt Petunia's kitchen."
-      //         }
-      //       ]
-      //     },
-      //     {
-      //       words: [ ['look'] ],
-      //       response: [
-      //         {
-      //           type: 'text',
-      //           value: 'The window looks out to the very small back yard.'
-      //         }
-      //       ]
-      //     }
-      //   ]
-      // };
-      var existingMatch = false;
-      events.typing.forEach(function(typingEvent) {
-        if (!existingMatch) {
-          var matchFound = true;
-          typingEvent.words.forEach(function(wordSet) {
-              var possibleMatch = false;
-              wordSet.forEach(function(word) {
-                if ( phrase.includes(word) ) {
-                  possibleMatch = true;
+      var foundEvent = false; // Whether a typing event has already been triggered
+      events.typing.forEach(function(typingEvent) { // Loop through all the typing events
+        if (!foundEvent) {  // Only continue checking as long as another event has already not been triggered
+          var requirementsMet = true;   // Assume that the requirements will be met
+          typingEvent.requirements.forEach(function(requirement) {  // Loop through all the requirements
+            if (requirement.type === 'achievement' && self.saveInfo.achievements.indexOf(requirement.value) === -1) { // If an achievement is required, check the player's past achievements
+              requirementsMet = false;  // Requirements fail if achievement is not present
+            } else if (requirement.type === 'inventory' && self.saveInfo.inventory.indexOf(requirement.value) === -1) { // If an inventory item is required, check the player's inventory
+              requirementsMet = false;  // Requirements fail if inventory does not contain necessary item
+            }
+          });
+          if (requirementsMet) {  // If all the requirements have been met, check the event's triggers
+            var triggerSatisfied = true;  // Assume that the trigger conditions will be met
+            typingEvent.trigger.forEach(function(wordSet) { // Loop through the sets of words to check
+                var possibleMatch = false;  // Assume that each wordset does not satisfy the requirements
+                wordSet.forEach(function(word) {  // Loop through all the words in the wordSet
+                  if ( phrase.includes(word) ) {  // If the user typed one of the words in the wordSet, it's a possible match
+                    possibleMatch = true;
+                  }
+                });
+                if (!possibleMatch) { // If the the entire wordSet was passed through without finding a match, then the entire trigger fails
+                  triggerSatisfied = false;
+                  self.responding.phrase = 'I have literally no idea what you just said.';  // If the trigger failed, set the response to a standard default
+                }
+            });
+            if (triggerSatisfied) {
+              foundEvent = true;
+              typingEvent.results.forEach(function(result) {
+                if (result.type === 'text') {
+                  self.responding.phrase = result.value;
+                }
+                if (result.type === 'inventory') {
+                  self.saveInfo.inventory.push(result.value);
+                }
+                if (result.type === 'achievement') {
+                  self.saveInfo.achievements.push(result.name);
+                  self.saveInfo.score += result.value;
                 }
               });
-              if (!possibleMatch) {
-                matchFound = false;
-                responding.phrase = 'I have literally no idea what you just said.';
-              }
-          });
-          if (matchFound) {
-            existingMatch = true;
-            responding.phrase = typingEvent.response[0].value;
+            }
           }
         }
       });
-        $('.dialog').text(responding.phrase).show();
-        responding.show = true;
-        pause = true;
+      self.responding.show = true;
+      self.pause = true;
     }
 
     function checkAvatarBounds() {
@@ -4540,7 +4720,6 @@ angular.module('questCreator')
             }
         });
         if (collision.found) {
-          console.log("Avatar Collided!");
             switch (collision.type) {
                 case 'wall':
                     avatar.collide(collision.direction);
@@ -4718,6 +4897,7 @@ angular.module('questCreator')
     }
 
     function updateLocation() {
+        self.saveInfo.scenePos = self.currentScenePos;
         fullPlayer.scenePos = self.currentScenePos;
         self.currentMap = allMaps[self.currentScenePos[0]];
         self.allRows = self.currentMap.scenes;
@@ -4732,7 +4912,7 @@ angular.module('questCreator')
 
     function loadEntities() {
       entities = [];
-      var oldEntities = self.currentScene.entities;
+      var oldEntities = angular.copy(self.currentScene.entities);
       oldEntities.forEach(function(entity) {
         var newEntity = new Entity(entity);
         entities.push(newEntity);
@@ -4743,7 +4923,7 @@ angular.module('questCreator')
     function updateAvatar() {
       avatar.updatePos();
       fullPlayer.avatar = avatar;
-      socket.emit('update player', fullPlayer);
+      // socket.emit('update player', fullPlayer);
     }
 
     function updateEntities() {
@@ -4752,8 +4932,6 @@ angular.module('questCreator')
       });
     }
 
-    // NOTE: these frame index variables should probably belong to the individual avatar, object, or entity in the factory
-    // var currentAvatarFrameIndex = 0;
     function checkAvatarAction() {
       avatar.info.currentFrameIndex = avatar.info.currentFrameIndex || 0;
         if (avatar.action === 'walkLeft' || avatar.action === 'walkUp' || avatar.action === 'walkRight' || avatar.action === 'walkDown') {
@@ -4767,17 +4945,6 @@ angular.module('questCreator')
             // avatar.info.currentFrame = avatar.info.animate.walkLeft[0];
         }
     }
-
-    // Not currently animating objects
-    // var currentSceneObjFrameIndex = 0;
-    // function checkSceneObjectAction() {
-    //   // Animate the object.
-    //   if (currentSceneObjFrameIndex > sceneObject.info.animate[sceneObject.allActions[0]].length - 1) {
-    //     currentSceneObjFrameIndex = 0;
-    //   }
-    //   sceneObject.info.currentFrame = sceneObject.info.animate[sceneObject.allActions[0]][currentSceneObjFrameIndex];
-    //   currentSceneObjFrameIndex++;
-    // }
 
     function drawAvatar(avatarToDraw) {
         // Save the drawing context
@@ -4849,7 +5016,6 @@ angular.module('questCreator')
         //     return -1;
         //   }
         // });
-        // console.log(objects);
         objects.forEach(function(object) {
 
             // Save the drawing context
@@ -4954,6 +5120,20 @@ angular.module('questCreator')
         gameCtx.clearRect(0, 0, gameWidth, gameHeight);
     }
 
+    function updateTime() {
+      var currentTime = new Date();
+      self.timeDiff = Math.floor( (currentTime - self.startTime) / 1000 );
+      // var self.timeDiff = Math.floor( (currentTime - self.startTime) ); // to test higher times
+      var numSeconds = self.timeDiff % 60;
+      var numMinutes = Math.floor(self.timeDiff / 60) % 60;
+      var numHours = Math.floor(self.timeDiff / 3600);
+      // Formatting zeros
+      numSeconds = (numSeconds < 10) ? '0'+numSeconds : numSeconds;
+      numMinutes = (numMinutes < 10) ? '0'+numMinutes : numMinutes;
+      numHours = (numHours < 10) ? '0'+numHours : numHours;
+      self.displayTime = numHours + ":" + numMinutes + ":" + numSeconds;
+    }
+
     currentGame = GameService.loadGame(self.gameName).done(function(response) {
         self.gameLoaded = true;
         gameInfo = response.info;
@@ -4970,20 +5150,59 @@ angular.module('questCreator')
         events = {
           typing: [
             {
-              words: [ ['look'], ['window'] ],
-              response: [
+              requirements: [],
+              trigger: [ ['talk', 'say'], ['vernon', 'uncle', 'man'] ],
+              results: [
                 {
                   type: 'text',
-                  value: 'The window looks out to the very small back yard.'
+                  value: '"Make me an omelette, Harry!"'
+                },
+                {
+                  type: 'achievement',
+                  name: 'talked to vernon',
+                  value: 5
                 }
               ]
             },
             {
-              words: [ ['look'] ],
-              response: [
+              requirements: [
+                {
+                  type: 'achievement',
+                  value: 'talked to vernon'
+                }
+              ],
+              trigger: [ ['take', 'get'], ['frying', 'pan'] ],
+              results: [
                 {
                   type: 'text',
-                  value: "You are standing in Uncle Vernon's and Aunt Petunia's kitchen."
+                  value: 'You take the frying pan as you have done so many mornings before.'
+                },
+                {
+                  type: 'achievement',
+                  value: 10
+                },
+                {
+                  type: 'inventory',
+                  value: 'frying pan'
+                }
+              ]
+            },
+            {
+              requirements: [
+                {
+                  type: 'inventory',
+                  value: 'frying pan'
+                }
+              ],
+              trigger: [ ['cook'], ['egg'] ],
+              results: [
+                {
+                  type: 'text',
+                  value: "You cook the egg decently. You're no chef, but you have plenty of experience."
+                },
+                {
+                  type: 'achievement',
+                  value: 100
                 }
               ]
             }
@@ -4996,7 +5215,7 @@ angular.module('questCreator')
           map: 1,
           row: 0,
           column: 0,
-          x: 100,
+          x: 300,
           y: 250
         };
         $scope.$apply();
@@ -5010,11 +5229,11 @@ angular.module('questCreator')
           avatar.info.currentFrame = avatar.info.animate.walkLeft[0];
           avatarLoaded = true;
           fullPlayer.avatar = avatar;
+          initSocket();
           socket.emit('game joined', fullPlayer);
           setInterval(checkAvatarAction, 75);
         });
     }
-
 
     this.startGame = function() {
         // Tell the server that I joined this game
@@ -5024,6 +5243,7 @@ angular.module('questCreator')
         fullPlayer.scenePos = self.currentScenePos;
         updateLocation();
         loadMainCharacter();
+        self.startTime = new Date();
         self.gameStarted = true;
     };
 
@@ -5033,6 +5253,7 @@ angular.module('questCreator')
         if (self.gameStarted) {
             clearCanvas();
             if (avatarLoaded) {
+                updateTime();
                 checkAvatarBounds();
                 checkAvatarCollisions();
                 checkEntityCollisions();
@@ -5047,83 +5268,98 @@ angular.module('questCreator')
                 drawBackground();
             }
         }
-        requestAnimationFrame(runGame);
+        if (!self.pause) {
+          requestAnimationFrame(runGame);
+        }
     }
     requestAnimationFrame(runGame);
 
-  // Socket functionality
-  // Get my own information
-  socket.off('self info');
-  socket.on('self info', function(id) {
-    fullPlayer.socketId = id;
-  });
 
-  // Notify me in the chat window that another player joined the game.
-  socket.off('new player');
-  socket.on('new player', function(playerBasic) {
-    var msg = "Player " + playerBasic.id + ' is playing ' + playerBasic.game;
-    $('.chat-messages').append($('<li>').text(msg));
-  });
+  function initSocket() {
+    // Socket functionality
+    // Get my own information
+    socket.off('self info');
+    socket.on('self info', function(id) {
+      fullPlayer.socketId = id;
+    });
 
-  socket.off('draw new player');
-  socket.on('draw new player', function(newPlayer) {
-    allPlayers.push(newPlayer);
-    var response = {
-      data: fullPlayer,
-      dest: newPlayer.socketId
-    };
-    socket.emit('draw old player', response);
-  });
+    // Notify me in the chat window that another player joined the game.
+    socket.off('new player');
+    socket.on('new player', function(playerBasic) {
+      var msg = "Player " + playerBasic.id + ' is playing ' + playerBasic.game;
+      $('.chat-messages').append($('<li>').text(msg));
+    });
 
-  socket.off('draw old player');
-  socket.on('draw old player', function(oldPlayer) {
-    console.log("Old player received!");
-    allPlayers.push(oldPlayer);
-  });
+    socket.off('draw new player');
+    socket.on('draw new player', function(newPlayer) {
+      allPlayers.push(newPlayer);
+      var response = {
+        data: fullPlayer,
+        dest: newPlayer.socketId
+      };
+      socket.emit('draw old player', response);
+    });
 
-  socket.off('update player');
-  socket.on('update player', function(player) {
-    for (var index = 0; index < allPlayers.length; index++) {
-      if (allPlayers[index].id === player.id) {
-        allPlayers[index] = player;
+    socket.off('draw old player');
+    socket.on('draw old player', function(oldPlayer) {
+      allPlayers.push(oldPlayer);
+    });
+
+    socket.off('update player');
+    socket.on('update player', function(player) {
+      for (var index = 0; index < allPlayers.length; index++) {
+        if (allPlayers[index].id === player.id) {
+          allPlayers[index] = player;
+        }
       }
-    }
-  });
+    });
 
-  // When I submit a chat message, send it to the server along with the game I'm playing
-  $('.chat-submit').submit(function(){
-    var msgInfo = {
-      msg: playerInfo.id + ': ' + $('.message').val(),
-      gameName: self.gameName
-    };
-    socket.emit('chat message', msgInfo);
-    $('.message').val('');
-    return false;   // Prevent default page refresh
-  });
+    // When I submit a chat message, send it to the server along with the game I'm playing
+    $('.chat-submit').submit(function(){
+      var msgInfo = {
+        msg: playerInfo.id + ': ' + $('.message').val(),
+        gameName: self.gameName
+      };
+      socket.emit('chat message', msgInfo);
+      $('.message').val('');
+      return false;   // Prevent default page refresh
+    });
 
-  // When a message has been received, display it on the screen
-  socket.off('chat message');
-  socket.on('chat message', function(msg){
-    $('.chat-messages').append($('<li>').text(msg));
-  });
+    // When a message has been received, display it on the screen
+    socket.off('chat message');
+    socket.on('chat message', function(msg){
+      $('.chat-messages').append($('<li>').text(msg));
+    });
 
-  // Notify me if a player leaves the game
-  socket.off('player left');
-  socket.on('player left', function(leavingPlayer) {
-    console.log("Player " + leavingPlayer.id + " left!");
-    var msg = "Player " + leavingPlayer.id + ' left ' + leavingPlayer.game;
-    $('.chat-messages').append($('<li>').text(msg));
-  });
+    // Notify me if a player leaves the game
+    socket.off('player left');
+    socket.on('player left', function(leavingPlayer) {
+      console.log("Player " + leavingPlayer.id + " left!");
+      var msg = "Player " + leavingPlayer.id + ' left ' + leavingPlayer.game;
+      $('.chat-messages').append($('<li>').text(msg));
+    });
 
-  // Let others know that I left the game if the controller ceases (closing browser, etc)
-  $scope.$on("$destroy", function(){
-    var leavingPlayer = {
-      id: playerInfo.id,
-      game: self.gameName
-    };
-    socket.emit('game left', leavingPlayer);
-  });
+    // Let others know that I left the game if the controller ceases (closing browser, etc)
+    $scope.$on("$destroy", function(){
+      var leavingPlayer = {
+        id: playerInfo.id,
+        game: self.gameName
+      };
+      socket.emit('game left', leavingPlayer);
+    });
+  }
 });
+
+// Not currently animating objects
+// var currentSceneObjFrameIndex = 0;
+// function checkSceneObjectAction() {
+//   // Animate the object.
+//   if (currentSceneObjFrameIndex > sceneObject.info.animate[sceneObject.allActions[0]].length - 1) {
+//     currentSceneObjFrameIndex = 0;
+//   }
+//   sceneObject.info.currentFrame = sceneObject.info.animate[sceneObject.allActions[0]][currentSceneObjFrameIndex];
+//   currentSceneObjFrameIndex++;
+// }
 ;angular.module('questCreator').controller('profileCtrl', function(socket, $state, $scope, UserService) {
 
     $scope.showReqs = false;
