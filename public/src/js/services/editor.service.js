@@ -415,19 +415,11 @@ angular.module('questCreator').service('EditorService', function (UserService, $
         user_id: UserService.get().id,
         token: UserService.get().token
       };
-      var eventInfo = {};
-      // Event categories:
-      // -typing
-      // -eventually more here
-      switch (type) {
-        case 'typing':
-          eventInfo = {
-            requirements: [],
-            words: [],
-            response: []
-          };
-          break;
-      }
+      var eventInfo = {
+        requirements: [],
+        triggers: [],
+        results: []
+      };
       var newEvent = {
         name: name,
         category: type,

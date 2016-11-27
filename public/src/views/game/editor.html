@@ -131,12 +131,14 @@
                       <input type="button" class="search-button" title="Click to browse entities to add to your palette." ng-click="editor.goToPalette('entities')" disabled>
                     </div>
                     <ul>
-                        <li ng-click="editor.createEvent('typing')">
-                            <div class="asset new"></div>
-                            <div class="asset-name">+</div>
+                        <li ng-click="editor.selectEventType()">
+                            <div class="asset new">
+                              <div class="asset-name new">+</div>
+                            </div>
+                            <div class="asset-name new">...</div>
                         </li>
                         <li ng-repeat="event in editor.availableEvents | orderBy:'-'" ng-click="editor.editEvent(event)">
-                            <div class="asset available {{event.name | nospace}} {{event.type}}" ng-mousedown="editor.dragAvailableAsset(event, 'events')"></div>
+                            <div class="asset available {{event.name | nospace}} {{event.type}}" ng-mousedown="editor.dragAvailableAsset(event, 'events')"><h1>!</h1></div>
                             <div class="asset-name">{{event.name}}</div>
                         </li>
                     </ul>

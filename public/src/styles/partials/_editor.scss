@@ -50,6 +50,29 @@
       background: whitesmoke;
       border: 4px solid black;
       border-bottom: none;
+
+      &:last-child {
+        border-right: none;
+        box-shadow: none;
+      }
+    }
+
+  }
+
+  &.scene, &.event {
+    border: none;
+
+    .tab {
+      background: whitesmoke;
+
+      &.active {
+        box-shadow: none;
+        border-bottom: dashed 4px black;
+
+        &:last-child {
+          border-right: 4px solid black;
+        }
+      }
     }
   }
 }
@@ -130,11 +153,6 @@
   display: flex;
   flex: 4;
   flex-direction: column;
-
-  .tab:last-child {
-    border-right: none;
-    box-shadow: none;
-  }
 }
 
 .editor-contents {
@@ -285,6 +303,7 @@
       flex-wrap: wrap;
       justify-content: space-between;
       vertical-align: middle;
+
       &.size-picker {
         li {
           cursor: pointer;
@@ -400,6 +419,7 @@ canvas.asset {
       flex: 1;
       li {
         margin: 0 15px;
+        position: relative;
       }
     }
 //end dummy stuff
@@ -410,6 +430,19 @@ canvas.asset {
 
     &:nth-child(2n - 1){
       border-right: 2px black dashed;
+    }
+  }
+}
+
+#events {
+  .asset.available {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    > * {
+      text-align: center;
+      font-size: 3em;
+      width: .75ch;
     }
   }
 }
@@ -524,5 +557,100 @@ canvas.asset {
         }
       }
     }
+  }
+}
+
+#event-editor {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 400px;
+}
+
+
+.event-edit {
+  border: 4px solid black;
+  width: 100%;
+
+  &#preview {
+    height: 100px;
+    background: $lightgrey;
+    }
+
+  &#edit {
+    border-top: none;
+    height: 200px;
+    overflow-y: auto;
+    padding: 10px;
+  }
+}
+
+
+#preview-pane {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 100%;
+  box-shadow: 8px 8px 0 0 $medgrey inset;
+
+  .preview-step {
+    height: 68px;
+    width: 25%;
+    background: $white;
+    box-shadow: 8px 8px 0 0 $medgrey;
+    font-size: .75em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 4px 0 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .preview-list {
+      list-style: square;
+      li {
+        display: list-item;
+        &.default {
+          text-align: center;
+        }
+      }
+    }
+  }
+
+  .arrow {
+    color: $white;
+    text-shadow: 4px 4px $medgrey;
+  }
+
+}
+
+#keywords {
+
+  li span form {
+    display: inline-block;
+  }
+
+  .word {
+    &.keyword {
+      display: block;
+      font-size: 1.25em;
+      font-family: PCSenior;
+      text-decoration: underline;
+      width: 100%;
+      white-space: wrap;
+    }
+    display: inline-block;
+    border: none;
+    padding: 10px 0;
+    &:hover {
+      background: $lightgrey;
+    }
+  }
+}
+
+.text-select {
+  &:focus {
+    background: black;
+    color: $white;
   }
 }

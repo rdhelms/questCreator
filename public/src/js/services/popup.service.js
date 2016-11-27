@@ -80,6 +80,10 @@ angular.module('questCreator')
       title: 'Done',
       content: 'alert-game-archived.html'
     },
+    'event-prompt': {
+      title: 'Choose event type:',
+      content: 'event-prompt.html'
+    }
   };
 
   function templateSelector(name, scope) {

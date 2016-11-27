@@ -34,6 +34,21 @@ angular.module('questCreator')
   this.availableObjects = [];
   this.availableEntities = [];
   this.availableEvents = [];
+  this.eventTypes = [
+    {
+      name: 'text',
+      description: 'Events triggered by text input.',
+    },
+    {
+      name: 'collision',
+      description: 'Events triggered by player position.'
+    }
+  ];
+  this.eventType = null;
+  this.eventRequirements = [
+    'inventory',
+    'achievement'
+  ];
   this.selectedAnimation = "walkLeft";
 
   this.currentColor = 'green';
@@ -46,8 +61,6 @@ angular.module('questCreator')
   this.modeledFrameIndex = 0; // For some reason ng-model is being wacky for the first click of navigating entity frames. This is the duct tape solution.
   this.dragIndex = null;
   this.dragAsset = null;
-
-  this.currentEvent = null;
 
   this.goToPalette = function (type) {
     self.selectingAssets = true;
@@ -181,6 +194,7 @@ angular.module('questCreator')
     var game_id = self.currentEditingGame.id;
     name = self.assetNamer(name, 'availableEntities');
     EditorService.createEntity(name, game_id).done(function(entity) {
+      PopupService.close();
       console.log("ent", entity);
       self.availableEntities.push(entity);
       self.currentEntity = entity;
@@ -199,10 +213,16 @@ angular.module('questCreator')
     $scope.$broadcast('redrawEntity', entity.info.animate[self.selectedAnimation][self.currentFrameIndex].image, entity.info.animate[self.selectedAnimation][self.currentFrameIndex].collisionMap);
   };
 
+  this.selectEventType = function(){
+    PopupService.open('event-prompt', $scope);
+  };
+
   this.createEvent = function(type) {
+    console.log("in createEvent");
     var name = "New Event";
     var game_id = self.currentEditingGame.id;
     EditorService.createEvent(name, type, game_id).done(function(event) {
+      PopupService.close();
       console.log(event);
       self.availableEvents.push(event);
       self.currentEvent = event;
