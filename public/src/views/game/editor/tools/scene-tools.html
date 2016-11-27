@@ -1,109 +1,113 @@
 <p ng-show="editor.currentScene === null"> First pick a scene from a map! </p>
-<section id="scene-assets" ng-show="editor.currentScene !== null">
-  <h4>{{editor.currentScene.name}} Assets</h4>
+<section id="scene-tools" ng-show="editor.currentScene !== null">
 
-  <ul>
-<!-- BACKGROUND -->
-    <li>
-      <span class="select" tabindex="1">
-        <h3>Background:</h3>
-        <ul class="options" tabindex="1">
-          <li ng-repeat="background in editor.availableBackgrounds | orderBy:'-'" ng-mouseover="scene.selectBackground(background)" class="option" tabindex="1">{{background.name}}</li>
-        </ul>
-      </span>
-      <span>{{editor.currentScene.background.name || "none"}}</span>
+  <ul class="tab-nav scene">
+    <li class="tab" ng-class="{'active': scene.view === 'events'}" ng-click="scene.view = 'events'">
+      <h5>Events</h5>
     </li>
-<!-- OBJECTS -->
-    <li>
-      <span class="select" tabindex="1">
-        <h3>Objects:</h3>
-        <ul class="options">
-          <li class="option" tabindex="1" ng-repeat="object in editor.availableObjects" ng-mouseover="scene.selectedObject = object" ng-show="editor.availableObjects.length > 0">
-            {{object.name}}
+    <li class="tab" ng-class="{'active': scene.view === 'assets'}" ng-click="scene.view = 'assets'">
+      <h5>Assets</h5>
+    </li>
+  </ul>
+
+  <section class="scene-assets" ng-show="scene.view==='events'">
+    <h4>{{editor.currentScene.name}} Events:
+    <ul>
+
+      <li class="scene-event">
+        <span class="keywords">
+          <div>Type</div>
+          <div>Keywords</div>
+        </span> |
+        <span class="response">Response</span>
+      </li>
+
+      <li class="scene-event">
+      </li>
+
+      <li class="scene-event">
+      </li>
+
+      <li class="scene-event">
+      </li>
+
+    </ul>
+  </section>
+
+  <section class="scene-assets" ng-show="scene.view==='assets'">
+    <h4>{{editor.currentScene.name}} Assets:</h4>
+
+    <ul>
+      <!-- BACKGROUND -->
+      <li>
+        <span class="select" tabindex="1">
+          <h3>Background:</h3>
+          <ul class="options" tabindex="1">
+            <li ng-repeat="background in editor.availableBackgrounds | orderBy:'-'" ng-mouseover="scene.selectBackground(background)" class="option" tabindex="1">{{background.name}}</li>
+          </ul>
+        </span>
+        <span>{{editor.currentScene.background.name || "none"}}</span>
+      </li>
+      <!-- OBJECTS -->
+      <li>
+        <span class="select" tabindex="1">
+          <h3>Objects:</h3>
+          <ul class="options">
+            <li class="option" tabindex="1" ng-repeat="object in editor.availableObjects" ng-mouseover="scene.selectedObject = object" ng-show="editor.availableObjects.length > 0">
+              {{object.name}}
+            </li>
+            <li ng-show="editor.availableObjects.length === 0">(none)</li>
+          </ul>
+        </span>
+        <button ng-click="scene.selectObject(scene.selectedObject)" ng-disabled="!scene.selectedObject"> Add {{scene.selectedObject.name || "Object"}} </button>
+
+        <ul id="scene-assets objects">
+          <li ng-repeat="object in editor.currentScene.objects track by $index" ng-show="editor.currentScene.objects.length > 0">
+            <h5 class="scene-asset object">{{object.name}} (index: {{$index}}):</h5>
+            <div class="asset-positioner" ng-show="object">
+              <label>X</label>
+              <input ng-model="object.info.pos.x" placeholder="350" type="number">
+              <label>Y</label>
+              <input ng-model="object.info.pos.y" placeholder="250" type="number">
+              <button ng-click="scene.removeAsset($index, 'objects')">X</button>
+            </div>
           </li>
-          <li ng-show="editor.availableObjects.length === 0">(none)</li>
-        </ul>
-      </span>
-      <button ng-click="scene.selectObject(scene.selectedObject)" ng-disabled="!scene.selectedObject"> Add {{scene.selectedObject.name || "Object"}} </button>
-
-      <ul id="scene-assets objects">
-        <li ng-repeat="object in editor.currentScene.objects track by $index" ng-show="editor.currentScene.objects.length > 0">
-          <h5 class="scene-asset object">{{object.name}} (index: {{$index}}):</h5>
-          <div class="asset-positioner" ng-show="object">
-            <label>X</label>
-            <input ng-model="object.info.pos.x" placeholder="350" type="number">
-            <label>Y</label>
-            <input ng-model="object.info.pos.y" placeholder="250" type="number">
-            <button ng-click="scene.removeAsset($index, 'objects')">X</button>
-          </div>
-        </li>
-        <li ng-show="editor.currentScene.objects.length === 0">
-          <h5 class="scene-object">(no objects yet!)</h5>
-        </li>
-      </ul>
-    </li>
-<!-- ENTITIES -->
-    <li>
-      <span class="select" tabindex="1">
-        <h3>Entities:</h3>
-        <ul class="options">
-          <li class="option" tabindex="1" ng-repeat="entity in editor.availableEntities" ng-mouseover="scene.selectedEntity = entity" ng-show="editor.availableEntities.length > 0">
-            {{entity.name}}
+          <li ng-show="editor.currentScene.objects.length === 0">
+            <h5 class="scene-object">(no objects yet!)</h5>
           </li>
-          <li ng-show="editor.availableEntities.length === 0">(none)</li>
         </ul>
-      </span>
-      <button ng-click="scene.selectEntity(scene.selectedEntity)" ng-disabled="!scene.selectedEntity"> Add {{scene.selectedEntity.name || "Entity"}} </button>
+      </li>
+      <!-- ENTITIES -->
+      <li>
+        <span class="select" tabindex="1">
+          <h3>Entities:</h3>
+          <ul class="options">
+            <li class="option" tabindex="1" ng-repeat="entity in editor.availableEntities" ng-mouseover="scene.selectedEntity = entity" ng-show="editor.availableEntities.length > 0">
+              {{entity.name}}
+            </li>
+            <li ng-show="editor.availableEntities.length === 0">(none)</li>
+          </ul>
+        </span>
+        <button ng-click="scene.selectEntity(scene.selectedEntity)" ng-disabled="!scene.selectedEntity"> Add {{scene.selectedEntity.name || "Entity"}} </button>
 
-      <ul id="scene-assets entities">
-        <li ng-repeat="entity in editor.currentScene.entities track by $index" ng-show="editor.currentScene.entities.length > 0">
-          <h5 class="scene-asset entity">{{entity.name}} (index: {{$index}}):</h5>
-          <div class="asset-positioner" ng-show="entity">
-            <label>X</label>
-            <input ng-model="entity.info.pos.x" placeholder="350" type="number">
-            <label>Y</label>
-            <input ng-model="entity.info.pos.y" placeholder="250" type="number">
-            <button ng-click="scene.removeAsset($index, 'entities')">X</button>
-          </div>
-        </li>
-        <li ng-show="editor.currentScene.entities.length === 0">
-          <h5 class="scene-asset entity">(no entity yet!)</h5>
-        </li>
-      </ul>
-    </li>
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- OLD -->
-    <!-- <li>
-      <h5> Entities </h5>
-      <ul ng-show="editor.currentScene.entities.length > 0">
-        Current entities:
-        <li ng-repeat="entity in editor.currentScene.entities"> {{entity.name}} </li>
-      </ul>
-      <p ng-show="editor.currentScene.entities.length === 0">(none)</p>
-      <button ng-click="scene.selecting.entity = true" class="addSceneBackground"> Add Entity </button>
-
-      <div ng-show="scene.selecting.entity" class="selector-box">
-        <ul class="available-entities-list">
-          <li ng-repeat="entity in editor.availableEntities | orderBy:'-'" ng-click="scene.selectEntity(entity)">{{entity.name}}</li>
+        <ul id="scene-assets entities">
+          <li ng-repeat="entity in editor.currentScene.entities track by $index" ng-show="editor.currentScene.entities.length > 0">
+            <h5 class="scene-asset entity">{{entity.name}} (index: {{$index}}):</h5>
+            <div class="asset-positioner" ng-show="entity">
+              <label>X</label>
+              <input ng-model="entity.info.pos.x" placeholder="350" type="number">
+              <label>Y</label>
+              <input ng-model="entity.info.pos.y" placeholder="250" type="number">
+              <button ng-click="scene.removeAsset($index, 'entities')">X</button>
+            </div>
+          </li>
+          <li ng-show="editor.currentScene.entities.length === 0">
+            <h5 class="scene-asset entity">(no entity yet!)</h5>
+          </li>
         </ul>
-        <button ng-click="scene.selecting.entity = false">Cancel</button>
-      </div>
-    </li>
-
-  </ul> -->
-</section>
+      </li>
+    </section>
 
 
 
-<!-- <button class="saveScene" ng-click="scene.saveScene(editor.currentScene)"> Save Scene </button> -->
+  </section>

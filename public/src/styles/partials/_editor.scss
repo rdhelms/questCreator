@@ -169,11 +169,13 @@
 
   &#asset {
     flex: 1;
+    height: 400px;
 
-    #scene-assets {
-      border: 4px solid black;
+    .scene-assets {
+      height: 400px; //NOTE this is a quick fix, need to find underlying cause!
       overflow: auto;
-      max-height: 400px; //NOTE this is a quick fix, need to find underlying cause!
+      border: 4px black solid;
+      border-top: none;
 
       h4 {
         text-align: center;
