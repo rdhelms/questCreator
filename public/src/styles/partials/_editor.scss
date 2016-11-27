@@ -185,6 +185,15 @@
         padding: .5rem;
       }
 
+      .scene-event {
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        &:first-child {
+          border-bottom: 2px solid dashed;
+        }
+      }
+
       .asset-positioner {
         input {
           width: 5rem;
