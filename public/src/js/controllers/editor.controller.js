@@ -121,7 +121,7 @@ angular.module('questCreator')
   };
 
   this.assetNamer = function(name, address) {
-    if (self[address].filter(function(asset){return asset.name.includes(name.toLowerCase())})){
+    if (self[address].filter(function(asset){return asset.name.includes(name.toLowerCase());})){
       var num = 1;
       self[address].forEach(function(value){
         num = (value.name.includes(name.toLowerCase())) ? num + 1 : num;
@@ -221,7 +221,7 @@ angular.module('questCreator')
         "background-repeat": "no-repeat"
       };
     }
-  }
+  };
 
   this.cancel = function () {
     PopupService.close();
@@ -238,21 +238,21 @@ angular.module('questCreator')
       'left': asset.info.pos.x,
       'position': 'absolute'
     };
-  }
+  };
 
   this.dragPositionAsset = function(index, type){
     self.dragIndex = {
       index: index,
       type: type
     };
-  }
+  };
 
   this.dragAvailableAsset = function(asset, type){
     self.dragAsset = {
       asset: asset,
       type: type
     };
-  }
+  };
 
   this.removeAsset = function(index, type){
     self.currentScene[type].splice(index, 1);
