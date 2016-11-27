@@ -74,6 +74,12 @@ angular.module('questCreator')
     PopupService.open('edit-game', $scope);
   }
 
+  this.cancelCreate = function () {
+    console.log("here");
+    $state.go('main.landing');
+    PopupService.close();
+  };
+
   this.createNewGame = function (name) {
       PopupService.close();
       EditorService.createGame(name).done(function(game) {
