@@ -1,6 +1,8 @@
 angular.module('questCreator').controller('sceneCtrl', function(socket, $state, $scope, $compile) {
   var self = this;
 
+  this.view = 'events';
+
   this.selecting = {
     background: false,
     object: false,
@@ -61,6 +63,5 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
     $(element).appendTo('#scene-BG');
     $scope.apply;
   };
-
 
 });

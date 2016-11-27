@@ -62,8 +62,8 @@
                 controller: 'entCtrl as ent'
               },
               'events': {
-                templateUrl: './src/views/game/editor/scripts.html',
-                controller: 'scriptsCtrl as scripts'
+                templateUrl: './src/views/game/editor/events.html',
+                controller: 'eventsCtrl as events'
               }
             }
           }).state('main.profile', {

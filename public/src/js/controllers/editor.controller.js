@@ -24,6 +24,7 @@ angular.module('questCreator')
   this.currentObject = null;
   this.currentEntity = null;
   this.currentScene = null;
+  this.currentEvent = null;
   //NOTE probably can remove:
   // this.currentSceneImg = {};
   //NOTE probably can remove^
