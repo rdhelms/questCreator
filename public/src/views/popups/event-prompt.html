@@ -1,0 +1,5 @@
+<h3>Event Type:</h3>
+<ul>
+  <li class="text-select" ng-repeat="type in editor.eventTypes" ng-focus="editor.eventType = type.name" tabindex="1">{{type.name}}: {{type.description}}</li>
+</ul>
+<button ng-click="editor.createEvent(editor.eventType); editor.eventType = null" ng-disabled="editor.eventType === null">Go!</button>
