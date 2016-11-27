@@ -114,11 +114,12 @@ angular.module('questCreator')
 
   this.editGame = function () {
       PopupService.close();
+      PopupService.open('loading-screen');
       EditorService.getGame(self.currentEditingGame.name).done(function(game) {
         self.currentEditingGame = game;
         // console.log(self.currentEditingGame);
         EditorService.getGameAssets(game.id).done(function(assets) {
-          console.log(assets);
+          PopupService.close();
           self.availableBackgrounds = assets.availableBackgrounds;
           self.availableObjects = assets.availableObstacles;
           self.availableEntities = assets.availableEntities;

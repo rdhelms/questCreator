@@ -1,4 +1,4 @@
-angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, GameService, $state, $scope) {
+angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, GameService, $state, $scope, PopupService) {
     $scope.settings = {
           "play": { "x": 0, "y": 0, "w": 31, "h": 30, "show": true},
           "next": { "x": 32, "y": 0, "w": 17, "h": 11, "show": true},
@@ -871,7 +871,9 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       self.displayTime = numHours + ":" + numMinutes + ":" + numSeconds;
     }
 
+    PopupService.open('loading-screen');
     currentGame = GameService.loadGame(self.gameName).done(function(response) {
+      PopupService.close();
         self.gameLoaded = true;
         gameInfo = response.info;
         allMaps = gameInfo.maps;
