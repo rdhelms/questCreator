@@ -1,0 +1,125 @@
+
+
+<section id="event-editor">
+  <section>
+    <input class="eventEditorTitle" type="text" ng-model="editor.currentEvent.name" ng-click="editor.selectText($event)" blur-on-enter></input>
+    <span>({{editor.currentEvent.category | capitalize}} Event)</span>
+    <button ng-click="events.log()">log</button>
+    <div class="event-edit" id="preview">
+      <ul id="preview-pane">
+        <li class="preview-step">
+          <ul class="preview-list">
+            <li>
+              -got 'key'
+            </li>
+            <li>
+              -did 'answered riddle'
+            </li>
+          </ul>
+        </li>
+        <li class="arrow">-></li>
+        <li class="preview-step">
+          <ul class="preview-list">
+            <li ng-if="editor.currentEvent.info.triggers.length === 0" class="default">(Triggers)</li>
+            <li ng-repeat="trigger in editor.currentEvent.info.triggers">
+              <div>
+                <span>-types '{{trigger[0]}}'</span>
+                <span ng-if="trigger[1]">/'{{trigger[1]}}'</span>
+                <span ng-if="trigger[2]">/'{{trigger[2]}}'</span>
+              </div>
+              <div ng-if="!$last">AND</div>
+            </li>
+          </ul>
+        </li>
+        <li class="arrow">-></li>
+        <li class="preview-step">
+          <ul class="preview-list">
+            <li>
+              -text: "The door opens!"
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+    </div>
+  </section>
+
+  <section>
+    <ul class="tab-nav event">
+      <li class="tab" ng-class="{'active': events.view === 'requirements'}" ng-click="events.view = 'requirements'">
+        <h5>Requirements</h5>
+      </li>
+      <li class="tab" ng-class="{'active': events.view === 'triggers'}" ng-click="events.view = 'triggers'">
+        <h5>Triggers</h5>
+      </li>
+      <li class="tab" ng-class="{'active': events.view === 'results'}" ng-click="events.view = 'results'">
+        <h5>Results</h5>
+      </li>
+    </ul>
+
+    <div class="event-edit" id="edit">
+    <!-- REQUIREMENTS -->
+      <section ng-show="events.view === 'requirements'">
+
+      </section>
+    <!-- TRIGGERS -->
+      <section ng-show="events.view === 'triggers'">
+        <section ng-if="editor.currentEvent.category === 'text'">
+          <p>Choose Keyword:</p>
+          <ul id="keywords">
+
+            <li ng-if="editor.currentEvent.info.triggers.length === 0">
+              <form name="wordList" ng-submit="events.addWordList(events.newWord)">
+                <input class="word keyword" ng-model="events.newWord" placeholder="+Keyword" type="text" ng-click="editor.selectText($event)" blur-on-enter></input>
+              </form>
+            </li>
+
+            <li ng-repeat="wordList in editor.currentEvent.info.triggers" ng-init="outerindex = $index">
+              <span ng-repeat="word in wordList track by $index" ng-init="bufferIndex = events.bufferIndex()">
+                <input class="word keyword" ng-model="wordList[$index]" type="text" ng-click="editor.selectText($event)" blur-on-enter ng-if="$first"></input>
+                <input class="word" ng-model="wordList[$index]" type="text" ng-click="editor.selectText($event)" elastic blur-on-enter ng-if="!$first"></input>
+                or:
+                <form ng-submit="events.addAlias(events.wordBuffer[bufferIndex], outerindex)" ng-if="$last">
+                  <input class="word new" ng-model="events.wordBuffer[bufferIndex]" placeholder="+Alias" type="text" ng-click="editor.selectText($event)" elastic focus="$last"></input>
+                </form>
+              </span>
+              <div>AND:</div>
+              <form ng-submit="events.addWordList(events.newWord)" ng-if="$last">
+                <input class="word keyword" ng-model="events.newWord" placeholder="+Keyword" type="text"></input>
+              </form>
+            </li>
+          </ul>
+        </section>
+      </section>
+    <!-- RESULTS -->
+      <section ng-show="events.view === 'results'">
+      </section>
+    </div>
+  </section>
+</section>
+
+
+
+
+
+<!-- <input class="eventEditorTitle" type="text" ng-model="editor.currentEvent.name" ng-click="editor.selectText($event)" blur-on-enter></input>
+<li>
+  <span class="select" tabindex="1">
+    <h3>Requirements:</h3>
+    <ul class="options" tabindex="1">
+      <li ng-repeat="requirement in scripts.possibleRequirements | orderBy:'-'" ng-mouseover="scripts.addRequirement(requirement)" class="option" tabindex="1">{{requirement.type}}</li>
+    </ul>
+  </span>
+  <span tabindex="1">
+    <h3>Typed Words:</h3>
+    <ul>
+      <li ng-repeat="andWords in scripts.possibleAndWords | orderBy:'-'" class="option" tabindex="1"></li>
+    </ul>
+  </span>
+  <span class="select" tabindex="1">
+    <h3>Result:</h3>
+    <ul class="options" tabindex="1">
+      <li ng-repeat="result in scripts.possibleResults | orderBy:'-'" ng-mouseover="scripts.addResult(result)" class="option" tabindex="1">{{result.type}}</li>
+    </ul>
+  </span>
+</li> -->
