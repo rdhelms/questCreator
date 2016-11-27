@@ -9,7 +9,7 @@
         <button ng-if="landing.searching" ng-click="landing.showAll()" type="button">Show All Games</button>
         <div id="game-results">
             <div ng-repeat="game in landing.allGames.responseJSON" class="game" ng-click="goToGameDetail(game)">
-                <img src="{{ game.thumbnail }}" alt="Game thumbnail"/>
+                <img ng-src="{{ game.thumbnail }}" alt="Game thumbnail"/>
                 <ul>
                     <li>
                         <span><h1>{{ game.name | capitalize }}</h1></span>

@@ -19,11 +19,72 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      .menu {
+        z-index: 10;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 30px;
+        width: 100%;
+        background: white;
+        border: 3px solid black;
+        font-size: 15px;
+        box-sizing: border-box;
+        .options {
+          display: flex;
+          list-style: none;
+          height: 100%;
+          .option {
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            height: 100%;
+            font-family: PCSenior;
+            &.fileOption {
+              position: relative;
+              width: 15%;
+              overflow: hidden;
+              .fileOptions {
+                position: absolute;
+                width: 120%;
+                top: 100%;
+                left: 0;
+                list-style: none;
+                li {
+                  display: flex;
+                  align-items: center;
+                  padding-left: 10px;
+                  height: 30px;
+                  background: white;
+                  color: black;
+                  &:hover, &.active {
+                    background: black;
+                    color: white;
+                  }
+                }
+              }
+            }
+            &.invOption {
+              width: 25%;
+            }
+            &.scoreOption {
+              width: 25%;
+            }
+            &.timeOption {
+              width: 35%;
+            }
+            &.active, &:hover {
+              background: black;
+              color: white;
+              overflow: visible;
+            }
+          }
+        }
+      }
       .playBtn {
         position: absolute;
       }
-      .typing, .dialog {
-        display: none;
+      .typing, .dialog, .inventoryContainer, .saveMenu, .restoreMenu {
         min-width: 150px;
         max-width: 500px;
         word-wrap: break-word;

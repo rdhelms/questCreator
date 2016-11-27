@@ -75,7 +75,6 @@ angular.module('questCreator')
                 scope: 'profile'
             }).then(function() {
                 auth2 = gapi.auth2.getAuthInstance(); // Store authInstance for easier accessibility
-                console.log("Session authorized");
                 auth2.isSignedIn.listen(updateSignInStatus);
                 updateSignInStatus(auth2.isSignedIn.get());
             });
@@ -85,12 +84,10 @@ angular.module('questCreator')
             if (isSignedIn) {
                 $('#login').hide();
                 $('#logout').show();
-                console.log("Signed In!");
                 getLogin();
             } else {
                 $('#login').show();
                 $('#logout').hide();
-                console.log("Signed Out!");
             }
         }
 
@@ -220,7 +217,7 @@ angular.module('questCreator')
                 // dataType: 'json',
                 // contentType: 'application/json',
                 success: function(response) {
-                    console.log(response);
+                    // console.log(response);
                 },
                 error: function(error) {
                     console.log(error);
@@ -237,7 +234,7 @@ angular.module('questCreator')
                     token: user.token
                 },
                 success: function(response) {
-                    console.log('success requests', response);
+                    // console.log('success requests', response);
                 },
                 error: function(error) {
                     console.log('error requests', error);
@@ -256,7 +253,7 @@ angular.module('questCreator')
                 dataType: 'json',
                 contentType: 'application/json',
                 success: function(response) {
-                    console.log('success collaborators', response);
+                    // console.log('success collaborators', response);
                 },
                 error: function(error) {
                     console.log('error collaborators', error);
@@ -275,7 +272,7 @@ angular.module('questCreator')
                 dataType: 'json',
                 contentType: 'application/json',
                 success: function(response) {
-                    console.log('success collaborations', response);
+                    // console.log('success collaborations', response);
                 },
                 error: function(error) {
                     console.log('error collaborations', error);
@@ -296,7 +293,7 @@ angular.module('questCreator')
                     requester_id: requesterId
                 },
                 success: function(response) {
-                    console.log(response);
+                    // console.log(response);
                 },
                 error: function(error) {
                     console.log(error);
@@ -318,7 +315,7 @@ angular.module('questCreator')
                   requester_id: requesterId
                 },
                 success: function(response) {
-                    console.log(response);
+                    // console.log(response);
                 },
                 error: function(error) {
                     console.log(error);
@@ -340,7 +337,7 @@ angular.module('questCreator')
                 dataType: 'json',
                 contentType: 'application/json',
                 success: function(response) {
-                    console.log(response);
+                    // console.log(response);
                 },
                 error: function(error) {
                     console.log(error);
@@ -378,7 +375,7 @@ angular.module('questCreator')
               dataType: 'json',
               contentType: 'application/json',
               success: function(response) {
-                console.log(response);
+                // console.log(response);
                   return response;
               },
               error: function(error) {
@@ -401,7 +398,7 @@ angular.module('questCreator')
                 id: id
               },
               success: function(response) {
-                console.log(response);
+                // console.log(response);
                   return response;
               },
               error: function(error) {

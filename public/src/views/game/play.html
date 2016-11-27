@@ -2,9 +2,46 @@
   <div class="game-window">
     <h1> {{play.gameToPlay | capitalize}} </h1>
     <div class="game-screen">
+      <header class="menu">
+        <ul class="options">
+          <li class="fileOption option">
+            File
+            <ul class="fileOptions">
+              <li ng-click="play.savingGame = true" class="save">Save</li>
+              <li ng-click="play.restoringGame = true" class="restore">Restore</li>
+            </ul>
+          </li>
+          <li ng-click="play.showingInventory = true" class="invOption option">Inventory</li>
+          <li class="scoreOption option">Score: {{play.saveInfo.score}}</li>
+          <li class="timeOption option">Time: {{play.displayTime}}</li>
+        </ul>
+      </header>
       <canvas id="play-canvas" width=700 height=500></canvas>
-      <div class="typing"> </div>
-      <div class="dialog"> </div>
+      <div ng-show="play.typing.show" ng-click="play.typing.show = false" class="typing"> {{play.typing.phrase}} </div>
+      <div ng-show="play.responding.show" ng-click = "play.responding.show = false" class="dialog"> {{play.responding.phrase}} </div>
+      <div ng-show="play.showingInventory" class="inventoryContainer">
+        <div class="inventoryTitle">Inventory</div>
+        <br><br>
+        <ul class="inventory">
+          <li ng-repeat="item in play.saveInfo.inventory"> {{item}} </li>
+        </ul>
+        <button ng-click="play.showingInventory = false">Cancel</button>
+      </div>
+      <div ng-show="play.savingGame" class="saveMenu">
+        Name your saved game.
+        <form ng-submit="play.saveGame(); play.savingGame = false;">
+          <input type="text" class="saveName" ng-model="play.saveInfo.name">
+          <button type="button" ng-click="play.savingGame = false">Cancel</button>
+          <button type="submit">Save</button>
+        </form>
+      </div>
+      <div ng-show="play.restoringGame" class="restoreMenu">
+        Pick a game to restore.
+        <ul class="savedGames">
+          <li ng-repeat="savedGame in play.allSavedGames" ng-click="play.restoreGame(savedGame)"> {{savedGame.name}} </li>
+        </ul>
+        <button ng-click="play.restoringGame = false">Cancel</button>
+      </div>
       <button ng-show="!play.gameStarted && play.gameLoaded" ng-click="play.startGame()" class="playBtn">PLAY GAME</button>
     </div>
     <p>Press spacebar to type command</p>
