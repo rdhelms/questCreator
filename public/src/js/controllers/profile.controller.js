@@ -1,4 +1,4 @@
-angular.module('questCreator').controller('profileCtrl', function(socket, $state, $scope, UserService) {
+angular.module('questCreator').controller('profileCtrl', function(socket, $state, $scope, UserService, PopupService) {
 
     $scope.showReqs = false;
     $scope.showCollabs = false;
@@ -10,7 +10,7 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
     $scope.large = null;
 
     UserService.checkLogin().then(function(response) {
-
+        PopupService.open('loading-screen');
         $scope.user = UserService.get();
 
         $scope.getJoinedDate = function(date) {
@@ -18,15 +18,15 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
         };
 
         function getGameName(requests, games) {
-                for (var i = 0; i < requests.length; i++) {
-                    for (var j = 0; j < games.length; j++) {
-                        if (requests[i].game_id === games[j].id) {
-                            requests[i].gameName = games[j].name;
-                        }
+            for (var i = 0; i < requests.length; i++) {
+                for (var j = 0; j < games.length; j++) {
+                    if (requests[i].game_id === games[j].id) {
+                        requests[i].gameName = games[j].name;
                     }
                 }
-                $scope.requests = requests;
-                $scope.$apply();
+            }
+            $scope.requests = requests;
+            $scope.$apply();
         }
 
         function filterCollaborators(collaborators, games) {
@@ -46,24 +46,25 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
         }
 
         UserService.getUserGames().done(function(games) {
-          $scope.games = games;
-          $scope.$apply();
-          UserService.getCollabRequests().done(function(requests) {
-            getGameName(requests, games);
-          });
-          UserService.getCollaborators().done(function(collaborators) {
-            filterCollaborators(collaborators, games);
-        });
+            $scope.games = games;
+            $scope.$apply();
+            UserService.getCollabRequests().done(function(requests) {
+                getGameName(requests, games);
+            });
+            UserService.getCollaborators().done(function(collaborators) {
+                filterCollaborators(collaborators, games);
+            });
 
-        UserService.getAvatars().done(function (avatars) {
-            $scope.avatars = avatars;
-            for (var i = 0; i < avatars.length; i++) {
-              if (avatars[i].current)
-              $scope.large = avatars[i];
-              $scope.$apply();
-            }
+            UserService.getAvatars().done(function(avatars) {
+                $scope.avatars = avatars;
+                for (var i = 0; i < avatars.length; i++) {
+                    if (avatars[i].current)
+                        $scope.large = avatars[i];
+                    $scope.$apply();
+                }
+                PopupService.close();
+            });
         });
-});
 
 
         UserService.getCollaborations().done(function(collaborations) {
@@ -108,11 +109,11 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
             UserService.toggleAccepted(info.game_id, info.user_id);
             var games = $scope.games;
             UserService.getCollabRequests().done(function(requests) {
-              getGameName(requests, games);
+                getGameName(requests, games);
             });
             UserService.getCollaborators().done(function(collaborators) {
-              filterCollaborators(collaborators, games);
-          });
+                filterCollaborators(collaborators, games);
+            });
         };
 
         $scope.removeRequest = function(collab, index) {
@@ -132,23 +133,23 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
             });
         };
 
-        $scope.highlightAvatar = function (avatar, index) {
-          $scope.large = avatar;
+        $scope.highlightAvatar = function(avatar, index) {
+            $scope.large = avatar;
         };
 
-        $scope.updateDefault = function () {
-          if ($scope.large) {
-            for (var i = 0; i < $scope.avatars.length; i++) {
-              if ($scope.avatars[i].current && $scope.avatars[i].id !== $scope.large.id) {
-                $scope.avatars[i].current = false;
-                UserService.updateAvatar(false, $scope.avatars[i].id);
-              }
-              if ($scope.avatars[i].id === $scope.large.id) {
-                $scope.avatars[i].current = $scope.large.current;
-              }
+        $scope.updateDefault = function() {
+            if ($scope.large) {
+                for (var i = 0; i < $scope.avatars.length; i++) {
+                    if ($scope.avatars[i].current && $scope.avatars[i].id !== $scope.large.id) {
+                        $scope.avatars[i].current = false;
+                        UserService.updateAvatar(false, $scope.avatars[i].id);
+                    }
+                    if ($scope.avatars[i].id === $scope.large.id) {
+                        $scope.avatars[i].current = $scope.large.current;
+                    }
+                }
+                UserService.updateAvatar($scope.large.current, $scope.large.id);
             }
-            UserService.updateAvatar($scope.large.current, $scope.large.id);
-          }
         };
 
     });

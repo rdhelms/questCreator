@@ -24,6 +24,10 @@ angular.module('questCreator')
       title: 'Please...',
       content: 'signin-to-continue.html'
     },
+    'loading-screen': {
+      title: 'Loading...',
+      content: 'loading-screen.html'
+    },
     'fail-user-load': {
       title: 'Oops!',
       content: 'fail-user-load.html'
@@ -86,7 +90,6 @@ angular.module('questCreator')
     scope = scope || $rootScope.$$childHead;
     var template = path + templates[name].content;
     var content = $('<ng-include>').attr('src', '\''+ template+ '\'');
-    // Creates new popup on the page in specified scope:
     $rootScope.$$childHead.popupTemp = false;
     PopupFactory.new(content, templates[name].title, scope);
   }

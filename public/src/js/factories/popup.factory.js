@@ -3,6 +3,7 @@ angular.module('questCreator')
 
   function create(content, title, scope) {
     // var defer = $q.defer();
+
     var popup = $('<popup>')
       .attr({
         'popup-title': '\"'+ title +'\"'

@@ -79,11 +79,6 @@
             }
         }
 
-        .canvas-tools {
-            background-color: $darkgrey;
-            border: 3px black solid;
-        }
-
         .avatar-selector {
             display: flex;
             flex-direction: column;
@@ -113,7 +108,7 @@
 
                     p {
                       text-align: center;
-                    }                    
+                    }
                 }
             }
 
@@ -173,10 +168,15 @@
         background: $medgrey;
         overflow: scroll;
         border-left: black solid 5px;
-        // display: flex;
-        // flex-direction: column;
-        // justify-content: center;
-        // align-items: space-around;
+
+        .user-create {
+            margin-left: 26%;
+            font-size: 1.3em;
+            font-style: italic;
+            font-weight: bold;
+
+        }
+
         .user-games {
             border: 5px solid black;
             padding: 5px;
