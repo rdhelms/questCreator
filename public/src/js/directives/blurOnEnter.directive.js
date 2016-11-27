@@ -3,13 +3,12 @@
 angular.module('questCreator')
 .directive('blurOnEnter', function(){
     return {
+        terminal: true,
         link:  function (scope, element, attrs) {
-            element.bind("keypress", function (event) {
-              console.log("in directive");
+            element.bind("keyup", function (event) {
                 if(event.which === 13) {
-                    console.log('blurrin');
                     element.blur();
-                    event.preventDefault();
+                    // event.preventDefault();
                 }
             });
         }
