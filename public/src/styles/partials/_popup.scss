@@ -12,6 +12,17 @@
     @include pseudo();
     @include checkerboard(4px, .6);
   }
+
+  &.temp {
+    background: transparent;
+    justify-content: none;
+    align-items: none;
+  }
+
+  &.temp .popup {
+    background-color: purple;
+    top: 100px;
+  }
 }
 
 #popup {
@@ -22,12 +33,11 @@
   font-family: PCSenior;
   box-shadow: 8px 8px 0 0 rgba(164,172,150,0.5);
 
-
   .nav {
     position: static;
     box-shadow: none;
     ul {
-      justify-content: space-between;
+      // justify-content: space-between;
       width: 100%;
 
       li:hover {
