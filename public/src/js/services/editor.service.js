@@ -69,7 +69,8 @@ angular.module('questCreator').service('EditorService', function (UserService, $
         pos: [0,0,0],
         background: null,
         objects: [],
-        entities: []
+        entities: [],
+        events: []
       };
       var titleMap = {
         name: 'Title Map',

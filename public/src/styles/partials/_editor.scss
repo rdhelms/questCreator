@@ -176,12 +176,13 @@
       overflow: auto;
       border: 4px black solid;
       border-top: none;
+      padding: .5rem;
 
       h4 {
         text-align: center;
       }
 
-      ul > * {
+      .assets-list > * {
         padding: .5rem;
       }
 

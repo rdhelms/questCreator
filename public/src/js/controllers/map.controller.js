@@ -13,7 +13,8 @@ angular.module('questCreator').controller('mapCtrl', function($state, $scope) {
       name: sceneName,
       background: undefined,
       objects: [],
-      entities: []
+      entities: [],
+      events: []
     };
     var newMap = {
       name: name,
@@ -43,7 +44,8 @@ angular.module('questCreator').controller('mapCtrl', function($state, $scope) {
       name: name,
       background: undefined,
       objects: [],
-      entities: []
+      entities: [],
+      events: []
     };
     $scope.editor.currentEditingGame.info.maps[$scope.editor.currentEditingGame.info.maps.indexOf(mapObj)].scenes.push([newScene]);
   }
@@ -54,12 +56,17 @@ angular.module('questCreator').controller('mapCtrl', function($state, $scope) {
       name: name,
       background: undefined,
       objects: [],
-      entities: []
+      entities: [],
+      events: []
     };
     $scope.editor.currentEditingGame.info.maps[$scope.editor.currentEditingGame.info.maps.indexOf(mapObj)].scenes[rowNum].push(newScene);
   }
 
   this.editScene = function(scene) {
+    //backwards compatibility fix:
+    if (!scene.events) {
+      scene.events = [];
+    }
     $scope.editor.currentScene = scene;
     $scope.editor.currentLargeView = 'scene';
   }
