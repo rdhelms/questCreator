@@ -1116,8 +1116,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     socket.off('draw new player');
     socket.on('draw new player', function(newPlayer) {
       console.log(newPlayer);
-      var newFullPlayer = new Avatar(newPlayer);
-      allPlayers.push(newFullPlayer);
+      newPlayer.avatar = new Avatar(newPlayer.avatar);
+      allPlayers.push(newPlayer);
       var response = {
         data: fullPlayer,
         dest: newPlayer.socketId
@@ -1127,8 +1127,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
     socket.off('draw old player');
     socket.on('draw old player', function(oldPlayer) {
-      var oldFullPlayer = new Avatar(oldPlayer);
-      allPlayers.push(oldFullPlayer);
+      oldPlayer.avatar = new Avatar(oldPlayer.avatar);
+      allPlayers.push(oldPlayer);
     });
 
     socket.off('update player');
@@ -1142,7 +1142,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       // };
       for (var index = 0; index < allPlayers.length; index++) {
         if (allPlayers[index].id === playerUpdate.id) {
-          allPlayers[index].action = playerUpdate.action;
+          allPlayers[index].avatar.action = playerUpdate.action;
           allPlayers[index].scenePos = playerUpdate.scenePos;
         }
       }
