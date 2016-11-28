@@ -233,110 +233,120 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
         });
 
     function checkTypingEvents(phrase) {
+      phrase = phrase.toLowerCase();
       var foundEvent = false; // Whether a typing event has already been triggered
-      events.forEach(function(event) { // Loop through all the typing events
-        if (event.category === 'text') {
-          var typingEvent = event.info;
-          if (!foundEvent) {  // Only continue checking as long as another event has already not been triggered
-            var requirementsMet = true;   // Assume that the requirements will be met
-            typingEvent.requirements.forEach(function(requirement) {  // Loop through all the requirements
-              if (requirement.type === 'achievement' && self.saveInfo.achievements.indexOf(requirement.value) === -1) { // If an achievement is required, check the player's past achievements
-                requirementsMet = false;  // Requirements fail if achievement is not present
-              } else if (requirement.type === 'inventory' && self.saveInfo.inventory.indexOf(requirement.value) === -1) { // If an inventory item is required, check the player's inventory
-                requirementsMet = false;  // Requirements fail if inventory does not contain necessary item
-              }
-            });
-            if (requirementsMet) {  // If all the requirements have been met, check the event's triggers
-              var triggerSatisfied = true;  // Assume that the trigger conditions will be met
-              typingEvent.trigger.forEach(function(wordSet) { // Loop through the sets of words to check
-                  var possibleMatch = false;  // Assume that each wordset does not satisfy the requirements
-                  wordSet.forEach(function(word) {  // Loop through all the words in the wordSet
-                    if ( phrase.includes(word) ) {  // If the user typed one of the words in the wordSet, it's a possible match
-                      possibleMatch = true;
-                    }
-                  });
-                  if (!possibleMatch) { // If the the entire wordSet was passed through without finding a match, then the entire trigger fails
-                    triggerSatisfied = false;
-                    self.responding.phrase = 'I have literally no idea what you just said.';  // If the trigger failed, set the response to a standard default
-                    self.responding.show = true;
-                    self.pause = true;
-                  }
+      if (events) {
+        events.forEach(function(event) { // Loop through all the typing events
+          console.log(event);
+          if (event.category === 'text') {
+            var typingEvent = event.info;
+            if (!foundEvent) {  // Only continue checking as long as another event has already not been triggered
+              var requirementsMet = true;   // Assume that the requirements will be met
+              typingEvent.requirements.forEach(function(requirement) {  // Loop through all the requirements
+                if (requirement.type === 'achievement' && self.saveInfo.achievements.indexOf(requirement.value) === -1) { // If an achievement is required, check the player's past achievements
+                  requirementsMet = false;  // Requirements fail if achievement is not present
+                } else if (requirement.type === 'inventory' && self.saveInfo.inventory.indexOf(requirement.value) === -1) { // If an inventory item is required, check the player's inventory
+                  requirementsMet = false;  // Requirements fail if inventory does not contain necessary item
+                }
               });
-              if (triggerSatisfied) {
-                foundEvent = true;
-                typingEvent.results.forEach(function(result) {
-                  if (result.type === 'text') {
-                    self.responding.phrase = result.value;
-                    self.responding.show = true;
-                    self.pause = true;
-                  }
-                  if (result.type === 'inventory') {
-                    self.saveInfo.inventory.push(result.value);
-                  }
-                  if (result.type === 'achievement') {
-                    self.saveInfo.achievements.push(result.name);
-                    self.saveInfo.score += result.value;
-                  }
-                  if (result.type === 'portal') {
-                    self.currentScenePos = angular.copy(result.scenePos);
-                    updateLocation();
-                    avatar.info.pos = angular.copy(result.pos);
-                  }
+              if (requirementsMet) {  // If all the requirements have been met, check the event's triggers
+                var triggerSatisfied = true;  // Assume that the trigger conditions will be met
+                typingEvent.triggers.forEach(function(wordSet) { // Loop through the sets of words to check
+                    var possibleMatch = false;  // Assume that each wordset does not satisfy the requirements
+                    wordSet.forEach(function(word) {  // Loop through all the words in the wordSet
+                      word = word.toLowerCase();
+                      if ( phrase.includes(word) ) {  // If the user typed one of the words in the wordSet, it's a possible match
+                        possibleMatch = true;
+                      }
+                    });
+                    if (!possibleMatch) { // If the the entire wordSet was passed through without finding a match, then the entire trigger fails
+                      triggerSatisfied = false;
+                      self.responding.phrase = 'I have literally no idea what you just said.';  // If the trigger failed, set the response to a standard default
+                      self.responding.show = true;
+                      self.pause = true;
+                    }
                 });
+                if (triggerSatisfied) {
+                  foundEvent = true;
+                  typingEvent.results.text.forEach(function(textResult) {
+                      self.responding.phrase = textResult;
+                      self.responding.show = true;
+                      self.pause = true;
+                  });
+                  typingEvent.results.inventory.forEach(function(inventoryItem) {
+                      self.saveInfo.inventory.push(inventoryItem);
+                  });
+                  typingEvent.results.achievements.forEach(function(achievement) {
+                      self.saveInfo.achievements.push(acheievement.name);
+                      self.saveInfo.score += achievement.value;
+                  });
+                  if (typingEvent.results.portal.scenePos) {
+                      var location = typingEvent.results.portal;
+                      self.currentScenePos = angular.copy(location.scenePos);
+                      updateLocation();
+                      avatar.info.pos = angular.copy(location.pos);
+                  }
+                }
               }
             }
           }
-        }
-      });
+        });
+      } else {
+        self.responding.phrase = 'I have literally no idea what you just said.';
+        self.responding.show = true;
+        self.pause = true;
+      }
     }
 
     function checkLocationEvents(avatarBounds) {
       var foundEvent = false; // Whether a typing event has already been triggered
-      events.forEach(function(event) { // Loop through all the typing events
-        if (event.category === 'location') {
-          locationEvent = event.info;
-          if (!foundEvent) {  // Only continue checking as long as another event has already not been triggered
-            var requirementsMet = true;   // Assume that the requirements will be met
-            locationEvent.requirements.forEach(function(requirement) {  // Loop through all the requirements
-              if (requirement.type === 'achievement' && self.saveInfo.achievements.indexOf(requirement.value) === -1) { // If an achievement is required, check the player's past achievements
-                requirementsMet = false;  // Requirements fail if achievement is not present
-              } else if (requirement.type === 'inventory' && self.saveInfo.inventory.indexOf(requirement.value) === -1) { // If an inventory item is required, check the player's inventory
-                requirementsMet = false;  // Requirements fail if inventory does not contain necessary item
-              }
-            });
-            if (requirementsMet) {  // If all the requirements have been met, check the event's triggers
-              var triggerSatisfied = false;  // Assume that the trigger conditions will not be met
-              locationEvent.trigger.forEach(function(bounds) {  // Compare the avatar's bounds with the locationEvent's trigger bounds
-                if (avatarBounds.left <= bounds.right && avatarBounds.right >= bounds.left && avatarBounds.top <= bounds.bottom && avatarBounds.bottom >= bounds.top) {
-                  triggerSatisfied = true;
+      if (events) {
+        events.forEach(function(event) { // Loop through all the typing events
+          if (event.category === 'location') {
+            locationEvent = event.info;
+            if (!foundEvent) {  // Only continue checking as long as another event has already not been triggered
+              var requirementsMet = true;   // Assume that the requirements will be met
+              locationEvent.requirements.forEach(function(requirement) {  // Loop through all the requirements
+                if (requirement.type === 'achievement' && self.saveInfo.achievements.indexOf(requirement.value) === -1) { // If an achievement is required, check the player's past achievements
+                  requirementsMet = false;  // Requirements fail if achievement is not present
+                } else if (requirement.type === 'inventory' && self.saveInfo.inventory.indexOf(requirement.value) === -1) { // If an inventory item is required, check the player's inventory
+                  requirementsMet = false;  // Requirements fail if inventory does not contain necessary item
                 }
               });
-              if (triggerSatisfied) {
-                foundEvent = true;
-                locationEvent.results.forEach(function(result) {
-                  if (result.type === 'text') {
-                    self.responding.phrase = result.value;
-                    self.responding.show = true;
-                    self.pause = true;
-                  }
-                  if (result.type === 'inventory') {
-                    self.saveInfo.inventory.push(result.value);
-                  }
-                  if (result.type === 'achievement') {
-                    self.saveInfo.achievements.push(result.name);
-                    self.saveInfo.score += result.value;
-                  }
-                  if (result.type === 'portal') {
-                    self.currentScenePos = angular.copy(result.scenePos);
-                    updateLocation();
-                    avatar.info.pos = angular.copy(result.pos);
+              if (requirementsMet) {  // If all the requirements have been met, check the event's triggers
+                var triggerSatisfied = false;  // Assume that the trigger conditions will not be met
+                locationEvent.triggers.forEach(function(bounds) {  // Compare the avatar's bounds with the locationEvent's trigger bounds
+                  if (avatarBounds.left <= bounds.right && avatarBounds.right >= bounds.left && avatarBounds.top <= bounds.bottom && avatarBounds.bottom >= bounds.top) {
+                    triggerSatisfied = true;
                   }
                 });
+                if (triggerSatisfied) {
+                  foundEvent = true;
+                  locationEvent.results.forEach(function(result) {
+                    if (result.type === 'text') {
+                      self.responding.phrase = result.value;
+                      self.responding.show = true;
+                      self.pause = true;
+                    }
+                    if (result.type === 'inventory') {
+                      self.saveInfo.inventory.push(result.value);
+                    }
+                    if (result.type === 'achievement') {
+                      self.saveInfo.achievements.push(result.name);
+                      self.saveInfo.score += result.value;
+                    }
+                    if (result.type === 'portal') {
+                      self.currentScenePos = angular.copy(result.scenePos);
+                      updateLocation();
+                      avatar.info.pos = angular.copy(result.pos);
+                    }
+                  });
+                }
               }
             }
           }
-        }
-      });
+        });
+      }
     }
 
     function checkAvatarBounds() {
@@ -744,6 +754,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
         socket.emit('update player', playerUpdate);
         background = self.currentScene.background;
         events = self.currentScene.events;
+        console.log(self.currentScene);
+        console.log(events);
         objects = self.currentScene.objects;
         loadEntities();
     }
