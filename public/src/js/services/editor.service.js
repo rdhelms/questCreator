@@ -483,9 +483,34 @@ angular.module('questCreator').service('EditorService', function (UserService, $
       });
     }
 
+    function getAssetInfo(id, type) {
+      if (type === 'objects') {
+        type = 'obstacles';
+      }
+      var headerData = {
+        user_id: UserService.get().id,
+        token: UserService.get().token
+      };
+      return $.ajax({
+         method: 'GET',
+         url: 'https://forge-api.herokuapp.com/' + type + '/select',
+         headers: headerData,
+         data: {
+           id: id
+         },
+         success: function(response) {
+           return response;
+         },
+         error: function(error) {
+           console.log(error);
+         }
+       });
+    }
+
     return {
       getGame: getGame,
       getGameAssets: getGameAssets,
+      getAssetInfo: getAssetInfo,
       createGame: createGame,
       saveGame: saveGame,
       createBackground: createBackground,
