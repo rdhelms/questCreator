@@ -35,6 +35,17 @@
                   color: pink;
                   -webkit-text-stroke: 1px red;
                   font-size: 2em;
+
+                  .edit {
+                    padding: 0;
+                    width: 20px;
+                    height: 20px;
+                    background-color: $lightgrey;
+                    background-image: url('../images/edit-pencil.png');
+                    background-size: cover;
+                    display: inline-block;
+                    border: none;
+                  }
                 }
             }
 

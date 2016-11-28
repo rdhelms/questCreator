@@ -3,7 +3,7 @@
         <section class="user-info">
             <img src="{{ user.picture }}" alt="Google profile picture" />
             <ul class="info">
-                <li class="profile-name">{{ user.username | capitalize }}</li>
+                <li class="profile-name">{{ user.username | capitalize }}<i class="edit"  ng-click="openToEdit()"> </i></li>
                 <label for="joined">Joined:<li>{{ getJoinedDate(user.joined) | date:'MMM d - h:mm a' }}</li></label>
                 <label>Games Created:<li>{{ games.length }}</li></label>
             </ul>
