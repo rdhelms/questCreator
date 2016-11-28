@@ -5731,6 +5731,15 @@ angular.module('questCreator')
     socket.on('player left', function(leavingPlayer) {
       var msg = "Player " + leavingPlayer.id + ' left ' + leavingPlayer.game;
       $('.chat-messages').append($('<li>').text(msg));
+      var indexToRemove = null;
+      for (var index = 0; index < allPlayers.length; index++) {
+        if (allPlayers[index].id === playerUpdate.id) {
+          indexToRemove = index;
+        }
+      }
+      if (indexToRemove) {
+        allPlayers.splice(indexToRemove, 1);
+      }
     });
 
     // Let others know that I left the game if the controller ceases (closing browser, etc)
