@@ -1015,27 +1015,27 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
             }
           ],
           location: [
-            {
-              requirements: [],
-              trigger: [
-                {
-                  left: 0,
-                  right: 700,
-                  top: 450,
-                  bottom: 500
-                }
-              ],
-              results: [
-                {
-                  type: 'teleport',
-                  scenePos: [1,2,0],
-                  pos: {
-                    x: 350,
-                    y: 250
-                  }
-                }
-              ]
-            }
+            // {
+            //   requirements: [],
+            //   trigger: [
+            //     {
+            //       left: 0,
+            //       right: 700,
+            //       top: 450,
+            //       bottom: 500
+            //     }
+            //   ],
+            //   results: [
+            //     {
+            //       type: 'teleport',
+            //       scenePos: [1,2,0],
+            //       pos: {
+            //         x: 350,
+            //         y: 250
+            //       }
+            //     }
+            //   ]
+            // }
           ]
         };
         drawEntities('background');
