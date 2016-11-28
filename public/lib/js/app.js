@@ -62,8 +62,8 @@
                 controller: 'entCtrl as ent'
               },
               'events': {
-                templateUrl: './src/views/game/editor/scripts.html',
-                controller: 'scriptsCtrl as scripts'
+                templateUrl: './src/views/game/editor/events.html',
+                controller: 'eventsCtrl as events'
               }
             }
           }).state('main.profile', {
@@ -95,42 +95,87 @@
     this.name = avatarInfo.name;
     this.info = avatarInfo.info;
     this.user_id = avatarInfo.user_id;
-    this.action = 'stand';
-    this.speed = {
+    this.action = 'walkLeft';
+    this.info.speed = {
       mag: 3,
       x: 0,
       y: 0
     };
-  };
+    this.info.currentFrameIndex = 0;
+    this.info.currentFrame = this.info.animate[this.action][this.info.currentFrameIndex];
+    this.animateDelay = 10;
+    this.animateTime = 0;
+    this.scale = 1;
+  }
 
   Avatar.prototype.updatePos = function() {
-    this.info.pos.x += this.speed.x;
-    this.info.pos.y += this.speed.y;
+    this.info.pos.x += this.info.speed.x;
+    this.info.pos.y += this.info.speed.y;
+  };
+
+  Avatar.prototype.checkAction = function() {
+    var self = this;
+    if (self.action === 'stand' || self.action === 'walkLeft' || self.action === 'walkUp' || self.action === 'walkRight' || self.action === 'walkDown') {
+      switch (self.action) {
+          case 'stand':
+              self.info.speed.x = 0;
+              self.info.speed.y = 0;
+              break;
+          case 'walkLeft':
+              self.info.speed.x = -self.info.speed.mag;
+              self.info.speed.y = 0;
+              break;
+          case 'walkUp':
+              self.info.speed.x = 0;
+              self.info.speed.y = -self.info.speed.mag;
+              break;
+          case 'walkRight':
+              self.info.speed.x = self.info.speed.mag;
+              self.info.speed.y = 0;
+              break;
+          case 'walkDown':
+              self.info.speed.x = 0;
+              self.info.speed.y = self.info.speed.mag;
+              break;
+      }
+      if (self.animateTime > self.animateDelay) {
+        // Animate the avatar.
+        if (self.action !== 'stand') {
+          self.info.currentFrame = self.info.animate[self.action][self.info.currentFrameIndex];
+          self.info.currentFrameIndex++;
+          if (self.info.currentFrameIndex > self.info.animate[self.action].length - 1) {
+              self.info.currentFrameIndex = 0;
+          }
+        }
+        self.animateTime = 0;
+      }
+      self.animateTime++;
+    }
   }
 
   Avatar.prototype.stop = function() {
     this.action = 'stand';
-    this.speed.x = 0;
-    this.speed.y = 0;
-  }
+    this.info.speed.x = 0;
+    this.info.speed.y = 0;
+  };
 
   Avatar.prototype.collide = function(direction) {
     this.stop();
     switch (direction) {
       case 'left':
-        this.info.pos.x += this.speed.mag;
+        this.info.pos.x += this.info.speed.mag;
         break;
       case 'right':
-        this.info.pos.x -= this.speed.mag;
+        this.info.pos.x -= this.info.speed.mag;
         break;
       case 'up':
-        this.info.pos.y += this.speed.mag;
+        this.info.pos.y += this.info.speed.mag;
         break;
       case 'down':
-        this.info.pos.y -= this.speed.mag;
+        this.info.pos.y -= this.info.speed.mag;
         break;
     }
-  }
+  };
 
   return Avatar;
 });
@@ -320,18 +365,129 @@
 angular.module('questCreator')
 .directive('blurOnEnter', function(){
     return {
+        terminal: true,
         link:  function (scope, element, attrs) {
-            element.bind("keypress", function (event) {
-              console.log("in directive");
+            element.bind("keyup", function (event) {
                 if(event.which === 13) {
-                    console.log('blurrin');
                     element.blur();
-                    event.preventDefault();
+                    // event.preventDefault();
                 }
             });
         }
     }
 });
+;angular.module('questCreator').directive('elastic', ['$document', '$window', function($document, $window) {
+
+    var wrapper = angular.element('<div style="position:fixed; top:-999px; left:0;"></div>');
+    angular.element($document[0].body).append(wrapper);
+
+    function getStyle(oElm, css3Prop){
+        var strValue = "";
+
+        if(window.getComputedStyle){
+            strValue = getComputedStyle(oElm).getPropertyValue(css3Prop);
+
+        } else if (oElm.currentStyle){ //IE
+            try {
+                strValue = oElm.currentStyle[css3Prop];
+            } catch (e) {}
+        }
+        return strValue;
+    }
+
+    function getParentWidth(element) {
+
+        var parent = element[0], width;
+
+        do {
+            parent = parent.parentNode;
+            width = parseInt(getStyle(parent, 'width'), 10) - parseInt(getStyle(parent, 'padding-left'), 10) - parseInt(getStyle(parent, 'padding-right'), 10);
+
+        } while( getStyle(parent, 'display') != 'block' && parent.nodeName.toLowerCase() != 'body' );
+
+        return width + 'px';
+    }
+
+    function setMirrorStyle(mirror, element, attrs) {
+        var style = $window.getComputedStyle(element[0]);
+        var defaultMaxWidth = style.maxWidth === 'none' ? getParentWidth(element) : style.maxWidth;
+        element.css('minWidth', attrs.puElasticInputMinwidth || style.minWidth);
+        element.css('maxWidth', attrs.puElasticInputMaxwidth || defaultMaxWidth);
+
+        angular.forEach(['fontFamily', 'fontSize', 'fontWeight', 'fontStyle',
+            'letterSpacing', 'textTransform', 'wordSpacing'], function(value) {
+            mirror.css(value, style[value]);
+        });
+
+        mirror.css('paddingLeft', style.textIndent);
+
+        if (style.boxSizing === 'border-box') {
+            angular.forEach(['paddingLeft', 'paddingRight',
+                'borderLeftStyle', 'borderLeftWidth',
+                'borderRightStyle', 'borderRightWidth'], function(value) {
+                mirror.css(value, style[value]);
+            });
+        } else if (style.boxSizing === 'padding-box') {
+            angular.forEach(['paddingLeft', 'paddingRight'], function(value) {
+                mirror.css(value, style[value]);
+            });
+        }
+    }
+
+    return {
+        restrict: 'A',
+        link: function postLink(scope, element, attrs) {
+
+            // Disable trimming inputs by default
+            attrs.$set('ngTrim', attrs.ngTrim === 'true' ? 'true' : 'false');
+
+            // Initial value of mirror is null character what should trigger initial width update
+            var mirror = angular.element('<span style="white-space:pre;">&#000;</span>');
+            setMirrorStyle(mirror, element, attrs);
+
+            wrapper.append(mirror);
+
+            function update() {
+
+                var newValue = element.val() || attrs.placeholder || '';
+
+                // If new value is the same value as previous one there is no need to update the styling
+                if ( mirror.text() == newValue ) return;
+
+                mirror.text( newValue );
+
+                var delta = parseInt(attrs.puElasticInputWidthDelta) || 1;
+                element.css('width', mirror.prop('offsetWidth') + delta + 'px');
+            }
+
+            update();
+
+            scope.$watch(attrs.ngModel, update);
+            element.on('keydown keyup focus input propertychange change', update);
+
+            scope.$on('$destroy', function() {
+                mirror.remove();
+            });
+        }
+    };
+}]);
+;angular.module('questCreator')
+.directive('focus', ['$timeout', '$parse', function ($timeout, $parse) {
+    return {
+        //scope: true,   // optionally create a child scope
+        link: function (scope, element, attrs) {
+            var model = $parse(attrs.focus);
+            scope.$watch(model, function (value) {
+                console.log('value=', value);
+                if (value === true) {
+                    $timeout(function () {
+                        element[0].focus();
+                    });
+                }
+            });
+        }
+    };
+}]);
 ;angular.module('questCreator')
 .directive('popup', function(){
   return {
@@ -771,19 +927,11 @@ angular.module('questCreator')
         user_id: UserService.get().id,
         token: UserService.get().token
       };
-      var eventInfo = {};
-      // Event categories:
-      // -typing
-      // -eventually more here
-      switch (type) {
-        case 'typing':
-          eventInfo = {
-            requirements: [],
-            words: [],
-            response: []
-          };
-          break;
-      }
+      var eventInfo = {
+        requirements: [],
+        triggers: [],
+        results: []
+      };
       var newEvent = {
         name: name,
         category: type,
@@ -1076,6 +1224,10 @@ angular.module('questCreator')
       title: 'Done',
       content: 'alert-game-archived.html'
     },
+    'event-prompt': {
+      title: 'Choose event type:',
+      content: 'event-prompt.html'
+    }
   };
 
   function templateSelector(name, scope) {
@@ -2334,6 +2486,7 @@ angular.module('questCreator')
   this.currentObject = null;
   this.currentEntity = null;
   this.currentScene = null;
+  this.currentEvent = null;
   //NOTE probably can remove:
   // this.currentSceneImg = {};
   //NOTE probably can remove^
@@ -2343,6 +2496,21 @@ angular.module('questCreator')
   this.availableObjects = [];
   this.availableEntities = [];
   this.availableEvents = [];
+  this.eventTypes = [
+    {
+      name: 'text',
+      description: 'Events triggered by text input.',
+    },
+    {
+      name: 'collision',
+      description: 'Events triggered by player position.'
+    }
+  ];
+  this.eventType = null;
+  this.eventRequirements = [
+    'inventory',
+    'achievement'
+  ];
   this.selectedAnimation = "walkLeft";
 
   this.currentColor = 'green';
@@ -2355,8 +2523,6 @@ angular.module('questCreator')
   this.modeledFrameIndex = 0; // For some reason ng-model is being wacky for the first click of navigating entity frames. This is the duct tape solution.
   this.dragIndex = null;
   this.dragAsset = null;
-
-  this.currentEvent = null;
 
   this.goToPalette = function (type) {
     self.selectingAssets = true;
@@ -2490,6 +2656,7 @@ angular.module('questCreator')
     var game_id = self.currentEditingGame.id;
     name = self.assetNamer(name, 'availableEntities');
     EditorService.createEntity(name, game_id).done(function(entity) {
+      PopupService.close();
       console.log("ent", entity);
       self.availableEntities.push(entity);
       self.currentEntity = entity;
@@ -2508,10 +2675,16 @@ angular.module('questCreator')
     $scope.$broadcast('redrawEntity', entity.info.animate[self.selectedAnimation][self.currentFrameIndex].image, entity.info.animate[self.selectedAnimation][self.currentFrameIndex].collisionMap);
   };
 
+  this.selectEventType = function(){
+    PopupService.open('event-prompt', $scope);
+  };
+
   this.createEvent = function(type) {
+    console.log("in createEvent");
     var name = "New Event";
     var game_id = self.currentEditingGame.id;
     EditorService.createEvent(name, type, game_id).done(function(event) {
+      PopupService.close();
       console.log(event);
       self.availableEvents.push(event);
       self.currentEvent = event;
@@ -3352,6 +3525,43 @@ angular.module('questCreator')
     touchMoveEvent = event.touches[0];
     moved = true;
   });
+});
+;angular.module('questCreator').controller('eventsCtrl', function($state, $scope) {
+  this.view = 'triggers';
+  this.newWord = null;
+  this.wordBuffer = {};
+  this.counter = 0;
+// DEBUG
+  this.log = function(){
+    console.log($scope.editor.currentEvent);
+  }
+
+  this.addWordList = function(word){
+    console.log(word);
+    if (!word) {
+      console.log("no word!");
+      return;
+    }
+    var newList = [word];
+    $scope.editor.currentEvent.info.triggers.push(newList);
+    this.newWord = null;
+    this.counter++;
+  }
+
+  this.addAlias = function(word, index){
+    if (!word) {
+      console.log("no word!");
+      return;
+    }
+    $scope.editor.currentEvent.info.triggers[index].push(word);
+    this.counter++;
+  };
+
+  this.bufferIndex = function(){
+    return this.counter;
+  }
+
+
 });
 ;angular.module('questCreator').controller('gameCtrl', function(socket, $state, $scope) {
 });
@@ -4282,6 +4492,12 @@ angular.module('questCreator')
       avatar: null,
       socketId: null
     };
+    var playerUpdate = {
+      id: null,
+      game: null,
+      scenePos: null,
+      socketId: null
+    };
     var allPlayers = [];
     var self = this;
     var playerInfo = {
@@ -4354,11 +4570,11 @@ angular.module('questCreator')
     }
 
     this.restoreGame = function(savedGame) {
-      self.saveInfo = savedGame;
-      self.startTime = Date.now() - (savedGame.time * 1000);
-      self.currentScenePos = savedGame.scenePos;
+      self.saveInfo = angular.copy(savedGame);
+      self.startTime = Date.now() - (angular.copy(savedGame.time) * 1000);
+      self.currentScenePos = angular.copy(savedGame.scenePos);
       updateLocation();
-      avatar.info.pos = savedGame.pos;
+      avatar.info.pos = angular.copy(savedGame.pos);
     }
 
     $('body').off('keyup').on('keyup', function(event) {
@@ -4391,8 +4607,14 @@ angular.module('questCreator')
                 }
                 if (!self.pause) {
                   avatar.action = (avatar.action === 'walkLeft') ? 'stand' : 'walkLeft';
-                  avatar.speed.x = (avatar.speed.x === -1 * avatar.speed.mag) ? 0 : -1 * avatar.speed.mag;
-                  avatar.speed.y = 0;
+                  playerUpdate = {
+                    id: angular.copy(fullPlayer.id),
+                    game: angular.copy(fullPlayer.game),
+                    scenePos: angular.copy(fullPlayer.scenePos),
+                    socketId: angular.copy(fullPlayer.socketId),
+                    action: angular.copy(avatar.action)
+                  };
+                  socket.emit('update player', playerUpdate);
                 }
             } else if (keyCode === 38) {
                 if (self.pause && $('.fileOption.active').length === 1 && $('.save.active').length === 0) {
@@ -4400,8 +4622,14 @@ angular.module('questCreator')
                 }
                 if (!self.pause) {
                   avatar.action = (avatar.action === 'walkUp') ? 'stand' : 'walkUp';
-                  avatar.speed.x = 0;
-                  avatar.speed.y = (avatar.speed.y === -1 * avatar.speed.mag) ? 0 : -1 * avatar.speed.mag;
+                  playerUpdate = {
+                    id: angular.copy(fullPlayer.id),
+                    game: angular.copy(fullPlayer.game),
+                    scenePos: angular.copy(fullPlayer.scenePos),
+                    socketId: angular.copy(fullPlayer.socketId),
+                    action: angular.copy(avatar.action)
+                  };
+                  socket.emit('update player', playerUpdate);
                 }
             } else if (keyCode === 39) {
                 if (self.pause && $('.timeOption.active').length === 0) {
@@ -4409,8 +4637,14 @@ angular.module('questCreator')
                 }
                 if (!self.pause) {
                   avatar.action = (avatar.action === 'walkRight') ? 'stand' : 'walkRight';
-                  avatar.speed.x = (avatar.speed.x === avatar.speed.mag) ? 0 : avatar.speed.mag;
-                  avatar.speed.y = 0;
+                  playerUpdate = {
+                    id: angular.copy(fullPlayer.id),
+                    game: angular.copy(fullPlayer.game),
+                    scenePos: angular.copy(fullPlayer.scenePos),
+                    socketId: angular.copy(fullPlayer.socketId),
+                    action: angular.copy(avatar.action)
+                  };
+                  socket.emit('update player', playerUpdate);
                 }
             } else if (keyCode === 40) {
                 if (self.pause && $('.fileOption.active').length === 1 && $('.restore.active').length === 0) {
@@ -4418,8 +4652,14 @@ angular.module('questCreator')
                 }
                 if (!self.pause) {
                   avatar.action = (avatar.action === 'walkDown') ? 'stand' : 'walkDown';
-                  avatar.speed.x = 0;
-                  avatar.speed.y = (avatar.speed.y === avatar.speed.mag) ? 0 : avatar.speed.mag;
+                  playerUpdate = {
+                    id: angular.copy(fullPlayer.id),
+                    game: angular.copy(fullPlayer.game),
+                    scenePos: angular.copy(fullPlayer.scenePos),
+                    socketId: angular.copy(fullPlayer.socketId),
+                    action: angular.copy(avatar.action)
+                  };
+                  socket.emit('update player', playerUpdate);
                 }
             } else if (keyCode === 191) {
               // Forward slash
@@ -4442,7 +4682,7 @@ angular.module('questCreator')
                     self.typing.show = false;
                     var userPhrase = self.typing.phrase;
                     self.typing.phrase = '';
-                    checkTyping(userPhrase);
+                    checkTypingEvents(userPhrase);
                 } else if (self.responding.show) { // If the user is finished reading a response
                     self.responding.show = false;
                     self.responding.phrase = '';
@@ -4473,7 +4713,7 @@ angular.module('questCreator')
             }
         });
 
-    function checkTyping(phrase) {
+    function checkTypingEvents(phrase) {
       var foundEvent = false; // Whether a typing event has already been triggered
       events.typing.forEach(function(typingEvent) { // Loop through all the typing events
         if (!foundEvent) {  // Only continue checking as long as another event has already not been triggered
@@ -4497,6 +4737,8 @@ angular.module('questCreator')
                 if (!possibleMatch) { // If the the entire wordSet was passed through without finding a match, then the entire trigger fails
                   triggerSatisfied = false;
                   self.responding.phrase = 'I have literally no idea what you just said.';  // If the trigger failed, set the response to a standard default
+                  self.responding.show = true;
+                  self.pause = true;
                 }
             });
             if (triggerSatisfied) {
@@ -4504,6 +4746,8 @@ angular.module('questCreator')
               typingEvent.results.forEach(function(result) {
                 if (result.type === 'text') {
                   self.responding.phrase = result.value;
+                  self.responding.show = true;
+                  self.pause = true;
                 }
                 if (result.type === 'inventory') {
                   self.saveInfo.inventory.push(result.value);
@@ -4512,13 +4756,62 @@ angular.module('questCreator')
                   self.saveInfo.achievements.push(result.name);
                   self.saveInfo.score += result.value;
                 }
+                if (result.type === 'teleport') {
+                  self.currentScenePos = angular.copy(result.scenePos);
+                  updateLocation();
+                  avatar.info.pos = angular.copy(result.pos);
+                }
               });
             }
           }
         }
       });
-      self.responding.show = true;
-      self.pause = true;
+    }
+
+    function checkLocationEvents(avatarBounds) {
+      var foundEvent = false; // Whether a typing event has already been triggered
+      events.location.forEach(function(locationEvent) { // Loop through all the typing events
+        if (!foundEvent) {  // Only continue checking as long as another event has already not been triggered
+          var requirementsMet = true;   // Assume that the requirements will be met
+          locationEvent.requirements.forEach(function(requirement) {  // Loop through all the requirements
+            if (requirement.type === 'achievement' && self.saveInfo.achievements.indexOf(requirement.value) === -1) { // If an achievement is required, check the player's past achievements
+              requirementsMet = false;  // Requirements fail if achievement is not present
+            } else if (requirement.type === 'inventory' && self.saveInfo.inventory.indexOf(requirement.value) === -1) { // If an inventory item is required, check the player's inventory
+              requirementsMet = false;  // Requirements fail if inventory does not contain necessary item
+            }
+          });
+          if (requirementsMet) {  // If all the requirements have been met, check the event's triggers
+            var triggerSatisfied = false;  // Assume that the trigger conditions will not be met
+            locationEvent.trigger.forEach(function(bounds) {  // Compare the avatar's bounds with the locationEvent's trigger bounds
+              if (avatarBounds.left <= bounds.right && avatarBounds.right >= bounds.left && avatarBounds.top <= bounds.bottom && avatarBounds.bottom >= bounds.top) {
+                triggerSatisfied = true;
+              }
+            });
+            if (triggerSatisfied) {
+              foundEvent = true;
+              locationEvent.results.forEach(function(result) {
+                if (result.type === 'text') {
+                  self.responding.phrase = result.value;
+                  self.responding.show = true;
+                  self.pause = true;
+                }
+                if (result.type === 'inventory') {
+                  self.saveInfo.inventory.push(result.value);
+                }
+                if (result.type === 'achievement') {
+                  self.saveInfo.achievements.push(result.name);
+                  self.saveInfo.score += result.value;
+                }
+                if (result.type === 'teleport') {
+                  self.currentScenePos = angular.copy(result.scenePos);
+                  updateLocation();
+                  avatar.info.pos = angular.copy(result.pos);
+                }
+              });
+            }
+          }
+        }
+      });
     }
 
     function checkAvatarBounds() {
@@ -4548,6 +4841,7 @@ angular.module('questCreator')
             width: right - left,
             height: bottom - top
         };
+        checkLocationEvents(avatar.bounds);
         if (avatar.bounds.right < 0) { // Character moves to the left scene
             self.currentScenePos[2]--;
             if (self.currentScenePos[2] < 0) {
@@ -4600,13 +4894,13 @@ angular.module('questCreator')
                     if (avatarLeft <= bgRight && avatarRight >= bgLeft && avatarTop <= bgBottom && avatarBottom >= bgTop) {
                         collision.found = true;
                         collision.type = 'wall';
-                        if (avatar.speed.x > 0) {
+                        if (avatar.info.speed.x > 0) {
                             collision.direction = 'right';
-                        } else if (avatar.speed.x < 0) {
+                        } else if (avatar.info.speed.x < 0) {
                             collision.direction = 'left';
-                        } else if (avatar.speed.y < 0) {
+                        } else if (avatar.info.speed.y < 0) {
                             collision.direction = 'up';
-                        } else if (avatar.speed.y > 0) {
+                        } else if (avatar.info.speed.y > 0) {
                             collision.direction = 'down';
                         }
                     }
@@ -4652,13 +4946,13 @@ angular.module('questCreator')
                       if (avatarLeft <= objRight && avatarRight >= objLeft && avatarTop <= objBottom && avatarBottom >= objTop) {
                           collision.found = true;
                           collision.type = 'wall';
-                          if (avatar.speed.x > 0) {
+                          if (avatar.info.speed.x > 0) {
                               collision.direction = 'right';
-                          } else if (avatar.speed.x < 0) {
+                          } else if (avatar.info.speed.x < 0) {
                               collision.direction = 'left';
-                          } else if (avatar.speed.y < 0) {
+                          } else if (avatar.info.speed.y < 0) {
                               collision.direction = 'up';
-                          } else if (avatar.speed.y > 0) {
+                          } else if (avatar.info.speed.y > 0) {
                               collision.direction = 'down';
                           }
                       }
@@ -4705,13 +4999,13 @@ angular.module('questCreator')
                     if (avatarLeft <= entRight && avatarRight >= entLeft && avatarTop <= entBottom && avatarBottom >= entTop) {
                         collision.found = true;
                         collision.type = 'wall';
-                        if (avatar.speed.x > 0) {
+                        if (avatar.info.speed.x > 0) {
                             collision.direction = 'right';
-                        } else if (avatar.speed.x < 0) {
+                        } else if (avatar.info.speed.x < 0) {
                             collision.direction = 'left';
-                        } else if (avatar.speed.y < 0) {
+                        } else if (avatar.info.speed.y < 0) {
                             collision.direction = 'up';
-                        } else if (avatar.speed.y > 0) {
+                        } else if (avatar.info.speed.y > 0) {
                             collision.direction = 'down';
                         }
                     }
@@ -4923,7 +5217,6 @@ angular.module('questCreator')
     function updateAvatar() {
       avatar.updatePos();
       fullPlayer.avatar = avatar;
-      // socket.emit('update player', fullPlayer);
     }
 
     function updateEntities() {
@@ -4932,25 +5225,13 @@ angular.module('questCreator')
       });
     }
 
-    function checkAvatarAction() {
-      avatar.info.currentFrameIndex = avatar.info.currentFrameIndex || 0;
-        if (avatar.action === 'walkLeft' || avatar.action === 'walkUp' || avatar.action === 'walkRight' || avatar.action === 'walkDown') {
-            if (avatar.info.currentFrameIndex > avatar.info.animate[avatar.action].length - 1) {
-                avatar.info.currentFrameIndex = 0;
-            }
-            avatar.info.currentFrame = avatar.info.animate[avatar.action][avatar.info.currentFrameIndex];
-            avatar.info.currentFrameIndex++;
-        } else {
-            // Do nothing, or set frame to a given specific frame.
-            // avatar.info.currentFrame = avatar.info.animate.walkLeft[0];
-        }
-    }
-
     function drawAvatar(avatarToDraw) {
+        avatarToDraw.checkAction();
         // Save the drawing context
         gameCtx.save();
         // Translate the canvas origin to be the top left of the avatarToDraw
         gameCtx.translate(avatarToDraw.info.pos.x, avatarToDraw.info.pos.y);
+        gameCtx.scale(avatarToDraw.scale, avatarToDraw.scale);
         // Draw the squares from the avatarToDraw's current frame
         avatarToDraw.info.currentFrame.image.forEach(function(square) {
             gameCtx.fillStyle = square.color;
@@ -4958,10 +5239,12 @@ angular.module('questCreator')
         });
         gameCtx.globalAlpha = 0.2;
         // Draw the avatarToDraw's collision map (purely for testing)
-        avatarToDraw.info.currentFrame.collisionMap.forEach(function(square) {
-            gameCtx.fillStyle = square.color;
-            gameCtx.fillRect(square.x, square.y, square.width, square.height);
-        });
+        if (avatarToDraw.info.currentFrame.collisionMap.length > 0) {
+          avatarToDraw.info.currentFrame.collisionMap.forEach(function(square) {
+              gameCtx.fillStyle = square.color;
+              gameCtx.fillRect(square.x, square.y, square.width, square.height);
+          });
+        }
         gameCtx.restore();
     }
 
@@ -5003,35 +5286,12 @@ angular.module('questCreator')
 
     function drawObjects(type) {
       if (objects) {
-        // objects.sort(function(objectA, objectB) {
-        //   if (!objectA.bounds) {
-        //     objectA.bounds.bottom = null;
-        //   }
-        //   if (!objectB.bounds) {
-        //     objectB.bounds.bottom = null;
-        //   }
-        //   if (objectA.bounds.bottom < objectB.bounds.bottom) {
-        //     return 1;
-        //   } else {
-        //     return -1;
-        //   }
-        // });
         objects.forEach(function(object) {
 
             // Save the drawing context
             gameCtx.save();
             // Translate the canvas origin to be the top left of the object
             gameCtx.translate(object.info.pos.x, object.info.pos.y);
-            // If object has collision map bounds, check avatar location. Otherwise, draw behind character by default.
-            // if (object.bounds) {
-            //   if (avatar.bounds.top > object.bounds.bottom) {
-            //     gameCtx.globalCompositeOperation = "destination-over";  // If object is behind character.
-            //   } else {
-            //     gameCtx.globalCompositeOperation = "source-over"; // If object is in front of character.
-            //   }
-            // } else {
-            //   gameCtx.globalCompositeOperation = "destination-over";  // If object is behind character.
-            // }
             if (object.bounds) {
               if ( (avatar.bounds.top > object.bounds.bottom && type === 'background') || (avatar.bounds.top < object.bounds.bottom && type === 'foreground') ) {
                 // Draw the squares from the object's current frame
@@ -5074,16 +5334,6 @@ angular.module('questCreator')
             // Translate the canvas origin to be the top left of the entity
             gameCtx.translate(entity.info.pos.x, entity.info.pos.y);
             gameCtx.scale(entity.scale, entity.scale);
-            // If entity has collision map bounds, check avatar location. Otherwise, draw behind character by default.
-            // if (entity.bounds) {
-            //   if (avatar.bounds.top > entity.bounds.bottom) {
-            //     gameCtx.globalCompositeOperation = "destination-over";  // If entity is behind character.
-            //   } else {
-            //     gameCtx.globalCompositeOperation = "source-over"; // If entity is in front of character.
-            //   }
-            // } else {
-            //   gameCtx.globalCompositeOperation = "destination-over";  // If entity is behind character.
-            // }
             if (entity.bounds) {
               if ( (avatar.bounds.top > entity.bounds.bottom && type === 'background') || (avatar.bounds.top < entity.bounds.bottom && type === 'foreground') ) {
                 // Draw the squares from the entity's current frame
@@ -5202,7 +5452,53 @@ angular.module('questCreator')
                 },
                 {
                   type: 'achievement',
+                  value: 10
+                }
+              ]
+            },
+            {
+              requirements: [
+              ],
+              trigger: [ ['apparate'] ],
+              results: [
+                {
+                  type: 'text',
+                  value: "Welcome to Hogwarts!"
+                },
+                {
+                  type: 'teleport',
+                  scenePos: [2,1,0],
+                  pos: {
+                    x: 350,
+                    y: 250
+                  }
+                },
+                {
+                  type: 'achievement',
                   value: 100
+                }
+              ]
+            }
+          ],
+          location: [
+            {
+              requirements: [],
+              trigger: [
+                {
+                  left: 0,
+                  right: 700,
+                  top: 450,
+                  bottom: 500
+                }
+              ],
+              results: [
+                {
+                  type: 'teleport',
+                  scenePos: [1,2,0],
+                  pos: {
+                    x: 350,
+                    y: 250
+                  }
                 }
               ]
             }
@@ -5223,6 +5519,7 @@ angular.module('questCreator')
 
     function loadMainCharacter() {
         UserService.getPlayerAvatar().done(function(playerAvatar) {
+          console.log(playerAvatar);
           avatar = new Avatar(playerAvatar);
           avatar.info.pos.x = startPos.x;
           avatar.info.pos.y = startPos.y;
@@ -5231,7 +5528,6 @@ angular.module('questCreator')
           fullPlayer.avatar = avatar;
           initSocket();
           socket.emit('game joined', fullPlayer);
-          setInterval(checkAvatarAction, 75);
         });
     }
 
@@ -5306,10 +5602,18 @@ angular.module('questCreator')
     });
 
     socket.off('update player');
-    socket.on('update player', function(player) {
+    socket.on('update player', function(playerUpdate) {
+      // playerUpdate = {
+      //   id: angular.copy(fullPlayer.id),
+      //   game: angular.copy(fullPlayer.game),
+      //   scenePos: angular.copy(fullPlayer.scenePos),
+      //   socketId: angular.copy(fullPlayer.socketId),
+      //   action: avatar.action
+      // };
       for (var index = 0; index < allPlayers.length; index++) {
         if (allPlayers[index].id === player.id) {
-          allPlayers[index] = player;
+          allPlayers[index].action = playerUpdate.action;
+          allPlayers[index].scenePos = playerUpdate.scenePos;
         }
       }
     });
@@ -5349,17 +5653,6 @@ angular.module('questCreator')
     });
   }
 });
-
-// Not currently animating objects
-// var currentSceneObjFrameIndex = 0;
-// function checkSceneObjectAction() {
-//   // Animate the object.
-//   if (currentSceneObjFrameIndex > sceneObject.info.animate[sceneObject.allActions[0]].length - 1) {
-//     currentSceneObjFrameIndex = 0;
-//   }
-//   sceneObject.info.currentFrame = sceneObject.info.animate[sceneObject.allActions[0]][currentSceneObjFrameIndex];
-//   currentSceneObjFrameIndex++;
-// }
 ;angular.module('questCreator').controller('profileCtrl', function(socket, $state, $scope, UserService) {
 
     $scope.showReqs = false;
@@ -5518,6 +5811,8 @@ angular.module('questCreator')
 ;angular.module('questCreator').controller('sceneCtrl', function(socket, $state, $scope, $compile) {
   var self = this;
 
+  this.view = 'events';
+
   this.selecting = {
     background: false,
     object: false,
@@ -5579,33 +5874,6 @@ angular.module('questCreator')
     $scope.apply;
   };
 
-
-});
-;angular.module('questCreator').controller('scriptsCtrl', function($state) {
-  this.possibleRequirements = [
-    {
-      type: 'Inventory',
-      value: ''
-    },
-    {
-      type: 'Achievement',
-      value: 0
-    },
-    {
-      type: 'Location',
-      value: [1, 0, 0, 350, 250]
-    }
-  ];
-  this.possibleResults = [
-    {
-      type: 'Inventory',
-      value: ''
-    },
-    {
-      type: 'Achievement',
-      value: ''
-    }
-  ];
 });
 ;if (false) {
 
