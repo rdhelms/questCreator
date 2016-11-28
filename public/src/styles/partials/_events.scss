@@ -44,7 +44,7 @@
   .preview-step {
     height: 68px;
     width: 25%;
-    background: $white;
+    background-color: $white;
     color: black;
     box-shadow: 8px 8px 0 0 $medgrey;
     font-size: .75em;
@@ -54,11 +54,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: box-shadow 1s ease, background .5s ease, color .5s ease;
+    transition: box-shadow 1s ease, background-color .5s ease, color .5s ease;
 
     &:hover {
-      transition: background .5s ease, color .5s ease;
-      background: $darkgrey;
+      transition: background-color .5s ease, color .5s ease;
+      background-color: $darkgrey;
       color: $white;
       cursor: pointer;
     }
@@ -142,35 +142,46 @@
 
 //TEXT RESULT:
 
-#event-results, #event-requirements {
+.event-section {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   height: 100%;
 
-  #result-menu, #requirement-menu {
+  .event-menu {
     flex: 1;
+  }
 
-    .menu-item {
-      cursor: pointer;
-      padding: 2px;
-      margin: 2px;
-      display: flex;
-      justify-content: space-between;
+  .menu-item {
+    cursor: pointer;
+    padding: 2px;
+    margin: 2px;
+    display: flex;
+    justify-content: space-between;
 
-      &:hover, &.active {
-        background: $darkgrey;
-        color: $white;
-      }
-
+    &#map-menu, #scene-menu {
+      max-width: 165px; //overflow fix
     }
+
+    span, button {
+      min-width: 0px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &:hover, &.active {
+      background: $darkgrey;
+      color: $white;
+    }
+
   }
 
   button {
     border: none;
   }
 
-  #result-type, #requirement-type {
+  .menu-type {
     flex: 2;
 
     textarea {

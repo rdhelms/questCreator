@@ -10,6 +10,8 @@
       <button ng-click="events.save(editor.currentEvent)">Save</button>
     </div>
 
+  <!-- PREVIEW -->
+
     <div class="event-edit" id="preview">
       <ul id="preview-pane">
 
@@ -22,9 +24,9 @@
         </li>
         <li class="arrow">-></li>
 
-        <li class="preview-step" ng-click="events.view = 'triggers'">
+        <li class="preview-step" ng-click="events.view = 'triggers'" ng-style="editor.setThumbnail(events.scene.background)">
           <ul class="preview-list">
-            <li ng-if="editor.currentEvent.info.triggers.length === 0" class="default">
+            <li ng-if="editor.currentEvent.info.triggers.length === 0 && !events.bgApplied" class="default">
               -Triggers-
             </li>
             <li ng-repeat="trigger in editor.currentEvent.info.triggers">
@@ -76,15 +78,15 @@
         <h5>Results</h5>
       </li>
     </ul>
-    
+
     <div class="event-edit" id="edit">
 
     <!-- REQUIREMENTS -->
       <section ng-show="events.view === 'requirements'">
         <h4>Event Requirements: {{events.requirementType}}</h4>
-          <section id="event-requirements">
+          <section class="event-section">
 
-            <span id="requirement-menu">
+            <span class="event-menu">
               <ul>
                 <li class="menu-item" ng-class="{'active': events.requirementType === 'achievement'}" ng-click="events.requirementType='achievement'">
                   <span>Achievement:</span>
@@ -98,7 +100,7 @@
             </span>
 
 
-            <span id="requirement-type">
+            <span class="menu-type">
 
               <div class="requirement-value" ng-if="events.resultType==='achievement' && editor.currentEvent.info.results.achievements > 0">
                 <ul>
@@ -116,8 +118,11 @@
           </section>
 
       </section>
+
     <!-- TRIGGERS -->
+
       <section ng-show="events.view === 'triggers'">
+
       <!-- TEXT TRIGGERS -->
         <section ng-if="editor.currentEvent.category === 'text'">
           <h4>Event Keywords:</h4>
@@ -145,15 +150,52 @@
             </li>
           </ul>
         </section>
+
+      <!-- COLLISION TRIGGERS -->
+
+        <section ng-if="editor.currentEvent.category === 'collision'">
+          <h4>Event Collision Data:</h4>
+        <!-- SCENE SELECTOR VIEW -->
+
+          <section class="event-section" ng-if="events.collisionView === 'scene'">
+
+            <span class="event-menu" id="map-menu">
+              <p>Maps:</p>
+              <ul ng-if="editor.currentEditingGame.info.maps.length > 1">
+                <li class="menu-item" ng-repeat="map in editor.currentEditingGame.info.maps track by $index" ng-click="events.map = editor.currentEditingGame.info.maps[$index]" ng-class="{'active': events.map === editor.currentEditingGame.info.maps[$index]}" ng-hide="$first">
+                  <span>{{map.name}}</span>
+                  <button>-></button>
+                </li>
+              </ul>
+              <p ng-if="editor.currentEditingGame.info.maps.length <= 1">Make a new map silly!!</p>
+            </span>
+
+            <span class="menu-type" id="scene-menu">
+              <p ng-show="events.map">Scenes in {{events.map.name}}:</p>
+              <ul  ng-if="events.map" ng-repeat="row in events.map.scenes track by $index" ng-init="mapRow = $index">
+                <li class="menu-item" ng-repeat="scene in row track by $index" ng-click="events.selectScene(events.map.scenes[mapRow][$index])" ng-class="{'active': events.scene === events.map.scenes[mapRow][$index]}">
+                  <span>{{scene.name}}</span>
+                  <button disabled>set</button>
+                </li>
+              </ul>
+              <p ng-if="events.map.scenes.length === 0">Make a new scene silly!!</p>
+            </span>
+
+          </section>
+
+        </section>
+
+
       </section>
+
 
 
     <!-- RESULTS -->
       <section ng-show="events.view === 'results'">
         <h4>Event Results: {{events.resultType | capitalize}}</h4>
       <!-- TEXT RESULTS -->
-        <section id="event-results">
-          <span id="result-menu">
+        <section class="event-section">
+          <span class="event-menu">
             <ul>
               <li class="menu-item" ng-class="{'active': events.resultType === 'text'}" ng-click="events.resultType='text'">
                 <span>Text:</span>
@@ -175,7 +217,7 @@
           </span>
 
 
-          <span id="result-type">
+          <span class="menu-type">
 
             <div class="result-value" ng-if="events.resultType==='text' && editor.currentEvent.info.results.text.length > 0">
               <div class="value text" ng-repeat="response in editor.currentEvent.info.results.text track by $index">

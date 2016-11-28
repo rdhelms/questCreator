@@ -2,12 +2,17 @@ angular.module('questCreator').controller('eventsCtrl', function($state, $scope,
   this.view = 'triggers';
   this.resultType = 'text';
   this.requirementType = 'achievement';
+  this.collisionView = 'scene';
+  this.map = null;
+  this.scene = null;
+  this.bgApplied = null;
   this.newWord = null;
   this.wordBuffer = {};
   this.counter = 0;
 // DEBUG
   this.log = function(){
     console.log($scope.editor.currentEvent);
+    console.log("maps: ", $scope.editor.currentEditingGame.info.maps);
   }
 
   this.save = function(event) {
@@ -45,6 +50,18 @@ angular.module('questCreator').controller('eventsCtrl', function($state, $scope,
   this.bufferIndex = function() {
     return this.counter;
   }
+
+//COLLISION:
+
+  this.selectScene = function(scene){
+    console.log(scene);
+    this.scene = scene;
+    if ($scope.editor.setThumbnail(scene.background)["background-image"] === "none") {
+      this.bgApplied = false;
+    } else {
+      this.bgApplied = true;
+    }
+  };
 
 ////
 //RESULTS:
