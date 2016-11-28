@@ -5610,14 +5610,15 @@ angular.module('questCreator')
       //   socketId: angular.copy(fullPlayer.socketId),
       //   action: avatar.action
       // };
+      console.log(playerUpdate);
       for (var index = 0; index < allPlayers.length; index++) {
         if (allPlayers[index].id === playerUpdate.id) {
           allPlayers[index].action = playerUpdate.action;
           allPlayers[index].scenePos = playerUpdate.scenePos;
         }
       }
+      console.log(allPlayers);
     });
-    
 
     // When I submit a chat message, send it to the server along with the game I'm playing
     $('.chat-submit').submit(function(){
