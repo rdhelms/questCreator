@@ -3,7 +3,9 @@ angular.module('questCreator').controller('landingCtrl', function($state, $scope
     this.searching = false;
     var self = this;
 
-    this.allGames = GameService.getGames().done(function(response) {
+    GameService.getGames().done(function(response) {
+      self.allGames = response;
+      console.log(self.allGames);
         $scope.$apply();
     });
 
@@ -26,14 +28,17 @@ angular.module('questCreator').controller('landingCtrl', function($state, $scope
 
     this.searchGames = function (keyword) {
         this.searching = true;
-        this.allGames = GameService.searchGames(keyword).done(function (response) {
+        GameService.searchGames(keyword).done(function (response) {
+          self.allGames = response;
+          console.log(self.allGames);
           $scope.$apply();
         });
     };
 
     this.showAll = function () {
         this.searching = false;
-        this.allGames = GameService.getGames().done(function(response) {
+        GameService.getGames().done(function(response) {
+          self.allGames = response;
             $scope.$apply();
         });
     };

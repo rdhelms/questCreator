@@ -1,39 +1,71 @@
 #landing-container {
     display: flex;
-    height: 90vh;
+    height: 100vh;
     overflow-x: hidden;
 
     main {
         flex: 3;
         padding: 2rem;
 
+        .landing-header {
+          margin: 15px 0;
+        }
+
         #game-results {
+
             background: $medgrey;
             padding: 2rem;
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
             justify-content: space-around;
-            height: 90%;
+            height: 95%;
             overflow-y: auto;
             border: 4px black solid;
-        }
 
-        .game {
+            .game {
+                margin: 15px;
+                width: 300px;
+                border: 4px solid black;
+                background: $white;
+                box-shadow: 8px 8px 0 0 $darkgrey;
 
-          li {
+                img {
+                    width: 100%;
+                }
 
-            span {
-              min-width: 0;
-              max-width: 100%;
+                ul {
+                    font-size: 0.75em;
+
+                    li {
+                        color: grey;
+                        display: flex;
+                        justify-content: flex-start;
+                        padding: 0.5em;
+
+                        &:nth-child(odd) {
+                            background: whitesmoke;
+                        }
+
+                        &:nth-child(even) {
+                            background: $lightgrey;
+                        }
+
+                        span {
+                          min-width: 0;
+                          max-width: 100%;
+                          color: black;
+                        }
+
+                        .game-name {
+                          text-overflow: ellipsis;
+                          overflow: hidden;
+                          white-space: normal;
+                        }
+                    }
+                }
             }
 
-            .game-name {
-              text-overflow: ellipsis;
-              overflow: hidden;
-              white-space: normal;
-            }
-          }
         }
     }
 
@@ -44,11 +76,18 @@
         flex-direction: column;
         align-items: center;
         justify-content: space-around;
-        overflow: initial;
+        // overflow: initial;
 
         h1 {
             font-size: 3em;
            }
+
+        p {
+          font-weight: bold;
+          font-size: 1.3em;
+          font-style: italic;
+          color: $deepgrey;
+        }
 
         button {
             overflow: hidden;
@@ -56,41 +95,6 @@
 
             &::after {
                 @include sheen();
-            }
-        }
-    }
-}
-
-.game {
-    margin: 15px;
-    width: 300px;
-    border: 4px solid black;
-    background: $white;
-    box-shadow: 8px 8px 0 0 $darkgrey;
-
-    img {
-        width: 100%;
-    }
-
-    ul {
-        font-size: 0.75em;
-
-        li {
-            color: grey;
-            display: flex;
-            justify-content: flex-start;
-            padding: 0.5em;
-
-            &:nth-child(odd) {
-                background: whitesmoke;
-            }
-
-            &:nth-child(even) {
-                background: $lightgrey;
-            }
-
-            span {
-                color: black;
             }
         }
     }
