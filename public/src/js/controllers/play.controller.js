@@ -1115,6 +1115,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
     socket.off('draw new player');
     socket.on('draw new player', function(newPlayer) {
+      console.log(newPlayer);
       var newFullPlayer = new Avatar(newPlayer);
       allPlayers.push(newFullPlayer);
       var response = {
