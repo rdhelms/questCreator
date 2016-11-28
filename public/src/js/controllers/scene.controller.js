@@ -16,7 +16,7 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
     console.log(background);
     $scope.editor.currentScene.background = background;
     self.selecting.background = false;
-  }
+  };
 
   this.selectObject = function(object) {
     if (!object) {
@@ -26,7 +26,7 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
     $scope.editor.currentScene.objects.push(object);
     // this.placeAsset(object, 'object');
     self.selecting.object = false;
-  }
+  };
 
   this.selectEntity = function(entity) {
     if (!entity) {
@@ -37,7 +37,7 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
     console.log($scope.editor.currentScene.entities);
     // this.placeAsset(entity, 'entity');
     self.selecting.entity = false;
-  }
+  };
 
   this.removeAsset = function(index, type){
     $scope.editor.currentScene[type].splice(index, 1);
