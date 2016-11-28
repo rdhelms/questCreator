@@ -76,13 +76,13 @@
                       <input type="button" class="search-button" title="Click to browse backgrounds to add to your palette." ng-click="editor.goToPalette('backgrounds')">
                     </div>
                     <ul>
-                        <li ng-click="editor.createBackground()">
+                        <li ng-click="editor.createBackground(); editor.currentLargeView = 'background'">
                             <div class="asset new">
                               <div class="asset-name new">+</div>
                             </div>
                             <div class="asset-name new">...</div>
                         </li>
-                        <li ng-repeat="background in editor.availableBackgrounds | orderBy:'-'" ng-click="editor.editBackground(background)">
+                        <li ng-repeat="background in editor.availableBackgrounds | orderBy:'-'" ng-click="editor.editBackground(background); editor.currentLargeView = 'background'">
                             <div class="asset available {{background.name | nospace}}" ng-style="editor.setThumbnail(background)"></div>
                             <div class="asset-name">{{background.name}}</div>
                         </li>
