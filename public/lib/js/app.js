@@ -2759,7 +2759,7 @@ angular.module('questCreator')
     $('.asset.available').draggable({
       helper: function(){
         var url = self.dragAsset.asset.thumbnail;
-        return $('<img>').attr('src', url);
+        return $('<img>').attr('src', url).appendTo('#editor');
       },
       start: function(event, ui) {
         $(ui.helper).addClass('grabbed');
@@ -5902,7 +5902,7 @@ angular.module('questCreator')
     }
     console.log(object);
     $scope.editor.currentScene.objects.push(object);
-    this.placeAsset(object, 'object');
+    // this.placeAsset(object, 'object');
     self.selecting.object = false;
   }
 
@@ -5913,7 +5913,7 @@ angular.module('questCreator')
     console.log($scope.editor.currentScene.entities);
     $scope.editor.currentScene.entities.push(entity);
     console.log($scope.editor.currentScene.entities);
-    this.placeAsset(entity, 'entity');
+    // this.placeAsset(entity, 'entity');
     self.selecting.entity = false;
   }
 
