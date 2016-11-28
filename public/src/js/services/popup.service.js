@@ -12,6 +12,10 @@ angular.module('questCreator')
       title: 'Hey, you\'re new!',
       content: 'user-register.html'
     },
+    'edit-username': {
+      title: 'Change your name:',
+      content: 'edit-username.html'
+    },
     'edit-game': {
       title: 'Awesome! Now you\'re editing:',
       content: 'edit-game.html'

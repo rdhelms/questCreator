@@ -152,5 +152,19 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
             }
         };
 
+        $scope.openToEdit = function () {
+            PopupService.open('edit-username', $scope);
+        };
+
+        $scope.cancel = function () {
+          PopupService.close();
+        };
+
+        $scope.editUsername = function (newName) {
+          console.log('here');
+          PopupService.close();
+          $scope.user.username = newName;
+          UserService.editUsername(newName);
+        };
     });
 });

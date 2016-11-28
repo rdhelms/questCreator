@@ -163,6 +163,28 @@ angular.module('questCreator')
             });
         }
 
+        function editUsername(newName) {
+          console.log(newName);
+            user.username = newName;
+            return $.ajax({
+              method: 'PATCH',
+              url: 'https://forge-api.herokuapp.com/users/update',
+              headers: {
+                  user_id: user.id,
+                  token: user.token
+              },
+              data: {
+                username: newName
+              },
+              success: function (response) {
+                return response;
+              },
+              error: function (error) {
+
+              }
+            });
+        }
+
         function getUserGames() {
             return $.ajax({
                 method: 'GET',
@@ -423,6 +445,7 @@ angular.module('questCreator')
             getPlayerAvatar: getPlayerAvatar,
             archive: archiveGame,
             register: registerUser,
+            editUsername: editUsername,
             signOut: signOut,
             signIn: signIn,
             checkLogin: checkLogin
