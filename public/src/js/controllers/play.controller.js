@@ -544,6 +544,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
             switch (collision.type) {
                 case 'wall':
                     avatar.collide(collision.direction);
+                    playerUpdate = {
+                      id: angular.copy(fullPlayer.id),
+                      game: angular.copy(fullPlayer.game),
+                      scenePos: angular.copy(fullPlayer.scenePos),
+                      socketId: angular.copy(fullPlayer.socketId),
+                      action: angular.copy(avatar.action)
+                    };
+                    socket.emit('update player', playerUpdate);
                     break;
             }
             collision = {
