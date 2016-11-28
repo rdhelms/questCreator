@@ -1,16 +1,4 @@
 angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, GameService, $state, $scope, PopupService) {
-    $scope.settings = {
-          "play": { "x": 0, "y": 0, "w": 31, "h": 30, "show": true},
-          "next": { "x": 32, "y": 0, "w": 17, "h": 11, "show": true},
-          "art": { "x": 50, "y": 0, "w": 100, "h": 100, "show": true},
-          "currenttitle": { "x": 201, "y": 0, "w": 300, "h": 30,
-            "styles": { "font-family": "PCSenior;src:url('fonts/pc_senior/pcsenior.ttf')", "color": "pink"}
-          }
-    };
-    $scope.musicControl = function(){
-      var $playerWindow = $('#bandcamp-music')[0].contentWindow;
-      $playerWindow.play();
-    };
 
     var fullPlayer = {
       id: null,
@@ -88,7 +76,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       self.allSavedGames.push(newSave);
       // Call to POST save game to database here
       self.saveInfo.name = '';
-    }
+    };
 
     this.restoreGame = function(savedGame) {
       self.saveInfo = savedGame;
@@ -96,7 +84,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       self.currentScenePos = savedGame.scenePos;
       updateLocation();
       avatar.info.pos = savedGame.pos;
-    }
+    };
 
     $('body').off('keyup').on('keyup', function(event) {
             var keyCode = event.which;
