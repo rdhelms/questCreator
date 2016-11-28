@@ -5,14 +5,12 @@ angular.module('questCreator').controller('eventsCtrl', function($state, $scope,
   this.collisionView = 'scene';
   this.map = null;
   this.scene = null;
-  this.bgApplied = null;
   this.newWord = null;
   this.wordBuffer = {};
   this.counter = 0;
 // DEBUG
   this.log = function(){
     console.log($scope.editor.currentEvent);
-    console.log("maps: ", $scope.editor.currentEditingGame.info.maps);
   }
 
   this.save = function(event) {
@@ -54,12 +52,12 @@ angular.module('questCreator').controller('eventsCtrl', function($state, $scope,
 //COLLISION:
 
   this.selectScene = function(scene){
-    console.log(scene);
     this.scene = scene;
-    if ($scope.editor.setThumbnail(scene.background)["background-image"] === "none") {
-      this.bgApplied = false;
+    if (scene.background){
+      $scope.editor.currentEvent.info.thumbnail = scene.background.thumbnail;
+      console.log("added thumbnail");
     } else {
-      this.bgApplied = true;
+      $scope.editor.currentEvent.info.thumbnail = false;
     }
   };
 

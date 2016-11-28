@@ -24,9 +24,9 @@
         </li>
         <li class="arrow">-></li>
 
-        <li class="preview-step" ng-click="events.view = 'triggers'" ng-style="editor.setThumbnail(events.scene.background)">
+        <li class="preview-step" ng-click="events.view = 'triggers'" ng-style="editor.setThumbnail(editor.currentEvent.info)">
           <ul class="preview-list">
-            <li ng-if="editor.currentEvent.info.triggers.length === 0 && !events.bgApplied" class="default">
+            <li ng-if="editor.currentEvent.info.triggers.length === 0 && !editor.currentEvent.info.thumbnail" class="default">
               -Triggers-
             </li>
             <li ng-repeat="trigger in editor.currentEvent.info.triggers">
