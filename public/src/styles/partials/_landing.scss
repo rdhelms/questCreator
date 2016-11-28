@@ -18,6 +18,23 @@
             overflow-y: auto;
             border: 4px black solid;
         }
+
+        .game {
+
+          li {
+
+            span {
+              min-width: 0;
+              max-width: 100%;
+            }
+
+            .game-name {
+              text-overflow: ellipsis;
+              overflow: hidden;
+              white-space: normal;
+            }
+          }
+        }
     }
 
     #create-splash {
