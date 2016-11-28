@@ -19,6 +19,12 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       avatar: null,
       socketId: null
     };
+    var playerUpdate = {
+      id: null,
+      game: null,
+      scenePos: null,
+      socketId: null
+    };
     var allPlayers = [];
     var self = this;
     var playerInfo = {
@@ -91,11 +97,11 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     }
 
     this.restoreGame = function(savedGame) {
-      self.saveInfo = savedGame;
-      self.startTime = Date.now() - (savedGame.time * 1000);
-      self.currentScenePos = savedGame.scenePos;
+      self.saveInfo = angular.copy(savedGame);
+      self.startTime = Date.now() - (angular.copy(savedGame.time) * 1000);
+      self.currentScenePos = angular.copy(savedGame.scenePos);
       updateLocation();
-      avatar.info.pos = savedGame.pos;
+      avatar.info.pos = angular.copy(savedGame.pos);
     }
 
     $('body').off('keyup').on('keyup', function(event) {
@@ -128,8 +134,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                 }
                 if (!self.pause) {
                   avatar.action = (avatar.action === 'walkLeft') ? 'stand' : 'walkLeft';
-                  avatar.speed.x = (avatar.speed.x === -1 * avatar.speed.mag) ? 0 : -1 * avatar.speed.mag;
-                  avatar.speed.y = 0;
+                  playerUpdate = {
+                    id: angular.copy(fullPlayer.id),
+                    game: angular.copy(fullPlayer.game),
+                    scenePos: angular.copy(fullPlayer.scenePos),
+                    socketId: angular.copy(fullPlayer.socketId),
+                    action: angular.copy(avatar.action)
+                  };
+                  socket.emit('update player', playerUpdate);
                 }
             } else if (keyCode === 38) {
                 if (self.pause && $('.fileOption.active').length === 1 && $('.save.active').length === 0) {
@@ -137,8 +149,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                 }
                 if (!self.pause) {
                   avatar.action = (avatar.action === 'walkUp') ? 'stand' : 'walkUp';
-                  avatar.speed.x = 0;
-                  avatar.speed.y = (avatar.speed.y === -1 * avatar.speed.mag) ? 0 : -1 * avatar.speed.mag;
+                  playerUpdate = {
+                    id: angular.copy(fullPlayer.id),
+                    game: angular.copy(fullPlayer.game),
+                    scenePos: angular.copy(fullPlayer.scenePos),
+                    socketId: angular.copy(fullPlayer.socketId),
+                    action: angular.copy(avatar.action)
+                  };
+                  socket.emit('update player', playerUpdate);
                 }
             } else if (keyCode === 39) {
                 if (self.pause && $('.timeOption.active').length === 0) {
@@ -146,8 +164,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                 }
                 if (!self.pause) {
                   avatar.action = (avatar.action === 'walkRight') ? 'stand' : 'walkRight';
-                  avatar.speed.x = (avatar.speed.x === avatar.speed.mag) ? 0 : avatar.speed.mag;
-                  avatar.speed.y = 0;
+                  playerUpdate = {
+                    id: angular.copy(fullPlayer.id),
+                    game: angular.copy(fullPlayer.game),
+                    scenePos: angular.copy(fullPlayer.scenePos),
+                    socketId: angular.copy(fullPlayer.socketId),
+                    action: angular.copy(avatar.action)
+                  };
+                  socket.emit('update player', playerUpdate);
                 }
             } else if (keyCode === 40) {
                 if (self.pause && $('.fileOption.active').length === 1 && $('.restore.active').length === 0) {
@@ -155,8 +179,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                 }
                 if (!self.pause) {
                   avatar.action = (avatar.action === 'walkDown') ? 'stand' : 'walkDown';
-                  avatar.speed.x = 0;
-                  avatar.speed.y = (avatar.speed.y === avatar.speed.mag) ? 0 : avatar.speed.mag;
+                  playerUpdate = {
+                    id: angular.copy(fullPlayer.id),
+                    game: angular.copy(fullPlayer.game),
+                    scenePos: angular.copy(fullPlayer.scenePos),
+                    socketId: angular.copy(fullPlayer.socketId),
+                    action: angular.copy(avatar.action)
+                  };
+                  socket.emit('update player', playerUpdate);
                 }
             } else if (keyCode === 191) {
               // Forward slash
@@ -179,7 +209,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                     self.typing.show = false;
                     var userPhrase = self.typing.phrase;
                     self.typing.phrase = '';
-                    checkTyping(userPhrase);
+                    checkTypingEvents(userPhrase);
                 } else if (self.responding.show) { // If the user is finished reading a response
                     self.responding.show = false;
                     self.responding.phrase = '';
@@ -210,7 +240,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
             }
         });
 
-    function checkTyping(phrase) {
+    function checkTypingEvents(phrase) {
       var foundEvent = false; // Whether a typing event has already been triggered
       events.typing.forEach(function(typingEvent) { // Loop through all the typing events
         if (!foundEvent) {  // Only continue checking as long as another event has already not been triggered
@@ -234,6 +264,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                 if (!possibleMatch) { // If the the entire wordSet was passed through without finding a match, then the entire trigger fails
                   triggerSatisfied = false;
                   self.responding.phrase = 'I have literally no idea what you just said.';  // If the trigger failed, set the response to a standard default
+                  self.responding.show = true;
+                  self.pause = true;
                 }
             });
             if (triggerSatisfied) {
@@ -241,6 +273,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
               typingEvent.results.forEach(function(result) {
                 if (result.type === 'text') {
                   self.responding.phrase = result.value;
+                  self.responding.show = true;
+                  self.pause = true;
                 }
                 if (result.type === 'inventory') {
                   self.saveInfo.inventory.push(result.value);
@@ -249,13 +283,62 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                   self.saveInfo.achievements.push(result.name);
                   self.saveInfo.score += result.value;
                 }
+                if (result.type === 'teleport') {
+                  self.currentScenePos = angular.copy(result.scenePos);
+                  updateLocation();
+                  avatar.info.pos = angular.copy(result.pos);
+                }
               });
             }
           }
         }
       });
-      self.responding.show = true;
-      self.pause = true;
+    }
+
+    function checkLocationEvents(avatarBounds) {
+      var foundEvent = false; // Whether a typing event has already been triggered
+      events.location.forEach(function(locationEvent) { // Loop through all the typing events
+        if (!foundEvent) {  // Only continue checking as long as another event has already not been triggered
+          var requirementsMet = true;   // Assume that the requirements will be met
+          locationEvent.requirements.forEach(function(requirement) {  // Loop through all the requirements
+            if (requirement.type === 'achievement' && self.saveInfo.achievements.indexOf(requirement.value) === -1) { // If an achievement is required, check the player's past achievements
+              requirementsMet = false;  // Requirements fail if achievement is not present
+            } else if (requirement.type === 'inventory' && self.saveInfo.inventory.indexOf(requirement.value) === -1) { // If an inventory item is required, check the player's inventory
+              requirementsMet = false;  // Requirements fail if inventory does not contain necessary item
+            }
+          });
+          if (requirementsMet) {  // If all the requirements have been met, check the event's triggers
+            var triggerSatisfied = false;  // Assume that the trigger conditions will not be met
+            locationEvent.trigger.forEach(function(bounds) {  // Compare the avatar's bounds with the locationEvent's trigger bounds
+              if (avatarBounds.left <= bounds.right && avatarBounds.right >= bounds.left && avatarBounds.top <= bounds.bottom && avatarBounds.bottom >= bounds.top) {
+                triggerSatisfied = true;
+              }
+            });
+            if (triggerSatisfied) {
+              foundEvent = true;
+              locationEvent.results.forEach(function(result) {
+                if (result.type === 'text') {
+                  self.responding.phrase = result.value;
+                  self.responding.show = true;
+                  self.pause = true;
+                }
+                if (result.type === 'inventory') {
+                  self.saveInfo.inventory.push(result.value);
+                }
+                if (result.type === 'achievement') {
+                  self.saveInfo.achievements.push(result.name);
+                  self.saveInfo.score += result.value;
+                }
+                if (result.type === 'teleport') {
+                  self.currentScenePos = angular.copy(result.scenePos);
+                  updateLocation();
+                  avatar.info.pos = angular.copy(result.pos);
+                }
+              });
+            }
+          }
+        }
+      });
     }
 
     function checkAvatarBounds() {
@@ -285,6 +368,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
             width: right - left,
             height: bottom - top
         };
+        checkLocationEvents(avatar.bounds);
         if (avatar.bounds.right < 0) { // Character moves to the left scene
             self.currentScenePos[2]--;
             if (self.currentScenePos[2] < 0) {
@@ -337,13 +421,13 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                     if (avatarLeft <= bgRight && avatarRight >= bgLeft && avatarTop <= bgBottom && avatarBottom >= bgTop) {
                         collision.found = true;
                         collision.type = 'wall';
-                        if (avatar.speed.x > 0) {
+                        if (avatar.info.speed.x > 0) {
                             collision.direction = 'right';
-                        } else if (avatar.speed.x < 0) {
+                        } else if (avatar.info.speed.x < 0) {
                             collision.direction = 'left';
-                        } else if (avatar.speed.y < 0) {
+                        } else if (avatar.info.speed.y < 0) {
                             collision.direction = 'up';
-                        } else if (avatar.speed.y > 0) {
+                        } else if (avatar.info.speed.y > 0) {
                             collision.direction = 'down';
                         }
                     }
@@ -389,13 +473,13 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                       if (avatarLeft <= objRight && avatarRight >= objLeft && avatarTop <= objBottom && avatarBottom >= objTop) {
                           collision.found = true;
                           collision.type = 'wall';
-                          if (avatar.speed.x > 0) {
+                          if (avatar.info.speed.x > 0) {
                               collision.direction = 'right';
-                          } else if (avatar.speed.x < 0) {
+                          } else if (avatar.info.speed.x < 0) {
                               collision.direction = 'left';
-                          } else if (avatar.speed.y < 0) {
+                          } else if (avatar.info.speed.y < 0) {
                               collision.direction = 'up';
-                          } else if (avatar.speed.y > 0) {
+                          } else if (avatar.info.speed.y > 0) {
                               collision.direction = 'down';
                           }
                       }
@@ -442,13 +526,13 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                     if (avatarLeft <= entRight && avatarRight >= entLeft && avatarTop <= entBottom && avatarBottom >= entTop) {
                         collision.found = true;
                         collision.type = 'wall';
-                        if (avatar.speed.x > 0) {
+                        if (avatar.info.speed.x > 0) {
                             collision.direction = 'right';
-                        } else if (avatar.speed.x < 0) {
+                        } else if (avatar.info.speed.x < 0) {
                             collision.direction = 'left';
-                        } else if (avatar.speed.y < 0) {
+                        } else if (avatar.info.speed.y < 0) {
                             collision.direction = 'up';
-                        } else if (avatar.speed.y > 0) {
+                        } else if (avatar.info.speed.y > 0) {
                             collision.direction = 'down';
                         }
                     }
@@ -660,7 +744,6 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     function updateAvatar() {
       avatar.updatePos();
       fullPlayer.avatar = avatar;
-      // socket.emit('update player', fullPlayer);
     }
 
     function updateEntities() {
@@ -669,25 +752,13 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       });
     }
 
-    function checkAvatarAction() {
-      avatar.info.currentFrameIndex = avatar.info.currentFrameIndex || 0;
-        if (avatar.action === 'walkLeft' || avatar.action === 'walkUp' || avatar.action === 'walkRight' || avatar.action === 'walkDown') {
-            if (avatar.info.currentFrameIndex > avatar.info.animate[avatar.action].length - 1) {
-                avatar.info.currentFrameIndex = 0;
-            }
-            avatar.info.currentFrame = avatar.info.animate[avatar.action][avatar.info.currentFrameIndex];
-            avatar.info.currentFrameIndex++;
-        } else {
-            // Do nothing, or set frame to a given specific frame.
-            // avatar.info.currentFrame = avatar.info.animate.walkLeft[0];
-        }
-    }
-
     function drawAvatar(avatarToDraw) {
+        avatarToDraw.checkAction();
         // Save the drawing context
         gameCtx.save();
         // Translate the canvas origin to be the top left of the avatarToDraw
         gameCtx.translate(avatarToDraw.info.pos.x, avatarToDraw.info.pos.y);
+        gameCtx.scale(avatarToDraw.scale, avatarToDraw.scale);
         // Draw the squares from the avatarToDraw's current frame
         avatarToDraw.info.currentFrame.image.forEach(function(square) {
             gameCtx.fillStyle = square.color;
@@ -695,10 +766,12 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
         });
         gameCtx.globalAlpha = 0.2;
         // Draw the avatarToDraw's collision map (purely for testing)
-        avatarToDraw.info.currentFrame.collisionMap.forEach(function(square) {
-            gameCtx.fillStyle = square.color;
-            gameCtx.fillRect(square.x, square.y, square.width, square.height);
-        });
+        if (avatarToDraw.info.currentFrame.collisionMap.length > 0) {
+          avatarToDraw.info.currentFrame.collisionMap.forEach(function(square) {
+              gameCtx.fillStyle = square.color;
+              gameCtx.fillRect(square.x, square.y, square.width, square.height);
+          });
+        }
         gameCtx.restore();
     }
 
@@ -740,35 +813,12 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
     function drawObjects(type) {
       if (objects) {
-        // objects.sort(function(objectA, objectB) {
-        //   if (!objectA.bounds) {
-        //     objectA.bounds.bottom = null;
-        //   }
-        //   if (!objectB.bounds) {
-        //     objectB.bounds.bottom = null;
-        //   }
-        //   if (objectA.bounds.bottom < objectB.bounds.bottom) {
-        //     return 1;
-        //   } else {
-        //     return -1;
-        //   }
-        // });
         objects.forEach(function(object) {
 
             // Save the drawing context
             gameCtx.save();
             // Translate the canvas origin to be the top left of the object
             gameCtx.translate(object.info.pos.x, object.info.pos.y);
-            // If object has collision map bounds, check avatar location. Otherwise, draw behind character by default.
-            // if (object.bounds) {
-            //   if (avatar.bounds.top > object.bounds.bottom) {
-            //     gameCtx.globalCompositeOperation = "destination-over";  // If object is behind character.
-            //   } else {
-            //     gameCtx.globalCompositeOperation = "source-over"; // If object is in front of character.
-            //   }
-            // } else {
-            //   gameCtx.globalCompositeOperation = "destination-over";  // If object is behind character.
-            // }
             if (object.bounds) {
               if ( (avatar.bounds.top > object.bounds.bottom && type === 'background') || (avatar.bounds.top < object.bounds.bottom && type === 'foreground') ) {
                 // Draw the squares from the object's current frame
@@ -811,16 +861,6 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
             // Translate the canvas origin to be the top left of the entity
             gameCtx.translate(entity.info.pos.x, entity.info.pos.y);
             gameCtx.scale(entity.scale, entity.scale);
-            // If entity has collision map bounds, check avatar location. Otherwise, draw behind character by default.
-            // if (entity.bounds) {
-            //   if (avatar.bounds.top > entity.bounds.bottom) {
-            //     gameCtx.globalCompositeOperation = "destination-over";  // If entity is behind character.
-            //   } else {
-            //     gameCtx.globalCompositeOperation = "source-over"; // If entity is in front of character.
-            //   }
-            // } else {
-            //   gameCtx.globalCompositeOperation = "destination-over";  // If entity is behind character.
-            // }
             if (entity.bounds) {
               if ( (avatar.bounds.top > entity.bounds.bottom && type === 'background') || (avatar.bounds.top < entity.bounds.bottom && type === 'foreground') ) {
                 // Draw the squares from the entity's current frame
@@ -939,7 +979,53 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                 },
                 {
                   type: 'achievement',
+                  value: 10
+                }
+              ]
+            },
+            {
+              requirements: [
+              ],
+              trigger: [ ['apparate'] ],
+              results: [
+                {
+                  type: 'text',
+                  value: "Welcome to Hogwarts!"
+                },
+                {
+                  type: 'teleport',
+                  scenePos: [2,1,0],
+                  pos: {
+                    x: 350,
+                    y: 250
+                  }
+                },
+                {
+                  type: 'achievement',
                   value: 100
+                }
+              ]
+            }
+          ],
+          location: [
+            {
+              requirements: [],
+              trigger: [
+                {
+                  left: 0,
+                  right: 700,
+                  top: 450,
+                  bottom: 500
+                }
+              ],
+              results: [
+                {
+                  type: 'teleport',
+                  scenePos: [1,2,0],
+                  pos: {
+                    x: 350,
+                    y: 250
+                  }
                 }
               ]
             }
@@ -960,6 +1046,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
     function loadMainCharacter() {
         UserService.getPlayerAvatar().done(function(playerAvatar) {
+          console.log(playerAvatar);
           avatar = new Avatar(playerAvatar);
           avatar.info.pos.x = startPos.x;
           avatar.info.pos.y = startPos.y;
@@ -968,7 +1055,6 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
           fullPlayer.avatar = avatar;
           initSocket();
           socket.emit('game joined', fullPlayer);
-          setInterval(checkAvatarAction, 75);
         });
     }
 
@@ -1043,10 +1129,18 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     });
 
     socket.off('update player');
-    socket.on('update player', function(player) {
+    socket.on('update player', function(playerUpdate) {
+      // playerUpdate = {
+      //   id: angular.copy(fullPlayer.id),
+      //   game: angular.copy(fullPlayer.game),
+      //   scenePos: angular.copy(fullPlayer.scenePos),
+      //   socketId: angular.copy(fullPlayer.socketId),
+      //   action: avatar.action
+      // };
       for (var index = 0; index < allPlayers.length; index++) {
         if (allPlayers[index].id === player.id) {
-          allPlayers[index] = player;
+          allPlayers[index].action = playerUpdate.action;
+          allPlayers[index].scenePos = playerUpdate.scenePos;
         }
       }
     });
@@ -1086,14 +1180,3 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     });
   }
 });
-
-// Not currently animating objects
-// var currentSceneObjFrameIndex = 0;
-// function checkSceneObjectAction() {
-//   // Animate the object.
-//   if (currentSceneObjFrameIndex > sceneObject.info.animate[sceneObject.allActions[0]].length - 1) {
-//     currentSceneObjFrameIndex = 0;
-//   }
-//   sceneObject.info.currentFrame = sceneObject.info.animate[sceneObject.allActions[0]][currentSceneObjFrameIndex];
-//   currentSceneObjFrameIndex++;
-// }
