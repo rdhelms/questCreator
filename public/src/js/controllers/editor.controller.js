@@ -37,8 +37,9 @@ angular.module('questCreator')
         this.eventTypes = [{
             name: 'text',
             description: 'Events triggered by text input.',
-        }, {
-            name: 'collision',
+          },
+          {
+            name: 'location',
             description: 'Events triggered by player position.'
         }];
         this.eventType = null;
