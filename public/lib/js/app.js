@@ -95,14 +95,14 @@
     this.name = avatarInfo.name;
     this.info = avatarInfo.info;
     this.user_id = avatarInfo.user_id;
-    this.action = 'walkLeft';
+    this.action = 'stand';
     this.info.speed = {
       mag: 3,
       x: 0,
       y: 0
     };
     this.info.currentFrameIndex = 0;
-    this.info.currentFrame = this.info.animate[this.action][this.info.currentFrameIndex];
+    this.info.currentFrame = this.info.animate['walkDown'][this.info.currentFrameIndex];
     this.animateDelay = 10;
     this.animateTime = 0;
     this.scale = 1;
@@ -323,6 +323,7 @@
 
   function create(content, title, scope) {
     // var defer = $q.defer();
+
     var popup = $('<popup>')
       .attr({
         'popup-title': '\"'+ title +'\"'
@@ -930,7 +931,12 @@ angular.module('questCreator')
       var eventInfo = {
         requirements: [],
         triggers: [],
-        results: []
+        results: {
+          text: [],
+          achievements: [],
+          inventory: [],
+          portal: {}
+        }
       };
       var newEvent = {
         name: name,
@@ -964,7 +970,7 @@ angular.module('questCreator')
       };
       return $.ajax({
         method: 'PUT',
-        url: 'https://forge-api.herokuapp.com/obstacles/update',
+        url: 'https://forge-api.herokuapp.com/events/update',
         headers: headerData,
         data: JSON.stringify(eventUpdate),
         dataType: 'json',
@@ -1168,6 +1174,10 @@ angular.module('questCreator')
       title: 'Please...',
       content: 'signin-to-continue.html'
     },
+    'loading-screen': {
+      title: 'Loading...',
+      content: 'loading-screen.html'
+    },
     'fail-user-load': {
       title: 'Oops!',
       content: 'fail-user-load.html'
@@ -1234,7 +1244,6 @@ angular.module('questCreator')
     scope = scope || $rootScope.$$childHead;
     var template = path + templates[name].content;
     var content = $('<ng-include>').attr('src', '\''+ template+ '\'');
-    // Creates new popup on the page in specified scope:
     $rootScope.$$childHead.popupTemp = false;
     PopupFactory.new(content, templates[name].title, scope);
   }
@@ -1811,7 +1820,6 @@ angular.module('questCreator')
     $scope.editor.currentSceneImg = {
       'background': 'url("' + dataURL + '")'
     };
-    console.log("??", $scope.editor.currentSceneImg);
     //NOTE probably can edit this out eventually^
 
   });
@@ -2576,11 +2584,12 @@ angular.module('questCreator')
 
   this.editGame = function () {
       PopupService.close();
+      PopupService.open('loading-screen');
       EditorService.getGame(self.currentEditingGame.name).done(function(game) {
         self.currentEditingGame = game;
         // console.log(self.currentEditingGame);
         EditorService.getGameAssets(game.id).done(function(assets) {
-          console.log(assets);
+          PopupService.close();
           self.availableBackgrounds = assets.availableBackgrounds;
           self.availableObjects = assets.availableObstacles;
           self.availableEntities = assets.availableEntities;
@@ -2657,7 +2666,6 @@ angular.module('questCreator')
     name = self.assetNamer(name, 'availableEntities');
     EditorService.createEntity(name, game_id).done(function(entity) {
       PopupService.close();
-      console.log("ent", entity);
       self.availableEntities.push(entity);
       self.currentEntity = entity;
       self.currentSmallView = 'entity';
@@ -2669,9 +2677,6 @@ angular.module('questCreator')
     self.currentFrameIndex = self.modeledFrameIndex || 0;
     self.currentEntity = entity;
     self.currentSmallView = 'entity';
-    console.log("ent:", entity);
-    console.log("frame index:", self.currentFrameIndex);
-    console.log("selected frame:", entity.info.animate[self.selectedAnimation][self.currentFrameIndex]);
     $scope.$broadcast('redrawEntity', entity.info.animate[self.selectedAnimation][self.currentFrameIndex].image, entity.info.animate[self.selectedAnimation][self.currentFrameIndex].collisionMap);
   };
 
@@ -2680,12 +2685,10 @@ angular.module('questCreator')
   };
 
   this.createEvent = function(type) {
-    console.log("in createEvent");
     var name = "New Event";
     var game_id = self.currentEditingGame.id;
     EditorService.createEvent(name, type, game_id).done(function(event) {
       PopupService.close();
-      console.log(event);
       self.availableEvents.push(event);
       self.currentEvent = event;
       self.currentSmallView = 'event';
@@ -2694,17 +2697,16 @@ angular.module('questCreator')
   };
 
   this.editEvent = function(event) {
-    console.log(event);
     self.currentEvent = event;
     self.currentSmallView = 'event';
   };
 
   this.setThumbnail = function(asset){
     if (asset === undefined || !asset.thumbnail) {
-      return {"background": "none"};
+      return {"background-image": "none"};
     } else {
       return {
-        "background": 'url("'+ asset.thumbnail +'")',
+        "background-image": 'url("'+ asset.thumbnail +'")',
         "background-size": "contain",
         "background-position": "center",
         "background-repeat": "no-repeat"
@@ -2757,7 +2759,6 @@ angular.module('questCreator')
     $('.asset.available').draggable({
       helper: function(){
         var url = self.dragAsset.asset.thumbnail;
-        console.log(url);
         return $('<img>').attr('src', url);
       },
       start: function(event, ui) {
@@ -2782,8 +2783,6 @@ angular.module('questCreator')
           var type = self.dragAsset.type;
           var asset = self.dragAsset.asset;
           var offset = $('#scene-BG').offset();
-          console.log("event: ", event);
-          console.log("ui: ", ui);
           asset.info.pos.x = event.pageX - offset.left;
           asset.info.pos.y = event.pageY - offset.top;
           $scope.editor.currentScene[type].push(asset);
@@ -3526,8 +3525,13 @@ angular.module('questCreator')
     moved = true;
   });
 });
-;angular.module('questCreator').controller('eventsCtrl', function($state, $scope) {
+;angular.module('questCreator').controller('eventsCtrl', function($state, $scope, EditorService) {
   this.view = 'triggers';
+  this.resultType = 'text';
+  this.requirementType = 'achievement';
+  this.collisionView = 'scene';
+  this.map = null;
+  this.scene = null;
   this.newWord = null;
   this.wordBuffer = {};
   this.counter = 0;
@@ -3536,8 +3540,19 @@ angular.module('questCreator')
     console.log($scope.editor.currentEvent);
   }
 
+  this.save = function(event) {
+    console.log("Saving event", event);
+    EditorService.saveEvent(event).done(function(response){
+      console.log("Event saved: ", response);
+    });
+  }
+////
+//TRIGGERS:
+////
+
+//TEXT:
+
   this.addWordList = function(word){
-    console.log(word);
     if (!word) {
       console.log("no word!");
       return;
@@ -3557,10 +3572,52 @@ angular.module('questCreator')
     this.counter++;
   };
 
-  this.bufferIndex = function(){
+  this.bufferIndex = function() {
     return this.counter;
   }
 
+//COLLISION:
+
+  this.selectScene = function(scene){
+    this.scene = scene;
+    if (scene.background){
+      $scope.editor.currentEvent.info.thumbnail = scene.background.thumbnail;
+      console.log("added thumbnail");
+    } else {
+      $scope.editor.currentEvent.info.thumbnail = false;
+    }
+  };
+
+////
+//RESULTS:
+////
+
+//GENERAL:
+
+  this.anyResults = function(){
+    if (!$scope.editor.currentEvent) {
+      return false;
+    }
+    var results = $scope.editor.currentEvent.info.results;
+    if (results.text.length > 0 ||
+        results.achievements.length > 0 ||
+        results.inventory.length > 0 ||
+        Object.keys(results.portal).length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+//TEXT:
+
+  this.addText = function(){
+    $scope.editor.currentEvent.info.results.text.push('');
+  };
+
+  this.removeText = function(index){
+    $scope.editor.currentEvent.info.results.text.splice(index, 1);
+  };
 
 });
 ;angular.module('questCreator').controller('gameCtrl', function(socket, $state, $scope) {
@@ -4471,19 +4528,7 @@ angular.module('questCreator')
 
     });
 });
-;angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, GameService, $state, $scope) {
-    $scope.settings = {
-          "play": { "x": 0, "y": 0, "w": 31, "h": 30, "show": true},
-          "next": { "x": 32, "y": 0, "w": 17, "h": 11, "show": true},
-          "art": { "x": 50, "y": 0, "w": 100, "h": 100, "show": true},
-          "currenttitle": { "x": 201, "y": 0, "w": 300, "h": 30,
-            "styles": { "font-family": "PCSenior;src:url('fonts/pc_senior/pcsenior.ttf')", "color": "pink"}
-          }
-    };
-    $scope.musicControl = function(){
-      var $playerWindow = $('#bandcamp-music')[0].contentWindow;
-      $playerWindow.play();
-    };
+;angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, GameService, $state, $scope, PopupService) {
 
     var fullPlayer = {
       id: null,
@@ -4567,7 +4612,7 @@ angular.module('questCreator')
       self.allSavedGames.push(newSave);
       // Call to POST save game to database here
       self.saveInfo.name = '';
-    }
+    };
 
     this.restoreGame = function(savedGame) {
       self.saveInfo = angular.copy(savedGame);
@@ -4575,7 +4620,7 @@ angular.module('questCreator')
       self.currentScenePos = angular.copy(savedGame.scenePos);
       updateLocation();
       avatar.info.pos = angular.copy(savedGame.pos);
-    }
+    };
 
     $('body').off('keyup').on('keyup', function(event) {
             var keyCode = event.which;
@@ -5205,6 +5250,14 @@ angular.module('questCreator')
         self.allRows = self.currentMap.scenes;
         self.currentRow = self.allRows[self.currentScenePos[1]];
         self.currentScene = self.currentRow[self.currentScenePos[2]];
+        playerUpdate = {
+          id: angular.copy(fullPlayer.id),
+          game: angular.copy(fullPlayer.game),
+          scenePos: angular.copy(fullPlayer.scenePos),
+          socketId: angular.copy(fullPlayer.socketId),
+          action: angular.copy(avatar.action)
+        };
+        socket.emit('update player', playerUpdate);
         background = self.currentScene.background;
         // Expected location of events
         // events = self.currentScene.events;
@@ -5393,7 +5446,9 @@ angular.module('questCreator')
       self.displayTime = numHours + ":" + numMinutes + ":" + numSeconds;
     }
 
+    PopupService.open('loading-screen');
     currentGame = GameService.loadGame(self.gameName).done(function(response) {
+      PopupService.close();
         self.gameLoaded = true;
         gameInfo = response.info;
         allMaps = gameInfo.maps;
@@ -5559,11 +5614,11 @@ angular.module('questCreator')
             clearCanvas();
             if (avatarLoaded) {
                 updateTime();
+                updateAvatar();
                 checkAvatarBounds();
                 checkAvatarCollisions();
-                checkEntityCollisions();
-                updateAvatar();
                 updateEntities();
+                checkEntityCollisions();
                 drawEntities('background');
                 drawObjects('background');
                 drawAvatar(avatar);
@@ -5665,7 +5720,7 @@ angular.module('questCreator')
     });
   }
 });
-;angular.module('questCreator').controller('profileCtrl', function(socket, $state, $scope, UserService) {
+;angular.module('questCreator').controller('profileCtrl', function(socket, $state, $scope, UserService, PopupService) {
 
     $scope.showReqs = false;
     $scope.showCollabs = false;
@@ -5677,7 +5732,7 @@ angular.module('questCreator')
     $scope.large = null;
 
     UserService.checkLogin().then(function(response) {
-
+        PopupService.open('loading-screen');
         $scope.user = UserService.get();
 
         $scope.getJoinedDate = function(date) {
@@ -5685,15 +5740,15 @@ angular.module('questCreator')
         };
 
         function getGameName(requests, games) {
-                for (var i = 0; i < requests.length; i++) {
-                    for (var j = 0; j < games.length; j++) {
-                        if (requests[i].game_id === games[j].id) {
-                            requests[i].gameName = games[j].name;
-                        }
+            for (var i = 0; i < requests.length; i++) {
+                for (var j = 0; j < games.length; j++) {
+                    if (requests[i].game_id === games[j].id) {
+                        requests[i].gameName = games[j].name;
                     }
                 }
-                $scope.requests = requests;
-                $scope.$apply();
+            }
+            $scope.requests = requests;
+            $scope.$apply();
         }
 
         function filterCollaborators(collaborators, games) {
@@ -5713,24 +5768,25 @@ angular.module('questCreator')
         }
 
         UserService.getUserGames().done(function(games) {
-          $scope.games = games;
-          $scope.$apply();
-          UserService.getCollabRequests().done(function(requests) {
-            getGameName(requests, games);
-          });
-          UserService.getCollaborators().done(function(collaborators) {
-            filterCollaborators(collaborators, games);
-        });
+            $scope.games = games;
+            $scope.$apply();
+            UserService.getCollabRequests().done(function(requests) {
+                getGameName(requests, games);
+            });
+            UserService.getCollaborators().done(function(collaborators) {
+                filterCollaborators(collaborators, games);
+            });
 
-        UserService.getAvatars().done(function (avatars) {
-            $scope.avatars = avatars;
-            for (var i = 0; i < avatars.length; i++) {
-              if (avatars[i].current)
-              $scope.large = avatars[i];
-              $scope.$apply();
-            }
+            UserService.getAvatars().done(function(avatars) {
+                $scope.avatars = avatars;
+                for (var i = 0; i < avatars.length; i++) {
+                    if (avatars[i].current)
+                        $scope.large = avatars[i];
+                    $scope.$apply();
+                }
+                PopupService.close();
+            });
         });
-});
 
 
         UserService.getCollaborations().done(function(collaborations) {
@@ -5775,11 +5831,11 @@ angular.module('questCreator')
             UserService.toggleAccepted(info.game_id, info.user_id);
             var games = $scope.games;
             UserService.getCollabRequests().done(function(requests) {
-              getGameName(requests, games);
+                getGameName(requests, games);
             });
             UserService.getCollaborators().done(function(collaborators) {
-              filterCollaborators(collaborators, games);
-          });
+                filterCollaborators(collaborators, games);
+            });
         };
 
         $scope.removeRequest = function(collab, index) {
@@ -5799,23 +5855,23 @@ angular.module('questCreator')
             });
         };
 
-        $scope.highlightAvatar = function (avatar, index) {
-          $scope.large = avatar;
+        $scope.highlightAvatar = function(avatar, index) {
+            $scope.large = avatar;
         };
 
-        $scope.updateDefault = function () {
-          if ($scope.large) {
-            for (var i = 0; i < $scope.avatars.length; i++) {
-              if ($scope.avatars[i].current && $scope.avatars[i].id !== $scope.large.id) {
-                $scope.avatars[i].current = false;
-                UserService.updateAvatar(false, $scope.avatars[i].id);
-              }
-              if ($scope.avatars[i].id === $scope.large.id) {
-                $scope.avatars[i].current = $scope.large.current;
-              }
+        $scope.updateDefault = function() {
+            if ($scope.large) {
+                for (var i = 0; i < $scope.avatars.length; i++) {
+                    if ($scope.avatars[i].current && $scope.avatars[i].id !== $scope.large.id) {
+                        $scope.avatars[i].current = false;
+                        UserService.updateAvatar(false, $scope.avatars[i].id);
+                    }
+                    if ($scope.avatars[i].id === $scope.large.id) {
+                        $scope.avatars[i].current = $scope.large.current;
+                    }
+                }
+                UserService.updateAvatar($scope.large.current, $scope.large.id);
             }
-            UserService.updateAvatar($scope.large.current, $scope.large.id);
-          }
         };
 
     });
