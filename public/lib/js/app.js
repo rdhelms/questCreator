@@ -4579,7 +4579,7 @@ angular.module('questCreator')
     var background = null;
     var objects = null;
     var entities = null;
-    var scene = null;
+    var events = null;
 
     var gameLoaded = false;
     var avatarLoaded = false;
@@ -4596,7 +4596,6 @@ angular.module('questCreator')
     this.currentScene = null;
     this.currentScenePos = [0, 0, 0];
     this.gameLoaded = false;
-    this.events = null;
     this.allSavedGames = [];
     this.saveInfo = {
       name: '',
@@ -4668,7 +4667,8 @@ angular.module('questCreator')
                     game: angular.copy(fullPlayer.game),
                     scenePos: angular.copy(fullPlayer.scenePos),
                     socketId: angular.copy(fullPlayer.socketId),
-                    action: angular.copy(avatar.action)
+                    action: angular.copy(avatar.action),
+                    pos: angular.copy(avatar.info.pos)
                   };
                   socket.emit('update player', playerUpdate);
                 }
@@ -4683,7 +4683,8 @@ angular.module('questCreator')
                     game: angular.copy(fullPlayer.game),
                     scenePos: angular.copy(fullPlayer.scenePos),
                     socketId: angular.copy(fullPlayer.socketId),
-                    action: angular.copy(avatar.action)
+                    action: angular.copy(avatar.action),
+                    pos: angular.copy(avatar.info.pos)
                   };
                   socket.emit('update player', playerUpdate);
                 }
@@ -4698,7 +4699,8 @@ angular.module('questCreator')
                     game: angular.copy(fullPlayer.game),
                     scenePos: angular.copy(fullPlayer.scenePos),
                     socketId: angular.copy(fullPlayer.socketId),
-                    action: angular.copy(avatar.action)
+                    action: angular.copy(avatar.action),
+                    pos: angular.copy(avatar.info.pos)
                   };
                   socket.emit('update player', playerUpdate);
                 }
@@ -4713,7 +4715,8 @@ angular.module('questCreator')
                     game: angular.copy(fullPlayer.game),
                     scenePos: angular.copy(fullPlayer.scenePos),
                     socketId: angular.copy(fullPlayer.socketId),
-                    action: angular.copy(avatar.action)
+                    action: angular.copy(avatar.action),
+                    pos: angular.copy(avatar.info.pos)
                   };
                   socket.emit('update player', playerUpdate);
                 }
@@ -5078,7 +5081,8 @@ angular.module('questCreator')
                       game: angular.copy(fullPlayer.game),
                       scenePos: angular.copy(fullPlayer.scenePos),
                       socketId: angular.copy(fullPlayer.socketId),
-                      action: angular.copy(avatar.action)
+                      action: angular.copy(avatar.action),
+                      pos: angular.copy(avatar.info.pos)
                     };
                     socket.emit('update player', playerUpdate);
                     break;
@@ -5266,12 +5270,12 @@ angular.module('questCreator')
           game: angular.copy(fullPlayer.game),
           scenePos: angular.copy(fullPlayer.scenePos),
           socketId: angular.copy(fullPlayer.socketId),
-          action: angular.copy(avatar.action)
+          action: angular.copy(avatar.action),
+          pos: angular.copy(avatar.info.pos)
         };
         socket.emit('update player', playerUpdate);
         background = self.currentScene.background;
-        // Expected location of events
-        // events = self.currentScene.events;
+        // events = self.currentScene.events.info;
         objects = self.currentScene.objects;
         loadEntities();
     }
@@ -5289,6 +5293,15 @@ angular.module('questCreator')
     function updateAvatar() {
       avatar.updatePos();
       fullPlayer.avatar = avatar;
+      playerUpdate = {
+        id: angular.copy(fullPlayer.id),
+        game: angular.copy(fullPlayer.game),
+        scenePos: angular.copy(fullPlayer.scenePos),
+        socketId: angular.copy(fullPlayer.socketId),
+        action: angular.copy(avatar.action),
+        pos: angular.copy(avatar.info.pos)
+      };
+      socket.emit('update player', playerUpdate);
     }
 
     function updateEntities() {
@@ -5322,7 +5335,7 @@ angular.module('questCreator')
 
     function drawAllPlayers() {
       allPlayers.forEach(function(player) {
-        player.avatar.updatePos();
+        // player.avatar.updatePos();
         if (player.scenePos[0] === fullPlayer.scenePos[0] && player.scenePos[1] === fullPlayer.scenePos[1] && player.scenePos[2] === fullPlayer.scenePos[2]) {
           drawAvatar(player.avatar);
         }
@@ -5470,8 +5483,7 @@ angular.module('questCreator')
         background = self.currentScene.background;
         objects = self.currentScene.objects;
         loadEntities();
-        // Expected location of events
-        // events = self.currentScene.events;
+        // events = self.currentScene.events.info;
         events = {
           typing: [
             {
@@ -5594,7 +5606,6 @@ angular.module('questCreator')
 
     function loadMainCharacter() {
         UserService.getPlayerAvatar().done(function(playerAvatar) {
-          console.log(playerAvatar);
           avatar = new Avatar(playerAvatar);
           avatar.info.pos.x = startPos.x;
           avatar.info.pos.y = startPos.y;
@@ -5663,7 +5674,6 @@ angular.module('questCreator')
 
     socket.off('draw new player');
     socket.on('draw new player', function(newPlayer) {
-      console.log(newPlayer);
       newPlayer.avatar = new Avatar(newPlayer.avatar);
       allPlayers.push(newPlayer);
       var response = {
@@ -5690,8 +5700,9 @@ angular.module('questCreator')
       // };
       for (var index = 0; index < allPlayers.length; index++) {
         if (allPlayers[index].id === playerUpdate.id) {
-          allPlayers[index].avatar.action = playerUpdate.action;
-          allPlayers[index].scenePos = playerUpdate.scenePos;
+          allPlayers[index].avatar.action = angular.copy(playerUpdate.action);
+          allPlayers[index].scenePos = angular.copy(playerUpdate.scenePos);
+          allPlayers[index].avatar.info.pos = angular.copy(playerUpdate.pos);
         }
       }
     });
@@ -5716,7 +5727,6 @@ angular.module('questCreator')
     // Notify me if a player leaves the game
     socket.off('player left');
     socket.on('player left', function(leavingPlayer) {
-      console.log("Player " + leavingPlayer.id + " left!");
       var msg = "Player " + leavingPlayer.id + ' left ' + leavingPlayer.game;
       $('.chat-messages').append($('<li>').text(msg));
     });
