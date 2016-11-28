@@ -451,6 +451,17 @@ angular.module('questCreator').service('EditorService', function (UserService, $
     }
 
     function saveEvent(eventUpdate) {
+      var saveData = {
+        id: eventUpdate.id,
+        info: eventUpdate.info,
+        game_id: eventUpdate.game_id,
+        published: eventUpdate.published,
+        name: eventUpdate.name,
+        tags: eventUpdate.tags,
+        category: eventUpdate.category
+      };
+      debugger;
+      console.log(saveData);
       var headerData = {
         user_id: UserService.get().id,
         token: UserService.get().token
@@ -459,7 +470,7 @@ angular.module('questCreator').service('EditorService', function (UserService, $
         method: 'PUT',
         url: 'https://forge-api.herokuapp.com/events/update',
         headers: headerData,
-        data: JSON.stringify(eventUpdate),
+        data: JSON.stringify(saveData),
         dataType: 'json',
         contentType: 'application/json',
         success: function(response) {

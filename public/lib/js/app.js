@@ -964,6 +964,17 @@ angular.module('questCreator')
     }
 
     function saveEvent(eventUpdate) {
+      var saveData = {
+        id: eventUpdate.id,
+        info: eventUpdate.info,
+        game_id: eventUpdate.game_id,
+        published: eventUpdate.published,
+        name: eventUpdate.name,
+        tags: eventUpdate.tags,
+        category: eventUpdate.category
+      };
+      debugger;
+      console.log(saveData);
       var headerData = {
         user_id: UserService.get().id,
         token: UserService.get().token
@@ -972,7 +983,7 @@ angular.module('questCreator')
         method: 'PUT',
         url: 'https://forge-api.herokuapp.com/events/update',
         headers: headerData,
-        data: JSON.stringify(eventUpdate),
+        data: JSON.stringify(saveData),
         dataType: 'json',
         contentType: 'application/json',
         success: function(response) {
@@ -5902,7 +5913,7 @@ angular.module('questCreator')
     }
     console.log(object);
     $scope.editor.currentScene.objects.push(object);
-    this.placeAsset(object, 'object');
+    // this.placeAsset(object, 'object');
     self.selecting.object = false;
   }
 
@@ -5913,7 +5924,7 @@ angular.module('questCreator')
     console.log($scope.editor.currentScene.entities);
     $scope.editor.currentScene.entities.push(entity);
     console.log($scope.editor.currentScene.entities);
-    this.placeAsset(entity, 'entity');
+    // this.placeAsset(entity, 'entity');
     self.selecting.entity = false;
   }
 
