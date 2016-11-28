@@ -1192,11 +1192,11 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       $('.chat-messages').append($('<li>').text(msg));
       var indexToRemove = null;
       for (var index = 0; index < allPlayers.length; index++) {
-        if (allPlayers[index].id === playerUpdate.id) {
+        if (allPlayers[index].id === leavingPlayer.id) {
           indexToRemove = index;
         }
       }
-      if (indexToRemove) {
+      if (indexToRemove !== null) {
         allPlayers.splice(indexToRemove, 1);
       }
     });
