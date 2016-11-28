@@ -3,14 +3,14 @@ angular.module('questCreator').factory('Avatar', function() {
     this.name = avatarInfo.name;
     this.info = avatarInfo.info;
     this.user_id = avatarInfo.user_id;
-    this.action = 'walkLeft';
+    this.action = 'stand';
     this.info.speed = {
       mag: 3,
       x: 0,
       y: 0
     };
     this.info.currentFrameIndex = 0;
-    this.info.currentFrame = this.info.animate[this.action][this.info.currentFrameIndex];
+    this.info.currentFrame = this.info.animate['walkDown'][this.info.currentFrameIndex];
     this.animateDelay = 10;
     this.animateTime = 0;
     this.scale = 1;
