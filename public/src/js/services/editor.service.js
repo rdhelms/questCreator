@@ -418,7 +418,12 @@ angular.module('questCreator').service('EditorService', function (UserService, $
       var eventInfo = {
         requirements: [],
         triggers: [],
-        results: []
+        results: {
+          text: [],
+          achievements: [],
+          inventory: [],
+          portal: {}
+        }
       };
       var newEvent = {
         name: name,

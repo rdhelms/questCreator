@@ -88,6 +88,13 @@ button, input, select, option {
   }
 }
 
+textarea {
+  border: none;
+  resize: vertical;
+  margin: 2px;
+  padding: 2px;
+}
+
 button {
   box-shadow: -.25rem -.25rem 0 0 $lightgrey inset;
 
