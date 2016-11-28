@@ -1060,6 +1060,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
           avatar.info.currentFrame = avatar.info.animate.walkLeft[0];
           avatarLoaded = true;
           fullPlayer.avatar = avatar;
+          updateLocation();
           initSocket();
           socket.emit('game joined', fullPlayer);
         });
@@ -1071,7 +1072,6 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
         fullPlayer.game = self.gameName;
         self.currentScenePos = [startPos.map, startPos.row, startPos.column];
         fullPlayer.scenePos = self.currentScenePos;
-        updateLocation();
         loadMainCharacter();
         self.startTime = new Date();
         self.gameStarted = true;
