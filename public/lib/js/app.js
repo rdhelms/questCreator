@@ -5556,7 +5556,6 @@ angular.module('questCreator')
                 checkEntityCollisions();
                 updateAvatar();
                 updateEntities();
-                updatePlayers();
                 drawEntities('background');
                 drawObjects('background');
                 drawAvatar(avatar);

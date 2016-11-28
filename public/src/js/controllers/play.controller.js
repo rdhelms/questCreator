@@ -1083,7 +1083,6 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                 checkEntityCollisions();
                 updateAvatar();
                 updateEntities();
-                updatePlayers();
                 drawEntities('background');
                 drawObjects('background');
                 drawAvatar(avatar);
