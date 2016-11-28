@@ -23,9 +23,7 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
     if (!object) {
       return;
     }
-    console.log(object);
     $scope.editor.currentScene.objects.push(object);
-    // this.placeAsset(object, 'object');
     self.selecting.object = false;
   };
 
@@ -33,10 +31,7 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
     if (!entity) {
       return;
     }
-    console.log($scope.editor.currentScene.entities);
     $scope.editor.currentScene.entities.push(entity);
-    console.log($scope.editor.currentScene.entities);
-    // this.placeAsset(entity, 'entity');
     self.selecting.entity = false;
   };
 
