@@ -1138,12 +1138,13 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       //   action: avatar.action
       // };
       for (var index = 0; index < allPlayers.length; index++) {
-        if (allPlayers[index].id === player.id) {
+        if (allPlayers[index].id === playerUpdate.id) {
           allPlayers[index].action = playerUpdate.action;
           allPlayers[index].scenePos = playerUpdate.scenePos;
         }
       }
     });
+    
 
     // When I submit a chat message, send it to the server along with the game I'm playing
     $('.chat-submit').submit(function(){
