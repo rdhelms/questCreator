@@ -24,7 +24,7 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
     }
     console.log(object);
     $scope.editor.currentScene.objects.push(object);
-    this.placeAsset(object, 'object');
+    // this.placeAsset(object, 'object');
     self.selecting.object = false;
   }
 
@@ -35,7 +35,7 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
     console.log($scope.editor.currentScene.entities);
     $scope.editor.currentScene.entities.push(entity);
     console.log($scope.editor.currentScene.entities);
-    this.placeAsset(entity, 'entity');
+    // this.placeAsset(entity, 'entity');
     self.selecting.entity = false;
   }
 
