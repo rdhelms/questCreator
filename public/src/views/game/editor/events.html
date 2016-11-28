@@ -12,8 +12,8 @@
 
   <!-- PREVIEW -->
 
-    <div class="event-edit" id="preview">
-      <ul id="preview-pane">
+    <div class="event-edit preview">
+      <ul class="preview-pane">
 
         <li class="preview-step" ng-click="events.view = 'requirements'">
           <ul class="preview-list">
@@ -151,13 +151,13 @@
           </ul>
         </section>
 
-      <!-- COLLISION TRIGGERS -->
+      <!-- LOCATION TRIGGERS -->
 
-        <section ng-if="editor.currentEvent.category === 'collision'">
-          <h4>Event Collision Data:</h4>
+        <section ng-if="editor.currentEvent.category === 'location'">
+          <h4>Event Location Data:</h4>
         <!-- SCENE SELECTOR VIEW -->
 
-          <section class="event-section" ng-if="events.collisionView === 'scene'">
+          <section class="event-section" ng-if="events.locationView === 'scene'">
 
             <span class="event-menu" id="map-menu">
               <p>Maps:</p>

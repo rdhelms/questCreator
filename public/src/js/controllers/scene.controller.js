@@ -11,33 +11,42 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
 
   this.selectedObject = null;
   this.selectedEntity = null;
+  this.selectedEvent= null;
 
   this.selectBackground = function(background) {
     console.log(background);
     $scope.editor.currentScene.background = background;
     self.selecting.background = false;
-  }
+  };
 
   this.selectObject = function(object) {
     if (!object) {
       return;
     }
-    console.log(object);
     $scope.editor.currentScene.objects.push(object);
-    // this.placeAsset(object, 'object');
     self.selecting.object = false;
-  }
+  };
 
   this.selectEntity = function(entity) {
     if (!entity) {
       return;
     }
-    console.log($scope.editor.currentScene.entities);
     $scope.editor.currentScene.entities.push(entity);
-    console.log($scope.editor.currentScene.entities);
-    // this.placeAsset(entity, 'entity');
     self.selecting.entity = false;
-  }
+  };
+
+  this.selectEvent = function(event) {
+    if (!event){
+      return;
+    }
+    console.log("before: ", $scope.editor.currentScene.events);
+    $scope.editor.currentScene.events.push(event);
+    console.log("after: ", $scope.editor.currentScene.events);
+  };
+
+  this.addLocationEvent = function(){
+    console.log("Something has to happen here :(");
+  };
 
   this.removeAsset = function(index, type){
     $scope.editor.currentScene[type].splice(index, 1);

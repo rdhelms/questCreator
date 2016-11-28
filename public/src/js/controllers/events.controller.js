@@ -2,7 +2,7 @@ angular.module('questCreator').controller('eventsCtrl', function($state, $scope,
   this.view = 'triggers';
   this.resultType = 'text';
   this.requirementType = 'achievement';
-  this.collisionView = 'scene';
+  this.locationView = 'scene';
   this.map = null;
   this.scene = null;
   this.newWord = null;
@@ -49,7 +49,7 @@ angular.module('questCreator').controller('eventsCtrl', function($state, $scope,
     return this.counter;
   }
 
-//COLLISION:
+//LOCATION:
 
   this.selectScene = function(scene){
     this.scene = scene;
