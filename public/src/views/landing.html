@@ -1,37 +1,34 @@
 <div id="landing-container">
     <main>
-        <form ng-submit="landing.searchGames(gameSearch)">
-            <label for="game-search">Search for games by keyword:</label>
-            <input ng-model="gameSearch" type="text" placeholder="Search">
-            <input type="submit" class="search-button" value="">
-        </form>
-        <h1 ng-if="!landing.searching">HOT NEW GAMES:</h1>
-        <button ng-if="landing.searching" ng-click="landing.showAll()" type="button">Show All Games</button>
+        <h1 class="landing-header" ng-if="!landing.searching">HOT NEW GAMES:</h1>
         <div id="game-results">
-            <div ng-repeat="game in landing.allGames.responseJSON" class="game" ng-click="goToGameDetail(game)">
+          <button ng-if="landing.searching" ng-click="landing.showAll()" class="show-all-games">Show All Games</button>
+            <div ng-repeat="game in landing.allGames" class="game" ng-click="goToGameDetail(game)">
                 <img ng-src="{{ game.thumbnail }}" alt="Game thumbnail"/>
                 <ul>
                     <li>
                         <span><h1 class="game-name">{{ game.name | capitalize }}</h1></span>
                     </li>
                     <li>
-                        <p>by <span>{{ game.creator }}</span></p>
+                        <p>by <span>{{ game.username | capitalize }}</span></p>
                     </li>
                     <li>
-                        <p>on <span>{{ game.created_at | date:'MMM d - h:mm a' }}</span></p>
-                    </li>
-                    <li>
-                        <p>up to <span>{{ game.plays }}</span> plays</p>
-                    </li>
-                    <li>
-                        <p><span>{{ game.score }}</span> available points </p>
+                        <p>created <span>{{ game.created_at | date:'MMM d, yyyy' }}</span></p>
                     </li>
                 </ul>
             </div>
         </div>
     </main>
     <aside id="create-splash">
+      <div class="">
         <h1 data-shadow="Yazua" class="yazua">Yazua DPS</h1>
+        <p>Design.Play.Share.</p>
+      </div>
+        <form ng-submit="landing.searchGames(gameSearch)">
+          <label for="game-search">Search for games:</label>
+          <input ng-model="gameSearch" type="text" placeholder="Search">
+          <input type="submit" class="search-button" value="">
+        </form>
         <button class="big" ng-click="createGame()">Create New Game</button>
     </aside>
 </div>

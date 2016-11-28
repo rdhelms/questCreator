@@ -36,6 +36,8 @@ angular.module('questCreator').controller('paletteCtrl', function(PaletteService
         };
 
         self.saveElements = function() {
+          console.log('in editor: ', $scope.editor.availableObjects);
+          console.log('in palette: ', self.elements);
           var currentObjects = null;
           if (self.currentType === 'backgrounds') {
             currentObjects =  $scope.editor.availableBackgrounds.concat(self.elements);
