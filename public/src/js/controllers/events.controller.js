@@ -1,5 +1,10 @@
-angular.module('questCreator').controller('eventsCtrl', function($state, $scope) {
+angular.module('questCreator').controller('eventsCtrl', function($state, $scope, EditorService) {
   this.view = 'triggers';
+  this.resultType = 'text';
+  this.requirementType = 'achievement';
+  this.collisionView = 'scene';
+  this.map = null;
+  this.scene = null;
   this.newWord = null;
   this.wordBuffer = {};
   this.counter = 0;
@@ -8,8 +13,19 @@ angular.module('questCreator').controller('eventsCtrl', function($state, $scope)
     console.log($scope.editor.currentEvent);
   }
 
+  this.save = function(event) {
+    console.log("Saving event", event);
+    EditorService.saveEvent(event).done(function(response){
+      console.log("Event saved: ", response);
+    });
+  }
+////
+//TRIGGERS:
+////
+
+//TEXT:
+
   this.addWordList = function(word){
-    console.log(word);
     if (!word) {
       console.log("no word!");
       return;
@@ -29,9 +45,51 @@ angular.module('questCreator').controller('eventsCtrl', function($state, $scope)
     this.counter++;
   };
 
-  this.bufferIndex = function(){
+  this.bufferIndex = function() {
     return this.counter;
   }
 
+//COLLISION:
+
+  this.selectScene = function(scene){
+    this.scene = scene;
+    if (scene.background){
+      $scope.editor.currentEvent.info.thumbnail = scene.background.thumbnail;
+      console.log("added thumbnail");
+    } else {
+      $scope.editor.currentEvent.info.thumbnail = false;
+    }
+  };
+
+////
+//RESULTS:
+////
+
+//GENERAL:
+
+  this.anyResults = function(){
+    if (!$scope.editor.currentEvent) {
+      return false;
+    }
+    var results = $scope.editor.currentEvent.info.results;
+    if (results.text.length > 0 ||
+        results.achievements.length > 0 ||
+        results.inventory.length > 0 ||
+        Object.keys(results.portal).length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+//TEXT:
+
+  this.addText = function(){
+    $scope.editor.currentEvent.info.results.text.push('');
+  };
+
+  this.removeText = function(index){
+    $scope.editor.currentEvent.info.results.text.splice(index, 1);
+  };
 
 });

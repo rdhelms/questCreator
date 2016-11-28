@@ -1,16 +1,4 @@
-angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, GameService, $state, $scope) {
-    $scope.settings = {
-          "play": { "x": 0, "y": 0, "w": 31, "h": 30, "show": true},
-          "next": { "x": 32, "y": 0, "w": 17, "h": 11, "show": true},
-          "art": { "x": 50, "y": 0, "w": 100, "h": 100, "show": true},
-          "currenttitle": { "x": 201, "y": 0, "w": 300, "h": 30,
-            "styles": { "font-family": "PCSenior;src:url('fonts/pc_senior/pcsenior.ttf')", "color": "pink"}
-          }
-    };
-    $scope.musicControl = function(){
-      var $playerWindow = $('#bandcamp-music')[0].contentWindow;
-      $playerWindow.play();
-    };
+angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, GameService, $state, $scope, PopupService) {
 
     var fullPlayer = {
       id: null,
@@ -94,15 +82,20 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       self.allSavedGames.push(newSave);
       // Call to POST save game to database here
       self.saveInfo.name = '';
-    }
+    };
 
     this.restoreGame = function(savedGame) {
       self.saveInfo = angular.copy(savedGame);
       self.startTime = Date.now() - (angular.copy(savedGame.time) * 1000);
       self.currentScenePos = angular.copy(savedGame.scenePos);
       updateLocation();
+<<<<<<< HEAD
       avatar.info.pos = angular.copy(savedGame.pos);
     }
+=======
+      avatar.info.pos = savedGame.pos;
+    };
+>>>>>>> 6098edf06c0fd80341795d1e5f66c9554ff38e68
 
     $('body').off('keyup').on('keyup', function(event) {
             var keyCode = event.which;
@@ -920,7 +913,9 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       self.displayTime = numHours + ":" + numMinutes + ":" + numSeconds;
     }
 
+    PopupService.open('loading-screen');
     currentGame = GameService.loadGame(self.gameName).done(function(response) {
+      PopupService.close();
         self.gameLoaded = true;
         gameInfo = response.info;
         allMaps = gameInfo.maps;

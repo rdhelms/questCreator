@@ -27,7 +27,6 @@
   }
 
   &.temp .popup {
-    // background-color: purple;
     top: 100px;
     max-width: 600px;
     height: auto;
@@ -69,4 +68,13 @@
     padding: 16px;
   }
 
+}
+
+.loading-screen {
+  height: 170px;
+  width: 170px;
+  background-image: url('../images/pink_floppy.gif-c200');
+  background-size: cover;
+  background-color: rgba(218, 112, 214, .5);
+  border: 2px solid red;
 }

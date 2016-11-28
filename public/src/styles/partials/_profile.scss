@@ -15,25 +15,50 @@
             flex-direction: column;
 
             img {
-                width: 150px;
-                height: 150px;
+              margin-left: 5%;
+                width: 275px;
+                height: 275px;
             }
 
             .info {
                 padding: 0.5rem;
+
+                label {
+                  display: flex;
+                  font-size: .5em;
+                  padding: 10px 0;
+                  margin-left: 2%;
+                }
+
+                li {
+                  padding-left: 7px;
+                  color: pink;
+                  -webkit-text-stroke: 1px red;
+                  font-size: 2em;
+                }
             }
 
             .collab-controls {
                 display: flex;
+                justify-content: space-between;
+                border-bottom: 1px solid black;
+                align-items: center;
+                .collab-header {
+                  display: flex;
+                }
             }
 
             .requests {
+              padding-left: 4%;
                 font-size: 0.7em;
+                max-width: 10%;
 
                 .requestArrow,
                 .requestCounter {
-                    width: 45px;
-                    height: 40px;
+                  background-color: $lightgrey;
+                  border: none;
+                    width: 17px;
+                    height: 14px;
                     box-shadow: none;
                     background-image: url('../images/pixel-arrow.png');
                     background-size: cover;
@@ -50,17 +75,39 @@
                 .requestCounter {
                     -webkit-transform: rotate(0deg);
                 }
+                .collab-tables {
+                  max-width: 100px;
+                  background-color: red;
+                }
+
+            }
+
+            .collab-number {
+                top: -1px;
+                position: relative;
+                color: black;
+                height: 20px;
+                width: 20px;
+                font-size: 1em;
+                text-align: center;
+                margin-left: 3px;
+
+                span {
+                  color: red
+                }
             }
 
             .collaborators {
+              padding-left: 4%;
                 font-size: 0.7em;
 
                 .collabArrow,
                 .collabCounter {
-                    background-color: $lightgrey;
+                  background-color: $lightgrey;
+                  border: none;
+                    width: 17px;
+                    height: 14px;
                     box-shadow: none;
-                    width: 45px;
-                    height: 40px;
                     background-image: url('../images/pixel-arrow.png');
                     background-size: cover;
                     -webkit-transition: 300ms ease all;
@@ -70,18 +117,13 @@
                 }
 
                 .collabArrow {
-                    -webkit-transform: rotate(180deg);
+                    -webkit-transform: rotate(0deg);
                 }
 
                 .collabCounter {
-                    -webkit-transform: rotate(0deg);
+                    -webkit-transform: rotate(180deg);
                 }
             }
-        }
-
-        .canvas-tools {
-            background-color: $darkgrey;
-            border: 3px black solid;
         }
 
         .avatar-selector {
@@ -102,6 +144,7 @@
                 background-color: $medgrey;
 
                 .avatar {
+                    margin: 0 5px;
                     border: 2px solid black;
                     text-overflow: ellipsis;
                     background-color: whitesmoke;
@@ -112,8 +155,8 @@
                     }
 
                     p {
-                      text-align: center;
-                    }                    
+                        text-align: center;
+                    }
                 }
             }
 
@@ -136,7 +179,7 @@
                 }
 
                 .current-checkbox {
-                  text-shadow: 4px 4px 8px rgba(150, 150, 150, 0.77);
+                    text-shadow: 4px 4px 8px rgba(150, 150, 150, 0.77);
                     display: flex;
                     flex-direction: column;
                     justify-content: space-around;
@@ -144,22 +187,22 @@
                     height: 80px;
 
                     label {
-                      color: $darkgrey;
+                        color: $darkgrey;
                     }
 
-                  input[type=checkbox] {
-                    margin-right: 25px;
-                    border: 4px black solid;
-                    -ms-transform: scale(3);
-                    -moz-transform: scale(3);
-                    -webkit-transform: scale(3);
-                    -o-transform: scale(3);
-                    padding: 10px;
+                    input[type=checkbox] {
+                        margin-right: 25px;
+                        border: 4px black solid;
+                        -ms-transform: scale(3);
+                        -moz-transform: scale(3);
+                        -webkit-transform: scale(3);
+                        -o-transform: scale(3);
+                        padding: 10px;
 
-                    &::after {
-                      background-color: black;
+                        &::after {
+                            background-color: black;
+                        }
                     }
-                  }
                 }
             }
         }
@@ -173,10 +216,14 @@
         background: $medgrey;
         overflow: scroll;
         border-left: black solid 5px;
-        // display: flex;
-        // flex-direction: column;
-        // justify-content: center;
-        // align-items: space-around;
+
+        .user-create {
+            margin-left: 26%;
+            font-size: 1.3em;
+            font-style: italic;
+            font-weight: bold;
+        }
+
         .user-games {
             border: 5px solid black;
             padding: 5px;

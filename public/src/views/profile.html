@@ -3,19 +3,21 @@
         <section class="user-info">
             <img src="{{ user.picture }}" alt="Google profile picture" />
             <ul class="info">
-                <label for="username">Questr Name:<li>{{ user.username }}</li></label>
-                <label for="joined">Joined the Quest:<li>{{ getJoinedDate(user.joined) | date:'MMM d - h:mm a' }}</li></label>
-                <label for="joined">Another Stat:<li>Something Impressive</li></label>
+                <li class="profile-name">{{ user.username | capitalize }}</li>
+                <label for="joined">Joined:<li>{{ getJoinedDate(user.joined) | date:'MMM d - h:mm a' }}</li></label>
+                <label>Games Created:<li>{{ games.length }}</li></label>
             </ul>
 
             <div ng-if="requests.length > 0" class="requests">
                 <section class="collab-controls">
-                    <p>Requests to collaborate</p>
+                  <div class="collab-header">
+                    <h5>Requests to collaborate</h5>
+                    <p class="collab-number" ng-model="requests.length">[<span>{{ requests.length }}]</span></p>
+                  </div>
                     <button ng-click="showRequests()" ng-animate="{enter: 'requestArrow', leave: 'requestCounter'}" ng-class="{true: 'requestArrow', false: 'requestCounter'}[requestActive]"></button>
-                    <p ng-model="requests.length">{{ requests.length }}</p>
                 </section>
 
-                <table ng-show="showReqs">
+                <table class="collab-tables" ng-show="showReqs">
                     <tr>
                         <th>Game:</th>
                         <th>Requested By:</th>
@@ -33,9 +35,11 @@
 
             <div ng-if="collaborators.length > 0" class="collaborators">
                 <section class="collab-controls">
-                    <p>Current Collaborators</p>
+                  <div class="collab-header">
+                    <h5>Current Collaborators</h5>
+                    <p class="collab-number" ng-model="collaborators.length">[<span>{{collaborators.length}}</span>]</p>
+                  </div>
                     <button ng-click="showCollaborators()" ng-animate="{enter: 'collabArrow', leave: 'collabCounter'}" ng-class="{true: 'collabArrow', false: 'collabCounter'}[collabActive]"></button>
-                    <p ng-model="collaborators.length">{{ collaborators.length }}</p>
                 </section>
 
                 <table ng-show="showCollabs">
@@ -79,7 +83,7 @@
     </div>
 
     <aside class="games-created">
-        <button ng-click="createGame()">Create a New Game</button>
+        <button class="user-create" ng-click="createGame()">Create a New Game</button>
         <div ng-if="!games" class="make-some">
             <h1>You Should Totally Make Some Games!</h1>
         </div>

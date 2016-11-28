@@ -2,25 +2,33 @@
 
 <section id="event-editor">
   <section>
-    <input class="eventEditorTitle" type="text" ng-model="editor.currentEvent.name" ng-click="editor.selectText($event)" blur-on-enter></input>
-    <span>({{editor.currentEvent.category | capitalize}} Event)</span>
-    <button ng-click="events.log()">log</button>
+
+    <div id="event-header">
+      <input class="eventEditorTitle" type="text" ng-model="editor.currentEvent.name" ng-click="editor.selectText($event)" blur-on-enter></input>
+      <span>({{editor.currentEvent.category | capitalize}} Event)</span>
+      <button ng-click="events.log()">log</button>
+      <button ng-click="events.save(editor.currentEvent)">Save</button>
+    </div>
+
+  <!-- PREVIEW -->
+
     <div class="event-edit" id="preview">
       <ul id="preview-pane">
-        <li class="preview-step">
+
+        <li class="preview-step" ng-click="events.view = 'requirements'">
           <ul class="preview-list">
             <li>
-              -got 'key'
-            </li>
-            <li>
-              -did 'answered riddle'
+              -Requirements-
             </li>
           </ul>
         </li>
         <li class="arrow">-></li>
-        <li class="preview-step">
+
+        <li class="preview-step" ng-click="events.view = 'triggers'" ng-style="editor.setThumbnail(editor.currentEvent.info)">
           <ul class="preview-list">
-            <li ng-if="editor.currentEvent.info.triggers.length === 0" class="default">(Triggers)</li>
+            <li ng-if="editor.currentEvent.info.triggers.length === 0 && !editor.currentEvent.info.thumbnail" class="default">
+              -Triggers-
+            </li>
             <li ng-repeat="trigger in editor.currentEvent.info.triggers">
               <div>
                 <span>-types '{{trigger[0]}}'</span>
@@ -32,10 +40,23 @@
           </ul>
         </li>
         <li class="arrow">-></li>
-        <li class="preview-step">
+
+        <li class="preview-step" ng-click="events.view = 'results'">
           <ul class="preview-list">
-            <li>
-              -text: "The door opens!"
+            <li ng-if="events.anyResults() === false" class="default">
+              -Results-
+            </li>
+            <li ng-if="editor.currentEvent.info.results.text.length > 0">
+              -text: "{{editor.currentEvent.info.results.text[0]}}"
+            </li>
+            <li ng-if="editor.currentEvent.info.results.achievements.length > 0">
+              -achieves:
+            </li>
+            <li ng-if="editor.currentEvent.info.results.inventory.length > 0">
+              -gains:
+            </li>
+            <li ng-if="Object.keys(editor.currentEvent.info.results.portal).length > 0">
+              -warps:
             </li>
           </ul>
         </li>
@@ -45,6 +66,7 @@
   </section>
 
   <section>
+
     <ul class="tab-nav event">
       <li class="tab" ng-class="{'active': events.view === 'requirements'}" ng-click="events.view = 'requirements'">
         <h5>Requirements</h5>
@@ -58,14 +80,52 @@
     </ul>
 
     <div class="event-edit" id="edit">
+
     <!-- REQUIREMENTS -->
       <section ng-show="events.view === 'requirements'">
+        <h4>Event Requirements: {{events.requirementType}}</h4>
+          <section class="event-section">
+
+            <span class="event-menu">
+              <ul>
+                <li class="menu-item" ng-class="{'active': events.requirementType === 'achievement'}" ng-click="events.requirementType='achievement'">
+                  <span>Achievement:</span>
+                  <button disabled>></button>
+                </li>
+                <li class="menu-item" ng-class="{'active': events.requirementType === 'inventory'}" ng-click="events.requirementType='inventory'">
+                  <span>Inventory:</span>
+                  <button disabled>></button>
+                </li>
+              </ul>
+            </span>
+
+
+            <span class="menu-type">
+
+              <div class="requirement-value" ng-if="events.resultType==='achievement' && editor.currentEvent.info.results.achievements > 0">
+                <ul>
+                  <li ng-repeat="achievement in editor.currentEvent.info.results.achievements">{{achievement.name}}</li>
+                </ul>
+              </div>
+
+              <div class="requirement-value" ng-if="events.resultType==='inventory' && editor.currentEvent.info.results.inventory > 0">
+                <ul>
+                  <li ng-repeat="item in editor.currentEvent.info.results.inventory">{{item}}</li>
+                </ul>
+              </div>
+
+            </span>
+          </section>
 
       </section>
+
     <!-- TRIGGERS -->
+
       <section ng-show="events.view === 'triggers'">
+
+      <!-- TEXT TRIGGERS -->
         <section ng-if="editor.currentEvent.category === 'text'">
-          <p>Choose Keyword:</p>
+          <h4>Event Keywords:</h4>
           <ul id="keywords">
 
             <li ng-if="editor.currentEvent.info.triggers.length === 0">
@@ -90,36 +150,100 @@
             </li>
           </ul>
         </section>
+
+      <!-- COLLISION TRIGGERS -->
+
+        <section ng-if="editor.currentEvent.category === 'collision'">
+          <h4>Event Collision Data:</h4>
+        <!-- SCENE SELECTOR VIEW -->
+
+          <section class="event-section" ng-if="events.collisionView === 'scene'">
+
+            <span class="event-menu" id="map-menu">
+              <p>Maps:</p>
+              <ul ng-if="editor.currentEditingGame.info.maps.length > 1">
+                <li class="menu-item" ng-repeat="map in editor.currentEditingGame.info.maps track by $index" ng-click="events.map = editor.currentEditingGame.info.maps[$index]" ng-class="{'active': events.map === editor.currentEditingGame.info.maps[$index]}" ng-hide="$first">
+                  <span>{{map.name}}</span>
+                  <button>-></button>
+                </li>
+              </ul>
+              <p ng-if="editor.currentEditingGame.info.maps.length <= 1">Make a new map silly!!</p>
+            </span>
+
+            <span class="menu-type" id="scene-menu">
+              <p ng-show="events.map">Scenes in {{events.map.name}}:</p>
+              <ul  ng-if="events.map" ng-repeat="row in events.map.scenes track by $index" ng-init="mapRow = $index">
+                <li class="menu-item" ng-repeat="scene in row track by $index" ng-click="events.selectScene(events.map.scenes[mapRow][$index])" ng-class="{'active': events.scene === events.map.scenes[mapRow][$index]}">
+                  <span>{{scene.name}}</span>
+                  <button disabled>set</button>
+                </li>
+              </ul>
+              <p ng-if="events.map.scenes.length === 0">Make a new scene silly!!</p>
+            </span>
+
+          </section>
+
+        </section>
+
+
       </section>
+
+
+
     <!-- RESULTS -->
       <section ng-show="events.view === 'results'">
+        <h4>Event Results: {{events.resultType | capitalize}}</h4>
+      <!-- TEXT RESULTS -->
+        <section class="event-section">
+          <span class="event-menu">
+            <ul>
+              <li class="menu-item" ng-class="{'active': events.resultType === 'text'}" ng-click="events.resultType='text'">
+                <span>Text:</span>
+                <button ng-click="events.addText()">+</button>
+              </li>
+              <li class="menu-item" ng-class="{'active': events.resultType === 'achievement'}" ng-click="events.resultType='achievement'">
+                <span>Achievement:</span>
+                <button disabled>+</button>
+              </li>
+              <li class="menu-item" ng-class="{'active': events.resultType === 'inventory'}" ng-click="events.resultType='inventory'">
+                <span>Inventory:</span>
+                <button disabled>+</button>
+              </li>
+              <li class="menu-item" ng-class="{'active': events.resultType === 'portal'}" ng-click="events.resultType='portal'">
+                <span>Portal:</span>
+                <button disabled>></button>
+              </li>
+            </ul>
+          </span>
+
+
+          <span class="menu-type">
+
+            <div class="result-value" ng-if="events.resultType==='text' && editor.currentEvent.info.results.text.length > 0">
+              <div class="value text" ng-repeat="response in editor.currentEvent.info.results.text track by $index">
+                <textarea ng-model="editor.currentEvent.info.results.text[$index]"></textarea>
+                <button ng-click="events.removeText($index)">x</button>
+              </div>
+            </div>
+
+            <div class="result-value" ng-if="events.resultType==='achievement' && editor.currentEvent.info.results.achievements > 0">
+              a c h i e v e
+            </div>
+
+            <div class="result-value" ng-if="events.resultType==='inventory' && editor.currentEvent.info.results.inventory > 0">
+              i n v e n t
+            </div>
+
+            <div class="result-value" ng-if="events.resultType==='portal' && Object.keys(editor.currentEvent.info.results.portal).length > 0">
+              p o r t
+            </div>
+
+          </span>
+        </section>
+
+
       </section>
+
     </div>
   </section>
 </section>
-
-
-
-
-
-<!-- <input class="eventEditorTitle" type="text" ng-model="editor.currentEvent.name" ng-click="editor.selectText($event)" blur-on-enter></input>
-<li>
-  <span class="select" tabindex="1">
-    <h3>Requirements:</h3>
-    <ul class="options" tabindex="1">
-      <li ng-repeat="requirement in scripts.possibleRequirements | orderBy:'-'" ng-mouseover="scripts.addRequirement(requirement)" class="option" tabindex="1">{{requirement.type}}</li>
-    </ul>
-  </span>
-  <span tabindex="1">
-    <h3>Typed Words:</h3>
-    <ul>
-      <li ng-repeat="andWords in scripts.possibleAndWords | orderBy:'-'" class="option" tabindex="1"></li>
-    </ul>
-  </span>
-  <span class="select" tabindex="1">
-    <h3>Result:</h3>
-    <ul class="options" tabindex="1">
-      <li ng-repeat="result in scripts.possibleResults | orderBy:'-'" ng-mouseover="scripts.addResult(result)" class="option" tabindex="1">{{result.type}}</li>
-    </ul>
-  </span>
-</li> -->

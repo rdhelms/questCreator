@@ -1,20 +1,199 @@
-// #event-editor {
-//   display: flex;
-//   flex-direction: column;
-//   justify-content: space-between;
-// }
-//
-// .event-edit {
-//   border: 4px solid black;
-//   width: 100%;
-//
-//   &.preview {
-//     height: 100px;
-//     background: $lightgrey;
-//   }
-//
-//   &.edit {
-//     border-top: none;
-//     height: 200px;
-//   }
-// }
+//OVERALL VIEW
+
+#event-editor {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 400px;
+}
+
+#event-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.event-edit {
+  border: 4px solid black;
+  width: 100%;
+
+  &#preview {
+    height: 100px;
+    background: $lightgrey;
+    }
+
+  &#edit {
+    border-top: none;
+    height: 200px;
+    overflow-y: auto;
+    padding: 10px;
+  }
+}
+
+//PREVIEW VIEW
+
+#preview-pane {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 100%;
+  box-shadow: 8px 8px 0 0 $medgrey inset;
+  transition: box-shadow 1s ease;
+
+  .preview-step {
+    height: 68px;
+    width: 25%;
+    background-color: $white;
+    color: black;
+    box-shadow: 8px 8px 0 0 $medgrey;
+    font-size: .75em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 4px 0 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: box-shadow 1s ease, background-color .5s ease, color .5s ease;
+
+    &:hover {
+      transition: background-color .5s ease, color .5s ease;
+      background-color: $darkgrey;
+      color: $white;
+      cursor: pointer;
+    }
+
+    .preview-list {
+      list-style: square;
+      li {
+        display: list-item;
+        &.default {
+          text-align: center;
+        }
+      }
+    }
+  }
+
+  .arrow {
+    color: $white;
+    text-shadow: 4px 4px $medgrey;
+    transition: text-shadow 1s ease;
+
+  }
+
+  &:hover {
+    box-shadow: 0 0 0 0 $lightgrey inset;
+    transition: box-shadow 1s ease;
+  }
+
+  &:hover > .preview-step {
+    box-shadow: 0 0 0 0 $lightgrey;
+    transition: box-shadow 1s ease;
+  }
+
+  &:hover > .arrow {
+    text-shadow: 0 0 $lightgrey;
+    transition: text-shadow 1s ease;
+  }
+
+}
+
+/////
+//REQUIREMENTS VIEW:
+/////
+
+//TEXT REQUIREMENT VIEW:
+
+#keywords {
+
+  li span form {
+    display: inline-block;
+  }
+
+  .word {
+    &.keyword {
+      display: block;
+      font-size: 1.25em;
+      font-family: PCSenior;
+      text-decoration: underline;
+      width: 100%;
+      white-space: wrap;
+    }
+    display: inline-block;
+    border: none;
+    padding: 10px 0;
+    &:hover {
+      background: $darkgrey;
+      color: $white;
+    }
+  }
+}
+
+.text-select {
+  &:focus {
+    background: black;
+    color: $white;
+  }
+}
+
+/////
+//RESULTS VIEW:
+/////
+
+//TEXT RESULT:
+
+.event-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  height: 100%;
+
+  .event-menu {
+    flex: 1;
+  }
+
+  .menu-item {
+    cursor: pointer;
+    padding: 2px;
+    margin: 2px;
+    display: flex;
+    justify-content: space-between;
+
+    &#map-menu, #scene-menu {
+      max-width: 165px; //overflow fix
+    }
+
+    span, button {
+      min-width: 0px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &:hover, &.active {
+      background: $darkgrey;
+      color: $white;
+    }
+
+  }
+
+  button {
+    border: none;
+  }
+
+  .menu-type {
+    flex: 2;
+
+    textarea {
+      width: 100%;
+    }
+
+    .value {
+      border-bottom: 1px solid $darkgrey;
+      &.text {
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+  }
+}
