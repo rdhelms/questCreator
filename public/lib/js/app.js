@@ -4874,6 +4874,7 @@ angular.module('questCreator')
     }
 
     function checkAvatarBounds() {
+      if (avatar.info.currentFrame.collisionMap[0]) {
         var left = avatar.info.currentFrame.collisionMap[0].x;
         var right = avatar.info.currentFrame.collisionMap[0].x + avatar.info.currentFrame.collisionMap[0].width;
         var top = avatar.info.currentFrame.collisionMap[0].y;
@@ -4930,6 +4931,7 @@ angular.module('questCreator')
             updateLocation();
             avatar.info.pos.y -= gameHeight;
         }
+      }
     }
 
     function checkAvatarCollisions() {
