@@ -89,13 +89,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       self.startTime = Date.now() - (angular.copy(savedGame.time) * 1000);
       self.currentScenePos = angular.copy(savedGame.scenePos);
       updateLocation();
-<<<<<<< HEAD
       avatar.info.pos = angular.copy(savedGame.pos);
-    }
-=======
-      avatar.info.pos = savedGame.pos;
     };
->>>>>>> 6098edf06c0fd80341795d1e5f66c9554ff38e68
 
     $('body').off('keyup').on('keyup', function(event) {
             var keyCode = event.which;
@@ -725,6 +720,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
         self.allRows = self.currentMap.scenes;
         self.currentRow = self.allRows[self.currentScenePos[1]];
         self.currentScene = self.currentRow[self.currentScenePos[2]];
+        playerUpdate = {
+          id: angular.copy(fullPlayer.id),
+          game: angular.copy(fullPlayer.game),
+          scenePos: angular.copy(fullPlayer.scenePos),
+          socketId: angular.copy(fullPlayer.socketId),
+          action: angular.copy(avatar.action)
+        };
+        socket.emit('update player', playerUpdate);
         background = self.currentScene.background;
         // Expected location of events
         // events = self.currentScene.events;
@@ -1081,11 +1084,11 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
             clearCanvas();
             if (avatarLoaded) {
                 updateTime();
+                updateAvatar();
                 checkAvatarBounds();
                 checkAvatarCollisions();
-                checkEntityCollisions();
-                updateAvatar();
                 updateEntities();
+                checkEntityCollisions();
                 drawEntities('background');
                 drawObjects('background');
                 drawAvatar(avatar);
