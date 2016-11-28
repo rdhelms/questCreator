@@ -97,7 +97,7 @@
   <section class="scene-assets" ng-show="scene.view==='assets'">
     <h4>{{editor.currentScene.name}} Assets:</h4>
 
-    <ul>
+    <ul class="assets-list">
       <!-- BACKGROUND -->
       <li>
         <span class="select" tabindex="1">
@@ -121,7 +121,7 @@
         </span>
         <button ng-click="scene.selectObject(scene.selectedObject)" ng-disabled="!scene.selectedObject"> Add {{scene.selectedObject.name || "Object"}} </button>
 
-        <ul id="scene-assets objects">
+        <ul class="assets-list objects">
           <li ng-repeat="object in editor.currentScene.objects track by $index" ng-show="editor.currentScene.objects.length > 0">
             <h5 class="scene-asset object">{{object.name}} (index: {{$index}}):</h5>
             <div class="asset-positioner" ng-show="object">
@@ -150,7 +150,7 @@
         </span>
         <button ng-click="scene.selectEntity(scene.selectedEntity)" ng-disabled="!scene.selectedEntity"> Add {{scene.selectedEntity.name || "Entity"}} </button>
 
-        <ul id="scene-assets entities">
+        <ul class="assets-list entities">
           <li ng-repeat="entity in editor.currentScene.entities track by $index" ng-show="editor.currentScene.entities.length > 0">
             <h5 class="scene-asset entity">{{entity.name}} (index: {{$index}}):</h5>
             <div class="asset-positioner" ng-show="entity">
