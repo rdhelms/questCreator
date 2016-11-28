@@ -457,7 +457,7 @@ angular.module('questCreator').service('EditorService', function (UserService, $
       };
       return $.ajax({
         method: 'PUT',
-        url: 'https://forge-api.herokuapp.com/obstacles/update',
+        url: 'https://forge-api.herokuapp.com/events/update',
         headers: headerData,
         data: JSON.stringify(eventUpdate),
         dataType: 'json',
