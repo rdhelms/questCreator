@@ -2759,7 +2759,7 @@ angular.module('questCreator')
     $('.asset.available').draggable({
       helper: function(){
         var url = self.dragAsset.asset.thumbnail;
-        return $('<img>').attr('src', url);
+        return $('<img>').attr('src', url).appendTo('#editor');
       },
       start: function(event, ui) {
         $(ui.helper).addClass('grabbed');
@@ -5545,27 +5545,27 @@ angular.module('questCreator')
             }
           ],
           location: [
-            {
-              requirements: [],
-              trigger: [
-                {
-                  left: 0,
-                  right: 700,
-                  top: 450,
-                  bottom: 500
-                }
-              ],
-              results: [
-                {
-                  type: 'teleport',
-                  scenePos: [1,2,0],
-                  pos: {
-                    x: 350,
-                    y: 250
-                  }
-                }
-              ]
-            }
+            // {
+            //   requirements: [],
+            //   trigger: [
+            //     {
+            //       left: 0,
+            //       right: 700,
+            //       top: 450,
+            //       bottom: 500
+            //     }
+            //   ],
+            //   results: [
+            //     {
+            //       type: 'teleport',
+            //       scenePos: [1,2,0],
+            //       pos: {
+            //         x: 350,
+            //         y: 250
+            //       }
+            //     }
+            //   ]
+            // }
           ]
         };
         drawEntities('background');
