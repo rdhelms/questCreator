@@ -196,7 +196,6 @@ angular.module('questCreator')
     name = self.assetNamer(name, 'availableEntities');
     EditorService.createEntity(name, game_id).done(function(entity) {
       PopupService.close();
-      console.log("ent", entity);
       self.availableEntities.push(entity);
       self.currentEntity = entity;
       self.currentSmallView = 'entity';
@@ -208,9 +207,6 @@ angular.module('questCreator')
     self.currentFrameIndex = self.modeledFrameIndex || 0;
     self.currentEntity = entity;
     self.currentSmallView = 'entity';
-    console.log("ent:", entity);
-    console.log("frame index:", self.currentFrameIndex);
-    console.log("selected frame:", entity.info.animate[self.selectedAnimation][self.currentFrameIndex]);
     $scope.$broadcast('redrawEntity', entity.info.animate[self.selectedAnimation][self.currentFrameIndex].image, entity.info.animate[self.selectedAnimation][self.currentFrameIndex].collisionMap);
   };
 
@@ -219,12 +215,10 @@ angular.module('questCreator')
   };
 
   this.createEvent = function(type) {
-    console.log("in createEvent");
     var name = "New Event";
     var game_id = self.currentEditingGame.id;
     EditorService.createEvent(name, type, game_id).done(function(event) {
       PopupService.close();
-      console.log(event);
       self.availableEvents.push(event);
       self.currentEvent = event;
       self.currentSmallView = 'event';
@@ -233,7 +227,6 @@ angular.module('questCreator')
   };
 
   this.editEvent = function(event) {
-    console.log(event);
     self.currentEvent = event;
     self.currentSmallView = 'event';
   };
@@ -296,7 +289,6 @@ angular.module('questCreator')
     $('.asset.available').draggable({
       helper: function(){
         var url = self.dragAsset.asset.thumbnail;
-        console.log(url);
         return $('<img>').attr('src', url);
       },
       start: function(event, ui) {
@@ -321,8 +313,6 @@ angular.module('questCreator')
           var type = self.dragAsset.type;
           var asset = self.dragAsset.asset;
           var offset = $('#scene-BG').offset();
-          console.log("event: ", event);
-          console.log("ui: ", ui);
           asset.info.pos.x = event.pageX - offset.left;
           asset.info.pos.y = event.pageY - offset.top;
           $scope.editor.currentScene[type].push(asset);

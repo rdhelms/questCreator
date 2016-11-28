@@ -18,12 +18,13 @@
 @import 'partials/landing';
 @import 'partials/game';
 @import 'partials/detail';
-@import 'partials/editor';
 @import 'partials/events';
+@import 'partials/editor';
 @import 'partials/play';
 @import 'partials/profile';
 @import 'partials/popup';
 @import 'partials/palette';
+@import 'partials/yazua';
 
 * {
     margin: 0;
@@ -37,51 +38,6 @@
 h1, h2, h3, h4, h5, h6, a {
   font-family: PCSenior;
 }
-
-.yazua {
-  display: inline-block;
-  color: pink;
-  -webkit-text-stroke: 2px red;
-  font-style: italic;
-  text-shadow: .05em .05em 0 $medgrey;
-   position: relative;
-}
-
-.yazua:before {
-  -webkit-text-stroke: 1px $medgrey;
-  content: attr(data-shadow);
-  position: absolute;
-  top: -0.03em; left: -0.03em;
-  z-index: -1;
-  text-shadow: none;
-
-}
-.yazua:after {
- -webkit-text-stroke: 0 pink;
- content: attr(data-shadow);
- position: absolute;
- top: .085em; left: .085em;
- z-index: -1;
- text-shadow: none;
- background-image:
-   linear-gradient(
-     45deg,
-    transparent 45%,
-     red 45%,
-     pink 55%,
-     transparent 0
-     );
- background-size: .1em .1em;
- -webkit-background-clip: text;
- -webkit-text-fill-color: transparent;
-
- animation: shad-anim 15s ease infinite;
- }
-
-@keyframes shad-anim {
- 0% {background-position: 0 0}
- 0% {background-position: 100% -100%}
- }
 
 button, input, select, option {
   border: 4px solid black;

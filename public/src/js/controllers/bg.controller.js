@@ -102,7 +102,6 @@ angular.module('questCreator').controller('bgCtrl', function($state, $scope, Edi
     $scope.editor.currentSceneImg = {
       'background': 'url("' + dataURL + '")'
     };
-    console.log("??", $scope.editor.currentSceneImg);
     //NOTE probably can edit this out eventually^
 
   });
