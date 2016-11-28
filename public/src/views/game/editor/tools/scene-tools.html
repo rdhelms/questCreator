@@ -10,28 +10,88 @@
     </li>
   </ul>
 
+
   <section class="scene-assets" ng-show="scene.view==='events'">
-    <h4>{{editor.currentScene.name}} Events:
-    <ul>
 
-      <li class="scene-event">
-        <span class="keywords">
-          <div>Type</div>
-          <div>Keywords</div>
-        </span> |
-        <span class="response">Response</span>
-      </li>
+  <!-- HEADER -->
+    <h4>{{editor.currentScene.name}} Events:</h4>
+    <section id="scene-event-controls">
+      <span class="select" tabindex="1">
+        <h3>Events:</h3>
+        <ul class="options">
+          <li class="option" tabindex="1" ng-repeat="event in editor.availableEvents" ng-mouseover="scene.selectedEvent = event" ng-show="editor.availableEvents.length > 0">
+            {{event.name}}
+          </li>
+          <li ng-show="editor.availableEvents.length === 0">(none)</li>
+        </ul>
+      </span>
+      <button ng-click="scene.selectEvent(scene.selectedEvent)" ng-disabled="!scene.selectedEvent">+ {{scene.selectedEvent.name || "Event"}}</button>
+      <button ng-click="scene.addLocationEvent()">+ Location Event</button>
+    </section>
 
-      <li class="scene-event">
-      </li>
 
-      <li class="scene-event">
-      </li>
 
-      <li class="scene-event">
-      </li>
+  <!-- PREVIEW LIST -->
+    <section class="event-in-scene" ng-repeat="event in editor.currentScene.events">
+      <div class="event-preview-head">
+        <span>{{event.name}}</span>
+        <span>({{event.category | capitalize}} Event)</span>
+        <button ng-click="editor.currentEvent = event; editor.currentSmallView = 'event'">
+          Edit
+        </button>
+      </div>
+      <div class="event-edit preview as-asset">
+        <ul class="preview-pane">
 
-    </ul>
+          <li class="preview-step" ng-click="editor.currentEvent = event; editor.currentSmallView = 'event'; events.view = 'requirements'">
+            <ul class="preview-list">
+              <li>
+                -Reqs-
+              </li>
+            </ul>
+          </li>
+          <li class="arrow">-></li>
+
+          <li class="preview-step" ng-click="editor.currentEvent = event; editor.currentSmallView = 'event'; events.view = 'triggers'" ng-style="editor.setThumbnail(editor.currentEvent.info)">
+            <ul class="preview-list">
+              <li ng-if="event.info.triggers.length === 0 && !event.info.thumbnail" class="default">
+                -Triggers-
+              </li>
+              <li ng-repeat="trigger in event.info.triggers">
+                <div>
+                  <span>-types '{{trigger[0]}}'</span>
+                  <span ng-if="trigger[1]">/'{{trigger[1]}}'</span>
+                  <span ng-if="trigger[2]">/'{{trigger[2]}}'</span>
+                </div>
+                <div ng-if="!$last">AND</div>
+              </li>
+            </ul>
+          </li>
+          <li class="arrow">-></li>
+
+          <li class="preview-step" ng-click="editor.currentEvent = event; editor.currentSmallView = 'event'; events.view = 'results'">
+            <ul class="preview-list">
+              <li ng-if="events.anyResults() === false" class="default">
+                -Results-
+              </li>
+              <li ng-if="event.info.results.text.length > 0">
+                -text: "{{event.info.results.text[0]}}"
+              </li>
+              <li ng-if="event.info.results.achievements.length > 0">
+                -achieves:
+              </li>
+              <li ng-if="event.info.results.inventory.length > 0">
+                -gains:
+              </li>
+              <li ng-if="Object.keys(events.info.results.portal).length > 0">
+                -warps:
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </section>
+
   </section>
 
   <section class="scene-assets" ng-show="scene.view==='assets'">
