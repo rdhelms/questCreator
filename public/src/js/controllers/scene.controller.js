@@ -11,6 +11,7 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
 
   this.selectedObject = null;
   this.selectedEntity = null;
+  this.selectedEvent= null;
 
   this.selectBackground = function(background) {
     console.log(background);
