@@ -10,8 +10,19 @@ angular.module('questCreator').controller('eventsCtrl', function($state, $scope,
     console.log($scope.editor.currentEvent);
   }
 
+  this.save = function(event) {
+    console.log("Saving event", event);
+    EditorService.saveEvent(event).done(function(response){
+      console.log("Event saved: ", response);
+    });
+  }
+////
+//TRIGGERS:
+////
+
+//TEXT:
+
   this.addWordList = function(word){
-    console.log(word);
     if (!word) {
       console.log("no word!");
       return;
