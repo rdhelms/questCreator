@@ -40,6 +40,8 @@ angular.module('questCreator')
           },
           {
             name: 'location',
+        }, {
+            name: 'collision',
             description: 'Events triggered by player position.'
         }];
         this.eventType = null;
