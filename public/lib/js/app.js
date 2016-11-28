@@ -5250,6 +5250,7 @@ angular.module('questCreator')
 
     function drawAllPlayers() {
       allPlayers.forEach(function(player) {
+        player.avatar.updatePos();
         if (player.scenePos[0] === fullPlayer.scenePos[0] && player.scenePos[1] === fullPlayer.scenePos[1] && player.scenePos[2] === fullPlayer.scenePos[2]) {
           drawAvatar(player.avatar);
         }
@@ -5555,6 +5556,7 @@ angular.module('questCreator')
                 checkEntityCollisions();
                 updateAvatar();
                 updateEntities();
+                updatePlayers();
                 drawEntities('background');
                 drawObjects('background');
                 drawAvatar(avatar);
