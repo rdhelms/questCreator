@@ -5588,7 +5588,8 @@ angular.module('questCreator')
 
     socket.off('draw new player');
     socket.on('draw new player', function(newPlayer) {
-      allPlayers.push(newPlayer);
+      var newFullPlayer = new Avatar(newPlayer);
+      allPlayers.push(newFullPlayer);
       var response = {
         data: fullPlayer,
         dest: newPlayer.socketId
@@ -5598,7 +5599,8 @@ angular.module('questCreator')
 
     socket.off('draw old player');
     socket.on('draw old player', function(oldPlayer) {
-      allPlayers.push(oldPlayer);
+      var oldFullPlayer = new Avatar(oldPlayer);
+      allPlayers.push(oldFullPlayer);
     });
 
     socket.off('update player');
@@ -5610,14 +5612,12 @@ angular.module('questCreator')
       //   socketId: angular.copy(fullPlayer.socketId),
       //   action: avatar.action
       // };
-      console.log(playerUpdate);
       for (var index = 0; index < allPlayers.length; index++) {
         if (allPlayers[index].id === playerUpdate.id) {
           allPlayers[index].action = playerUpdate.action;
           allPlayers[index].scenePos = playerUpdate.scenePos;
         }
       }
-      console.log(allPlayers);
     });
 
     // When I submit a chat message, send it to the server along with the game I'm playing
