@@ -1,28 +1,86 @@
-<h4>Palette</h4>
-<ul id="colors-menu">
-    <li class="tools">
-        <button ng-show="editor.drawingCollision" ng-click="editor.drawingCollision = false" class="collision">Stop Drawing Collisions</button>
-        <button ng-show="!editor.drawingCollision" ng-click="editor.drawingCollision = true" class="collision">Draw Collision</button>
-        <button ng-show="!editor.erasing" ng-click="editor.erasing = true" class="eraser">Erase</button>
-        <button ng-show="editor.erasing" ng-click="editor.erasing = false" class="eraser">Draw</button>
+<ul id="drawing-menu">
+  <!-- COLLISION -->
+    <li class="tool">
+        <button ng-show="editor.drawingCollision" ng-click="editor.drawingCollision = false" class="collision" ng-disabled="editor.erasing">
+          <div class="icon">
+            <div>[]</div>
+            <span class="label">Cancel</span>
+          </div>
+        </button>
+        <button ng-show="!editor.drawingCollision" ng-click="editor.drawingCollision = true" class="collision" ng-disabled="editor.erasing">
+          <div class="icon">
+            <div>[]</div>
+            <span class="label">Collision</span>
+          </div>
+        </button>
     </li>
-    <li class="color">
+  <!-- CLEAR -->
+    <li class="tool">
+      <button ng-disabled="editor.drawingCollision || editor.erasing" id="{{editor.qState.clear}}">
+        <div class="icon">
+          <div>X</div>
+          <span class="label">Clear</span>
+        </div>
+      </button>
     </li>
-    <li class="color">
+  <!-- ERASER -->
+    <li class="tool">
+      <button ng-show="!editor.erasing" ng-click="editor.erasing = true" class="eraser" ng-disabled="editor.drawingCollision">
+        <div class="icon">
+          <div>⌫</div>
+          <span class="label">Erase</span>
+        </div>
+      </button>
+      <button ng-show="editor.erasing" ng-click="editor.erasing = false" class="eraser" ng-disabled="editor.drawingCollision">
+        <div class="icon">
+          <div>⌫</div>
+          <span class="label">Cancel</span>
+        </div>
+      </button>
     </li>
-    <li class="color">
-      <input type="color" ng-model="editor.inputColor" ng-change="editor.selectColor()">
+  <!-- UNDO/REDO -->
+    <li class="tool">
+      <button class="do" ng-disabled="editor.erasing" id="{{editor.qState.undo}}">
+        <div class="icon">
+          <div>&lt-</div>
+          <span class="label">Undo</span>
+        </div>
+      </button>
+      <button class="do" ng-disabled="editor.erasing" id="{{editor.qState.redo}}">
+        <div class="icon">
+          <div>-></div>
+          <span class="label">Redo</span>
+        </div>
+      </button>
     </li>
-    <ul class="size-picker">
+  <!-- SIZE PICKER -->
+    <ul class="picker size" ng-class="{'disabled': editor.erasing}">
         <li ng-click="editor.currentPixelSize = 7">S</li>
         <li ng-click="editor.currentPixelSize = 15">M</li>
         <li ng-click="editor.currentPixelSize = 40">L</li>
         <li ng-click="editor.currentPixelSize = 80">XL</li>
     </ul>
-    <ul class="color-picker">
-        <li ng-click="editor.currentColor = 'skyblue'"><input class="color-input" type="color" ng-model="editor.inputColor" ng-change="editor.selectColor()"></li>
-        <li ng-click="editor.currentColor = 'green'"><input class="color-input" type="color" ng-model="editor.inputColor" ng-change="editor.selectColor()"></li>
-        <li ng-click="editor.currentColor = 'brown'"><input class="color-input" type="color" ng-model="editor.inputColor" ng-change="editor.selectColor()"></li>
-        <li ng-click="editor.currentColor = 'orange'"><input class="color-input" type="color" ng-model="editor.inputColor" ng-change="editor.selectColor()"></li>
+  <!-- COLOR PICKER -->
+    <ul class="picker color" ng-class="{'disabled': editor.drawingCollision || editor.erasing}">
+        <li ng-click="editor.currentColor = 'skyblue'">
+          <span class="color-icon">
+            <input class="color-input" type="color" ng-model="editor.inputColor" ng-change="editor.selectColor()" ng-disabled="editor.drawingCollision === true">
+          </span>
+        </li>
+        <li ng-click="editor.currentColor = 'green'">
+          <span class="color-icon">
+            <input class="color-input" type="color" ng-model="editor.inputColor" ng-change="editor.selectColor()" ng-disabled="editor.drawingCollision === true">
+          </span>
+        </li>
+        <li ng-click="editor.currentColor = 'brown'">
+          <span class="color-icon">
+            <input class="color-input" type="color" ng-model="editor.inputColor" ng-change="editor.selectColor()" ng-disabled="editor.drawingCollision === true">
+          </span>
+        </li>
+        <li ng-click="editor.currentColor = 'orange'">
+          <span class="color-icon">
+            <input class="color-input" type="color" ng-model="editor.inputColor" ng-change="editor.selectColor()" ng-disabled="editor.drawingCollision === true">
+          </span>
+        </li>
     </ul>
 </ul>
