@@ -1199,6 +1199,10 @@ angular.module('questCreator')
       title: 'Hey, you\'re new!',
       content: 'user-register.html'
     },
+    'edit-username': {
+      title: 'Change your name:',
+      content: 'edit-username.html'
+    },
     'edit-game': {
       title: 'Awesome! Now you\'re editing:',
       content: 'edit-game.html'
@@ -1488,6 +1492,28 @@ angular.module('questCreator')
             });
         }
 
+        function editUsername(newName) {
+          console.log(newName);
+            user.username = newName;
+            return $.ajax({
+              method: 'PATCH',
+              url: 'https://forge-api.herokuapp.com/users/update',
+              headers: {
+                  user_id: user.id,
+                  token: user.token
+              },
+              data: {
+                username: newName
+              },
+              success: function (response) {
+                return response;
+              },
+              error: function (error) {
+
+              }
+            });
+        }
+
         function getUserGames() {
             return $.ajax({
                 method: 'GET',
@@ -1748,6 +1774,7 @@ angular.module('questCreator')
             getPlayerAvatar: getPlayerAvatar,
             archive: archiveGame,
             register: registerUser,
+            editUsername: editUsername,
             signOut: signOut,
             signIn: signIn,
             checkLogin: checkLogin
@@ -3608,7 +3635,8 @@ angular.module('questCreator')
 //TRIGGERS:
 ////
 
-//TEXT:
+//TRIGGER
+////TEXT:
 
   this.addWordList = function(word){
     if (!word) {
@@ -3634,7 +3662,8 @@ angular.module('questCreator')
     return this.counter;
   }
 
-//LOCATION:
+//TRIGGER
+////LOCATION:
 
   this.selectScene = function(scene){
     this.scene = scene;
@@ -3665,9 +3694,10 @@ angular.module('questCreator')
     } else {
       return false;
     }
-  }
+  };
 
-//TEXT:
+//RESULT:
+////TEXT:
 
   this.addText = function(){
     $scope.editor.currentEvent.info.results.text.push('');
@@ -3676,6 +3706,33 @@ angular.module('questCreator')
   this.removeText = function(index){
     $scope.editor.currentEvent.info.results.text.splice(index, 1);
   };
+
+//RESULT:
+////ACHIEVEMENT:
+
+  this.addAchievement = function(){
+    $scope.editor.currentEvent.info.results.achievements.push({
+      name: '',
+      description: '',
+      points: 0
+    });
+  };
+
+  this.removeAchievement = function(index){
+    $scope.editor.currentEvent.info.results.achievements.splice(index, 1);
+  };
+
+//RESULT:
+////ITEM:
+
+  this.addItem = function(){
+    $scope.editor.currentEvent.info.results.inventory.push('');
+  };
+
+  this.removeItem = function(index){
+    $scope.editor.currentEvent.info.results.inventory.splice(index, 1);
+  };
+
 
 });
 ;angular.module('questCreator').controller('gameCtrl', function(socket, $state, $scope) {
@@ -4879,8 +4936,8 @@ angular.module('questCreator')
                       self.saveInfo.inventory.push(inventoryItem);
                   });
                   typingEvent.results.achievements.forEach(function(achievement) {
-                      self.saveInfo.achievements.push(acheievement.name);
-                      self.saveInfo.score += achievement.value;
+                      self.saveInfo.achievements.push(achievement.name);
+                      self.saveInfo.score += achievement.points;
                   });
                   if (typingEvent.results.portal.scenePos) {
                       var location = typingEvent.results.portal;
@@ -4924,25 +4981,24 @@ angular.module('questCreator')
                 });
                 if (triggerSatisfied) {
                   foundEvent = true;
-                  locationEvent.results.forEach(function(result) {
-                    if (result.type === 'text') {
-                      self.responding.phrase = result.value;
+                  locationEvent.results.text.forEach(function(textResult) {
+                      self.responding.phrase = textResult;
                       self.responding.show = true;
                       self.pause = true;
-                    }
-                    if (result.type === 'inventory') {
-                      self.saveInfo.inventory.push(result.value);
-                    }
-                    if (result.type === 'achievement') {
-                      self.saveInfo.achievements.push(result.name);
-                      self.saveInfo.score += result.value;
-                    }
-                    if (result.type === 'portal') {
-                      self.currentScenePos = angular.copy(result.scenePos);
-                      updateLocation();
-                      avatar.info.pos = angular.copy(result.pos);
-                    }
                   });
+                  locationEvent.results.inventory.forEach(function(inventoryItem) {
+                      self.saveInfo.inventory.push(inventoryItem);
+                  });
+                  locationEvent.results.achievements.forEach(function(achievement) {
+                      self.saveInfo.achievements.push(achievement.name);
+                      self.saveInfo.score += achievement.points;
+                  });
+                  if (locationEvent.results.portal.scenePos) {
+                      var location = locationEvent.results.portal;
+                      self.currentScenePos = angular.copy(location.scenePos);
+                      updateLocation();
+                      avatar.info.pos = angular.copy(location.pos);
+                  }
                 }
               }
             }
@@ -5990,6 +6046,20 @@ angular.module('questCreator')
             }
         };
 
+        $scope.openToEdit = function () {
+            PopupService.open('edit-username', $scope);
+        };
+
+        $scope.cancel = function () {
+          PopupService.close();
+        };
+
+        $scope.editUsername = function (newName) {
+          console.log('here');
+          PopupService.close();
+          $scope.user.username = newName;
+          UserService.editUsername(newName);
+        };
     });
 });
 ;angular.module('questCreator').controller('sceneCtrl', function(socket, $state, $scope, $compile) {
@@ -6039,8 +6109,44 @@ angular.module('questCreator')
   };
 
   this.addLocationEvent = function(){
-    console.log("Something has to happen here :(");
+    var locationCount = ($scope.editor.currentScene.events.filter(function(element){
+      return element.category === "location";
+    })).length;
+    console.log("LocationCount: ", locationCount);
+    var name = (locationCount >= 1) ? "New Location Event " + (locationCount) : "New Location Event";
+    var newEvent = {
+      name: name,
+      category: 'location',
+      info: {
+        requirements: [],
+        results: {
+          achievements: [],
+          inventory: [],
+          portal: {},
+          text: []
+        },
+        triggers: []
+      },
+    };
+    console.log("newEvent: ", newEvent);
+    $scope.editor.currentScene.events.push(newEvent);
   };
+
+  this.anyResults = function(event){
+    if (!event) {
+      return false;
+    }
+    var results = event.info.results;
+    if (results.text.length > 0 ||
+        results.achievements.length > 0 ||
+        results.inventory.length > 0 ||
+        Object.keys(results.portal).length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
 
   this.removeAsset = function(index, type){
     $scope.editor.currentScene[type].splice(index, 1);
