@@ -78,8 +78,8 @@ angular.module('questCreator')
                 b: parseInt(result[3], 16)
             } : null;
             self.currentColor = 'rgb(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ')';
-            console.log(self.currentColor);
-            console.log(self.inputColor);
+            // console.log(self.currentColor);
+            // console.log(self.inputColor);
         };
 
         if (this.currentEditingGame.name === null) {
@@ -116,7 +116,9 @@ angular.module('questCreator')
 
         this.editGame = function() {
             PopupService.close();
-            PopupService.open('loading-screen');
+            $scope.assetsToLoad = 0;
+            $scope.assetsLoaded = 0;
+            PopupService.open('loading-screen', $scope);
             EditorService.getGame(self.currentEditingGame.name).done(function(game) {
                 self.currentEditingGame = game;
                 EditorService.getGameAssets(game.id).done(function(assets) {
@@ -124,59 +126,60 @@ angular.module('questCreator')
                     self.availableObjects = assets.availableObstacles;
                     self.availableEntities = assets.availableEntities;
                     self.availableEvents = assets.availableEvents;
-                    var assetsToLoad = 0;
-                    var assetsLoaded = 0;
                     game.info.maps.forEach(function(map) {
                       map.scenes.forEach(function(row) {
                         row.forEach(function(scene) {
                           if (scene.background) {
-                            assetsToLoad++;
+                            $scope.assetsToLoad++;
                             var backgroundId = scene.background.id;
-                            console.log(scene.background.info);
+                            // console.log(scene.background.info);
                             EditorService.getAssetInfo(backgroundId, 'backgrounds').done(function(info) {  // Get each background's info from the database
                                 scene.background.info = info;
-                                console.log("Found background info!", scene.background.info);
-                                assetsLoaded++;
+                                // console.log("Found background info!", scene.background.info);
+                                $scope.assetsLoaded++;
+                                $scope.$apply();
                             });
                             assets.availableBackgrounds.forEach(function(availableBackground) {
                               if (backgroundId === availableBackground.id) {
-                                console.log("Background match found!");
+                                // console.log("Background match found!");
                                 scene.background.thumbnail = availableBackground.thumbnail;
                               }
                             });
                           }
                           if (scene.entities) {
-                            assetsToLoad += scene.entities.length;
+                            $scope.assetsToLoad += scene.entities.length;
                             scene.entities.forEach(function(entity) {
                               var entityId = entity.id;
-                              console.log(entity.info);
+                              // console.log(entity.info);
                               EditorService.getAssetInfo(entityId, 'entities').done(function(info) {  // Get each entity's info from the database
                                   entity.info.animate = info.animate;
-                                  console.log("Found entity info!", entity.info);
-                                  assetsLoaded++;
+                                  // console.log("Found entity info!", entity.info);
+                                  $scope.assetsLoaded++;
+                                  $scope.$apply();
                               });
                               assets.availableEntities.forEach(function(availableEntity) {
                                 if (entityId === availableEntity.id) {
-                                  console.log("Entity match found!");
+                                  // console.log("Entity match found!");
                                   entity.thumbnail = availableEntity.thumbnail;
                                 }
                               });
                             });
                           }
                           if (scene.objects) {
-                            assetsToLoad += scene.objects.length;
+                            $scope.assetsToLoad += scene.objects.length;
                             scene.objects.forEach(function(object) {
                               var objectId = object.id;
-                              console.log(object.info);
+                              // console.log(object.info);
                               EditorService.getAssetInfo(objectId, 'objects').done(function(info) {  // Get each object's info from the database
                                   object.info.collisionMap = info.collisionMap;
                                   object.info.image = info.image;
-                                  console.log("Found object info!", object.info);
-                                  assetsLoaded++;
+                                  // console.log("Found object info!", object.info);
+                                  $scope.assetsLoaded++;
+                                  $scope.$apply();
                               });
                               assets.availableObstacles.forEach(function(availableObject) {
                                 if (objectId === availableObject.id) {
-                                  console.log("Object match found!");
+                                  // console.log("Object match found!");
                                   object.thumbnail = availableObject.thumbnail;
                                 }
                               });
@@ -186,14 +189,14 @@ angular.module('questCreator')
                       });
                     });
                     var checkGameLoadLoop = setInterval(function() {
-                      console.log("Loading " + assetsToLoad + " assets.");
-                      console.log(assetsLoaded + " assets loaded.");
+                      // console.log("Loading " + $scope.assetsToLoad + " assets.");
+                      // console.log($scope.assetsLoaded + " assets loaded.");
                       var finishedLoading = false;
-                      if (assetsLoaded >= assetsToLoad) {
+                      if ($scope.assetsLoaded >= $scope.assetsToLoad) {
                         finishedLoading = true;
                       }
                       if (finishedLoading) {
-                        console.log("Game Loaded!",game);
+                        // console.log("Game Loaded!",game);
                         clearInterval(checkGameLoadLoop);
                         $scope.$apply();
                         PopupService.close();
@@ -208,7 +211,7 @@ angular.module('questCreator')
           PopupService.close();
           PopupService.open('loading-screen');
             EditorService.saveGame(self.currentEditingGame).done(function(savedGame) {
-                console.log("Saved Game:", savedGame);
+                // console.log("Saved Game:", savedGame);
                 PopupService.close();
             });
         };
@@ -290,7 +293,7 @@ angular.module('questCreator')
             self.currentFrameIndex = self.modeledFrameIndex || 0;
             EditorService.getAssetInfo(entity.id, 'entities').done(function(info) {
                 entity.info = info;
-                console.log(entity);
+                // console.log(entity);
                 self.currentEntity = entity;
                 self.currentSmallView = 'entity';
                 $scope.$broadcast('redrawEntity',entity.info.animate[self.selectedAnimation][self.currentFrameIndex].image, entity.info.animate[self.selectedAnimation][self.currentFrameIndex].collisionMap);
@@ -408,7 +411,7 @@ angular.module('questCreator')
                         var asset = self.dragAsset.asset;
                         var offset = $('#scene-BG').offset();
                         EditorService.getAssetInfo(asset.id, type).done(function(info) {
-                            console.log(info);
+                            // console.log(info);
                             asset.info = info;
                             asset.info.pos.x = event.pageX - offset.left;
                             asset.info.pos.y = event.pageY - offset.top;

@@ -957,46 +957,49 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       self.displayTime = numHours + ":" + numMinutes + ":" + numSeconds;
     }
 
-    PopupService.open('loading-screen');
+    $scope.assetsToLoad = 0;
+    $scope.assetsLoaded = 0;
+    PopupService.open('loading-screen', $scope);
     currentGame = GameService.loadGame(self.gameName).done(function(response) {
-      var assetsToLoad = 0;
-      var assetsLoaded = 0;
-      console.log(response);
+      // console.log(response);
       response.info.maps.forEach(function(map) {
         map.scenes.forEach(function(row) {
           row.forEach(function(scene) {
             if (scene.background) {
-              assetsToLoad++;
+              $scope.assetsToLoad++;
               var backgroundId = scene.background.id;
-              console.log(scene.background.info);
+              // console.log(scene.background.info);
               EditorService.getAssetInfo(backgroundId, 'backgrounds').done(function(info) {  // Get each background's info from the database
                   scene.background.info = info;
-                  console.log("Found background info!", scene.background.info);
-                  assetsLoaded++;
+                  // console.log("Found background info!", scene.background.info);
+                  $scope.assetsLoaded++;
+                  $scope.$apply();
               });
             }
             if (scene.entities) {
-              assetsToLoad += scene.entities.length;
+              $scope.assetsToLoad += scene.entities.length;
               scene.entities.forEach(function(entity) {
                 var entityId = entity.id;
-                console.log(entity.info);
+                // console.log(entity.info);
                 EditorService.getAssetInfo(entityId, 'entities').done(function(info) {  // Get each entity's info from the database
                     entity.info.animate = info.animate;
-                    console.log("Found entity info!", entity.info);
-                    assetsLoaded++;
+                    // console.log("Found entity info!", entity.info);
+                    $scope.assetsLoaded++;
+                    $scope.$apply();
                 });
               });
             }
             if (scene.objects) {
-              assetsToLoad += scene.objects.length;
+              $scope.assetsToLoad += scene.objects.length;
               scene.objects.forEach(function(object) {
                 var objectId = object.id;
-                console.log(object.info);
+                // console.log(object.info);
                 EditorService.getAssetInfo(objectId, 'objects').done(function(info) {  // Get each object's info from the database
                     object.info.collisionMap = info.collisionMap;
                     object.info.image = info.image;
-                    console.log("Found object info!", object.info);
-                    assetsLoaded++;
+                    // console.log("Found object info!", object.info);
+                    $scope.assetsLoaded++;
+                    $scope.$apply();
                 });
               });
             }
@@ -1005,14 +1008,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       });
 
       var checkGameLoadLoop = setInterval(function() {
-        console.log("Loading " + assetsToLoad + " assets.");
-        console.log(assetsLoaded + " assets loaded.");
+        // console.log("Loading " + $scope.assetsToLoad + " assets.");
+        // console.log($scope.assetsLoaded + " assets loaded.");
         var finishedLoading = false;
-        if (assetsLoaded >= assetsToLoad) {
+        if ($scope.assetsLoaded >= $scope.assetsToLoad) {
           finishedLoading = true;
         }
         if (finishedLoading) {
-          console.log("Game Loaded!", response);
+          // console.log("Game Loaded!", response);
           clearInterval(checkGameLoadLoop);
           PopupService.close();
           self.gameLoaded = true;

@@ -71,10 +71,19 @@
 }
 
 .loading-screen {
-  height: 170px;
-  width: 170px;
-  background-image: url('../images/pink_floppy.gif-c200');
-  background-size: cover;
-  background-color: rgba(218, 112, 214, .5);
-  border: 2px solid red;
+  display: flex;
+  flex-direction: column;
+  .dancing-floppy {
+    height: 170px;
+    width: 170px;
+    background-image: url('../images/pink_floppy.gif-c200');
+    background-size: cover;
+    background-color: rgba(218, 112, 214, .5);
+    border: 2px solid red;
+  }
+  .loading-count {
+    width: 170px;
+    background: white;
+    color: black;
+  }
 }
