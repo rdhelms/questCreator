@@ -88,11 +88,30 @@
     }
 
     .preview-list {
-      list-style: square;
-      li {
-        display: list-item;
-        &.default {
+      width: 100%;
+    }
+
+    .preview-list li {
+
+      &.preview-default {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+
+        .default-text {
+          display: inline-block;
           text-align: center;
+        }
+      }
+
+      &.preview-item {
+
+        span {
+          display: inline-block;
+          max-width: 120px;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
         }
       }
     }

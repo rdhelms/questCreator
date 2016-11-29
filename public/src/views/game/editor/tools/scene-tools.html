@@ -51,14 +51,14 @@
 
           <li class="preview-step" ng-click="editor.currentEvent = event; editor.currentSmallView = 'event'; events.view = 'requirements'">
             <ul class="preview-list">
-              <li ng-if="!scene.anyRequirements(editor.currentScene.events[$index])">
-                -Req's-
+              <li ng-if="!scene.anyRequirements(editor.currentScene.events[$index])" class="preview-default">
+                <span>[</span><span class="default-text">No Requirement</span><span>]</span>
               </li>
               <li ng-repeat="requirement in event.info.requirements.achievements">
-                <span>-did '{{requirement}}'</span>
+                <span>▪won '{{requirement}}'</span>
               </li>
               <li ng-repeat="requirement in event.info.requirements.inventory">
-                <span>-has '{{requirement}}'</span>
+                <span>▪has '{{requirement}}'</span>
               </li>
             </ul>
           </li>
@@ -66,12 +66,12 @@
 
           <li class="preview-step" ng-click="editor.currentEvent = event; editor.currentSmallView = 'event'; events.view = 'triggers'" ng-style="editor.setThumbnail(editor.currentEvent.info)">
             <ul class="preview-list">
-              <li ng-if="event.info.triggers.length === 0 && !event.info.thumbnail" class="default">
-                -Triggers-
+              <li ng-if="event.info.triggers.length === 0 && !event.info.thumbnail" class="preview-default">
+                <span>[</span><span class="default-text">No Trigger</span><span>]</span>
               </li>
               <li ng-repeat="trigger in event.info.triggers">
                 <div>
-                  <span>-types '{{trigger[0]}}'</span>
+                  <span>▪types '{{trigger[0]}}'</span>
                   <span ng-if="trigger[1]">/'{{trigger[1]}}'</span>
                   <span ng-if="trigger[2]">/'{{trigger[2]}}'</span>
                 </div>
@@ -83,25 +83,25 @@
 
           <li class="preview-step" ng-click="editor.currentEvent = event; editor.currentSmallView = 'event'; events.view = 'results'">
             <ul class="preview-list">
-              <li ng-if="scene.anyResults(event) === false" class="default">
-                -Results-
+              <li ng-if="scene.anyResults(event) === false" class="preview-default">
+                <span>[</span><span class="default-text">No Result</span><span>]</span>
               </li>
               <li ng-if="event.info.results.text.length > 0">
-                -text: "{{event.info.results.text[0]}}"
+                ▪text: "{{event.info.results.text[0]}}"
               </li>
               <li ng-if="event.info.results.achievements.length > 0">
-                -achieves: "{{event.info.results.achievements[0].name}}"
+                ▪wins: "{{event.info.results.achievements[0].name}}"
                 <span ng-if="event.info.results.achievements[1]"> "{{event.info.results.achievements[1].name}}"
                 <span ng-if="event.info.results.achievements[2]"> "{{event.info.results.achievements[2].name}}"
               </li>
               <li ng-if="event.info.results.inventory.length > 0">
-                -gains:
+                ▪gets:
                 <span ng-repeat="item in event.info.results.inventory">
                   "{{item}}"<span ng-if="!$last">,</span>
                 </span>
               </li>
               <li ng-if="Object.keys(events.info.results.portal).length > 0">
-                -warps:
+                ▪warps:
               </li>
             </ul>
           </li>
