@@ -277,8 +277,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                       self.saveInfo.inventory.push(inventoryItem);
                   });
                   typingEvent.results.achievements.forEach(function(achievement) {
-                      self.saveInfo.achievements.push(acheievement.name);
-                      self.saveInfo.score += achievement.value;
+                      self.saveInfo.achievements.push(achievement.name);
+                      self.saveInfo.score += achievement.points;
                   });
                   if (typingEvent.results.portal.scenePos) {
                       var location = typingEvent.results.portal;
@@ -322,25 +322,24 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                 });
                 if (triggerSatisfied) {
                   foundEvent = true;
-                  locationEvent.results.forEach(function(result) {
-                    if (result.type === 'text') {
-                      self.responding.phrase = result.value;
+                  locationEvent.results.text.forEach(function(textResult) {
+                      self.responding.phrase = textResult;
                       self.responding.show = true;
                       self.pause = true;
-                    }
-                    if (result.type === 'inventory') {
-                      self.saveInfo.inventory.push(result.value);
-                    }
-                    if (result.type === 'achievement') {
-                      self.saveInfo.achievements.push(result.name);
-                      self.saveInfo.score += result.value;
-                    }
-                    if (result.type === 'portal') {
-                      self.currentScenePos = angular.copy(result.scenePos);
-                      updateLocation();
-                      avatar.info.pos = angular.copy(result.pos);
-                    }
                   });
+                  locationEvent.results.inventory.forEach(function(inventoryItem) {
+                      self.saveInfo.inventory.push(inventoryItem);
+                  });
+                  locationEvent.results.achievements.forEach(function(achievement) {
+                      self.saveInfo.achievements.push(achievement.name);
+                      self.saveInfo.score += achievement.points;
+                  });
+                  if (locationEvent.results.portal.scenePos) {
+                      var location = locationEvent.results.portal;
+                      self.currentScenePos = angular.copy(location.scenePos);
+                      updateLocation();
+                      avatar.info.pos = angular.copy(location.pos);
+                  }
                 }
               }
             }
