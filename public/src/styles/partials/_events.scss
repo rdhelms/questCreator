@@ -160,6 +160,12 @@
   }
 }
 
+.number {
+  width: 40px;
+  border: none;
+  padding: 10px 0;
+}
+
 /////
 //RESULTS VIEW:
 /////
@@ -208,13 +214,45 @@
 
     textarea {
       width: 100%;
+
+      &:hover {
+        background: $darkgrey;
+        color: $white;
+      }
     }
 
     .value {
       border-bottom: 1px solid $darkgrey;
-      &.text {
+
+      .number, .word {
+        background: white;
+
+        &:hover {
+          background: $darkgrey;
+          color: $white;
+        }
+      }
+      
+      &.text, &.item, .achievement-header {
         display: flex;
         justify-content: space-between;
+        align-items: center;
+        margin: 2px;
+
+        span {
+          font-size: .7em;
+        }
+      }
+
+      &.achievement {
+        margin: 2px 0;
+
+      }
+
+      &.item {
+        .word {
+          width: 100%;
+        }
       }
     }
   }

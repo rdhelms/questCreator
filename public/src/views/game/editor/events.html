@@ -50,10 +50,13 @@
               -text: "{{editor.currentEvent.info.results.text[0]}}"
             </li>
             <li ng-if="editor.currentEvent.info.results.achievements.length > 0">
-              -achieves:
+              -achieves: "{{editor.currentEvent.info.results.achievement[0].name}}"
             </li>
             <li ng-if="editor.currentEvent.info.results.inventory.length > 0">
               -gains:
+              <span ng-repeat="item in editor.currentEvent.info.results.inventory">
+                "{{item}}"<span ng-if="!$last">,</span>
+              </span>
             </li>
             <li ng-if="Object.keys(editor.currentEvent.info.results.portal).length > 0">
               -warps:
@@ -205,11 +208,11 @@
               </li>
               <li class="menu-item" ng-class="{'active': events.resultType === 'achievement'}" ng-click="events.resultType='achievement'">
                 <span>Achievement:</span>
-                <button disabled>+</button>
+                <button ng-click="events.addAchievement()">+</button>
               </li>
               <li class="menu-item" ng-class="{'active': events.resultType === 'inventory'}" ng-click="events.resultType='inventory'">
                 <span>Inventory:</span>
-                <button disabled>+</button>
+                <button ng-click="events.addItem()">+</button>
               </li>
               <li class="menu-item" ng-class="{'active': events.resultType === 'portal'}" ng-click="events.resultType='portal'">
                 <span>Portal:</span>
@@ -229,12 +232,26 @@
               </div>
             </div>
 
-            <div class="result-value" ng-if="events.resultType==='achievement' && editor.currentEvent.info.results.achievements > 0">
-              a c h i e v e
+          <!-- ACHIEVEMENT RESULTS -->
+
+            <div class="result-value" ng-if="events.resultType==='achievement' && editor.currentEvent.info.results.achievements.length > 0">
+              <div class="value achievement" ng-repeat="achievement in editor.currentEvent.info.results.achievements">
+                <div class="achievement-header">
+                  <span>
+                    <input class="word" type="text" maxlength="26" placeholder="Name" ng-model="achievement.name" elastic blur-on-enter></input>
+                    <input class="number" type="number" placeholder="0" min="0" ng-model="achievement.points" blur-on-enter></input> Pts
+                  </span>
+                  <button ng-click="events.removeAchievement($index)">x</button>
+                </div>
+                <textarea placeholder="Description" ng-model="achievement.description"></textarea>
+              </div>
             </div>
 
-            <div class="result-value" ng-if="events.resultType==='inventory' && editor.currentEvent.info.results.inventory > 0">
-              i n v e n t
+            <div class="result-value" ng-if="events.resultType==='inventory' && editor.currentEvent.info.results.inventory.length > 0">
+              <div class="value item" ng-repeat="item in editor.currentEvent.info.results.inventory track by $index">
+                <input ng-model="editor.currentEvent.info.results.inventory[$index]" type="text" maxlength="50" class="word" placeholder="Item Name"></input>
+                <button ng-click="events.removeItem($index)">x</button>
+              </div>
             </div>
 
             <div class="result-value" ng-if="events.resultType==='portal' && Object.keys(editor.currentEvent.info.results.portal).length > 0">

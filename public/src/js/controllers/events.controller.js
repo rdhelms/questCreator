@@ -95,4 +95,31 @@ angular.module('questCreator').controller('eventsCtrl', function($state, $scope,
     $scope.editor.currentEvent.info.results.text.splice(index, 1);
   };
 
+//RESULT:
+////ACHIEVEMENT:
+
+  this.addAchievement = function(){
+    $scope.editor.currentEvent.info.results.achievements.push({
+      name: '',
+      description: '',
+      points: 0
+    });
+  };
+
+  this.removeAchievement = function(index){
+    $scope.editor.currentEvent.info.results.achievements.splice(index, 1);
+  };
+
+//RESULT:
+////ITEM:
+
+  this.addItem = function(){
+    $scope.editor.currentEvent.info.results.inventory.push('');
+  };
+
+  this.removeItem = function(index){
+    $scope.editor.currentEvent.info.results.inventory.splice(index, 1);
+  };
+
+
 });

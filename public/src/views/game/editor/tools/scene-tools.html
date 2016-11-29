@@ -71,17 +71,22 @@
 
           <li class="preview-step" ng-click="editor.currentEvent = event; editor.currentSmallView = 'event'; events.view = 'results'">
             <ul class="preview-list">
-              <li ng-if="events.anyResults() === false" class="default">
+              <li ng-if="scene.anyResults(event) === false" class="default">
                 -Results-
               </li>
               <li ng-if="event.info.results.text.length > 0">
                 -text: "{{event.info.results.text[0]}}"
               </li>
               <li ng-if="event.info.results.achievements.length > 0">
-                -achieves:
+                -achieves: "{{event.info.results.achievements[0].name}}"
+                <span ng-if="event.info.results.achievements[1]"> "{{event.info.results.achievements[1].name}}"
+                <span ng-if="event.info.results.achievements[2]"> "{{event.info.results.achievements[2].name}}"
               </li>
               <li ng-if="event.info.results.inventory.length > 0">
                 -gains:
+                <span ng-repeat="item in event.info.results.inventory">
+                  "{{item}}"<span ng-if="!$last">,</span>
+                </span>
               </li>
               <li ng-if="Object.keys(events.info.results.portal).length > 0">
                 -warps:
