@@ -27,6 +27,7 @@ angular.module('questCreator').controller('paletteCtrl', function(PaletteService
                     self.saveElements();
                 }
             }
+            this.elements = [];
             $scope.editor.selectingAssets = false;
         };
 
@@ -66,37 +67,26 @@ angular.module('questCreator').controller('paletteCtrl', function(PaletteService
           if (self.currentType === 'backgrounds') {
             for (var i = 0; i < self.elements.length; i++) {
               asset = self.elements[i];
-                EditorService.createBackground(asset.name, $scope.editor.currentEditingGame.id, asset.info).done(function (response) {
-                  response.thumbnail = asset.thumbnail;
-                  savedAssets.push(response);
-              });
+                EditorService.createBackground(asset.name, $scope.editor.currentEditingGame.id, asset.info, asset.thumbnail).done(function (response) {
+                  $scope.editor.availableBackgrounds.push(response);
+                });
             }
-            currentObjects = $scope.editor.availableBackgrounds.concat(savedAssets);
-            $scope.editor.availableBackgrounds = currentObjects;
-            console.log($scope.editor.availableBackgrounds);
           } else if (self.currentType === 'obstacles') {
             for (var j = 0; j < self.elements.length; j++) {
               asset = self.elements[j];
                 EditorService.createBackground(asset.name, $scope.editor.currentEditingGame.id, asset.info).done(function (response) {
-                  response.thumbnail = asset.thumbnail;
-                  savedAssets.push(response);
+                  $scope.editor.availableObjects.push(response);
               });
             }
-            currentObjects = $scope.editor.availableObjects.concat(savedAssets);
-            $scope.editor.availableObjects = currentObjects;
           } else if (self.currentType === 'entities') {
             for (var k = 0; k < self.elements.length; k++) {
               asset = self.elements[k];
                 EditorService.createEntity(asset.name, $scope.editor.currentEditingGame.id, asset.info).done(function (response) {
-                  response.thumbnail = asset.thumbnail;
-                  savedAssets.push(response);
+                  $scope.editor.availableEntities.push(response);
               });
             }
-            currentObjects = $scope.editor.availableEntities.concat(savedAssets);
-            $scope.editor.availableEntities = currentObjects;
           }
           self.elements = [];
-          $scope.editor.$apply();
           return self.elements;
         };
 

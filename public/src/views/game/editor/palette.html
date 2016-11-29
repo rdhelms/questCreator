@@ -1,22 +1,22 @@
 <div class="palette-container">
     <button ng-click="palette.goToEditor()" type="button">Return To Editing</button>
-    <form class="asset-search" ng-submit="palette.searchByTag(searchText)">
-        <label for="asset-search">Search {{ palette.currentType }} By Keyword:</label>
-        <input type="text" ng-model="searchText" placeholder="Enter 1 word to search by...">
+    <form ng-submit="palette.searchByTag(searchText)">
+      <h1>{{ palette.currentType | capitalize }}: </h1>
+        <input type="text" ng-model="searchText" placeholder="Search {{ palette.currentType | capitalize }}:">
         <input type="submit" class="search-button" value="">
     </form>
-    <p>Click on {{palette.currentType}} to add them to your Palette</p>
     <div class="format-container">
-
         <section id="assets-results">
-            <div ng-repeat="asset in palette.assets track by $index" ng-click="palette.addToPalette(asset, $index)" style="background-image: url('{{asset.thumbnail}}')" class="asset" ng-if="palette.testDupes(asset.id, asset.game_id)">
+          <p>Click on {{ palette.currentType }} to add them to your Palette</p>
+          <p ng-if="searchText">Results matching {{ searchText }}</p>
+            <div ng-repeat="asset in palette.assets track by $index" ng-click="palette.addToPalette(asset, $index)" ng-style="editor.setThumbnail(asset)" class="asset" ng-if="palette.testDupes(asset.id, asset.game_id)">
                 <p>{{ asset.name }}</p>
             </div>
         </section>
 
         <section id="assets-palette">
             <div ng-if="palette.elements.length > 0" class="palette-buttons">
-                <button ng-click="palette.saveElements()" type="button">Save These to Your Palette</button>
+                <button ng-click="palette.saveElements()" type="button">Save To Your Palette</button>
             </div>
 
             <div ng-repeat="element in palette.elements track by $index" ng-click="palette.removeFromPalette($index)" style="background-image: url('{{ element.thumbnail }}')" class="element">
