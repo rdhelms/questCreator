@@ -1,5 +1,5 @@
 angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, GameService, $state, $scope, PopupService) {
-    var socketDelay = 100;
+    var socketDelay = 50;
     var socketIterator = 0;
     var fullPlayer = {
       id: null,
@@ -237,18 +237,24 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       var foundEvent = false; // Whether a typing event has already been triggered
       if (events) {
         events.forEach(function(event) { // Loop through all the typing events
-          console.log(event);
           if (event.category === 'text') {
             var typingEvent = event.info;
             if (!foundEvent) {  // Only continue checking as long as another event has already not been triggered
               var requirementsMet = true;   // Assume that the requirements will be met
-              typingEvent.requirements.forEach(function(requirement) {  // Loop through all the requirements
-                if (requirement.type === 'achievement' && self.saveInfo.achievements.indexOf(requirement.value) === -1) { // If an achievement is required, check the player's past achievements
-                  requirementsMet = false;  // Requirements fail if achievement is not present
-                } else if (requirement.type === 'inventory' && self.saveInfo.inventory.indexOf(requirement.value) === -1) { // If an inventory item is required, check the player's inventory
-                  requirementsMet = false;  // Requirements fail if inventory does not contain necessary item
-                }
-              });
+              if (typingEvent.requirements.achievements) {
+                typingEvent.requirements.achievements.forEach(function(achievement) {  // Loop through all the achievement requirements
+                  if (self.saveInfo.achievements.indexOf(achievement) === -1) { // If an achievement is required, check the player's past achievements
+                    requirementsMet = false;  // Requirements fail if achievement is not present
+                  }
+                });
+              }
+              if (typingEvent.requirements.inventory) {
+                typingEvent.requirements.inventory.forEach(function(item) {  // Loop through all the inventory requirements
+                  if (self.saveInfo.inventory.indexOf(item) === -1) { // If an inventory item is required, check the player's inventory
+                    requirementsMet = false;  // Requirements fail if inventory does not contain necessary item
+                  }
+                });
+              }
               if (requirementsMet) {  // If all the requirements have been met, check the event's triggers
                 var triggerSatisfied = true;  // Assume that the trigger conditions will be met
                 typingEvent.triggers.forEach(function(wordSet) { // Loop through the sets of words to check
@@ -753,8 +759,6 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
         socket.emit('update player', playerUpdate);
         background = self.currentScene.background;
         events = self.currentScene.events;
-        console.log(self.currentScene);
-        console.log(events);
         objects = self.currentScene.objects;
         loadEntities();
     }
