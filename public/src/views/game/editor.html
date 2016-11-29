@@ -35,11 +35,11 @@
                     <div ng-show="editor.currentLargeView === 'scene'" ng-hide="editor.currentLargeView === 'map' || editor.currentLargeView === 'background'" ng-style="editor.setThumbnail(editor.currentScene.background)" id="scene-BG">
                       <span class="asset-in-scene" ng-repeat="object in editor.currentScene.objects track by $index" ng-style="editor.positionAsset(object)">
                         <span ng-click="editor.removeAsset($index, 'objects')">x</span>
-                        <img src="{{object.thumbnail}}" ng-mousedown="editor.dragPositionAsset($index, 'objects')">
+                        <img ng-src="{{object.thumbnail}}" ng-mousedown="editor.dragPositionAsset($index, 'objects')">
                       </span>
                       <span class="asset-in-scene" ng-repeat="entity in editor.currentScene.entities track by $index" ng-style="editor.positionAsset(entity)">
                         <span ng-click="editor.removeAsset($index, 'entities')">x</span>
-                        <img src="{{entity.thumbnail}}" ng-mousedown="editor.dragPositionAsset($index, 'entities')">
+                        <img ng-src="{{entity.thumbnail}}" ng-mousedown="editor.dragPositionAsset($index, 'entities')">
                       </span>
                     </div>
                     {{editor.uiDrag()}}
