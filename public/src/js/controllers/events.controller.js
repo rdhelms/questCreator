@@ -66,7 +66,7 @@ angular.module('questCreator').controller('eventsCtrl', function($state, $scope,
     if (!$scope.editor.currentEvent) {
       return false;
     }
-    var results = $scope.editor.currentEvent.info.results;
+    var requirements = $scope.editor.currentEvent.info.results;
     if (requirements.achievements.length > 0 ||
         requirements.inventory.length > 0) {
       return true;

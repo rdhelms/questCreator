@@ -50,7 +50,7 @@
 
           <li class="preview-step" ng-click="editor.currentEvent = event; editor.currentSmallView = 'event'; events.view = 'requirements'">
             <ul class="preview-list">
-              <li ng-if="scene.anyRequirements(event)">
+              <li ng-if="!scene.anyRequirements(editor.currentScene.events[$index])">
                 -Req's-
               </li>
               <li ng-repeat="requirement in event.info.requirements.achievements">

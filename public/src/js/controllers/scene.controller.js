@@ -105,7 +105,14 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
     if (!event) {
       return false;
     }
+    if (event.info.requirements.length === 0) {
+      event.info.requirements = {
+        achievements: [],
+        inventory: []
+      }
+    }
     var requirements = event.info.requirements;
+    //OH MY GOD THIS IS SO HACKY
     if (requirements.achievements.length > 0 ||
         requirements.inventory.length > 0) {
       return true;
