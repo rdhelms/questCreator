@@ -1,4 +1,4 @@
-angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, GameService, $state, $scope, PopupService) {
+angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, EditorService, GameService, $state, $scope, PopupService) {
     var socketDelay = 50;
     var socketIterator = 0;
     var fullPlayer = {
@@ -959,136 +959,86 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
     PopupService.open('loading-screen');
     currentGame = GameService.loadGame(self.gameName).done(function(response) {
-      PopupService.close();
-        self.gameLoaded = true;
-        gameInfo = response.info;
-        allMaps = gameInfo.maps;
-        self.currentMap = allMaps[0];
-        self.allRows = self.currentMap.scenes;
-        self.currentRow = self.allRows[0];
-        self.currentScene = self.currentRow[0];
-        background = self.currentScene.background;
-        objects = self.currentScene.objects;
-        loadEntities();
-        events = self.currentScene.events;
-        // events = {
-        //   typing: [
-        //     {
-        //       requirements: [],
-        //       trigger: [ ['talk', 'say'], ['vernon', 'uncle', 'man'] ],
-        //       results: [
-        //         {
-        //           type: 'text',
-        //           value: '"Make me an omelette, Harry!"'
-        //         },
-        //         {
-        //           type: 'achievement',
-        //           name: 'talked to vernon',
-        //           value: 5
-        //         }
-        //       ]
-        //     },
-        //     {
-        //       requirements: [
-        //         {
-        //           type: 'achievement',
-        //           value: 'talked to vernon'
-        //         }
-        //       ],
-        //       trigger: [ ['take', 'get'], ['frying', 'pan'] ],
-        //       results: [
-        //         {
-        //           type: 'text',
-        //           value: 'You take the frying pan as you have done so many mornings before.'
-        //         },
-        //         {
-        //           type: 'achievement',
-        //           value: 10
-        //         },
-        //         {
-        //           type: 'inventory',
-        //           value: 'frying pan'
-        //         }
-        //       ]
-        //     },
-        //     {
-        //       requirements: [
-        //         {
-        //           type: 'inventory',
-        //           value: 'frying pan'
-        //         }
-        //       ],
-        //       trigger: [ ['cook'], ['egg'] ],
-        //       results: [
-        //         {
-        //           type: 'text',
-        //           value: "You cook the egg decently. You're no chef, but you have plenty of experience."
-        //         },
-        //         {
-        //           type: 'achievement',
-        //           value: 10
-        //         }
-        //       ]
-        //     },
-        //     {
-        //       requirements: [
-        //       ],
-        //       trigger: [ ['apparate'] ],
-        //       results: [
-        //         {
-        //           type: 'text',
-        //           value: "Welcome to Hogwarts!"
-        //         },
-        //         {
-        //           type: 'teleport',
-        //           scenePos: [2,1,0],
-        //           pos: {
-        //             x: 350,
-        //             y: 250
-        //           }
-        //         },
-        //         {
-        //           type: 'achievement',
-        //           value: 100
-        //         }
-        //       ]
-        //     }
-        //   ],
-        //   location: [
-        //     // {
-        //     //   requirements: [],
-        //     //   trigger: [
-        //     //     {
-        //     //       left: 0,
-        //     //       right: 700,
-        //     //       top: 450,
-        //     //       bottom: 500
-        //     //     }
-        //     //   ],
-        //     //   results: [
-        //     //     {
-        //     //       type: 'teleport',
-        //     //       scenePos: [1,2,0],
-        //     //       pos: {
-        //     //         x: 350,
-        //     //         y: 250
-        //     //       }
-        //     //     }
-        //     //   ]
-        //     // }
-        //   ]
-        // };
-        drawEntities('background');
-        drawObjects('background');
-        drawBackground();
-        startPos = {    // Eventually will come from game object
-          map: 1,
-          row: 0,
-          column: 0,
-          x: 300,
-          y: 250
-        };
-        $scope.$apply();
+      var assetsToLoad = 0;
+      var assetsLoaded = 0;
+      console.log(response);
+      response.info.maps.forEach(function(map) {
+        map.scenes.forEach(function(row) {
+          row.forEach(function(scene) {
+            if (scene.background) {
+              assetsToLoad++;
+              var backgroundId = scene.background.id;
+              console.log(scene.background.info);
+              EditorService.getAssetInfo(backgroundId, 'backgrounds').done(function(info) {  // Get each background's info from the database
+                  scene.background.info = info;
+                  console.log("Found background info!", scene.background.info);
+                  assetsLoaded++;
+              });
+            }
+            if (scene.entities) {
+              assetsToLoad += scene.entities.length;
+              scene.entities.forEach(function(entity) {
+                var entityId = entity.id;
+                console.log(entity.info);
+                EditorService.getAssetInfo(entityId, 'entities').done(function(info) {  // Get each entity's info from the database
+                    entity.info.animate = info.animate;
+                    console.log("Found entity info!", entity.info);
+                    assetsLoaded++;
+                });
+              });
+            }
+            if (scene.objects) {
+              assetsToLoad += scene.objects.length;
+              scene.objects.forEach(function(object) {
+                var objectId = object.id;
+                console.log(object.info);
+                EditorService.getAssetInfo(objectId, 'objects').done(function(info) {  // Get each object's info from the database
+                    object.info.collisionMap = info.collisionMap;
+                    object.info.image = info.image;
+                    console.log("Found object info!", object.info);
+                    assetsLoaded++;
+                });
+              });
+            }
+          });
+        });
+      });
+
+      var checkGameLoadLoop = setInterval(function() {
+        console.log("Loading " + assetsToLoad + " assets.");
+        console.log(assetsLoaded + " assets loaded.");
+        var finishedLoading = false;
+        if (assetsLoaded >= assetsToLoad) {
+          finishedLoading = true;
+        }
+        if (finishedLoading) {
+          console.log("Game Loaded!", response);
+          clearInterval(checkGameLoadLoop);
+          PopupService.close();
+          self.gameLoaded = true;
+          gameInfo = response.info;
+          allMaps = gameInfo.maps;
+          self.currentMap = allMaps[0];
+          self.allRows = self.currentMap.scenes;
+          self.currentRow = self.allRows[0];
+          self.currentScene = self.currentRow[0];
+          background = self.currentScene.background;
+          objects = self.currentScene.objects;
+          loadEntities();
+          events = self.currentScene.events;
+          drawEntities('background');
+          drawObjects('background');
+          drawBackground();
+          startPos = {    // Eventually will come from game object
+            map: 1,
+            row: 0,
+            column: 0,
+            x: 300,
+            y: 250
+          };
+          $scope.$apply();
+        }
+      }, 200);
     });
 
     function loadMainCharacter() {

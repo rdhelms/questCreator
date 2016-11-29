@@ -139,10 +139,34 @@ angular.module('questCreator').service('EditorService', function (UserService, $
         tags: game.tags,
         description: game.description,
         info: game.info,
-        published: true,
+        published: game.published || false,
         thumbnail: game.info.maps[0].scenes[0][0].background.thumbnail
       };
-      console.log(gameUpdateData);
+      var slimGameData = angular.copy(gameUpdateData);
+      slimGameData.info.maps.forEach(function(map) {
+        map.scenes.forEach(function(row) {
+          row.forEach(function(scene) {
+            if (scene.background) {
+              scene.background.thumbnail = null;
+              scene.background.info = null;
+            }
+            if (scene.entities) {
+              scene.entities.forEach(function(entity) {
+                entity.thumbnail = null;
+                entity.info.animate = null;
+              });
+            }
+            if (scene.objects) {
+              scene.objects.forEach(function(object) {
+                object.thumbnail = null;
+                object.info.collisionMap = null;
+                object.info.image = null;
+              });
+            }
+          });
+        });
+      });
+      console.log("Game Save Object", slimGameData);
       var headerData = {
         user_id: UserService.get().id,
         token: UserService.get().token
@@ -151,7 +175,7 @@ angular.module('questCreator').service('EditorService', function (UserService, $
         method: 'PUT',
         url: 'https://forge-api.herokuapp.com/games/update',
         headers: headerData,
-        data: JSON.stringify(gameUpdateData),
+        data: JSON.stringify(slimGameData),
         dataType: 'json',
         contentType: 'application/json',
         success: function(response) {
@@ -501,7 +525,7 @@ angular.module('questCreator').service('EditorService', function (UserService, $
            id: id
          },
          success: function(response) {
-           console.log(response);
+          //  console.log(response);
            return response;
          },
          error: function(error) {

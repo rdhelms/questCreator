@@ -119,22 +119,97 @@ angular.module('questCreator')
             PopupService.open('loading-screen');
             EditorService.getGame(self.currentEditingGame.name).done(function(game) {
                 self.currentEditingGame = game;
-                // console.log(self.currentEditingGame);
                 EditorService.getGameAssets(game.id).done(function(assets) {
-                    PopupService.close();
                     self.availableBackgrounds = assets.availableBackgrounds;
                     self.availableObjects = assets.availableObstacles;
                     self.availableEntities = assets.availableEntities;
                     self.availableEvents = assets.availableEvents;
-                    $scope.$apply();
+                    var assetsToLoad = 0;
+                    var assetsLoaded = 0;
+                    game.info.maps.forEach(function(map) {
+                      map.scenes.forEach(function(row) {
+                        row.forEach(function(scene) {
+                          if (scene.background) {
+                            assetsToLoad++;
+                            var backgroundId = scene.background.id;
+                            console.log(scene.background.info);
+                            EditorService.getAssetInfo(backgroundId, 'backgrounds').done(function(info) {  // Get each background's info from the database
+                                scene.background.info = info;
+                                console.log("Found background info!", scene.background.info);
+                                assetsLoaded++;
+                            });
+                            assets.availableBackgrounds.forEach(function(availableBackground) {
+                              if (backgroundId === availableBackground.id) {
+                                console.log("Background match found!");
+                                scene.background.thumbnail = availableBackground.thumbnail;
+                              }
+                            });
+                          }
+                          if (scene.entities) {
+                            assetsToLoad += scene.entities.length;
+                            scene.entities.forEach(function(entity) {
+                              var entityId = entity.id;
+                              console.log(entity.info);
+                              EditorService.getAssetInfo(entityId, 'entities').done(function(info) {  // Get each entity's info from the database
+                                  entity.info.animate = info.animate;
+                                  console.log("Found entity info!", entity.info);
+                                  assetsLoaded++;
+                              });
+                              assets.availableEntities.forEach(function(availableEntity) {
+                                if (entityId === availableEntity.id) {
+                                  console.log("Entity match found!");
+                                  entity.thumbnail = availableEntity.thumbnail;
+                                }
+                              });
+                            });
+                          }
+                          if (scene.objects) {
+                            assetsToLoad += scene.objects.length;
+                            scene.objects.forEach(function(object) {
+                              var objectId = object.id;
+                              console.log(object.info);
+                              EditorService.getAssetInfo(objectId, 'objects').done(function(info) {  // Get each object's info from the database
+                                  object.info.collisionMap = info.collisionMap;
+                                  object.info.image = info.image;
+                                  console.log("Found object info!", object.info);
+                                  assetsLoaded++;
+                              });
+                              assets.availableObstacles.forEach(function(availableObject) {
+                                if (objectId === availableObject.id) {
+                                  console.log("Object match found!");
+                                  object.thumbnail = availableObject.thumbnail;
+                                }
+                              });
+                            });
+                          }
+                        });
+                      });
+                    });
+                    var checkGameLoadLoop = setInterval(function() {
+                      console.log("Loading " + assetsToLoad + " assets.");
+                      console.log(assetsLoaded + " assets loaded.");
+                      var finishedLoading = false;
+                      if (assetsLoaded >= assetsToLoad) {
+                        finishedLoading = true;
+                      }
+                      if (finishedLoading) {
+                        console.log("Game Loaded!",game);
+                        clearInterval(checkGameLoadLoop);
+                        $scope.$apply();
+                        PopupService.close();
+                      }
+                    }, 200);
                 });
             });
             $('.edit-game').hide();
         };
 
         this.saveGame = function() {
+          PopupService.close();
+          PopupService.open('loading-screen');
             EditorService.saveGame(self.currentEditingGame).done(function(savedGame) {
-                console.log(savedGame);
+                console.log("Saved Game:", savedGame);
+                PopupService.close();
             });
         };
 

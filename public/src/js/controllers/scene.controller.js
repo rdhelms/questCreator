@@ -1,4 +1,4 @@
-angular.module('questCreator').controller('sceneCtrl', function(socket, $state, $scope, $compile) {
+angular.module('questCreator').controller('sceneCtrl', function(socket, $state, $scope, $compile, EditorService) {
   var self = this;
 
   this.view = 'events';
@@ -14,32 +14,41 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
   this.selectedEvent= null;
 
   this.selectBackground = function(background) {
-    console.log(background);
-    $scope.editor.currentScene.background = background;
-    self.selecting.background = false;
+    EditorService.getAssetInfo(background.id, 'backgrounds').done(function(info) {
+        background.info = info;
+        $scope.editor.currentScene.background = angular.copy(background);
+        self.selecting.background = false;
+        $scope.$apply();
+    });
   };
 
   this.selectObject = function(object) {
     if (!object) {
       return;
     }
-    $scope.editor.currentScene.objects.push(object);
-    self.selecting.object = false;
+    EditorService.getAssetInfo(object.id, 'obstacles').done(function(info) {
+        object.info = info;
+        $scope.editor.currentScene.objects.push(angular.copy(object));
+        self.selecting.object = false;
+    });
   };
 
   this.selectEntity = function(entity) {
     if (!entity) {
       return;
     }
-    $scope.editor.currentScene.entities.push(entity);
-    self.selecting.entity = false;
+    EditorService.getAssetInfo(entity.id, 'entities').done(function(info) {
+        entity.info = info;
+        $scope.editor.currentScene.entities.push(angular.copy(entity));
+        self.selecting.entity = false;
+    });
   };
 
   this.selectEvent = function(event) {
     if (!event){
       return;
     }
-    $scope.editor.currentScene.events.push(event);
+    $scope.editor.currentScene.events.push(angular.copy(event));
   };
 
   this.alreadyAdded = function(event){
