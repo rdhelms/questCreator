@@ -676,12 +676,12 @@ angular.module('questCreator')
       });
     }
 
-    function createBackground(name, game_id) {
+    function createBackground(name, game_id, info) {
       var headerData = {
         user_id: UserService.get().id,
         token: UserService.get().token
       };
-      var backgroundInfo = {
+      var backgroundInfo = info || {
         image: [],
         collisionMap: []
       };
@@ -692,6 +692,7 @@ angular.module('questCreator')
         published: true,
         game_id: game_id
       };
+      console.log(currentBackground);
       return $.ajax({
         method: 'POST',
         url: 'https://forge-api.herokuapp.com/backgrounds/create',
@@ -700,6 +701,7 @@ angular.module('questCreator')
         dataType: 'json',
         contentType: 'application/json',
         success: function(response) {
+          console.log(response);
           return response;
         },
         error: function(error) {
@@ -732,12 +734,12 @@ angular.module('questCreator')
       });
     }
 
-    function createObject(name, game_id) {
+    function createObject(name, game_id, info) {
       var headerData = {
         user_id: UserService.get().id,
         token: UserService.get().token
       };
-      var objectInfo = {
+      var objectInfo = info || {
         pos: {
           x: 350,
           y: 250
@@ -792,12 +794,12 @@ angular.module('questCreator')
       });
     }
 
-    function createEntity(name, game_id) {
+    function createEntity(name, game_id, info) {
       var headerData = {
         user_id: UserService.get().id,
         token: UserService.get().token
       };
-      var entityInfo = {
+      var entityInfo = info || {
         pos: {
           x: 350,
           y: 250
@@ -974,7 +976,6 @@ angular.module('questCreator')
         tags: eventUpdate.tags,
         category: eventUpdate.category
       };
-      debugger;
       console.log(saveData);
       var headerData = {
         user_id: UserService.get().id,
@@ -1013,6 +1014,7 @@ angular.module('questCreator')
            id: id
          },
          success: function(response) {
+           console.log(response);
            return response;
          },
          error: function(error) {
@@ -1109,6 +1111,20 @@ angular.module('questCreator')
         getGames: getAllGames,
         searchGames: searchGames
     };
+});
+;angular.module('questCreator').service('StorageService', function (localStorageService) {
+  function getFromStorage(key) {
+
+  }
+
+  function setInStorage(key, value) {
+
+  }
+
+  return {
+    get: getFromStorage,
+    set: setInStorage
+  };
 });
 ;angular.module('questCreator').service('PaletteService', function (UserService, PopupService) {
 
@@ -2574,6 +2590,8 @@ angular.module('questCreator')
           },
           {
             name: 'location',
+        }, {
+            name: 'collision',
             description: 'Events triggered by player position.'
         }];
         this.eventType = null;
@@ -3613,7 +3631,11 @@ angular.module('questCreator')
 ;angular.module('questCreator').controller('eventsCtrl', function($state, $scope, EditorService) {
   this.view = 'triggers';
   this.resultType = 'text';
-  this.requirementType = 'achievement';
+  this.requirementType = null;
+  this.requirements = {
+    achievements: null,
+    inventory: null
+  }
   this.locationView = 'scene';
   this.map = null;
   this.scene = null;
@@ -3623,14 +3645,67 @@ angular.module('questCreator')
 // DEBUG
   this.log = function(){
     console.log($scope.editor.currentEvent);
+    console.log("requirements: ", this.requirements);
   }
 
   this.save = function(event) {
-    console.log("Saving event", event);
     EditorService.saveEvent(event).done(function(response){
-      console.log("Event saved: ", response);
     });
   }
+
+////
+//REQUIREMENTS:
+////
+
+  this.findRequirements = function() {
+    var achievements = [];
+    var itemList = [];
+    $scope.editor.currentEditingGame.info.maps.forEach(function(map){
+      map.scenes.forEach(function(sceneRow){
+        sceneRow.forEach(function(scene){
+          if (scene.events) {
+            scene.events.forEach(function(event){
+              event.info.results.achievements.forEach(function(achievement){
+                achievements.push(achievement.name);
+              });
+              event.info.results.inventory.forEach(function(item){
+                itemList.push(item);
+              });
+            })
+          }
+        })
+      });
+    });
+    this.requirements = {
+      achievements: achievements,
+      inventory: itemList
+    };
+  }
+
+  this.addRequirement = function(requirement, type) {
+    if ($scope.editor.currentEvent.info.requirements.length === 0) {
+      $scope.editor.currentEvent.info.requirements = {
+        achievements: [],
+        inventory: []
+      };
+    }
+    $scope.editor.currentEvent.info.requirements[type].push(requirement);
+  };
+
+  this.anyRequirements = function(){
+    if (!$scope.editor.currentEvent) {
+      return false;
+    }
+    var results = $scope.editor.currentEvent.info.results;
+    if (requirements.achievements.length > 0 ||
+        requirements.inventory.length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+
 ////
 //TRIGGERS:
 ////
@@ -4596,7 +4671,7 @@ angular.module('questCreator')
     moved = true;
   });
 });
-;angular.module('questCreator').controller('paletteCtrl', function(PaletteService, $scope) {
+;angular.module('questCreator').controller('paletteCtrl', function(PaletteService, $scope, EditorService) {
 
     var self = this;
     this.elements = [];
@@ -4605,7 +4680,6 @@ angular.module('questCreator')
     $scope.$on('paletteInit', function(event, type) {
 
         PaletteService.getByType(type.type).then(function(response) {
-          console.log(response);
             self.assets = response;
             $scope.$apply();
             self.currentType = PaletteService.getCurrentType();
@@ -4629,36 +4703,80 @@ angular.module('questCreator')
             $scope.editor.selectingAssets = false;
         };
 
-        self.addToPalette = function(element) {
+        self.testDupes = function (id, game) {
+          var notDupe = true;
+          if (game === $scope.editor.currentEditingGame.id) {
+            notDupe = false;
+          }
+          for (var i = 0; i < self.elements.length; i++) {
+            if (self.elements[i].id === id) {
+              notDupe = false;
+            }
+          }
+          return notDupe;
+        };
+
+        self.addToPalette = function(asset, index) {
+          self.assets.forEach(function (element) {
+          });
+          self.assets.splice(index, 1);
+          var element = angular.copy(asset);
+          EditorService.getAssetInfo(element.id, self.currentType).done(function (info) {
+            element.info = info;
             self.elements.push(element);
+            $scope.$apply();
+          });
+        };
+
+        self.removeFromPalette = function (index) {
+          self.elements.splice(index, 1);
         };
 
         self.saveElements = function() {
-          console.log('in editor: ', $scope.editor.availableObjects);
-          console.log('in palette: ', self.elements);
-          var currentObjects = null;
+          var currentObjects = [];
+          var savedAssets = [];
+          var asset = null;
           if (self.currentType === 'backgrounds') {
-            currentObjects =  $scope.editor.availableBackgrounds.concat(self.elements);
+            for (var i = 0; i < self.elements.length; i++) {
+              asset = self.elements[i];
+                EditorService.createBackground(asset.name, $scope.editor.currentEditingGame.id, asset.info).done(function (response) {
+                  response.thumbnail = asset.thumbnail;
+                  savedAssets.push(response);
+              });
+            }
+            currentObjects = $scope.editor.availableBackgrounds.concat(savedAssets);
             $scope.editor.availableBackgrounds = currentObjects;
+            console.log($scope.editor.availableBackgrounds);
           } else if (self.currentType === 'obstacles') {
-            currentObjects = $scope.editor.availableObjects.concat(self.elements);
+            for (var j = 0; j < self.elements.length; j++) {
+              asset = self.elements[j];
+                EditorService.createBackground(asset.name, $scope.editor.currentEditingGame.id, asset.info).done(function (response) {
+                  response.thumbnail = asset.thumbnail;
+                  savedAssets.push(response);
+              });
+            }
+            currentObjects = $scope.editor.availableObjects.concat(savedAssets);
             $scope.editor.availableObjects = currentObjects;
           } else if (self.currentType === 'entities') {
-            currentObjects = $scope.editor.availableEntities.concat(self.elements);
+            for (var k = 0; k < self.elements.length; k++) {
+              asset = self.elements[k];
+                EditorService.createEntity(asset.name, $scope.editor.currentEditingGame.id, asset.info).done(function (response) {
+                  response.thumbnail = asset.thumbnail;
+                  savedAssets.push(response);
+              });
+            }
+            currentObjects = $scope.editor.availableEntities.concat(savedAssets);
             $scope.editor.availableEntities = currentObjects;
           }
           self.elements = [];
+          $scope.editor.$apply();
           return self.elements;
-        };
-
-        self.removeFromPalette = function (element) {
-
         };
 
     });
 });
 ;angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, GameService, $state, $scope, PopupService) {
-    var socketDelay = 100;
+    var socketDelay = 50;
     var socketIterator = 0;
     var fullPlayer = {
       id: null,
@@ -4896,18 +5014,24 @@ angular.module('questCreator')
       var foundEvent = false; // Whether a typing event has already been triggered
       if (events) {
         events.forEach(function(event) { // Loop through all the typing events
-          console.log(event);
           if (event.category === 'text') {
             var typingEvent = event.info;
             if (!foundEvent) {  // Only continue checking as long as another event has already not been triggered
               var requirementsMet = true;   // Assume that the requirements will be met
-              typingEvent.requirements.forEach(function(requirement) {  // Loop through all the requirements
-                if (requirement.type === 'achievement' && self.saveInfo.achievements.indexOf(requirement.value) === -1) { // If an achievement is required, check the player's past achievements
-                  requirementsMet = false;  // Requirements fail if achievement is not present
-                } else if (requirement.type === 'inventory' && self.saveInfo.inventory.indexOf(requirement.value) === -1) { // If an inventory item is required, check the player's inventory
-                  requirementsMet = false;  // Requirements fail if inventory does not contain necessary item
-                }
-              });
+              if (typingEvent.requirements.achievements) {
+                typingEvent.requirements.achievements.forEach(function(achievement) {  // Loop through all the achievement requirements
+                  if (self.saveInfo.achievements.indexOf(achievement) === -1) { // If an achievement is required, check the player's past achievements
+                    requirementsMet = false;  // Requirements fail if achievement is not present
+                  }
+                });
+              }
+              if (typingEvent.requirements.inventory) {
+                typingEvent.requirements.inventory.forEach(function(item) {  // Loop through all the inventory requirements
+                  if (self.saveInfo.inventory.indexOf(item) === -1) { // If an inventory item is required, check the player's inventory
+                    requirementsMet = false;  // Requirements fail if inventory does not contain necessary item
+                  }
+                });
+              }
               if (requirementsMet) {  // If all the requirements have been met, check the event's triggers
                 var triggerSatisfied = true;  // Assume that the trigger conditions will be met
                 typingEvent.triggers.forEach(function(wordSet) { // Loop through the sets of words to check
@@ -5412,8 +5536,6 @@ angular.module('questCreator')
         socket.emit('update player', playerUpdate);
         background = self.currentScene.background;
         events = self.currentScene.events;
-        console.log(self.currentScene);
-        console.log(events);
         objects = self.currentScene.objects;
         loadEntities();
     }
@@ -6108,6 +6230,24 @@ angular.module('questCreator')
     console.log("after: ", $scope.editor.currentScene.events);
   };
 
+  this.alreadyAdded = function(event){
+    if (!$scope.editor.currentScene){
+      return false;
+    } else {
+      return $scope.editor.currentScene.events.forEach(function(element) {
+        if (event.id === element.id){
+          return true;
+        } else {
+          return false;
+        }
+      });
+    }
+  }
+
+  this.removeEvent = function(index){
+    $scope.editor.currentScene.events.splice(index, 1);
+  };
+
   this.addLocationEvent = function(){
     var locationCount = ($scope.editor.currentScene.events.filter(function(element){
       return element.category === "location";
@@ -6147,6 +6287,18 @@ angular.module('questCreator')
     }
   };
 
+  this.anyRequirements = function(event){
+    if (!event) {
+      return false;
+    }
+    var requirements = event.info.requirements;
+    if (requirements.achievements.length > 0 ||
+        requirements.inventory.length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  };
 
   this.removeAsset = function(index, type){
     $scope.editor.currentScene[type].splice(index, 1);
