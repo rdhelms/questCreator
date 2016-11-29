@@ -163,12 +163,12 @@ angular.module('questCreator').service('EditorService', function (UserService, $
       });
     }
 
-    function createBackground(name, game_id) {
+    function createBackground(name, game_id, info) {
       var headerData = {
         user_id: UserService.get().id,
         token: UserService.get().token
       };
-      var backgroundInfo = {
+      var backgroundInfo = info || {
         image: [],
         collisionMap: []
       };
@@ -179,6 +179,7 @@ angular.module('questCreator').service('EditorService', function (UserService, $
         published: true,
         game_id: game_id
       };
+      console.log(currentBackground);
       return $.ajax({
         method: 'POST',
         url: 'https://forge-api.herokuapp.com/backgrounds/create',
@@ -187,6 +188,7 @@ angular.module('questCreator').service('EditorService', function (UserService, $
         dataType: 'json',
         contentType: 'application/json',
         success: function(response) {
+          console.log(response);
           return response;
         },
         error: function(error) {
@@ -219,12 +221,12 @@ angular.module('questCreator').service('EditorService', function (UserService, $
       });
     }
 
-    function createObject(name, game_id) {
+    function createObject(name, game_id, info) {
       var headerData = {
         user_id: UserService.get().id,
         token: UserService.get().token
       };
-      var objectInfo = {
+      var objectInfo = info || {
         pos: {
           x: 350,
           y: 250
@@ -279,12 +281,12 @@ angular.module('questCreator').service('EditorService', function (UserService, $
       });
     }
 
-    function createEntity(name, game_id) {
+    function createEntity(name, game_id, info) {
       var headerData = {
         user_id: UserService.get().id,
         token: UserService.get().token
       };
-      var entityInfo = {
+      var entityInfo = info || {
         pos: {
           x: 350,
           y: 250
@@ -500,6 +502,7 @@ angular.module('questCreator').service('EditorService', function (UserService, $
            id: id
          },
          success: function(response) {
+           console.log(response);
            return response;
          },
          error: function(error) {

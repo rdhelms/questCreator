@@ -1,4 +1,4 @@
-angular.module('questCreator').controller('paletteCtrl', function(PaletteService, $scope) {
+angular.module('questCreator').controller('paletteCtrl', function(PaletteService, $scope, EditorService) {
 
     var self = this;
     this.elements = [];
@@ -7,7 +7,6 @@ angular.module('questCreator').controller('paletteCtrl', function(PaletteService
     $scope.$on('paletteInit', function(event, type) {
 
         PaletteService.getByType(type.type).then(function(response) {
-          console.log(response);
             self.assets = response;
             $scope.$apply();
             self.currentType = PaletteService.getCurrentType();
@@ -31,30 +30,74 @@ angular.module('questCreator').controller('paletteCtrl', function(PaletteService
             $scope.editor.selectingAssets = false;
         };
 
-        self.addToPalette = function(element) {
+        self.testDupes = function (id, game) {
+          var notDupe = true;
+          if (game === $scope.editor.currentEditingGame.id) {
+            notDupe = false;
+          }
+          for (var i = 0; i < self.elements.length; i++) {
+            if (self.elements[i].id === id) {
+              notDupe = false;
+            }
+          }
+          return notDupe;
+        };
+
+        self.addToPalette = function(asset, index) {
+          self.assets.forEach(function (element) {
+          });
+          self.assets.splice(index, 1);
+          var element = angular.copy(asset);
+          EditorService.getAssetInfo(element.id, self.currentType).done(function (info) {
+            element.info = info;
             self.elements.push(element);
+            $scope.$apply();
+          });
+        };
+
+        self.removeFromPalette = function (index) {
+          self.elements.splice(index, 1);
         };
 
         self.saveElements = function() {
-          console.log('in editor: ', $scope.editor.availableObjects);
-          console.log('in palette: ', self.elements);
-          var currentObjects = null;
+          var currentObjects = [];
+          var savedAssets = [];
+          var asset = null;
           if (self.currentType === 'backgrounds') {
-            currentObjects =  $scope.editor.availableBackgrounds.concat(self.elements);
+            for (var i = 0; i < self.elements.length; i++) {
+              asset = self.elements[i];
+                EditorService.createBackground(asset.name, $scope.editor.currentEditingGame.id, asset.info).done(function (response) {
+                  response.thumbnail = asset.thumbnail;
+                  savedAssets.push(response);
+              });
+            }
+            currentObjects = $scope.editor.availableBackgrounds.concat(savedAssets);
             $scope.editor.availableBackgrounds = currentObjects;
+            console.log($scope.editor.availableBackgrounds);
           } else if (self.currentType === 'obstacles') {
-            currentObjects = $scope.editor.availableObjects.concat(self.elements);
+            for (var j = 0; j < self.elements.length; j++) {
+              asset = self.elements[j];
+                EditorService.createBackground(asset.name, $scope.editor.currentEditingGame.id, asset.info).done(function (response) {
+                  response.thumbnail = asset.thumbnail;
+                  savedAssets.push(response);
+              });
+            }
+            currentObjects = $scope.editor.availableObjects.concat(savedAssets);
             $scope.editor.availableObjects = currentObjects;
           } else if (self.currentType === 'entities') {
-            currentObjects = $scope.editor.availableEntities.concat(self.elements);
+            for (var k = 0; k < self.elements.length; k++) {
+              asset = self.elements[k];
+                EditorService.createEntity(asset.name, $scope.editor.currentEditingGame.id, asset.info).done(function (response) {
+                  response.thumbnail = asset.thumbnail;
+                  savedAssets.push(response);
+              });
+            }
+            currentObjects = $scope.editor.availableEntities.concat(savedAssets);
             $scope.editor.availableEntities = currentObjects;
           }
           self.elements = [];
+          $scope.editor.$apply();
           return self.elements;
-        };
-
-        self.removeFromPalette = function (element) {
-
         };
 
     });
