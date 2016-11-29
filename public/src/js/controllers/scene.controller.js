@@ -68,6 +68,22 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
     $scope.editor.currentScene.events.push(newEvent);
   };
 
+  this.anyResults = function(event){
+    if (!event) {
+      return false;
+    }
+    var results = event.info.results;
+    if (results.text.length > 0 ||
+        results.achievements.length > 0 ||
+        results.inventory.length > 0 ||
+        Object.keys(results.portal).length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+
   this.removeAsset = function(index, type){
     $scope.editor.currentScene[type].splice(index, 1);
   };

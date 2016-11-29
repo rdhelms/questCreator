@@ -134,22 +134,23 @@
     display: inline-block;
   }
 
-  .word {
-    &.keyword {
-      display: block;
-      font-size: 1.25em;
-      font-family: PCSenior;
-      text-decoration: underline;
-      width: 100%;
-      white-space: wrap;
-    }
-    display: inline-block;
-    border: none;
-    padding: 10px 0;
-    &:hover {
-      background: $darkgrey;
-      color: $white;
-    }
+}
+
+.word {
+  &.keyword {
+    display: block;
+    font-size: 1.25em;
+    font-family: PCSenior;
+    text-decoration: underline;
+    width: 100%;
+    white-space: wrap;
+  }
+  display: inline-block;
+  border: none;
+  padding: 10px 0;
+  &:hover {
+    background: $darkgrey;
+    color: $white;
   }
 }
 
