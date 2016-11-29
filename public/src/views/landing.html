@@ -3,7 +3,7 @@
         <h1 class="landing-header" ng-if="!landing.searching">HOT NEW GAMES:</h1>
         <div id="game-results">
           <button ng-if="landing.searching" ng-click="landing.showAll()" class="show-all-games">Show All Games</button>
-            <div ng-repeat="game in landing.allGames" class="game" ng-click="goToGameDetail(game)">
+            <div ng-repeat="game in landing.allGames | orderBy:'-'" class="game" ng-click="goToGameDetail(game)">
                 <img ng-src="{{ game.thumbnail }}" alt="Game thumbnail"/>
                 <ul>
                     <li>
