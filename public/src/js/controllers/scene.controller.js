@@ -39,9 +39,7 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
     if (!event){
       return;
     }
-    console.log("before: ", $scope.editor.currentScene.events);
     $scope.editor.currentScene.events.push(event);
-    console.log("after: ", $scope.editor.currentScene.events);
   };
 
   this.alreadyAdded = function(event){
