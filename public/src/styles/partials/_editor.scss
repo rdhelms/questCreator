@@ -178,6 +178,12 @@
       border-top: none;
       padding: .5rem;
 
+      #scene-event-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
       h4 {
         text-align: center;
       }

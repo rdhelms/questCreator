@@ -77,7 +77,7 @@
     padding: 4px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     transition: box-shadow 1s ease, background-color .5s ease, color .5s ease;
 
     &:hover {

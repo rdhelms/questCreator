@@ -10,6 +10,7 @@
     </li>
   </ul>
 
+<!-- EVENTS IN SCENE VIEW  -->
 
   <section class="scene-assets" ng-show="scene.view==='events'">
 
@@ -17,7 +18,7 @@
     <h4>{{editor.currentScene.name}} Events:</h4>
     <section id="scene-event-controls">
       <span class="select" tabindex="1">
-        <h3>Events:</h3>
+        <p>Events:</p>
         <ul class="options" ng-show="editor.availableEvents.length > 0" >
           <li class="option" tabindex="1" ng-repeat="event in editor.availableEvents track by $index" ng-mouseover="scene.selectedEvent = editor.availableEvents[$index]" ng-class="{'disabled': scene.alreadyAdded(editor.availableEvents[$index])}">
             {{editor.availableEvents[$index].name}}
@@ -25,8 +26,8 @@
           <li ng-show="editor.availableEvents.length === 0">(none)</li>
         </ul>
       </span>
-      <button ng-click="scene.selectEvent(scene.selectedEvent)" ng-disabled="!scene.selectedEvent">+ {{scene.selectedEvent.name || "Event"}}</button>
-      <button ng-click="scene.addLocationEvent()">+ Location Event</button>
+      <button ng-click="scene.selectEvent(scene.selectedEvent)" ng-disabled="!scene.selectedEvent">Add {{scene.selectedEvent.name || "Event"}}</button>
+      <button ng-click="scene.addLocationEvent()">Add Location Event</button>
     </section>
 
 
@@ -110,6 +111,8 @@
 
   </section>
 
+<!-- GRAPHIC ASSETS IN SCENE VIEW -->
+
   <section class="scene-assets" ng-show="scene.view==='assets'">
     <h4>{{editor.currentScene.name}} Assets:</h4>
 
@@ -117,7 +120,7 @@
       <!-- BACKGROUND -->
       <li>
         <span class="select" tabindex="1">
-          <h3>Background:</h3>
+          <p>Background:</p>
           <ul class="options" tabindex="1">
             <li ng-repeat="background in editor.availableBackgrounds | orderBy:'-'" ng-mouseover="scene.selectBackground(background)" class="option" tabindex="1">{{background.name}}</li>
           </ul>
@@ -127,7 +130,7 @@
       <!-- OBJECTS -->
       <li>
         <span class="select" tabindex="1">
-          <h3>Objects:</h3>
+          <p>Objects:</p>
           <ul class="options">
             <li class="option" tabindex="1" ng-repeat="object in editor.availableObjects" ng-mouseover="scene.selectedObject = object" ng-show="editor.availableObjects.length > 0">
               {{object.name}}
@@ -156,7 +159,7 @@
       <!-- ENTITIES -->
       <li>
         <span class="select" tabindex="1">
-          <h3>Entities:</h3>
+          <p>Entities:</p>
           <ul class="options">
             <li class="option" tabindex="1" ng-repeat="entity in editor.availableEntities" ng-mouseover="scene.selectedEntity = entity" ng-show="editor.availableEntities.length > 0">
               {{entity.name}}
