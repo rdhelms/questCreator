@@ -169,7 +169,10 @@
 
   &#asset {
     flex: 1;
-    height: 400px;
+
+    > * {
+      height: 400px;
+    }
 
     .scene-assets {
       height: 400px; //NOTE this is a quick fix, need to find underlying cause!
@@ -218,13 +221,6 @@
     }
   }
 
-  .edit-header {
-    width: 80%;
-    display: flex;
-    justify-content: flex-start;
-    height: 1.4rem;
-  }
-
   .edit-canvas {
     box-sizing: content-box;
     height: 508px;
@@ -256,19 +252,6 @@
     rgba(255,255,255,1) 0%,
     rgba(231,223,199,1) 100%
     );
-  }
-}
-
-.editor-controls {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  > * {
-    flex: 1;
-    button {
-      width: 100%;
-      height: 100%;
-    }
   }
 }
 
@@ -607,6 +590,36 @@ canvas.asset {
   transition: transform ease 100ms;
   transform: scale(1.2);
   opacity: .5;
+}
+
+.asset-header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  margin: 1em 0;
+
+  &.big {
+    width: 80%;
+    height: 1.4rem;
+  }
+
+  &.map {
+    justify-content: flex-start;
+  }
+}
+
+.asset-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  width: 100%;
+
+  &.welcome {
+    justify-content: center;
+  }
 }
 
 #editor-footer {

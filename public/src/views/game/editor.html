@@ -22,12 +22,12 @@
             <section class="editor-contents" id="scene">
 
                 <!-- HEADER -->
-                <div class="edit-header">
+                <div class="asset-header big" ng-class="{'map': editor.currentLargeView === 'map'}">
                     <p ng-hide="editor.currentLargeView === 'map'">{{editor.currentLargeView | capitalize}} name:</p>
                     <p ng-show="editor.currentLargeView === 'map'">Maps:</p>
                     <input type="text" ng-model="editor.currentBackground.name" ng-click="editor.selectText($event)" blur-on-enter ng-show="editor.currentLargeView === 'background'">
                     <input type="text" ng-model="editor.currentScene.name" ng-click="editor.selectText($event)" blur-on-enter ng-show="editor.currentLargeView === 'scene'">
-                    <!-- <input type="text" class="currentColor" ng-model="bg.currentColor" value="{{editor.currentColor}}" ng-hide="true"> -->
+                    <button ng-if="editor.currentLargeView === 'background'" id="saveBackground">Save</button>
                 </div>
                 <!-- EDIT SPACE -->
                 <div class="edit-canvas {{editor.currentLargeView}}" ng-class="{{editor.currentLargeView}}">
@@ -45,19 +45,6 @@
                     {{editor.uiDrag()}}
                     <ui-view ng-show="editor.currentLargeView === 'background'" name="backgrounds"></ui-view>
                 </div>
-                <!-- CONTROLS -->
-                <ul class="editor-controls">
-                    <li><button id="clearBackground" ng-disabled="editor.currentLargeView !== 'background'">Clear</button></li>
-                    <li>
-                      <button id="saveBackground">
-                        <div ng-show="editor.currentLargeView === 'background'" ng-hide="editor.currentLargeView === 'map' || editor.currentLargeView ==='scene'">Save {{editor.currentBackground.name || "Background"}}</div>
-                        <div ng-show="editor.currentSmallView === 'scene'" ng-hide="editor.currentLargeView === 'map' || editor.currentLargeView === 'background'">Save {{editor.currentScene.name || "Scene"}}</div>
-                        <div ng-show="editor.currentLargeView === 'map'" ng-hide="editor.currentLargeView === 'scene' || editor.currentLargeView === 'background'">Save</div>
-                      </button>
-                    </li>
-                    <li><button id="undoBackground" ng-disabled="editor.currentLargeView !== 'background'">Undo</button></li>
-                    <li><button id="redoBackground" ng-disabled="editor.currentLargeView !== 'background'">Redo</button></li>
-                </ul>
             </section>
 
             <!-- TOOLBAR -->
@@ -149,6 +136,14 @@
                 <ui-view name="entities" ng-show="editor.currentSmallView === 'entity'"></ui-view>
                 <ui-view name="events" ng-show="editor.currentSmallView === 'event'"></ui-view>
                 <ui-view name="scenes" ng-show="editor.currentSmallView === 'scene'"></ui-view>
+                <div ng-if="editor.currentSmallView === 'welcome'">
+                  <div class="asset-container welcome">
+                    <div>
+                      <h1 class="yazua">Yazua DPS</h1>
+                      <p class="dps">Design.Play.Share.</p>
+                    </div>
+                  </div>
+                </div>
             </section>
         </aside>
 
