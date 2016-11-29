@@ -1,8 +1,14 @@
-<input class="objectEditorTitle" type="text" ng-model="editor.currentObject.name" ng-click="editor.selectText($event)" blur-on-enter></input>
-<div ng-show="editor.currentObject" class="edit-canvas"><canvas id="obj-canvas" height="200" width="200"></canvas></div>
-<ul class="editor-controls">
-    <li><button id="clearObject">Clear</button></li>
-    <li><button id="saveObject">Save Object</button></li>
-    <li><button id="undoObject">Undo</button></li>
-    <li><button id="redoObject">Redo</button></li>
-</ul>
+<div class="asset-container">
+  
+  <div class="asset-header">
+    <input class="objectEditorTitle" type="text" ng-model="editor.currentObject.name" ng-click="editor.selectText($event)" blur-on-enter></input>
+    <button id="saveObject">Save Object</button>
+  </div>
+
+  <div class="asset-content">
+    <div ng-show="editor.currentObject" class="edit-canvas">
+      <canvas id="obj-canvas" height="200" width="200" tabindex="1" ng-focus="editor.qState = {undo: 'undoObject', redo: 'redoObject', clear: 'clearObject'}"></canvas>
+    </div>
+  </div>
+
+</div>

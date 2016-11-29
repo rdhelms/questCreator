@@ -457,7 +457,7 @@ angular.module('questCreator').controller('objCtrl', function($state, $scope, Ed
   // });
 
   // When the user clicks the undo button, remove the last element from the object array and push it to the undo array, based on current drawing type. Then redraw canvas.
-  $('#undoObject').click(function() {
+  $('#tool-bar').on('click', '#undoObject', function() {
     // if (drawing.mobile && self.allMobileCircles.length > 0) {
     //   var lastObj = self.allMobileCircles.pop();
     //   undoCharacterArray.push(lastObj);
@@ -483,7 +483,7 @@ angular.module('questCreator').controller('objCtrl', function($state, $scope, Ed
   });
 
   // When the user clicks the redo button, remove the last element from the undo array and push it to the object array, based on current drawing type. Then redraw canvas.
-  $('#redoObject').click(function() {
+  $('#tool-bar').on('click', '#redoObject', function() {
     // if (drawing.mobile && undoCharacterArray.length > 0) {
     //   var lastObj = undoCharacterArray.pop();
     //   self.allMobileCircles.push(lastObj);
@@ -510,7 +510,7 @@ angular.module('questCreator').controller('objCtrl', function($state, $scope, Ed
 
   // When the Clear Canvas button is clicked, make the current Background and current Scene empty objects and reload the view.
   // Note: may need extra testing here.
-  $('#clearObject').click(function() {
+  $('#tool-bar').on('click', '#clearObject', function() {
     canvasWidth = self.myCanvas.width;
     canvasHeight = self.myCanvas.height;
     // self.allObstacleSquares = [];

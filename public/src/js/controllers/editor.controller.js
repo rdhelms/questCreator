@@ -29,7 +29,12 @@ angular.module('questCreator')
         // this.currentSceneImg = {};
         //NOTE probably can remove^
         this.currentLargeView = 'map';
-        this.currentSmallView = 'object';
+        this.currentSmallView = 'welcome';
+        this.qState = {
+          undo: 'undoBackground',
+          redo: 'redoBackground',
+          clear: 'clearBackground'
+        };
         this.availableBackgrounds = [];
         this.availableObjects = [];
         this.availableEntities = [];
@@ -272,6 +277,11 @@ angular.module('questCreator')
                 object.info = info;
                 self.currentObject = object;
                 self.currentSmallView = 'object';
+                self.qState = {
+                  undo: 'undoObject',
+                  redo: 'redoObject',
+                  clear: 'clearObject'
+                };
                 $scope.$broadcast('redrawObject', object.info.image, object.info.collisionMap);
             });
         };
@@ -296,6 +306,11 @@ angular.module('questCreator')
                 // console.log(entity);
                 self.currentEntity = entity;
                 self.currentSmallView = 'entity';
+                self.qState = {
+                  undo: 'undoEntity',
+                  redo: 'redoEntity',
+                  clear: 'clearEntity'
+                };
                 $scope.$broadcast('redrawEntity',entity.info.animate[self.selectedAnimation][self.currentFrameIndex].image, entity.info.animate[self.selectedAnimation][self.currentFrameIndex].collisionMap);
             });
         };

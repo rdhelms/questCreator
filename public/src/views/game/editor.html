@@ -13,7 +13,7 @@
                     <h5>Scene</h5>
                     <p>{{editor.currentScene.name || "..."}}</p>
                 </li>
-                <li class="tab" ng-class="{'active': editor.currentLargeView === 'background'}" ng-click="editor.currentLargeView = 'background'">
+                <li class="tab" ng-class="{'active': editor.currentLargeView === 'background'}" ng-click="editor.currentLargeView = 'background'; editor.qState = {undo: 'undoBackground', redo: 'redoBackground', clear: 'clearBackground'}">
                     <h5>Background</h5>
                     <p>{{editor.currentBackground.name || "..."}}</p>
                 </li>
@@ -76,13 +76,13 @@
                       <input type="button" class="search-button" title="Click to browse backgrounds to add to your palette." ng-click="editor.goToPalette('backgrounds')">
                     </div>
                     <ul>
-                        <li ng-click="editor.createBackground(); editor.currentLargeView = 'background'">
+                        <li ng-click="editor.createBackground(); editor.currentLargeView = 'background'; editor.qState = {undo: 'undoBackground', redo: 'redoBackground', clear: 'clearBackground'}">
                             <div class="asset new">
                               <div class="asset-name new">+</div>
                             </div>
                             <div class="asset-name new">...</div>
                         </li>
-                        <li ng-repeat="background in editor.availableBackgrounds | orderBy:'-'" ng-click="editor.editBackground(background); editor.currentLargeView = 'background'">
+                        <li ng-repeat="background in editor.availableBackgrounds | orderBy:'-'" ng-click="editor.editBackground(background); editor.currentLargeView = 'background'; editor.qState = {undo: 'undoBackground', redo: 'redoBackground', clear: 'clearBackground'}">
                             <div class="asset available {{background.name | nospace}}" ng-style="editor.setThumbnail(background)"></div>
                             <div class="asset-name">{{background.name}}</div>
                         </li>
