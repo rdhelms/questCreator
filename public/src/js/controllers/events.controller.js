@@ -66,7 +66,17 @@ angular.module('questCreator').controller('eventsCtrl', function($state, $scope,
     if (!$scope.editor.currentEvent) {
       return false;
     }
-    var requirements = $scope.editor.currentEvent.info.results;
+
+    //Backwards compat fix, should remove someday...:
+    if (!$scope.editor.currentEvent.info.requirements.achievements) {
+      $scope.editor.currentEvent.info.requirements.achievements = [];
+    }
+    if (!$scope.editor.currentEvent.info.requirements.inventory) {
+      $scope.editor.currentEvent.info.requirements.inventory = [];
+    }
+    //
+
+    var requirements = $scope.editor.currentEvent.info.requirements;
     if (requirements.achievements.length > 0 ||
         requirements.inventory.length > 0) {
       return true;
@@ -130,6 +140,29 @@ angular.module('questCreator').controller('eventsCtrl', function($state, $scope,
     if (!$scope.editor.currentEvent) {
       return false;
     }
+    //Backwards compat fix, should remove someday...:
+    if (!$scope.editor.currentEvent.info.results) {
+      $scope.editor.currentEvent.info.results = {
+        text: [],
+        achievements: [],
+        inventory: [],
+        portal: {}
+      };
+    }
+    if (!$scope.editor.currentEvent.info.results.achievements) {
+      $scope.editor.currentEvent.info.results.achievements = [];
+    }
+    if (!$scope.editor.currentEvent.info.results.inventory) {
+      $scope.editor.currentEvent.info.results.inventory = [];
+    }
+    if (!$scope.editor.currentEvent.info.results.text) {
+      $scope.editor.currentEvent.info.results.text = [];
+    }
+    if (!$scope.editor.currentEvent.info.results.portal) {
+      $scope.editor.currentEvent.info.results.portal = {};
+    }
+    //
+
     var results = $scope.editor.currentEvent.info.results;
     if (results.text.length > 0 ||
         results.achievements.length > 0 ||
