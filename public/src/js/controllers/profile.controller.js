@@ -57,6 +57,7 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
 
             UserService.getAvatars().done(function(avatars) {
                 $scope.avatars = avatars;
+                console.log(avatars);
                 for (var i = 0; i < avatars.length; i++) {
                     if (avatars[i].current)
                         $scope.large = avatars[i];

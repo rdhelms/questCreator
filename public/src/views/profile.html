@@ -63,7 +63,7 @@
             <h1>Avatars:</h1>
             <ul class="avatar-preview">
                 <li class="avatar" ng-model="avatars" ng-click="highlightAvatar(avatar, $index)" ng-repeat="avatar in avatars">
-                    <img class="avatar-thumbnail" src="{{ avatar.thumbnail }}" alt="Avatar thumbnail">
+                    <img class="avatar-thumbnail" ng-src="{{ avatar.thumbnail }}" alt="Avatar thumbnail">
                     <p>{{ avatar.name }}</p>
                 </li>
             </ul>
@@ -89,7 +89,7 @@
         </div>
         <h1 ng-if="games">You Did This:</h1>
         <div ng-if="games" class="user-games" ng-repeat="game in games">
-            <img src="{{ game.thumbnail }}" alt="Game thumbnail" />
+            <img ng-src="{{ game.thumbnail }}" alt="Game thumbnail" />
             <ul>
                 <li>
                     <label for="game-name">Game Name:</label> {{ game.name | capitalize }}</li>
