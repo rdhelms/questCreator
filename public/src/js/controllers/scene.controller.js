@@ -45,7 +45,27 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
   };
 
   this.addLocationEvent = function(){
-    console.log("Something has to happen here :(");
+    var locationCount = ($scope.editor.currentScene.events.filter(function(element){
+      return element.category === "location";
+    })).length;
+    console.log("LocationCount: ", locationCount);
+    var name = (locationCount >= 1) ? "New Location Event " + (locationCount) : "New Location Event";
+    var newEvent = {
+      name: name,
+      category: 'location',
+      info: {
+        requirements: [],
+        results: {
+          achievements: [],
+          inventory: [],
+          portal: {},
+          text: []
+        },
+        triggers: []
+      },
+    };
+    console.log("newEvent: ", newEvent);
+    $scope.editor.currentScene.events.push(newEvent);
   };
 
   this.removeAsset = function(index, type){
