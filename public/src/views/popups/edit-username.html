@@ -1,0 +1,8 @@
+<form ng-submit="editUsername(newUserName)" class="popup-form">
+  <label "popup-label">What should we call you?</label>
+  <input ng-model="newUserName" type="text" placeholder="{{ user.username }}">
+  <div class="popup-buttons">
+    <input type="submit">
+    <input ng-click="cancel()" type="button"value="cancel">
+  </div>
+</form>
