@@ -23,7 +23,8 @@ angular.module('questCreator').controller('eventsCtrl', function($state, $scope,
 //TRIGGERS:
 ////
 
-//TEXT:
+//TRIGGER
+////TEXT:
 
   this.addWordList = function(word){
     if (!word) {
@@ -49,7 +50,8 @@ angular.module('questCreator').controller('eventsCtrl', function($state, $scope,
     return this.counter;
   }
 
-//LOCATION:
+//TRIGGER
+////LOCATION:
 
   this.selectScene = function(scene){
     this.scene = scene;
@@ -80,9 +82,10 @@ angular.module('questCreator').controller('eventsCtrl', function($state, $scope,
     } else {
       return false;
     }
-  }
+  };
 
-//TEXT:
+//RESULT:
+////TEXT:
 
   this.addText = function(){
     $scope.editor.currentEvent.info.results.text.push('');
