@@ -652,10 +652,34 @@ angular.module('questCreator')
         tags: game.tags,
         description: game.description,
         info: game.info,
-        published: true,
+        published: game.published || false,
         thumbnail: game.info.maps[0].scenes[0][0].background.thumbnail
       };
-      console.log(gameUpdateData);
+      var slimGameData = angular.copy(gameUpdateData);
+      slimGameData.info.maps.forEach(function(map) {
+        map.scenes.forEach(function(row) {
+          row.forEach(function(scene) {
+            if (scene.background) {
+              scene.background.thumbnail = null;
+              scene.background.info = null;
+            }
+            if (scene.entities) {
+              scene.entities.forEach(function(entity) {
+                entity.thumbnail = null;
+                entity.info.animate = null;
+              });
+            }
+            if (scene.objects) {
+              scene.objects.forEach(function(object) {
+                object.thumbnail = null;
+                object.info.collisionMap = null;
+                object.info.image = null;
+              });
+            }
+          });
+        });
+      });
+      console.log("Game Save Object", slimGameData);
       var headerData = {
         user_id: UserService.get().id,
         token: UserService.get().token
@@ -664,7 +688,7 @@ angular.module('questCreator')
         method: 'PUT',
         url: 'https://forge-api.herokuapp.com/games/update',
         headers: headerData,
-        data: JSON.stringify(gameUpdateData),
+        data: JSON.stringify(slimGameData),
         dataType: 'json',
         contentType: 'application/json',
         success: function(response) {
@@ -1014,7 +1038,7 @@ angular.module('questCreator')
            id: id
          },
          success: function(response) {
-           console.log(response);
+          //  console.log(response);
            return response;
          },
          error: function(error) {
@@ -2669,22 +2693,97 @@ angular.module('questCreator')
             PopupService.open('loading-screen');
             EditorService.getGame(self.currentEditingGame.name).done(function(game) {
                 self.currentEditingGame = game;
-                // console.log(self.currentEditingGame);
                 EditorService.getGameAssets(game.id).done(function(assets) {
-                    PopupService.close();
                     self.availableBackgrounds = assets.availableBackgrounds;
                     self.availableObjects = assets.availableObstacles;
                     self.availableEntities = assets.availableEntities;
                     self.availableEvents = assets.availableEvents;
-                    $scope.$apply();
+                    var assetsToLoad = 0;
+                    var assetsLoaded = 0;
+                    game.info.maps.forEach(function(map) {
+                      map.scenes.forEach(function(row) {
+                        row.forEach(function(scene) {
+                          if (scene.background) {
+                            assetsToLoad++;
+                            var backgroundId = scene.background.id;
+                            console.log(scene.background.info);
+                            EditorService.getAssetInfo(backgroundId, 'backgrounds').done(function(info) {  // Get each background's info from the database
+                                scene.background.info = info;
+                                console.log("Found background info!", scene.background.info);
+                                assetsLoaded++;
+                            });
+                            assets.availableBackgrounds.forEach(function(availableBackground) {
+                              if (backgroundId === availableBackground.id) {
+                                console.log("Background match found!");
+                                scene.background.thumbnail = availableBackground.thumbnail;
+                              }
+                            });
+                          }
+                          if (scene.entities) {
+                            assetsToLoad += scene.entities.length;
+                            scene.entities.forEach(function(entity) {
+                              var entityId = entity.id;
+                              console.log(entity.info);
+                              EditorService.getAssetInfo(entityId, 'entities').done(function(info) {  // Get each entity's info from the database
+                                  entity.info.animate = info.animate;
+                                  console.log("Found entity info!", entity.info);
+                                  assetsLoaded++;
+                              });
+                              assets.availableEntities.forEach(function(availableEntity) {
+                                if (entityId === availableEntity.id) {
+                                  console.log("Entity match found!");
+                                  entity.thumbnail = availableEntity.thumbnail;
+                                }
+                              });
+                            });
+                          }
+                          if (scene.objects) {
+                            assetsToLoad += scene.objects.length;
+                            scene.objects.forEach(function(object) {
+                              var objectId = object.id;
+                              console.log(object.info);
+                              EditorService.getAssetInfo(objectId, 'objects').done(function(info) {  // Get each object's info from the database
+                                  object.info.collisionMap = info.collisionMap;
+                                  object.info.image = info.image;
+                                  console.log("Found object info!", object.info);
+                                  assetsLoaded++;
+                              });
+                              assets.availableObstacles.forEach(function(availableObject) {
+                                if (objectId === availableObject.id) {
+                                  console.log("Object match found!");
+                                  object.thumbnail = availableObject.thumbnail;
+                                }
+                              });
+                            });
+                          }
+                        });
+                      });
+                    });
+                    var checkGameLoadLoop = setInterval(function() {
+                      console.log("Loading " + assetsToLoad + " assets.");
+                      console.log(assetsLoaded + " assets loaded.");
+                      var finishedLoading = false;
+                      if (assetsLoaded >= assetsToLoad) {
+                        finishedLoading = true;
+                      }
+                      if (finishedLoading) {
+                        console.log("Game Loaded!",game);
+                        clearInterval(checkGameLoadLoop);
+                        $scope.$apply();
+                        PopupService.close();
+                      }
+                    }, 200);
                 });
             });
             $('.edit-game').hide();
         };
 
         this.saveGame = function() {
+          PopupService.close();
+          PopupService.open('loading-screen');
             EditorService.saveGame(self.currentEditingGame).done(function(savedGame) {
-                console.log(savedGame);
+                console.log("Saved Game:", savedGame);
+                PopupService.close();
             });
         };
 
@@ -3696,7 +3795,7 @@ angular.module('questCreator')
     if (!$scope.editor.currentEvent) {
       return false;
     }
-    var results = $scope.editor.currentEvent.info.results;
+    var requirements = $scope.editor.currentEvent.info.results;
     if (requirements.achievements.length > 0 ||
         requirements.inventory.length > 0) {
       return true;
@@ -4775,7 +4874,7 @@ angular.module('questCreator')
 
     });
 });
-;angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, GameService, $state, $scope, PopupService) {
+;angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, EditorService, GameService, $state, $scope, PopupService) {
     var socketDelay = 50;
     var socketIterator = 0;
     var fullPlayer = {
@@ -5736,136 +5835,86 @@ angular.module('questCreator')
 
     PopupService.open('loading-screen');
     currentGame = GameService.loadGame(self.gameName).done(function(response) {
-      PopupService.close();
-        self.gameLoaded = true;
-        gameInfo = response.info;
-        allMaps = gameInfo.maps;
-        self.currentMap = allMaps[0];
-        self.allRows = self.currentMap.scenes;
-        self.currentRow = self.allRows[0];
-        self.currentScene = self.currentRow[0];
-        background = self.currentScene.background;
-        objects = self.currentScene.objects;
-        loadEntities();
-        events = self.currentScene.events;
-        // events = {
-        //   typing: [
-        //     {
-        //       requirements: [],
-        //       trigger: [ ['talk', 'say'], ['vernon', 'uncle', 'man'] ],
-        //       results: [
-        //         {
-        //           type: 'text',
-        //           value: '"Make me an omelette, Harry!"'
-        //         },
-        //         {
-        //           type: 'achievement',
-        //           name: 'talked to vernon',
-        //           value: 5
-        //         }
-        //       ]
-        //     },
-        //     {
-        //       requirements: [
-        //         {
-        //           type: 'achievement',
-        //           value: 'talked to vernon'
-        //         }
-        //       ],
-        //       trigger: [ ['take', 'get'], ['frying', 'pan'] ],
-        //       results: [
-        //         {
-        //           type: 'text',
-        //           value: 'You take the frying pan as you have done so many mornings before.'
-        //         },
-        //         {
-        //           type: 'achievement',
-        //           value: 10
-        //         },
-        //         {
-        //           type: 'inventory',
-        //           value: 'frying pan'
-        //         }
-        //       ]
-        //     },
-        //     {
-        //       requirements: [
-        //         {
-        //           type: 'inventory',
-        //           value: 'frying pan'
-        //         }
-        //       ],
-        //       trigger: [ ['cook'], ['egg'] ],
-        //       results: [
-        //         {
-        //           type: 'text',
-        //           value: "You cook the egg decently. You're no chef, but you have plenty of experience."
-        //         },
-        //         {
-        //           type: 'achievement',
-        //           value: 10
-        //         }
-        //       ]
-        //     },
-        //     {
-        //       requirements: [
-        //       ],
-        //       trigger: [ ['apparate'] ],
-        //       results: [
-        //         {
-        //           type: 'text',
-        //           value: "Welcome to Hogwarts!"
-        //         },
-        //         {
-        //           type: 'teleport',
-        //           scenePos: [2,1,0],
-        //           pos: {
-        //             x: 350,
-        //             y: 250
-        //           }
-        //         },
-        //         {
-        //           type: 'achievement',
-        //           value: 100
-        //         }
-        //       ]
-        //     }
-        //   ],
-        //   location: [
-        //     // {
-        //     //   requirements: [],
-        //     //   trigger: [
-        //     //     {
-        //     //       left: 0,
-        //     //       right: 700,
-        //     //       top: 450,
-        //     //       bottom: 500
-        //     //     }
-        //     //   ],
-        //     //   results: [
-        //     //     {
-        //     //       type: 'teleport',
-        //     //       scenePos: [1,2,0],
-        //     //       pos: {
-        //     //         x: 350,
-        //     //         y: 250
-        //     //       }
-        //     //     }
-        //     //   ]
-        //     // }
-        //   ]
-        // };
-        drawEntities('background');
-        drawObjects('background');
-        drawBackground();
-        startPos = {    // Eventually will come from game object
-          map: 1,
-          row: 0,
-          column: 0,
-          x: 300,
-          y: 250
-        };
-        $scope.$apply();
+      var assetsToLoad = 0;
+      var assetsLoaded = 0;
+      console.log(response);
+      response.info.maps.forEach(function(map) {
+        map.scenes.forEach(function(row) {
+          row.forEach(function(scene) {
+            if (scene.background) {
+              assetsToLoad++;
+              var backgroundId = scene.background.id;
+              console.log(scene.background.info);
+              EditorService.getAssetInfo(backgroundId, 'backgrounds').done(function(info) {  // Get each background's info from the database
+                  scene.background.info = info;
+                  console.log("Found background info!", scene.background.info);
+                  assetsLoaded++;
+              });
+            }
+            if (scene.entities) {
+              assetsToLoad += scene.entities.length;
+              scene.entities.forEach(function(entity) {
+                var entityId = entity.id;
+                console.log(entity.info);
+                EditorService.getAssetInfo(entityId, 'entities').done(function(info) {  // Get each entity's info from the database
+                    entity.info.animate = info.animate;
+                    console.log("Found entity info!", entity.info);
+                    assetsLoaded++;
+                });
+              });
+            }
+            if (scene.objects) {
+              assetsToLoad += scene.objects.length;
+              scene.objects.forEach(function(object) {
+                var objectId = object.id;
+                console.log(object.info);
+                EditorService.getAssetInfo(objectId, 'objects').done(function(info) {  // Get each object's info from the database
+                    object.info.collisionMap = info.collisionMap;
+                    object.info.image = info.image;
+                    console.log("Found object info!", object.info);
+                    assetsLoaded++;
+                });
+              });
+            }
+          });
+        });
+      });
+
+      var checkGameLoadLoop = setInterval(function() {
+        console.log("Loading " + assetsToLoad + " assets.");
+        console.log(assetsLoaded + " assets loaded.");
+        var finishedLoading = false;
+        if (assetsLoaded >= assetsToLoad) {
+          finishedLoading = true;
+        }
+        if (finishedLoading) {
+          console.log("Game Loaded!", response);
+          clearInterval(checkGameLoadLoop);
+          PopupService.close();
+          self.gameLoaded = true;
+          gameInfo = response.info;
+          allMaps = gameInfo.maps;
+          self.currentMap = allMaps[0];
+          self.allRows = self.currentMap.scenes;
+          self.currentRow = self.allRows[0];
+          self.currentScene = self.currentRow[0];
+          background = self.currentScene.background;
+          objects = self.currentScene.objects;
+          loadEntities();
+          events = self.currentScene.events;
+          drawEntities('background');
+          drawObjects('background');
+          drawBackground();
+          startPos = {    // Eventually will come from game object
+            map: 1,
+            row: 0,
+            column: 0,
+            x: 300,
+            y: 250
+          };
+          $scope.$apply();
+        }
+      }, 200);
     });
 
     function loadMainCharacter() {
@@ -6184,7 +6233,7 @@ angular.module('questCreator')
         };
     });
 });
-;angular.module('questCreator').controller('sceneCtrl', function(socket, $state, $scope, $compile) {
+;angular.module('questCreator').controller('sceneCtrl', function(socket, $state, $scope, $compile, EditorService) {
   var self = this;
 
   this.view = 'events';
@@ -6200,25 +6249,34 @@ angular.module('questCreator')
   this.selectedEvent= null;
 
   this.selectBackground = function(background) {
-    console.log(background);
-    $scope.editor.currentScene.background = background;
-    self.selecting.background = false;
+    EditorService.getAssetInfo(background.id, 'backgrounds').done(function(info) {
+        background.info = info;
+        $scope.editor.currentScene.background = angular.copy(background);
+        self.selecting.background = false;
+        $scope.$apply();
+    });
   };
 
   this.selectObject = function(object) {
     if (!object) {
       return;
     }
-    $scope.editor.currentScene.objects.push(object);
-    self.selecting.object = false;
+    EditorService.getAssetInfo(object.id, 'obstacles').done(function(info) {
+        object.info = info;
+        $scope.editor.currentScene.objects.push(angular.copy(object));
+        self.selecting.object = false;
+    });
   };
 
   this.selectEntity = function(entity) {
     if (!entity) {
       return;
     }
-    $scope.editor.currentScene.entities.push(entity);
-    self.selecting.entity = false;
+    EditorService.getAssetInfo(entity.id, 'entities').done(function(info) {
+        entity.info = info;
+        $scope.editor.currentScene.entities.push(angular.copy(entity));
+        self.selecting.entity = false;
+    });
   };
 
   this.selectEvent = function(event) {
@@ -6226,7 +6284,7 @@ angular.module('questCreator')
       return;
     }
     console.log("before: ", $scope.editor.currentScene.events);
-    $scope.editor.currentScene.events.push(event);
+    $scope.editor.currentScene.events.push(angular.copy(event));
     console.log("after: ", $scope.editor.currentScene.events);
   };
 
@@ -6291,7 +6349,14 @@ angular.module('questCreator')
     if (!event) {
       return false;
     }
+    if (event.info.requirements.length === 0) {
+      event.info.requirements = {
+        achievements: [],
+        inventory: []
+      }
+    }
     var requirements = event.info.requirements;
+    //OH MY GOD THIS IS SO HACKY
     if (requirements.achievements.length > 0 ||
         requirements.inventory.length > 0) {
       return true;
