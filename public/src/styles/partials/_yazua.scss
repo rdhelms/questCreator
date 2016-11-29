@@ -36,4 +36,11 @@
  -webkit-text-fill-color: transparent;
 
  animation: shad-anim 15s ease infinite;
- }
+}
+
+.dps {
+  font-weight: bold;
+  font-size: 1.3em;
+  font-style: italic;
+  color: $deepgrey;
+}

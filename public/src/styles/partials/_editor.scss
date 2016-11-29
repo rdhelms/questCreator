@@ -1,6 +1,10 @@
 #editor {
   display: flex;
   flex-direction: column;
+
+  .yazua {
+    font-size: 3em;
+  }
 }
 
 #editor-view {
