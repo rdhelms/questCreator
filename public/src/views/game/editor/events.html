@@ -17,8 +17,14 @@
 
         <li class="preview-step" ng-click="events.view = 'requirements'">
           <ul class="preview-list">
-            <li>
+            <li ng-if="events.anyRequirements() === false">
               -Requirements-
+            </li>
+            <li ng-repeat="requirement in editor.currentEvent.info.requirements.achievements">
+              <span>-did '{{requirement}}'</span>
+            </li>
+            <li ng-repeat="requirement in editor.currentEvent.info.requirements.inventory">
+              <span>-has '{{requirement}}'</span>
             </li>
           </ul>
         </li>
@@ -91,13 +97,13 @@
 
             <span class="event-menu">
               <ul>
-                <li class="menu-item" ng-class="{'active': events.requirementType === 'achievement'}" ng-click="events.requirementType='achievement'">
+                <li class="menu-item" ng-class="{'active': events.requirementType === 'achievement'}" ng-click="events.requirementType='achievement'; events.findRequirements()">
                   <span>Achievement:</span>
-                  <button disabled>></button>
+                  <button>></button>
                 </li>
-                <li class="menu-item" ng-class="{'active': events.requirementType === 'inventory'}" ng-click="events.requirementType='inventory'">
+                <li class="menu-item" ng-class="{'active': events.requirementType === 'inventory'}" ng-click="events.requirementType='inventory'; events.findRequirements()">
                   <span>Inventory:</span>
-                  <button disabled>></button>
+                  <button>></button>
                 </li>
               </ul>
             </span>
@@ -105,15 +111,21 @@
 
             <span class="menu-type">
 
-              <div class="requirement-value" ng-if="events.resultType==='achievement' && editor.currentEvent.info.results.achievements > 0">
+              <div class="requirement-value" ng-if="events.requirementType==='achievement'">
                 <ul>
-                  <li ng-repeat="achievement in editor.currentEvent.info.results.achievements">{{achievement.name}}</li>
+                  <li class="menu-item" ng-repeat="achievement in events.requirements.achievements track by $index">
+                    <span>{{achievement}}</span>
+                    <button ng-click="events.addRequirement(events.requirements.achievements[$index], 'achievements')">+</button>
+                  </li>
                 </ul>
               </div>
 
-              <div class="requirement-value" ng-if="events.resultType==='inventory' && editor.currentEvent.info.results.inventory > 0">
+              <div class="requirement-value" ng-if="events.requirementType==='inventory'">
                 <ul>
-                  <li ng-repeat="item in editor.currentEvent.info.results.inventory">{{item}}</li>
+                  <li class="menu-item" ng-repeat="item in events.requirements.inventory track by $index">
+                    <span>{{item}}</span>
+                    <button ng-click="events.addRequirement(events.requirements.inventory[$index], 'inventory')">+</button>
+                  </li>
                 </ul>
               </div>
 

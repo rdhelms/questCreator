@@ -1,7 +1,11 @@
 angular.module('questCreator').controller('eventsCtrl', function($state, $scope, EditorService) {
   this.view = 'triggers';
   this.resultType = 'text';
-  this.requirementType = 'achievement';
+  this.requirementType = null;
+  this.requirements = {
+    achievements: null,
+    inventory: null
+  }
   this.locationView = 'scene';
   this.map = null;
   this.scene = null;
@@ -11,14 +15,67 @@ angular.module('questCreator').controller('eventsCtrl', function($state, $scope,
 // DEBUG
   this.log = function(){
     console.log($scope.editor.currentEvent);
+    console.log("requirements: ", this.requirements);
   }
 
   this.save = function(event) {
-    console.log("Saving event", event);
     EditorService.saveEvent(event).done(function(response){
-      console.log("Event saved: ", response);
     });
   }
+
+////
+//REQUIREMENTS:
+////
+
+  this.findRequirements = function() {
+    var achievements = [];
+    var itemList = [];
+    $scope.editor.currentEditingGame.info.maps.forEach(function(map){
+      map.scenes.forEach(function(sceneRow){
+        sceneRow.forEach(function(scene){
+          if (scene.events) {
+            scene.events.forEach(function(event){
+              event.info.results.achievements.forEach(function(achievement){
+                achievements.push(achievement.name);
+              });
+              event.info.results.inventory.forEach(function(item){
+                itemList.push(item);
+              });
+            })
+          }
+        })
+      });
+    });
+    this.requirements = {
+      achievements: achievements,
+      inventory: itemList
+    };
+  }
+
+  this.addRequirement = function(requirement, type) {
+    if ($scope.editor.currentEvent.info.requirements.length === 0) {
+      $scope.editor.currentEvent.info.requirements = {
+        achievements: [],
+        inventory: []
+      };
+    }
+    $scope.editor.currentEvent.info.requirements[type].push(requirement);
+  };
+
+  this.anyRequirements = function(){
+    if (!$scope.editor.currentEvent) {
+      return false;
+    }
+    var results = $scope.editor.currentEvent.info.results;
+    if (requirements.achievements.length > 0 ||
+        requirements.inventory.length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+
 ////
 //TRIGGERS:
 ////

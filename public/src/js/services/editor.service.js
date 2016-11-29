@@ -463,7 +463,6 @@ angular.module('questCreator').service('EditorService', function (UserService, $
         tags: eventUpdate.tags,
         category: eventUpdate.category
       };
-      debugger;
       console.log(saveData);
       var headerData = {
         user_id: UserService.get().id,

@@ -18,9 +18,9 @@
     <section id="scene-event-controls">
       <span class="select" tabindex="1">
         <h3>Events:</h3>
-        <ul class="options">
-          <li class="option" tabindex="1" ng-repeat="event in editor.availableEvents" ng-mouseover="scene.selectedEvent = event" ng-show="editor.availableEvents.length > 0">
-            {{event.name}}
+        <ul class="options" ng-show="editor.availableEvents.length > 0" >
+          <li class="option" tabindex="1" ng-repeat="event in editor.availableEvents track by $index" ng-mouseover="scene.selectedEvent = editor.availableEvents[$index]" ng-class="{'disabled': scene.alreadyAdded(editor.availableEvents[$index])}">
+            {{editor.availableEvents[$index].name}}
           </li>
           <li ng-show="editor.availableEvents.length === 0">(none)</li>
         </ul>
@@ -36,17 +36,28 @@
       <div class="event-preview-head">
         <span>{{event.name}}</span>
         <span>({{event.category | capitalize}} Event)</span>
-        <button ng-click="editor.currentEvent = event; editor.currentSmallView = 'event'">
-          Edit
-        </button>
+        <span>
+          <button ng-click="editor.currentEvent = editor.currentScene.events[$index]; editor.currentSmallView = 'event'">
+            Edit
+          </button>
+          <button ng-click="scene.removeEvent($index)">
+            x
+          </button>
+        </span>
       </div>
       <div class="event-edit preview as-asset">
         <ul class="preview-pane">
 
           <li class="preview-step" ng-click="editor.currentEvent = event; editor.currentSmallView = 'event'; events.view = 'requirements'">
             <ul class="preview-list">
-              <li>
-                -Reqs-
+              <li ng-if="scene.anyRequirements(event)">
+                -Req's-
+              </li>
+              <li ng-repeat="requirement in event.info.requirements.achievements">
+                <span>-did '{{requirement}}'</span>
+              </li>
+              <li ng-repeat="requirement in event.info.requirements.inventory">
+                <span>-has '{{requirement}}'</span>
               </li>
             </ul>
           </li>

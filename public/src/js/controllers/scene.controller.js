@@ -44,6 +44,24 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
     console.log("after: ", $scope.editor.currentScene.events);
   };
 
+  this.alreadyAdded = function(event){
+    if (!$scope.editor.currentScene){
+      return false;
+    } else {
+      return $scope.editor.currentScene.events.forEach(function(element) {
+        if (event.id === element.id){
+          return true;
+        } else {
+          return false;
+        }
+      });
+    }
+  }
+
+  this.removeEvent = function(index){
+    $scope.editor.currentScene.events.splice(index, 1);
+  };
+
   this.addLocationEvent = function(){
     var locationCount = ($scope.editor.currentScene.events.filter(function(element){
       return element.category === "location";
@@ -83,6 +101,18 @@ angular.module('questCreator').controller('sceneCtrl', function(socket, $state, 
     }
   };
 
+  this.anyRequirements = function(event){
+    if (!event) {
+      return false;
+    }
+    var requirements = event.info.requirements;
+    if (requirements.achievements.length > 0 ||
+        requirements.inventory.length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  };
 
   this.removeAsset = function(index, type){
     $scope.editor.currentScene[type].splice(index, 1);
