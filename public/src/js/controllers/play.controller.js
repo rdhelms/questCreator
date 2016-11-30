@@ -813,12 +813,12 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
         });
         gameCtx.globalAlpha = 0.2;
         // Draw the avatarToDraw's collision map (purely for testing)
-        if (avatarToDraw.info.currentFrame.collisionMap.length > 0) {
-          avatarToDraw.info.currentFrame.collisionMap.forEach(function(square) {
-              gameCtx.fillStyle = square.color;
-              gameCtx.fillRect(square.x, square.y, square.width, square.height);
-          });
-        }
+        // if (avatarToDraw.info.currentFrame.collisionMap.length > 0) {
+        //   avatarToDraw.info.currentFrame.collisionMap.forEach(function(square) {
+        //       gameCtx.fillStyle = square.color;
+        //       gameCtx.fillRect(square.x, square.y, square.width, square.height);
+        //   });
+        // }
         gameCtx.restore();
     }
 
@@ -845,10 +845,10 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
             gameCtx.globalCompositeOperation = "source-over";
             gameCtx.globalAlpha = 0.2;
             // Draw the background's collision map (purely for testing)
-            background.info.collisionMap.forEach(function(square) {
-                gameCtx.fillStyle = square.color;
-                gameCtx.fillRect(square.x, square.y, square.width, square.height);
-            });
+            // background.info.collisionMap.forEach(function(square) {
+            //     gameCtx.fillStyle = square.color;
+            //     gameCtx.fillRect(square.x, square.y, square.width, square.height);
+            // });
             gameCtx.restore();
         } else {
             self.warning = "This scene has no background yet!";
@@ -889,10 +889,10 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
               });
               gameCtx.globalAlpha = 0.2;
               // Draw the object's collision map (purely for testing)
-              object.info.collisionMap.forEach(function(square) {
-                  gameCtx.fillStyle = square.color;
-                  gameCtx.fillRect(square.x, square.y, square.width, square.height);
-              });
+              // object.info.collisionMap.forEach(function(square) {
+              //     gameCtx.fillStyle = square.color;
+              //     gameCtx.fillRect(square.x, square.y, square.width, square.height);
+              // });
             }
             gameCtx.restore();
         });
@@ -931,10 +931,10 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
               });
               gameCtx.globalAlpha = 0.2;
               // Draw the entity's collision map (purely for testing)
-              entity.info.currentFrame.collisionMap.forEach(function(square) {
-                  gameCtx.fillStyle = square.color;
-                  gameCtx.fillRect(square.x, square.y, square.width, square.height);
-              });
+              // entity.info.currentFrame.collisionMap.forEach(function(square) {
+              //     gameCtx.fillStyle = square.color;
+              //     gameCtx.fillRect(square.x, square.y, square.width, square.height);
+              // });
             }
             gameCtx.restore();
         });
