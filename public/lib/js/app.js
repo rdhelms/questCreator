@@ -1384,7 +1384,7 @@ angular.module('questCreator')
   };
 });
 ;angular.module('questCreator')
-    .service('UserService', function(PopupService) {
+    .service('UserService', function(PopupService, $rootScope) {
         // Google Info
         var apiKey = 'AIzaSyCe__2EGSmwp0DR-qKGqpYwawfmRsTLBEs';
         var clientId = '730683845367-tjrrmvelul60250evn5i74uka4ustuln.apps.googleusercontent.com';
@@ -1467,12 +1467,10 @@ angular.module('questCreator')
 
         function updateSignInStatus(isSignedIn) {
             if (isSignedIn) {
-                $('#login').hide();
-                $('#logout').show();
+              $rootScope.$$childHead.main.loggedIn = true;
                 getLogin();
             } else {
-                $('#login').show();
-                $('#logout').hide();
+              $rootScope.$$childHead.main.loggedIn = false;
             }
         }
 
@@ -3144,6 +3142,10 @@ angular.module('questCreator')
     };
 
     $scope.goToGameDetail = function(game) {
+      if (!$scope.main.loggedIn) {
+        PopupService.openTemp('signin-to-continue');
+        $scope.main.signIn();
+      }
         StorageService.setPlayingGame(game.name);
         GameService.setGameDetail(game);
         $state.go('main.game.detail');
@@ -3168,6 +3170,7 @@ angular.module('questCreator')
 ;angular.module('questCreator')
     .controller('mainCtrl', function(socket, $state, UserService, PopupService, $scope) {
 
+    this.loggedIn = null;
     $scope.popupTemp = false;
     //When the user clicks "Home" on the nav bar view is changed to landing
     this.goHome = function () {
@@ -3185,7 +3188,7 @@ angular.module('questCreator')
     };
 
     // When the user clicks the sign in button, prompt them to sign in to their google account.
-    $scope.signIn = function() {
+    this.signIn = function() {
         UserService.signIn();
     };
 
