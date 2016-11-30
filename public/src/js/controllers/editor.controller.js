@@ -30,6 +30,7 @@ angular.module('questCreator')
         //NOTE probably can remove^
         this.currentLargeView = 'map';
         this.currentSmallView = 'welcome';
+        this.assetsView = 'backgrounds';
         this.qState = {
           undo: 'undoBackground',
           redo: 'redoBackground',
@@ -443,3 +444,4 @@ angular.module('questCreator')
             });
         };
     });
+    
