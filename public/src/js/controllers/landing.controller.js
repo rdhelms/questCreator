@@ -22,6 +22,10 @@ angular.module('questCreator').controller('landingCtrl', function($state, $scope
     };
 
     $scope.goToGameDetail = function(game) {
+      if (!$scope.main.loggedIn) {
+        PopupService.openTemp('signin-to-continue');
+        $scope.main.signIn();
+      }
         GameService.setGameDetail(game);
         $state.go('main.game.detail');
     };

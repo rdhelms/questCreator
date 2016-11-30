@@ -1,5 +1,5 @@
 angular.module('questCreator')
-    .service('UserService', function(PopupService) {
+    .service('UserService', function(PopupService, $rootScope) {
         // Google Info
         var apiKey = 'AIzaSyCe__2EGSmwp0DR-qKGqpYwawfmRsTLBEs';
         var clientId = '730683845367-tjrrmvelul60250evn5i74uka4ustuln.apps.googleusercontent.com';
@@ -82,12 +82,10 @@ angular.module('questCreator')
 
         function updateSignInStatus(isSignedIn) {
             if (isSignedIn) {
-                $('#login').hide();
-                $('#logout').show();
+              $rootScope.$$childHead.main.loggedIn = true;
                 getLogin();
             } else {
-                $('#login').show();
-                $('#logout').hide();
+              $rootScope.$$childHead.main.loggedIn = false;
             }
         }
 
