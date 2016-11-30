@@ -86,11 +86,21 @@
   height: 100%;
   padding: 1rem;
 
+  input {
+    background: $lightgrey;
+  }
+
   .fullMap {
     display: flex;
     flex-direction: column;
     align-items: baseline;
     margin: 10px 0;
+
+    .mapName {
+      font-family: PCSenior;
+      font-size: 1.5em;
+      width: 100%;
+    }
 
     .mapRowWrapper {
       display: flex;
@@ -100,6 +110,7 @@
       .mapRow {
         display: flex;
         align-items: baseline;
+        margin: 10px 0;
 
         .mapColumnWrapper {
           display: flex;
@@ -109,6 +120,7 @@
             margin: 0 10px;
             display: flex;
             flex-direction: column;
+            align-items: center;
 
             .scene-button {
               height: 100px;
