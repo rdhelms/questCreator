@@ -1,18 +1,73 @@
 #detail-container {
     display: flex;
-    justify-content: space-between;
-    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
 
+    .main-portal {
+      display: flex;
+      background-color: $medgrey;
+      padding: 30px;
+      width: 93%;
+      height: 87%;
+      border: 4px solid black;
+      -webkit-box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9) inset;
+      -moz-box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9) inset;
+      box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9) inset;
+
+    }
     .game-detail {
-      width: 60%;
+      margin-left: 1%;
+      width: 50%;
+      height: 95%;
       display: flex;
       flex-direction: column;
-      background-color: whitesmoke;
-      justify-content: space-around;
+      background-color: $lightgrey;
+      justify-content: space-between;
       align-items: center;
       border: black solid 4px;
+      -webkit-box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9);
+      -moz-box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9);
+      box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9);
+
+      h2 {
+        text-align: center;
+        font-style: italic;
+        color: pink;
+        -webkit-text-stroke: 2px red;
+        margin: 20px 0;
+        text-shadow: 4px 4px 2px rgba(150, 150, 150, 0.8);
+      }
+
+      .detail-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;;
+        align-items: center;
+
+          img {
+            border: 4px black solid;
+            width: 95%;
+            background-color: $white;
+          }
+
+          label {
+            display: flex;
+            color: red;
+            font-size: .75em;
+            margin: 5px;
+
+            p {
+              color: black;
+              font-size: 20px;
+              margin-left: 5px;
+            }
+          }
+      }
 
       .collab-button {
+        margin: 25px 0 20px 0;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -20,32 +75,49 @@
         button {
           width: 150px;
           height: 55px;
-          margin-top: 10px;
+          margin-top: 7px;
         }
       }
     }
 
     #play-splash {
-        margin: 2rem;
-        width: 40%;
+        margin-left: 5%;
+        width: 42%;
         display: flex;
         flex-direction: column;
-        align-items: flex-end;
+        justify-content: center;
+        align-items: center;
 
-        h1 {
+        .yazua {
             font-size: 3em;
-            color: pink;
-            -webkit-text-stroke: 2px red;
-            font-style: italic;
+            // // color: pink;
+            // // -webkit-text-stroke: 1px red;
+            // // font-style: italic;
+            text-shadow: 8px 8px 2px rgba(150, 150, 150, 0.8);
+            margin-bottom: 20px;
+            //
         }
 
         button {
             font-size: 1.8em;
             height: 8em;
+            -webkit-box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9);
+            -moz-box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9);
+            box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9),
+            -.5em -.5em 0 0 $lightgrey inset;
+
+
 
             span {
               color: red;
             }
+        }
+
+        #leaderboards {
+          font-size: .5em;
+          tr {
+            display: flex;
+          }
         }
     }
 }

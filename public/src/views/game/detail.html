@@ -1,52 +1,22 @@
 <div ng-model="detail.game" id="detail-container">
+  <div class="main-portal">
     <section class="game-detail">
-        <h1>{{ detail.game.name | capitalize }}</h1>
-        <img src="{{ detail.game.thumbnail }}" alt="Game thumbnail" />
-        <ul>
-            <li>{{ detail.game.description }}</li>
-            <li>
-                <label for="creator">Created By:</label>
-                <p>{{ detail.game.creator }}</p>
-            </li>
-            <li>
-                <label for="created">Date Created:</label>
-                <a ng-click="detail.userGames">{{ detail.game.created_at | date:'MMM d - h:mm a' }}</a>
-            </li>
-            <li>
-                <label for="players">Players:</label>
-                <p>{{ detail.game.players }}</p>
-            </li>
-        </ul>
+      <h2>{{ detail.game.name | capitalize }}</h2>
+        <div class="detail-info">
+            <img src="{{ detail.game.thumbnail }}" alt="Game thumbnail" />
+            <label for="creator">Created By:
+            <p>{{ detail.game.username | capitalize }}</p></label>
+            <label for="created">On:
+            <p>{{ detail.game.created_at | date:'MMM d, yyyy' }}</p></label>
+        </div>
         <div class="collab-button">
-          <label>Ask <span>{{ game.creator }}</span> to be collaborator on this game</label>
-          <button ng-click="detail.sendCollabRequest(detail.game.id)" type="button" name="collaborate"> Send Request </button>
+            <label>Ask to be collaborator on this game</label>
+            <button ng-click="detail.sendCollabRequest(detail.game.id)" type="button" name="collaborate"> Send Request </button>
         </div>
     </section>
     <aside id="play-splash">
-        <h1>Yazua DPS</h1>
+        <h1 data-shadow="Yazua" class="yazua">Yazua DPS</h1>
         <button ng-click="detail.playGame(detail.game.name)">Play <span>{{ detail.game.name | capitalize }}</span></button>
-
-        <table id="leaderboard">
-          <tr>
-            <th>Rank:</th>
-            <th>Player Name:</th>
-            <th>Score:</th>
-            <th>Time to Complete:</th>
-          </tr>
-          <tr ng-repeat="player in detail.players | orderBy: 'score' : -1">
-            <td>
-              {{ $index + 1 }}
-            </td>
-            <td>
-              {{ player.name }}
-            </td>
-            <td>
-              {{ player.score }} out of {{ detail.game.totalPoints }}
-            </td>
-            <td>
-              {{ player.timeToComplete }}
-            </td>
-          </tr>
-        </table>
     </aside>
+    </div>
 </div>
