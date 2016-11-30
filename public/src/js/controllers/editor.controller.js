@@ -57,7 +57,13 @@ angular.module('questCreator')
         this.selectedAnimation = "walkLeft";
 
         this.currentColor = 'green';
-        this.inputColor;
+        this.inputColor = 'green';
+        this.colorPalette = {
+          1: "skyblue",
+          2: "green",
+          3: "brown",
+          4: "orange"
+        };
         this.currentPixelSize = 15;
         this.drawingCollision = false;
         this.erasing = false;
@@ -74,17 +80,16 @@ angular.module('questCreator')
             });
         };
 
-        this.selectColor = function() {
+        this.selectColor = function(index) {
             // Convert hex color to rgb
             var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(self.inputColor);
+            console.log("color result: ", result);
             var rgb = result ? {
                 r: parseInt(result[1], 16),
                 g: parseInt(result[2], 16),
                 b: parseInt(result[3], 16)
             } : null;
-            self.currentColor = 'rgb(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ')';
-            // console.log(self.currentColor);
-            // console.log(self.inputColor);
+            self.colorPalette[index] = 'rgb(' + rgb.r + ', ' + rgb.g + ', ' + rgb.b + ')';
         };
 
         if (this.currentEditingGame.name === null) {

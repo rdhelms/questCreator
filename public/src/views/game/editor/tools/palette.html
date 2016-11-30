@@ -62,24 +62,24 @@
     </ul>
   <!-- COLOR PICKER -->
     <ul class="picker color" ng-class="{'disabled': editor.drawingCollision || editor.erasing}">
-        <li ng-click="editor.currentColor = 'skyblue'">
+        <li ng-click="editor.currentColor = editor.colorPalette[1]" ng-style="{'background-color': editor.colorPalette[1]}">
           <span class="color-icon">
-            <input class="color-input" type="color" ng-model="editor.inputColor" ng-change="editor.selectColor()" ng-disabled="editor.drawingCollision === true">
+            <input class="color-input" type="color" ng-model="editor.inputColor" ng-change="editor.selectColor(1)" ng-disabled="editor.drawingCollision === true">
           </span>
         </li>
-        <li ng-click="editor.currentColor = 'green'">
+        <li ng-click="editor.currentColor = editor.colorPalette[2]" ng-style="{'background-color': editor.colorPalette[2]}">
           <span class="color-icon">
-            <input class="color-input" type="color" ng-model="editor.inputColor" ng-change="editor.selectColor()" ng-disabled="editor.drawingCollision === true">
+            <input class="color-input" type="color" ng-model="editor.inputColor" ng-change="editor.selectColor(2)" ng-disabled="editor.drawingCollision === true">
           </span>
         </li>
-        <li ng-click="editor.currentColor = 'brown'">
+        <li ng-click="editor.currentColor = editor.colorPalette[3]" ng-style="{'background-color': editor.colorPalette[3]}">
           <span class="color-icon">
-            <input class="color-input" type="color" ng-model="editor.inputColor" ng-change="editor.selectColor()" ng-disabled="editor.drawingCollision === true">
+            <input class="color-input" type="color" ng-model="editor.inputColor" ng-change="editor.selectColor(3)" ng-disabled="editor.drawingCollision === true">
           </span>
         </li>
-        <li ng-click="editor.currentColor = 'orange'">
+        <li ng-click="editor.currentColor = editor.colorPalette[4]" ng-style="{'background-color': editor.colorPalette[4]}">
           <span class="color-icon">
-            <input class="color-input" type="color" ng-model="editor.inputColor" ng-change="editor.selectColor()" ng-disabled="editor.drawingCollision === true">
+            <input class="color-input" type="color" ng-model="editor.inputColor" ng-change="editor.selectColor(4)" ng-disabled="editor.drawingCollision === true">
           </span>
         </li>
     </ul>
