@@ -77,3 +77,20 @@
   animation: sheen 3s forwards infinite steps(100);
   opacity: .5;
 }
+
+// responsive:
+
+$vertical-point: 1430px;
+$full-width-point: 950px;
+
+@mixin vertical {
+  @media (max-width: #{$vertical-point}) {
+    @content;
+  }
+}
+
+@mixin full-width {
+  @media (max-width: #{$full-width-point}) {
+    @content;
+  }
+}
