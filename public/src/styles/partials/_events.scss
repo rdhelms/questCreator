@@ -226,11 +226,11 @@
     color: $white;
   }
 
+  button {
+    border: none;
+  }
 }
 
-button {
-  border: none;
-}
 
 .menu-type {
   flex: 2;
@@ -276,5 +276,9 @@ button {
         width: 100%;
       }
     }
+  }
+
+  button {
+    border: none;
   }
 }
