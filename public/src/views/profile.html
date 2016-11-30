@@ -4,7 +4,7 @@
             <img src="{{ user.picture }}" alt="Google profile picture" />
             <ul class="info">
                 <li class="profile-name">{{ user.username | capitalize }}<i class="edit" ng-click="openToEdit()"> </i></li>
-                <label for="joined">Joined:<li>{{ getJoinedDate(user.joined) | date:'MMM d - h:mm a' }}</li></label>
+                <label for="joined">Joined:<li>{{ getJoinedDate(user.joined) | date:'MMM d, yyyy' }}</li></label>
                 <label>Games Created:<li>{{ games.length }}</li></label>
             </ul>
 
@@ -42,7 +42,7 @@
                     <button ng-click="showCollaborators()" ng-animate="{enter: 'collabArrow', leave: 'collabCounter'}" ng-class="{true: 'collabArrow', false: 'collabCounter'}[collabActive]"></button>
                 </section>
 
-                <table ng-show="showCollabs">
+                <table class="collab-tables" ng-show="showCollabs">
                     <tr>
                         <th>Game:</th>
                         <th>Collaborator:</th>
