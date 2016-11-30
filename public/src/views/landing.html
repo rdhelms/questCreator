@@ -1,6 +1,12 @@
 <div id="landing-container">
     <main>
-        <h1 class="landing-header" ng-if="!landing.searching">HOT NEW GAMES:</h1>
+        <div class="landing-header" ng-if="!landing.searching">
+          <h1>HOT NEW GAMES:</h1>
+          <form ng-submit="landing.searchGames(gameSearch)" id="game-search">
+            <input ng-model="gameSearch" type="text" placeholder="Search">
+            <input type="submit" class="search-button" value="">
+          </form>
+        </div>
         <div id="game-results">
           <button ng-if="landing.searching" ng-click="landing.showAll()" class="show-all-games">Show All Games</button>
             <div ng-repeat="game in landing.allGames | orderBy:'-'" class="game" ng-click="goToGameDetail(game)">
@@ -24,11 +30,6 @@
         <h1 data-shadow="Yazua" class="yazua">Yazua DPS</h1>
         <p class="dps">Design.Play.Share.</p>
       </div>
-        <form ng-submit="landing.searchGames(gameSearch)">
-          <label for="game-search">Search for games:</label>
-          <input ng-model="gameSearch" type="text" placeholder="Search">
-          <input type="submit" class="search-button" value="">
-        </form>
-        <button class="big" ng-click="createGame()">Create New Game</button>
+        <button class="big" ng-click="createGame()">Start Designing!</button>
     </aside>
 </div>
