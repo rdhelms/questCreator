@@ -25,13 +25,13 @@
     </li>
   <!-- ERASER -->
     <li class="tool">
-      <button ng-show="!editor.erasing" ng-click="editor.erasing = true" class="eraser" ng-disabled="editor.drawingCollision">
+      <button ng-show="!editor.erasing" ng-click="editor.erasing = true" class="eraser">
         <div class="icon">
           <div>⌫</div>
           <span class="label">Erase</span>
         </div>
       </button>
-      <button ng-show="editor.erasing" ng-click="editor.erasing = false" class="eraser" ng-disabled="editor.drawingCollision">
+      <button ng-show="editor.erasing" ng-click="editor.erasing = false" class="eraser">
         <div class="icon">
           <div>⌫</div>
           <span class="label">Cancel</span>
@@ -54,7 +54,7 @@
       </button>
     </li>
   <!-- SIZE PICKER -->
-    <ul class="picker size" ng-class="{'disabled': editor.erasing}">
+    <ul class="picker size">
         <li ng-click="editor.currentPixelSize = 0">S</li>
         <li ng-click="editor.currentPixelSize = 1">M</li>
         <li ng-click="editor.currentPixelSize = 3">L</li>
