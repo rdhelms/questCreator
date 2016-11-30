@@ -132,7 +132,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                     action: angular.copy(avatar.action),
                     pos: angular.copy(avatar.info.pos)
                   };
-                  socket.emit('update player', playerUpdate);
+                  // socket.emit('update player', playerUpdate);
                 }
             } else if (keyCode === 38) {
                 if (self.pause && $('.fileOption.active').length === 1 && $('.save.active').length === 0) {
@@ -148,7 +148,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                     action: angular.copy(avatar.action),
                     pos: angular.copy(avatar.info.pos)
                   };
-                  socket.emit('update player', playerUpdate);
+                  // socket.emit('update player', playerUpdate);
                 }
             } else if (keyCode === 39) {
                 if (self.pause && $('.timeOption.active').length === 0) {
@@ -164,7 +164,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                     action: angular.copy(avatar.action),
                     pos: angular.copy(avatar.info.pos)
                   };
-                  socket.emit('update player', playerUpdate);
+                  // socket.emit('update player', playerUpdate);
                 }
             } else if (keyCode === 40) {
                 if (self.pause && $('.fileOption.active').length === 1 && $('.restore.active').length === 0) {
@@ -180,7 +180,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                     action: angular.copy(avatar.action),
                     pos: angular.copy(avatar.info.pos)
                   };
-                  socket.emit('update player', playerUpdate);
+                  // socket.emit('update player', playerUpdate);
                 }
             } else if (keyCode === 191) {
               // Forward slash
@@ -569,7 +569,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                       action: angular.copy(avatar.action),
                       pos: angular.copy(avatar.info.pos)
                     };
-                    socket.emit('update player', playerUpdate);
+                    // socket.emit('update player', playerUpdate);
                     break;
             }
             collision = {
@@ -1054,8 +1054,8 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
           avatarLoaded = true;
           fullPlayer.avatar = avatar;
           updateLocation();
-          initSocket();
-          socket.emit('game joined', fullPlayer);
+          // initSocket();
+          // socket.emit('game joined', fullPlayer);
         });
     }
 
