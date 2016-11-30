@@ -1,14 +1,14 @@
 <div id="landing-container">
     <main>
-        <div class="landing-header" ng-if="!landing.searching">
-          <h1>HOT NEW GAMES:</h1>
+        <div class="landing-header">
+          <h1>Start Playing!</h1>
           <form ng-submit="landing.searchGames(gameSearch)" id="game-search">
-            <input ng-model="gameSearch" type="text" placeholder="Search">
-            <input type="submit" class="search-button" value="">
+            <input ng-model="gameSearch" type="text" placeholder="Search" class="toggle-width" ng-show="!landing.searching">
+            <button ng-if="landing.searching" ng-click="landing.showAll()" class="toggle-width">Show All Games</button>
+            <input type="submit" class="search-button" value="" ng-disabled="landing.searching">
           </form>
         </div>
         <div id="game-results">
-          <button ng-if="landing.searching" ng-click="landing.showAll()" class="show-all-games">Show All Games</button>
             <div ng-repeat="game in landing.allGames | orderBy:'-'" class="game" ng-click="goToGameDetail(game)">
                 <img ng-src="{{ game.thumbnail }}" alt="Game thumbnail"/>
                 <ul>
@@ -26,10 +26,12 @@
         </div>
     </main>
     <aside id="create-splash">
-      <div class="">
-        <h1 data-shadow="Yazua" class="yazua">Yazua DPS</h1>
-        <p class="dps">Design.Play.Share.</p>
-      </div>
-        <button class="big" ng-click="createGame()">Start Designing!</button>
+        <button class="create big" ng-click="createGame()">Start Designing!</button>
+        <div>
+          <h1 data-shadow="Yazua" class="yazua">Yazua DPS</h1>
+          <p class="dps">Design.Play.Share.</p>
+        </div>
+        <button class="big" ng-click="main.goToUser()" ng-if="main.loggedIn">Start Sharing!</button>
+        <button class="big" ng-click="main.signIn()" ng-if="!main.loggedIn">Join us to start Sharing!</button>
     </aside>
 </div>
