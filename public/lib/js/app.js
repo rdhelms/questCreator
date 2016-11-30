@@ -4545,10 +4545,10 @@ angular.module('questCreator')
                 });
                 gameCtx.globalAlpha = 0.2;
                 // Draw the object's collision map (purely for testing)
-                object.info.collisionMap.forEach(function(square) {
-                    gameCtx.fillStyle = square.color;
-                    gameCtx.fillRect(square.x, square.y, square.width, square.height);
-                });
+                // object.info.collisionMap.forEach(function(square) {
+                //     gameCtx.fillStyle = square.color;
+                //     gameCtx.fillRect(square.x, square.y, square.width, square.height);
+                // });
               }
             } else if (type === 'background'){
               // Draw the squares from the object's current frame
@@ -4587,10 +4587,10 @@ angular.module('questCreator')
                 });
                 gameCtx.globalAlpha = 0.2;
                 // Draw the entity's collision map (purely for testing)
-                entity.info.currentFrame.collisionMap.forEach(function(square) {
-                    gameCtx.fillStyle = square.color;
-                    gameCtx.fillRect(square.x, square.y, square.width, square.height);
-                });
+                // entity.info.currentFrame.collisionMap.forEach(function(square) {
+                //     gameCtx.fillStyle = square.color;
+                //     gameCtx.fillRect(square.x, square.y, square.width, square.height);
+                // });
               }
             } else if (type === 'background'){
               // Draw the squares from the entity's current frame
