@@ -91,6 +91,11 @@
       &:last-child {
         border-right: none;
         box-shadow: none;
+
+        @include vertical {
+          border-right: 4px solid black;
+          box-shadow: 8px 8px 0px 0px $medgrey;
+        }
       }
     }
 
@@ -208,6 +213,8 @@
     align-items: center;
     @include vertical {
       box-shadow: 8px 8px 0 0 $medgrey;
+      z-index: 100;
+      background-color: $white;
     }
   }
 
