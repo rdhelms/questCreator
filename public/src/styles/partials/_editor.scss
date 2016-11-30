@@ -86,10 +86,6 @@
   height: 100%;
   padding: 1rem;
 
-  input {
-    background: $lightgrey;
-  }
-
   .fullMap {
     display: flex;
     flex-direction: column;
@@ -148,10 +144,7 @@
     text-decoration: underline;
     text-align: center;
     text-overflow: ellipsis;
-    &:active {
-      background: whitesmoke;
-      color: black;
-    }
+    background: $lightgrey;
   }
 }
 
