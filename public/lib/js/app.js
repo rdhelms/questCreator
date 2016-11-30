@@ -1134,17 +1134,36 @@ angular.module('questCreator')
     };
 });
 ;angular.module('questCreator').service('StorageService', function (localStorageService) {
-  function getFromStorage(key) {
-
+  function getSavedGames(gameName) {
+    var allSavedGames = localStorageService.get('savedGames') || [];
+    var yourSaves = allSavedGames[gameName];
+    console.log("All saved games", allSavedGames);
+    console.log("Your saved games for " + gameName, yourSaves);
+    return yourSaves;
   }
 
-  function setInStorage(key, value) {
+  function setSavedGames(gameName, newSavedGames) {
+    var allSavedGames = localStorageService.get('savedGames') || [];
+    allSavedGames[gameName] = newSavedGames;
+    console.log("New saved games list", allSavedGames);
+    localStorageService.set('savedGames', allSavedGames);
+  }
 
+  function getPlayingGame() {
+    console.log("Checking for old game");
+    return localStorageService.get('currentPlaying') || null;
+  }
+
+  function setPlayingGame(gameName) {
+    console.log("Currently playing: " + gameName);
+    localStorageService.set('currentPlaying', gameName);
   }
 
   return {
-    get: getFromStorage,
-    set: setInStorage
+    getSavedGames: getSavedGames,
+    setSavedGames: setSavedGames,
+    getPlayingGame: getPlayingGame,
+    setPlayingGame: setPlayingGame
   };
 });
 ;angular.module('questCreator').service('PaletteService', function (UserService, PopupService) {
@@ -1490,7 +1509,9 @@ angular.module('questCreator')
                         user.joined = response.created_at;
                         user.username = response.username;
                         user.id = response.id;
-                        PopupService.openTemp('welcome');
+                        setTimeout(function() {
+                          PopupService.openTemp('welcome');
+                        }, 500);
                         loggedIn = true;
                     },
                     error: function(error) {
@@ -3100,15 +3121,14 @@ angular.module('questCreator')
 });
 ;angular.module('questCreator').controller('gameCtrl', function(socket, $state, $scope) {
 });
-;angular.module('questCreator').controller('landingCtrl', function($state, $scope, UserService, GameService, PopupService) {
+;angular.module('questCreator').controller('landingCtrl', function($state, $scope, UserService, GameService, PopupService, StorageService) {
 
     this.searching = false;
     var self = this;
 
     GameService.getGames().done(function(response) {
       self.allGames = response;
-      console.log(self.allGames);
-        $scope.$apply();
+      $scope.$apply();
     });
 
     $scope.createGame = function() {
@@ -3124,6 +3144,7 @@ angular.module('questCreator')
     };
 
     $scope.goToGameDetail = function(game) {
+        StorageService.setPlayingGame(game.name);
         GameService.setGameDetail(game);
         $state.go('main.game.detail');
     };
@@ -3132,7 +3153,6 @@ angular.module('questCreator')
         this.searching = true;
         GameService.searchGames(keyword).done(function (response) {
           self.allGames = response;
-          console.log(self.allGames);
           $scope.$apply();
         });
     };
@@ -3627,7 +3647,7 @@ angular.module('questCreator')
           } else if (self.currentType === 'obstacles') {
             for (var j = 0; j < self.elements.length; j++) {
               asset = self.elements[j];
-                EditorService.createBackground(asset.name, $scope.editor.currentEditingGame.id, asset.info).done(function (response) {
+                EditorService.createObject(asset.name, $scope.editor.currentEditingGame.id, asset.info).done(function (response) {
                   $scope.editor.availableObjects.push(response);
               });
             }
@@ -3645,7 +3665,9 @@ angular.module('questCreator')
 
     });
 });
-;angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, EditorService, GameService, $state, $scope, PopupService) {
+;angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, EditorService, GameService, $state, $scope, PopupService, StorageService) {
+  var self = this;
+  UserService.checkLogin().then(function(response) {
     var socketDelay = 50;
     var socketIterator = 0;
     var fullPlayer = {
@@ -3662,7 +3684,6 @@ angular.module('questCreator')
       socketId: null
     };
     var allPlayers = [];
-    var self = this;
     var playerInfo = {
         id: UserService.get().id,
     };
@@ -3670,16 +3691,16 @@ angular.module('questCreator')
     var gameCtx = gameCanvas.getContext('2d');
     var gameWidth = 700;
     var gameHeight = 500;
-    this.warning = '';
-    this.typing = {
+    self.warning = '';
+    self.typing = {
         show: false,
         phrase: ''
     };
-    this.responding = {
+    self.responding = {
         show: false,
         phrase: ''
     };
-    this.showingInventory = false;
+    self.showingInventory = false;
     var pause = false;
 
     var avatar = null;
@@ -3688,23 +3709,23 @@ angular.module('questCreator')
     var entities = null;
     var events = null;
 
-    var gameLoaded = false;
     var avatarLoaded = false;
     var entitiesLoaded = false;
 
-    this.gameName = GameService.getGameDetail().name;
+    self.gameName = StorageService.getPlayingGame() || GameService.getGameDetail().name || 'harry potter quest';
     var gameInfo = null;
     var startPos = null;
     var allMaps = null;
     var currentGame = null;
-    this.currentMap = null;
-    this.allRows = null;
-    this.currentRow = null;
-    this.currentScene = null;
-    this.currentScenePos = [0, 0, 0];
-    this.gameLoaded = false;
-    this.allSavedGames = [];
-    this.saveInfo = {
+    self.currentMap = null;
+    self.allRows = null;
+    self.currentRow = null;
+    self.currentScene = null;
+    self.currentScenePos = [0, 0, 0];
+    self.gameLoaded = false;
+    self.allSavedGames = StorageService.getSavedGames(self.gameName) || [];
+    self.saveInfo = {
+      game: '',
       name: '',
       score: 0,
       time: 0,
@@ -3716,22 +3737,23 @@ angular.module('questCreator')
         y: 250
       }
     };
-    this.startTime = new Date();
-    this.timeDiff = 0;
-    this.displayTime = '';
+    self.startTime = new Date();
+    self.timeDiff = 0;
+    self.displayTime = '';
 
-    this.gameStarted = false;
+    self.gameStarted = false;
 
-    this.saveGame = function() {
+    self.saveGame = function() {
       self.saveInfo.time = self.timeDiff;
       self.saveInfo.pos = avatar.info.pos;
       var newSave = angular.copy(self.saveInfo);
       self.allSavedGames.push(newSave);
+      StorageService.setSavedGames(self.gameName, self.allSavedGames);
       // Call to POST save game to database here
       self.saveInfo.name = '';
     };
 
-    this.restoreGame = function(savedGame) {
+    self.restoreGame = function(savedGame) {
       self.saveInfo = angular.copy(savedGame);
       self.startTime = Date.now() - (angular.copy(savedGame.time) * 1000);
       self.currentScenePos = angular.copy(savedGame.scenePos);
@@ -4662,7 +4684,6 @@ angular.module('questCreator')
           finishedLoading = true;
         }
         if (finishedLoading) {
-          // console.log("Game Loaded!", response);
           clearInterval(checkGameLoadLoop);
           PopupService.close();
           self.gameLoaded = true;
@@ -4705,7 +4726,7 @@ angular.module('questCreator')
         });
     }
 
-    this.startGame = function() {
+    self.startGame = function() {
         // Tell the server that I joined this game
         fullPlayer.id = playerInfo.id;
         fullPlayer.game = self.gameName;
@@ -4744,98 +4765,100 @@ angular.module('questCreator')
     requestAnimationFrame(runGame);
 
 
-  function initSocket() {
-    // Socket functionality
-    // Get my own information
-    socket.off('self info');
-    socket.on('self info', function(id) {
-      fullPlayer.socketId = id;
-    });
+    function initSocket() {
+      // Socket functionality
+      // Get my own information
+      socket.off('self info');
+      socket.on('self info', function(id) {
+        fullPlayer.socketId = id;
+      });
 
-    // Notify me in the chat window that another player joined the game.
-    socket.off('new player');
-    socket.on('new player', function(playerBasic) {
-      var msg = "Player " + playerBasic.id + ' is playing ' + playerBasic.game;
-      $('.chat-messages').append($('<li>').text(msg));
-    });
+      // Notify me in the chat window that another player joined the game.
+      socket.off('new player');
+      socket.on('new player', function(playerBasic) {
+        var msg = "Player " + playerBasic.id + ' is playing ' + playerBasic.game;
+        $('.chat-messages').append($('<li>').text(msg));
+      });
 
-    socket.off('draw new player');
-    socket.on('draw new player', function(newPlayer) {
-      newPlayer.avatar = new Avatar(newPlayer.avatar);
-      allPlayers.push(newPlayer);
-      var response = {
-        data: fullPlayer,
-        dest: newPlayer.socketId
-      };
-      socket.emit('draw old player', response);
-    });
+      socket.off('draw new player');
+      socket.on('draw new player', function(newPlayer) {
+        newPlayer.avatar = new Avatar(newPlayer.avatar);
+        allPlayers.push(newPlayer);
+        var response = {
+          data: fullPlayer,
+          dest: newPlayer.socketId
+        };
+        socket.emit('draw old player', response);
+      });
 
-    socket.off('draw old player');
-    socket.on('draw old player', function(oldPlayer) {
-      oldPlayer.avatar = new Avatar(oldPlayer.avatar);
-      allPlayers.push(oldPlayer);
-    });
+      socket.off('draw old player');
+      socket.on('draw old player', function(oldPlayer) {
+        oldPlayer.avatar = new Avatar(oldPlayer.avatar);
+        allPlayers.push(oldPlayer);
+      });
 
-    socket.off('update player');
-    socket.on('update player', function(playerUpdate) {
-      // playerUpdate = {
-      //   id: angular.copy(fullPlayer.id),
-      //   game: angular.copy(fullPlayer.game),
-      //   scenePos: angular.copy(fullPlayer.scenePos),
-      //   socketId: angular.copy(fullPlayer.socketId),
-      //   action: avatar.action
-      // };
-      for (var index = 0; index < allPlayers.length; index++) {
-        if (allPlayers[index].id === playerUpdate.id) {
-          allPlayers[index].avatar.action = angular.copy(playerUpdate.action);
-          allPlayers[index].scenePos = angular.copy(playerUpdate.scenePos);
-          allPlayers[index].avatar.info.pos = angular.copy(playerUpdate.pos);
+      socket.off('update player');
+      socket.on('update player', function(playerUpdate) {
+        // playerUpdate = {
+        //   id: angular.copy(fullPlayer.id),
+        //   game: angular.copy(fullPlayer.game),
+        //   scenePos: angular.copy(fullPlayer.scenePos),
+        //   socketId: angular.copy(fullPlayer.socketId),
+        //   action: avatar.action
+        // };
+        for (var index = 0; index < allPlayers.length; index++) {
+          if (allPlayers[index].id === playerUpdate.id) {
+            allPlayers[index].avatar.action = angular.copy(playerUpdate.action);
+            allPlayers[index].scenePos = angular.copy(playerUpdate.scenePos);
+            allPlayers[index].avatar.info.pos = angular.copy(playerUpdate.pos);
+          }
         }
-      }
-    });
+      });
 
-    // When I submit a chat message, send it to the server along with the game I'm playing
-    $('.chat-submit').submit(function(){
-      var msgInfo = {
-        msg: playerInfo.id + ': ' + $('.message').val(),
-        gameName: self.gameName
-      };
-      socket.emit('chat message', msgInfo);
-      $('.message').val('');
-      return false;   // Prevent default page refresh
-    });
+      // When I submit a chat message, send it to the server along with the game I'm playing
+      $('.chat-submit').submit(function(){
+        var msgInfo = {
+          msg: playerInfo.id + ': ' + $('.message').val(),
+          gameName: self.gameName
+        };
+        socket.emit('chat message', msgInfo);
+        $('.message').val('');
+        return false;   // Prevent default page refresh
+      });
 
-    // When a message has been received, display it on the screen
-    socket.off('chat message');
-    socket.on('chat message', function(msg){
-      $('.chat-messages').append($('<li>').text(msg));
-    });
+      // When a message has been received, display it on the screen
+      socket.off('chat message');
+      socket.on('chat message', function(msg){
+        $('.chat-messages').append($('<li>').text(msg));
+      });
 
-    // Notify me if a player leaves the game
-    socket.off('player left');
-    socket.on('player left', function(leavingPlayer) {
-      var msg = "Player " + leavingPlayer.id + ' left ' + leavingPlayer.game;
-      $('.chat-messages').append($('<li>').text(msg));
-      var indexToRemove = null;
-      for (var index = 0; index < allPlayers.length; index++) {
-        if (allPlayers[index].id === leavingPlayer.id) {
-          indexToRemove = index;
+      // Notify me if a player leaves the game
+      socket.off('player left');
+      socket.on('player left', function(leavingPlayer) {
+        var msg = "Player " + leavingPlayer.id + ' left ' + leavingPlayer.game;
+        $('.chat-messages').append($('<li>').text(msg));
+        var indexToRemove = null;
+        for (var index = 0; index < allPlayers.length; index++) {
+          if (allPlayers[index].id === leavingPlayer.id) {
+            indexToRemove = index;
+          }
         }
-      }
-      if (indexToRemove !== null) {
-        allPlayers.splice(indexToRemove, 1);
-      }
-    });
+        if (indexToRemove !== null) {
+          allPlayers.splice(indexToRemove, 1);
+        }
+      });
 
-    // Let others know that I left the game if the controller ceases (closing browser, etc)
-    $scope.$on("$destroy", function(){
-      var leavingPlayer = {
-        id: playerInfo.id,
-        game: self.gameName
-      };
-      socket.emit('game left', leavingPlayer);
-    });
-  }
+      // Let others know that I left the game if the controller ceases (closing browser, etc)
+      $scope.$on("$destroy", function(){
+        var leavingPlayer = {
+          id: playerInfo.id,
+          game: self.gameName
+        };
+        socket.emit('game left', leavingPlayer);
+      });
+    }
+    $scope.$apply();
+  });
 });
 ;angular.module('questCreator').controller('profileCtrl', function(socket, $state, $scope, UserService, PopupService) {
 
@@ -4856,43 +4879,16 @@ angular.module('questCreator')
             return new Date(date);
         };
 
-        function getGameName(requests, games) {
-            for (var i = 0; i < requests.length; i++) {
-                for (var j = 0; j < games.length; j++) {
-                    if (requests[i].game_id === games[j].id) {
-                        requests[i].gameName = games[j].name;
-                    }
-                }
-            }
-            $scope.requests = requests;
-            $scope.$apply();
-        }
-
-        function filterCollaborators(collaborators, games) {
-            for (var i = collaborators.length - 1; i >= 0; i--) {
-                if (collaborators[i].user_id === $scope.user.id) {
-                    collaborators.splice(i, 1);
-                } else {
-                    for (var j = 0; j < games.length; j++) {
-                        if (collaborators[i].game_id === games[j].id) {
-                            collaborators[i].gameName = games[j].name;
-                        }
-                    }
-                }
-                $scope.collaborators = collaborators;
-                $scope.$apply();
-            }
-        }
-
         UserService.getUserGames().done(function(games) {
             $scope.games = games;
-            console.log(games);
             $scope.$apply();
             UserService.getCollabRequests().done(function(requests) {
-                getGameName(requests, games);
+                $scope.requests = requests;
+                $scope.$apply();
             });
             UserService.getCollaborators().done(function(collaborators) {
-                filterCollaborators(collaborators, games);
+                $scope.collaborators = collaborators;
+                $scope.$apply();
             });
 
             UserService.getAvatars().done(function(avatars) {
@@ -4905,7 +4901,6 @@ angular.module('questCreator')
                 PopupService.close();
             });
         });
-
 
         UserService.getCollaborations().done(function(collaborations) {
             $scope.collaborations = collaborations;
