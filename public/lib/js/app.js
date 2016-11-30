@@ -4461,7 +4461,7 @@ angular.module('questCreator')
         pos: angular.copy(avatar.info.pos)
       };
       if (socketIterator > socketDelay) {
-        socket.emit('update player', playerUpdate);
+        // socket.emit('update player', playerUpdate);
         socketIterator = 0;
       }
       socketIterator++;
