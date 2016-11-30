@@ -5,6 +5,7 @@
   font-style: italic;
   text-shadow: .05em .05em 0 $medgrey;
    position: relative;
+   z-index: 2;
 }
 
 .yazua:before {
@@ -14,8 +15,8 @@
   top: -0.03em; left: -0.03em;
   z-index: -1;
   text-shadow: none;
-
 }
+
 .yazua:after {
  -webkit-text-stroke: 0 pink;
  content: attr(data-shadow);

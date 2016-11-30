@@ -4,13 +4,13 @@
       <li ng-click="main.goHome()">
         <a>Home</a>
       </li>
-      <li ng-click="main.goToUser()">
-        <a>Profile</a>
-      </li>
-      <li id="login" ng-click="signIn()">
+      <li id="login" ng-click="main.signIn()" ng-if="!main.loggedIn">
         <a>Login/Signup</a>
       </li>
-      <li id="logout" ng-click="main.signOut()" ng-cloak>
+      <li ng-click="main.goToUser()" ng-if="main.loggedIn" ng-cloak>
+        <a>Profile</a>
+      </li>
+      <li id="logout" ng-click="main.signOut()" ng-if="main.loggedIn" ng-cloak>
         <a>Logout</a>
       </li>
     </ul>
