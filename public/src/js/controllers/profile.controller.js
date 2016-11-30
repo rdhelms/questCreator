@@ -47,6 +47,7 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
 
         UserService.getUserGames().done(function(games) {
             $scope.games = games;
+            console.log(games);
             $scope.$apply();
             UserService.getCollabRequests().done(function(requests) {
                 getGameName(requests, games);
@@ -57,7 +58,6 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
 
             UserService.getAvatars().done(function(avatars) {
                 $scope.avatars = avatars;
-                console.log(avatars);
                 for (var i = 0; i < avatars.length; i++) {
                     if (avatars[i].current)
                         $scope.large = avatars[i];
