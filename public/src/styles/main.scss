@@ -79,16 +79,12 @@ button, input, select, option {
 .disabled {
   @include checkerboard(4px, .5);
   z-index: 8000;
-  pointer-events: none;
+  cursor: not-allowed;
 
   * {
     pointer-events: none;
     @include checkerboard(4px, .5);
     z-index: 0;
-    
-    &:hover {
-      cursor: not-allowed;
-    }
   }
 }
 
