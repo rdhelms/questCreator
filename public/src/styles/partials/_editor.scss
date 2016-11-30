@@ -1,3 +1,5 @@
+
+
 #editor {
   display: flex;
   flex-direction: column;
@@ -7,6 +9,20 @@
   @include vertical {
     max-width: 900px;
     min-width: 0;
+  }
+
+  #lol {
+    display: none;
+  }
+
+  @include lol {
+    #editor-view, #editor-footer ul li {
+      display: none;
+    }
+
+    #lol {
+      display: block;
+    }
   }
 
   margin: 0 auto;
