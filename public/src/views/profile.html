@@ -110,18 +110,18 @@
             <ul>
                 <li>
                     <h4>{{ collaboration.name | capitalize }}</h4>
-                  </li>
-                    <li>
-                        <label for="creator">Created By: </label>
-                        <p>{{ collaboration.username | capitalize }}</p>
-                        <label for="created">On: </label>
-                        <p> {{ collaboration.created_at | date:'MMM d, yyyy' }}</p>
-                    </li>
-                    <li>
-                      <label for="published">Published: </label>
-                      <p>{{ game.published ? 'Yup!' : 'Not Yet' }}
-                      </p>
-                    </li>
+                </li>
+                <li>
+                    <label for="creator">Created By: </label>
+                    <p>{{ collaboration.username | capitalize }}</p>
+                    <label for="created">On: </label>
+                    <p> {{ collaboration.created_at | date:'MMM d, yyyy' }}</p>
+                </li>
+                <li>
+                  <label for="published">Published: </label>
+                  <p>{{ game.published ? 'Yup!' : 'Not Yet' }}
+                  </p>
+                </li>
             </ul>
             <div class="buttons">
                 <button type="button" ng-click="editGame(collaboration.name)">Edit</button>

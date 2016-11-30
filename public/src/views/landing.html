@@ -9,19 +9,21 @@
           </form>
         </div>
         <div id="game-results">
-            <div ng-repeat="game in landing.allGames | orderBy:'-'" class="game" ng-click="goToGameDetail(game)">
+            <div ng-repeat="game in landing.allGames | orderBy:'-'" class="user-games" ng-click="goToGameDetail(game)">
+
+              <div class="game-body">
+                <h3>{{ game.name | capitalize }}</h3>
                 <img ng-src="{{ game.thumbnail }}" alt="Game thumbnail"/>
                 <ul>
-                    <li>
-                        <span><h1 class="game-name">{{ game.name | capitalize }}</h1></span>
-                    </li>
-                    <li>
-                        <p>by <span>{{ game.username | capitalize }}</span></p>
-                    </li>
-                    <li>
-                        <p>created <span>{{ game.created_at | date:'MMM d, yyyy' }}</span></p>
-                    </li>
+                  <li>
+                    <p>by <span>{{ game.username | capitalize }}</span></p>
+                  </li>
+                  <li>
+                    <p>created <span>{{ game.created_at | date:'MMM d, yyyy' }}</span></p>
+                  </li>
                 </ul>
+              </div>
+
             </div>
         </div>
     </main>

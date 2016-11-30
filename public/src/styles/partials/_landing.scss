@@ -53,52 +53,95 @@
   box-shadow: 8px 8px 0 0 $darkgrey inset;
   align-items: baseline;
 
-}
+  .user-games {
+    margin: 15px;
+    width: 350px;
+    border: 4px solid black;
+    background-color: $white;
 
-.game {
-  margin: 15px;
-  width: 300px;
-  border: 4px solid black;
-  background: $white;
-  box-shadow: 8px 8px 0 0 $darkgrey;
-  align-self: stretch;
-  max-height: 400px;
+    .game-body {
+      margin: 10px 0;
+    }
 
-  img {
-    width: 100%;
-  }
+    img {
+      width: 100%;
+    }
 
-  ul {
-    font-size: 0.75em;
+    h3 {
+      padding: 5px 0;
+      font-style: normal;
+      text-shadow: none;
+      text-align: center;
+      color: $blackgrey;
+    }
 
-    li {
-      color: grey;
-      display: flex;
-      justify-content: flex-start;
-      padding: 0.5em;
+    ul {
+      width: 100%;
+      font-size: 0.75em;
+      margin-top: 10px;
+      padding-top: 5px;
+      border-top: 2px dashed $deepgrey;
 
-      &:nth-child(odd) {
-        background: $white;
-      }
+      li {
+        display: flex;
+        justify-content: flex-start;
+        padding: 5px;
+        margin: 0;
 
-      &:nth-child(even) {
-        background: $lightgrey;
-      }
+        p {
+          color: red;
+          font-size: 1rem;
+        }
 
-      span {
-        min-width: 0;
-        max-width: 100%;
-        color: black;
-      }
+        // background-color: $deepgrey;
 
-      .game-name {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: normal;
+        // &:nth-child(odd) {
+        //   background: $deepgrey;
+        // }
+        //
+        // &:nth-child(even) {
+        //   background: $blackgrey;
+        // }
+
+        span {
+          min-width: 0;
+          max-width: 100%;
+          color: $blackgrey;
+        }
+
       }
     }
   }
 }
+
+// .game {
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: space-between;
+// margin: 15px;
+// width: 300px;
+// border: 4px solid black;
+//   background: $white;
+//   box-shadow: 8px 8px 0 0 $darkgrey;
+//   align-self: stretch;
+//   max-height: 400px;
+//
+//   img {
+//     width: 100%;
+//   }
+//
+//   .game-name {
+//     text-overflow: ellipsis;
+//     overflow: hidden;
+//     white-space: normal;
+//     text-align: center;
+//     padding: 5px 0;
+//     background-color: $lightgrey;
+//     // color: $white;
+//   }
+//
+// }
+//
 
 #create-splash {
   margin: 2rem;
