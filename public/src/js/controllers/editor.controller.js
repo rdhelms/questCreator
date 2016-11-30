@@ -444,4 +444,3 @@ angular.module('questCreator')
             });
         };
     });
-    

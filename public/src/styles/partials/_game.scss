@@ -1,3 +1,6 @@
 #game-container {
   margin: 2rem 4rem;
+  @include full-width {
+    margin: 2rem 0;
+  }
 }

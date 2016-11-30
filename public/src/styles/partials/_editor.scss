@@ -3,6 +3,12 @@
   flex-direction: column;
   max-width: 1584px;
   min-width: 1286px;
+
+  @include vertical {
+    max-width: 900px;
+    min-width: 0;
+  }
+
   margin: 0 auto;
 
   .yazua {
@@ -15,6 +21,11 @@
   flex: 1;
   display: flex;
   justify-content: center;
+
+  @include vertical {
+    flex-direction: column;
+    box-shadow: none;
+  }
 
   > * {
     font-family: PCSenior;
@@ -31,6 +42,10 @@
   display: flex;
   justify-content: space-around;
   border-right: 4px solid black;
+
+  @include vertical {
+    border-right: none;
+  }
 
   .tab {
     background: $lightgrey;
@@ -175,6 +190,9 @@
     border-right: 4px solid black;
     border-left: 4px solid black;
     align-items: center;
+    @include vertical {
+      box-shadow: 8px 8px 0 0 $medgrey;
+    }
   }
 
   &#asset {
@@ -283,6 +301,12 @@
   flex: 1;
   border: 4px black solid;
   padding: .5rem;
+  z-index: 100;
+  background-color: $white;
+
+  @include vertical {
+    box-shadow: 8px 8px 0 0 $medgrey;
+  }
 
   #drawing-menu {
     flex: 1;
@@ -421,6 +445,17 @@
   background: whitesmoke;
   border: 4px black solid;
   border-left: none;
+
+  @include vertical {
+    z-index: 200;
+    box-shadow: 8px 8px 0px 0 #A4AC96;
+    border-top: none;
+    border-left: solid 4px black;
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+    flex-direction: column-reverse;
+  }
 }
 
 #asset-editor {
@@ -437,6 +472,11 @@
   display: flex;
   width: 100%;
   border-bottom: 4px black dashed;
+
+  @include vertical {
+    border-bottom: none;
+    border-top: 4px black dashed;
+  }
 }
 
 #viewer-container {
@@ -668,5 +708,11 @@
         }
       }
     }
+
+    @include vertical {
+      width: 100%;
+      justify-content: space-around;
+    }
   }
+
 }
