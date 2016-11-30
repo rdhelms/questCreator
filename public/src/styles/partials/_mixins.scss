@@ -94,3 +94,9 @@ $full-width-point: 950px;
     @content;
   }
 }
+
+@mixin lol {
+  @media (max-width: 700px) {
+    @content;
+  }
+}
