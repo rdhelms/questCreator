@@ -3,8 +3,8 @@
 #event-editor {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  height: 400px;
+  justify-content: space-around;
+  height: 100%;
 }
 
 #event-header {
@@ -42,7 +42,7 @@
 
   &#edit {
     border-top: none;
-    height: 200px;
+    height: 250px;
     overflow-y: auto;
     padding: 10px;
   }

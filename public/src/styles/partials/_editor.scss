@@ -1,6 +1,9 @@
 #editor {
   display: flex;
   flex-direction: column;
+  max-width: 1584px;
+  min-width: 1286px;
+  margin: 0 auto;
 
   .yazua {
     font-size: 3em;
@@ -157,7 +160,6 @@
 
 #scene-editor {
   background: whitesmoke;
-  height: 800px;
   display: flex;
   flex: 4;
   flex-direction: column;
@@ -177,13 +179,14 @@
 
   &#asset {
     flex: 1;
+    height: 100%;
 
     > * {
-      height: 400px;
+      height: 100%;
     }
 
     .scene-assets {
-      height: 400px; //NOTE this is a quick fix, need to find underlying cause!
+      height: 450px; //NOTE this is a quick fix, need to find underlying cause!
       overflow: auto;
       border: 4px black solid;
       border-top: none;
@@ -408,7 +411,9 @@
 }
 
 #asset-bar {
-  max-width: 600px;
+  width: 40%;
+  min-width: 500px;
+  max-width: 800px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
