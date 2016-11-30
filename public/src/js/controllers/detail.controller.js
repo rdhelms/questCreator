@@ -5,6 +5,7 @@ angular.module('questCreator').controller('detailCtrl', function ($state, GameSe
     };
 
     this.game = GameService.getGameDetail();
+    console.log(this.game);
 
     this.sendCollabRequest = function (gameId) {
       var request = UserService.validateCollabRequest(gameId).done(function (response) {
@@ -27,7 +28,7 @@ angular.module('questCreator').controller('detailCtrl', function ($state, GameSe
     //This is for testing only
     this.players = [
       {
-        name: 'billy badass',
+        name: 'billy bad',
         score: 72,
         timeToComplete: '00:45:06'
       }, {
