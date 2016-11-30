@@ -2627,8 +2627,6 @@ angular.module('questCreator')
             });
         };
     });
-
-    
 ;angular.module('questCreator').controller('entCtrl', function($state, $scope, EditorService) {
   var self = this;      // To help with scope issues
   var drawingEntity = false;
@@ -4434,7 +4432,7 @@ angular.module('questCreator')
           action: angular.copy(avatar.action),
           pos: angular.copy(avatar.info.pos)
         };
-        socket.emit('update player', playerUpdate);
+        // socket.emit('update player', playerUpdate);
         background = self.currentScene.background;
         events = self.currentScene.events;
         objects = self.currentScene.objects;

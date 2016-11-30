@@ -758,7 +758,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
           action: angular.copy(avatar.action),
           pos: angular.copy(avatar.info.pos)
         };
-        socket.emit('update player', playerUpdate);
+        // socket.emit('update player', playerUpdate);
         background = self.currentScene.background;
         events = self.currentScene.events;
         objects = self.currentScene.objects;
