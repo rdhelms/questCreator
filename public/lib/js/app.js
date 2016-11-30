@@ -2125,6 +2125,7 @@ angular.module('questCreator')
     };
 
     this.game = GameService.getGameDetail();
+    console.log(this.game);
 
     this.sendCollabRequest = function (gameId) {
       var request = UserService.validateCollabRequest(gameId).done(function (response) {
@@ -2147,7 +2148,7 @@ angular.module('questCreator')
     //This is for testing only
     this.players = [
       {
-        name: 'billy badass',
+        name: 'billy bad',
         score: 72,
         timeToComplete: '00:45:06'
       }, {
@@ -2622,6 +2623,7 @@ angular.module('questCreator')
             });
         };
     });
+    
 ;angular.module('questCreator').controller('entCtrl', function($state, $scope, EditorService) {
   var self = this;      // To help with scope issues
   var drawingEntity = false;
@@ -3136,7 +3138,7 @@ angular.module('questCreator')
             $state.go('main.game.editor.views');
         } else {
             PopupService.openTemp('signin-to-continue');
-              $scope.signIn();
+            main.signIn();
         }
     };
 
@@ -3168,7 +3170,7 @@ angular.module('questCreator')
 });
 ;angular.module('questCreator')
     .controller('mainCtrl', function(socket, $state, UserService, PopupService, $scope) {
-
+    var self = this;
     this.loggedIn = null;
     $scope.popupTemp = false;
     //When the user clicks "Home" on the nav bar view is changed to landing
@@ -3206,6 +3208,18 @@ angular.module('questCreator')
         };
         UserService.set(user);
         $state.go('main.landing');
+    };
+
+    this.createGame = function() {
+        var user = UserService.get();
+        if (user.id) {
+            user.editGame = null;
+            UserService.set(user);
+            $state.go('main.game.editor.views');
+        } else {
+            PopupService.openTemp('signin-to-continue', $scope);
+            self.signIn();
+        }
     };
 
     //New user can register a user name
