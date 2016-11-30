@@ -17,43 +17,16 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
             return new Date(date);
         };
 
-        function getGameName(requests, games) {
-            for (var i = 0; i < requests.length; i++) {
-                for (var j = 0; j < games.length; j++) {
-                    if (requests[i].game_id === games[j].id) {
-                        requests[i].gameName = games[j].name;
-                    }
-                }
-            }
-            $scope.requests = requests;
-            $scope.$apply();
-        }
-
-        function filterCollaborators(collaborators, games) {
-            for (var i = collaborators.length - 1; i >= 0; i--) {
-                if (collaborators[i].user_id === $scope.user.id) {
-                    collaborators.splice(i, 1);
-                } else {
-                    for (var j = 0; j < games.length; j++) {
-                        if (collaborators[i].game_id === games[j].id) {
-                            collaborators[i].gameName = games[j].name;
-                        }
-                    }
-                }
-                $scope.collaborators = collaborators;
-                $scope.$apply();
-            }
-        }
-
         UserService.getUserGames().done(function(games) {
             $scope.games = games;
-            console.log(games);
             $scope.$apply();
             UserService.getCollabRequests().done(function(requests) {
-                getGameName(requests, games);
+                $scope.requests = requests;
+                $scope.$apply();
             });
             UserService.getCollaborators().done(function(collaborators) {
-                filterCollaborators(collaborators, games);
+                $scope.collaborators = collaborators;
+                $scope.$apply();
             });
 
             UserService.getAvatars().done(function(avatars) {
@@ -66,7 +39,6 @@ angular.module('questCreator').controller('profileCtrl', function(socket, $state
                 PopupService.close();
             });
         });
-
 
         UserService.getCollaborations().done(function(collaborations) {
             $scope.collaborations = collaborations;

@@ -25,7 +25,7 @@
                         <th>Remove</th>
                     </tr>
                     <tr ng-repeat="request in requests">
-                        <td>{{ request.gameName | capitalize }}</td>
+                        <td>{{ request.game_name | capitalize }}</td>
                         <td>{{ request.username }}</td>
                         <td><input ng-model="request.accepted" ng-change="toggleCollab(request)" type="checkbox"></td>
                         <td><button ng-click="removeRequest(request, $index)" type="button" name="button"></button></td>
@@ -50,7 +50,7 @@
                         <th>Remove</th>
                     </tr>
                     <tr ng-repeat="collaborator in collaborators">
-                        <td>{{ collaborator.gameName | capitalize }}</td>
+                        <td>{{ collaborator.game_name | capitalize }}</td>
                         <td>{{ collaborator.username }}</td>
                         <td><input ng-model="collaborator.accepted" ng-change="toggleCollab(collaborator)" type="checkbox" value="{{ collaborator.accepted }}"></td>
                         <td><button ng-click="removeCollaborator(collaborator, $index)" type="button" name="button"></button></td>

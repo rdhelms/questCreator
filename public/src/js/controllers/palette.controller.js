@@ -74,7 +74,7 @@ angular.module('questCreator').controller('paletteCtrl', function(PaletteService
           } else if (self.currentType === 'obstacles') {
             for (var j = 0; j < self.elements.length; j++) {
               asset = self.elements[j];
-                EditorService.createBackground(asset.name, $scope.editor.currentEditingGame.id, asset.info).done(function (response) {
+                EditorService.createObject(asset.name, $scope.editor.currentEditingGame.id, asset.info).done(function (response) {
                   $scope.editor.availableObjects.push(response);
               });
             }

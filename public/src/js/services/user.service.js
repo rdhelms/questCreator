@@ -122,7 +122,9 @@ angular.module('questCreator')
                         user.joined = response.created_at;
                         user.username = response.username;
                         user.id = response.id;
-                        PopupService.openTemp('welcome');
+                        setTimeout(function() {
+                          PopupService.openTemp('welcome');
+                        }, 500);
                         loggedIn = true;
                     },
                     error: function(error) {

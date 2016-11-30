@@ -1,12 +1,11 @@
-angular.module('questCreator').controller('landingCtrl', function($state, $scope, UserService, GameService, PopupService) {
+angular.module('questCreator').controller('landingCtrl', function($state, $scope, UserService, GameService, PopupService, StorageService) {
 
     this.searching = false;
     var self = this;
 
     GameService.getGames().done(function(response) {
       self.allGames = response;
-      console.log(self.allGames);
-        $scope.$apply();
+      $scope.$apply();
     });
 
     $scope.createGame = function() {
@@ -26,6 +25,7 @@ angular.module('questCreator').controller('landingCtrl', function($state, $scope
         PopupService.openTemp('signin-to-continue');
         $scope.main.signIn();
       }
+        StorageService.setPlayingGame(game.name);
         GameService.setGameDetail(game);
         $state.go('main.game.detail');
     };
@@ -34,7 +34,6 @@ angular.module('questCreator').controller('landingCtrl', function($state, $scope
         this.searching = true;
         GameService.searchGames(keyword).done(function (response) {
           self.allGames = response;
-          console.log(self.allGames);
           $scope.$apply();
         });
     };
