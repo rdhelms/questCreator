@@ -55,10 +55,10 @@
     </li>
   <!-- SIZE PICKER -->
     <ul class="picker size" ng-class="{'disabled': editor.erasing}">
-        <li ng-click="editor.currentPixelSize = 7">S</li>
-        <li ng-click="editor.currentPixelSize = 15">M</li>
-        <li ng-click="editor.currentPixelSize = 40">L</li>
-        <li ng-click="editor.currentPixelSize = 80">XL</li>
+        <li ng-click="editor.currentPixelSize = 0">S</li>
+        <li ng-click="editor.currentPixelSize = 1">M</li>
+        <li ng-click="editor.currentPixelSize = 3">L</li>
+        <li ng-click="editor.currentPixelSize = 5">XL</li>
     </ul>
   <!-- COLOR PICKER -->
     <ul class="picker color" ng-class="{'disabled': editor.drawingCollision || editor.erasing}">

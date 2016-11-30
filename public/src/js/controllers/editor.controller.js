@@ -65,7 +65,7 @@ angular.module('questCreator')
           3: "brown",
           4: "orange"
         };
-        this.currentPixelSize = 15;
+        this.currentPixelSize = 3;
         this.drawingCollision = false;
         this.erasing = false;
         this.selectingAssets = false;
