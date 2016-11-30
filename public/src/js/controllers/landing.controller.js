@@ -16,7 +16,7 @@ angular.module('questCreator').controller('landingCtrl', function($state, $scope
             $state.go('main.game.editor.views');
         } else {
             PopupService.openTemp('signin-to-continue');
-              $scope.signIn();
+            main.signIn();
         }
     };
 
