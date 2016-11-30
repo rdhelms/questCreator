@@ -262,6 +262,7 @@ angular.module('questCreator')
                 background.info = info;
                 self.currentBackground = background;
                 $scope.$broadcast('redrawBackground', background.info.image, background.info.collisionMap);
+                $scope.$apply();
             });
         };
 
@@ -289,6 +290,7 @@ angular.module('questCreator')
                   clear: 'clearObject'
                 };
                 $scope.$broadcast('redrawObject', object.info.image, object.info.collisionMap);
+                $scope.$apply();
             });
         };
 
@@ -318,6 +320,7 @@ angular.module('questCreator')
                   clear: 'clearEntity'
                 };
                 $scope.$broadcast('redrawEntity',entity.info.animate[self.selectedAnimation][self.currentFrameIndex].image, entity.info.animate[self.selectedAnimation][self.currentFrameIndex].collisionMap);
+                $scope.$apply();
             });
         };
 
@@ -340,6 +343,7 @@ angular.module('questCreator')
         this.editEvent = function(event) {
             self.currentEvent = event;
             self.currentSmallView = 'event';
+            $scope.$apply();
         };
 
         this.setThumbnail = function(asset) {
