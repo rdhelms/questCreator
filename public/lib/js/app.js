@@ -72,7 +72,6 @@
             controller: 'profileCtrl as profile'
           });
         });
-
 })();
 ;angular.module('questCreator').filter('capitalize', function() {
 
@@ -2191,6 +2190,7 @@ angular.module('questCreator')
         //NOTE probably can remove^
         this.currentLargeView = 'map';
         this.currentSmallView = 'welcome';
+        this.assetsView = 'backgrounds';
         this.qState = {
           undo: 'undoBackground',
           redo: 'redoBackground',
@@ -4886,6 +4886,7 @@ angular.module('questCreator')
 
         UserService.getUserGames().done(function(games) {
             $scope.games = games;
+            console.log(games);
             $scope.$apply();
             UserService.getCollabRequests().done(function(requests) {
                 getGameName(requests, games);
@@ -4896,7 +4897,6 @@ angular.module('questCreator')
 
             UserService.getAvatars().done(function(avatars) {
                 $scope.avatars = avatars;
-                console.log(avatars);
                 for (var i = 0; i < avatars.length; i++) {
                     if (avatars[i].current)
                         $scope.large = avatars[i];

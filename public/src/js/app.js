@@ -72,5 +72,4 @@
             controller: 'profileCtrl as profile'
           });
         });
-
 })();
