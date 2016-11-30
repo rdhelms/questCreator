@@ -200,40 +200,55 @@
     flex: 1;
   }
 
-  .menu-item {
-    cursor: pointer;
-    padding: 2px;
-    margin: 2px;
-    display: flex;
-    justify-content: space-between;
+}
 
-    &#map-menu, #scene-menu {
-      max-width: 165px; //overflow fix
-    }
 
-    span, button {
-      min-width: 0px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+.menu-item {
+  cursor: pointer;
+  padding: 2px;
+  margin: 2px;
+  display: flex;
+  justify-content: space-between;
 
-    &:hover, &.active {
+  &#map-menu, #scene-menu {
+    max-width: 165px; //overflow fix
+  }
+
+  span, button {
+    min-width: 0px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &:hover, &.active {
+    background: $darkgrey;
+    color: $white;
+  }
+
+}
+
+button {
+  border: none;
+}
+
+.menu-type {
+  flex: 2;
+
+  textarea {
+    width: 100%;
+
+    &:hover {
       background: $darkgrey;
       color: $white;
     }
-
   }
 
-  button {
-    border: none;
-  }
+  .value {
+    border-bottom: 1px solid $darkgrey;
 
-  .menu-type {
-    flex: 2;
-
-    textarea {
-      width: 100%;
+    .number, .word {
+      background: white;
 
       &:hover {
         background: $darkgrey;
@@ -241,37 +256,24 @@
       }
     }
 
-    .value {
-      border-bottom: 1px solid $darkgrey;
+    &.text, &.item, &.requirement, .achievement-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 2px;
 
-      .number, .word {
-        background: white;
-
-        &:hover {
-          background: $darkgrey;
-          color: $white;
-        }
+      span {
+        font-size: .7em;
       }
+    }
 
-      &.text, &.item, &.requirement, .achievement-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin: 2px;
+    &.achievement {
+      margin: 2px 0;
+    }
 
-        span {
-          font-size: .7em;
-        }
-      }
-
-      &.achievement {
-        margin: 2px 0;
-      }
-
-      &.item {
-        .word {
-          width: 100%;
-        }
+    &.item {
+      .word {
+        width: 100%;
       }
     }
   }

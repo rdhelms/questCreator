@@ -56,81 +56,81 @@
 
         <!-- ASSET BAR -->
         <aside id="asset-bar">
-            <ul class="assets">
-                <li class="viewer" id="backgrounds">
-                    <div class="viewer-header">
-                      <h4>Backgrounds</h4>
-                      <input type="button" class="search-button" title="Click to browse backgrounds to add to your palette." ng-click="editor.goToPalette('backgrounds')">
-                    </div>
-                    <ul>
-                        <li ng-click="editor.createBackground(); editor.currentLargeView = 'background'; editor.qState = {undo: 'undoBackground', redo: 'redoBackground', clear: 'clearBackground'}">
-                            <div class="asset new">
-                              <div class="asset-name new">+</div>
-                            </div>
-                            <div class="asset-name new">...</div>
-                        </li>
-                        <li ng-repeat="background in editor.availableBackgrounds | orderBy:'-'" ng-click="editor.editBackground(background); editor.currentLargeView = 'background'; editor.qState = {undo: 'undoBackground', redo: 'redoBackground', clear: 'clearBackground'}">
-                            <div class="asset available {{background.name | nospace}}" ng-style="editor.setThumbnail(background)"></div>
-                            <div class="asset-name">{{background.name}}</div>
-                        </li>
-                    </ul>
+          <div id="viewer-selector">
+            <div id="viewer-container">
+              <div class="viewer-header" ng-if="editor.assetsView === 'backgrounds'">
+                <button ng-click="editor.createBackground(); editor.currentLargeView='background'">+ Design New Background</button>
+                <input type="button" class="search-button" title="Click to browse backgrounds to add to your palette." ng-click="editor.goToPalette('backgrounds')">
+              </div>
+              <div class="viewer-header" ng-if="editor.assetsView === 'objects'">
+                <button ng-click="editor.createObject()">+ Design New Object</button>
+                <input type="button" class="search-button" title="Click to browse game objects to add to your palette." ng-click="editor.goToPalette('obstacles')">
+              </div>
+              <div class="viewer-header" ng-if="editor.assetsView === 'entities'">
+                <button ng-click="editor.createEntity()">+ Design New Entity</button>
+                <input type="button" class="search-button" title="Click to browse entities to add to your palette." ng-click="editor.goToPalette('entities')">
+              </div>
+              <div class="viewer-header" ng-if="editor.assetsView === 'events'">
+                <button ng-click="editor.selectEventType()">+ Design New Event</button>
+                <input type="button" class="search-button" title="Click to browse entities to add to your palette." ng-click="editor.goToPalette('entities')" disabled>
+              </div>
+              <ul id="assets">
+                <li class="viewer" id="backgrounds" ng-if="editor.assetsView === 'backgrounds'">
+                  <ul>
+                    <li ng-repeat="background in editor.availableBackgrounds | orderBy:'-'" ng-click="editor.editBackground(background); editor.currentLargeView = 'background'; editor.qState = {undo: 'undoBackground', redo: 'redoBackground', clear: 'clearBackground'}">
+                      <div class="asset available {{background.name | nospace}}" ng-style="editor.setThumbnail(background)"></div>
+                      <div class="asset-name">{{background.name}}</div>
+                    </li>
+                  </ul>
                 </li>
-                <li class="viewer" id="game-objects">
-                    <div class="viewer-header">
-                      <h4>Game Objects</h4>
-                      <input type="button" class="search-button" title="Click to browse game objects to add to your palette." ng-click="editor.goToPalette('obstacles')">
-                    </div>
-                    <ul>
-                        <li ng-click="editor.createObject()">
-                            <div class="asset new">
-                              <div class="asset-name new">+</div>
-                            </div>
-                            <div class="asset-name new">...</div>
-                        </li>
-                        <li ng-repeat="object in editor.availableObjects | orderBy:'-'" ng-click="editor.editObject(object)">
-                            <div class="asset available {{object.name | nospace}}" ng-style="editor.setThumbnail(object)" ng-mousedown="editor.dragAvailableAsset(object, 'objects')"></div>
-                            <div class="asset-name">{{object.name}}</div>
-                        </li>
-                    </ul>
+                <li class="viewer" id="game-objects" ng-if="editor.assetsView === 'objects'">
+                  <ul>
+                    <li ng-repeat="object in editor.availableObjects | orderBy:'-'" ng-click="editor.editObject(object)">
+                      <div class="asset available {{object.name | nospace}}" ng-style="editor.setThumbnail(object)" ng-mousedown="editor.dragAvailableAsset(object, 'objects')"></div>
+                      <div class="asset-name">{{object.name}}</div>
+                    </li>
+                  </ul>
                 </li>
-                <li class="viewer" id="entities">
-                    <div class="viewer-header">
-                      <h4>Entities</h4>
-                      <input type="button" class="search-button" title="Click to browse entities to add to your palette." ng-click="editor.goToPalette('entities')">
-                    </div>
-                    <ul>
-                        <li ng-click="editor.createEntity()">
-                            <div class="asset new">
-                              <div class="asset-name new">+</div>
-                            </div>
-                            <div class="asset-name new">...</div>
-                        </li>
-                        <li ng-repeat="entity in editor.availableEntities | orderBy:'-'" ng-click="editor.editEntityFrame(entity)">
-                            <div class="asset available {{entity.name | nospace}}" ng-style="editor.setThumbnail(entity)" ng-mousedown="editor.dragAvailableAsset(entity, 'entities')"></div>
-                            <div class="asset-name">{{entity.name}}</div>
-                        </li>
-                        {{editor.uiDrag()}}
-                    </ul>
+                <li class="viewer" id="entities" ng-if="editor.assetsView === 'entities'">
+                  <ul>
+                    <li ng-repeat="entity in editor.availableEntities | orderBy:'-'" ng-click="editor.editEntityFrame(entity)">
+                      <div class="asset available {{entity.name | nospace}}" ng-style="editor.setThumbnail(entity)" ng-mousedown="editor.dragAvailableAsset(entity, 'entities')"></div>
+                      <div class="asset-name">{{entity.name}}</div>
+                    </li>
+                    {{editor.uiDrag()}}
+                  </ul>
                 </li>
-                <li class="viewer" id="events">
-                    <div class="viewer-header">
-                      <h4>Events</h4>
-                      <input type="button" class="search-button" title="Click to browse entities to add to your palette." ng-click="editor.goToPalette('entities')" disabled>
-                    </div>
-                    <ul>
-                        <li ng-click="editor.selectEventType()">
-                            <div class="asset new">
-                              <div class="asset-name new">+</div>
-                            </div>
-                            <div class="asset-name new">...</div>
-                        </li>
-                        <li ng-repeat="event in editor.availableEvents | orderBy:'-'" ng-click="editor.editEvent(event)">
-                            <div class="asset available {{event.name | nospace}} {{event.type}}" ng-mousedown="editor.dragAvailableAsset(event, 'events')"><h1>!</h1></div>
-                            <div class="asset-name">{{event.name}}</div>
-                        </li>
-                    </ul>
+                <li class="viewer" id="events" ng-if="editor.assetsView === 'events'">
+                  <ul>
+                    <li ng-repeat="event in editor.availableEvents | orderBy:'-'" ng-click="editor.editEvent(event)">
+                      <div class="asset available {{event.name | nospace}} {{event.type}}" ng-mousedown="editor.dragAvailableAsset(event, 'events')"><h1>!</h1></div>
+                      <div class="asset-name">{{event.name}}</div>
+                    </li>
+                  </ul>
                 </li>
-            </ul>
+              </ul>
+            </div>
+            <span id="viewer-menu">
+              <ul>
+                <li class="menu-item" ng-class="{'active': editor.assetsView === 'backgrounds'}" ng-click="editor.assetsView='backgrounds'">
+                  <button>&lt-</button>
+                  <span>Backgrounds</span>
+                </li>
+                <li class="menu-item" ng-class="{'active': editor.assetsView === 'objects'}" ng-click="editor.assetsView='objects'">
+                  <button>&lt-</button>
+                  <span>Objects</span>
+                </li>
+                <li class="menu-item" ng-class="{'active': editor.assetsView === 'entities'}" ng-click="editor.assetsView='entities'">
+                  <button>&lt-</button>
+                  <span>Entities</span>
+                </li>
+                <li class="menu-item" ng-class="{'active': editor.assetsView === 'events'}" ng-click="editor.assetsView='events'">
+                  <button>&lt-</button>
+                  <span>Events</span>
+                </li>
+              </ul>
+            </span>
+          </div>
             <section class="editor-contents" id="asset">
                 <ui-view name="objects" ng-show="editor.currentSmallView === 'object'"></ui-view>
                 <ui-view name="entities" ng-show="editor.currentSmallView === 'entity'"></ui-view>
