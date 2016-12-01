@@ -3684,7 +3684,7 @@ angular.module('questCreator')
 ;angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, EditorService, GameService, $state, $scope, PopupService, StorageService) {
   var self = this;
   UserService.checkLogin().then(function(response) {
-    var socketDelay = 50;
+    var socketDelay = 5; 
     var socketIterator = 0;
     var fullPlayer = {
       id: null,
