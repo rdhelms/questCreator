@@ -1,17 +1,16 @@
 //OVERALL VIEW
 
 #event-editor {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  height: 100%;
+  @include display(flex);
+  @include flex-direction(column);
+  @include justify-content(space-around);
 }
 
 #event-header {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+  @include display(flex);
+  @include flex-direction(row);
+  @include justify-content(space-between);
+  @include align-items(center);
 }
 
 .event-edit {
@@ -52,15 +51,15 @@
 //PREVIEW VIEW
 
 .event-preview-head {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
+  @include display(flex);
+  @include justify-content(space-around);
+  @include align-items(center);
 }
 
 .preview-pane {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
+  @include display(flex);
+  @include justify-content(space-around);
+  @include align-items(center);
   height: 100%;
   box-shadow: 8px 8px 0 0 $medgrey inset;
   transition: box-shadow 1s ease;
@@ -75,9 +74,9 @@
     overflow: hidden;
     text-overflow: ellipsis;
     padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
+    @include display(flex);
+    @include align-items(center);
+    @include justify-content(flex-start);
     transition: box-shadow 1s ease, background-color .5s ease, color .5s ease;
 
     &:hover {
@@ -94,9 +93,9 @@
     .preview-list li {
 
       &.preview-default {
-        display: flex;
-        align-items: center;
-        justify-content: space-around;
+        @include display(flex);
+        @include align-items(center);
+        @include justify-content(space-around);
 
         .default-text {
           display: inline-block;
@@ -191,13 +190,13 @@
 /////
 
 .event-section {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  @include display(flex);
+  @include flex-direction(row);
+  @include justify-content(space-around);
   height: 100%;
 
   .event-menu {
-    flex: 1;
+    @include flex(1);
   }
 
 }
@@ -207,8 +206,8 @@
   cursor: pointer;
   padding: 2px;
   margin: 2px;
-  display: flex;
-  justify-content: space-between;
+  @include display(flex);
+  @include justify-content(space-between);
 
   &#map-menu, #scene-menu {
     max-width: 165px; //overflow fix
@@ -233,7 +232,7 @@
 
 
 .menu-type {
-  flex: 2;
+  @include flex(2);
 
   textarea {
     width: 100%;
@@ -257,9 +256,9 @@
     }
 
     &.text, &.item, &.requirement, .achievement-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      @include display(flex);
+      @include justify-content(space-between);
+      @include align-items(center);
       margin: 2px;
 
       span {
