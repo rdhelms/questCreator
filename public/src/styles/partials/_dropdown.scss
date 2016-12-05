@@ -42,7 +42,7 @@
     height: 50%;
     width: 95%;
     content: "^";
-    transform: rotate(180deg) translateY(-50%);
+    @include transform(rotate(180deg) translateY(-50%));
     pointer-events: none;
   }
 }

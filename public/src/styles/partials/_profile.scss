@@ -2,14 +2,14 @@
     padding-top: 1.6rem;
     height: 100vh;
     width: 100vw;
-    display: flex;
-    justify-content: space-around;
+    @include display(flex);
+    @include justify-content(space-around);
 
     .user-container {
       margin: 1rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
+      @include display(flex);
+      @include flex-direction(column);
+      @include justify-content(flex-start);
       background-color: $lightgrey;
 
       img {
@@ -27,7 +27,7 @@
         padding: 0.5rem;
 
         label {
-          display: flex;
+          @include display(flex);
           font-size: 0.5em;
           padding: 10px 0;
           margin-left: 2%;
@@ -53,14 +53,14 @@
       }
 
       .collab-controls {
-        display: flex;
-        justify-content: space-between;
+        @include display(flex);
+        @include justify-content(space-between);
         border-bottom: 1px solid black;
-        align-items: center;
+        @include align-items(center);
         width: 100%;
 
         .collab-header {
-          display: flex;
+          @include display(flex);
         }
       }
 
@@ -96,18 +96,15 @@
             box-shadow: none;
             background-image: url('../images/pixel-arrow.png');
             background-size: cover;
-            -webkit-transition: 300ms ease all;
-            -moz-transition: 300ms ease all;
-            -o-transition: 300ms ease all;
             transition: 300ms ease all;
           }
 
           .requestArrow {
-            -webkit-transform: rotate(180deg);
+            @include transform(rotate(180deg));
           }
 
           .requestCounter {
-            -webkit-transform: rotate(0deg);
+            @include transform(rotate(0deg));
           }
         }
 
@@ -129,18 +126,15 @@
           box-shadow: none;
           background-image: url('../images/pixel-arrow.png');
           background-size: cover;
-          -webkit-transition: 300ms ease all;
-          -moz-transition: 300ms ease all;
-          -o-transition: 300ms ease all;
           transition: 300ms ease all;
         }
 
         .collabArrow {
-          -webkit-transform: rotate(0deg);
+          @include transform(rotate(0deg));
         }
 
         .collabCounter {
-          -webkit-transform: rotate(180deg);
+          @include transform(rotate(180deg));
         }
       }
 
@@ -155,10 +149,10 @@
     .avatar-container {
       margin: 1rem;
       width: 30%;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;;
-      align-items: center;
+      @include display(flex);
+      @include flex-direction(column);
+      @include justify-content(space-between);
+      @include align-items(center);
 
       h2 {
         color: $darkgrey;
@@ -195,8 +189,8 @@
     }
 
     .avatar-preview {
-      display: flex;
-      align-items: center;
+      @include display(flex);
+      @include align-items(center);
       overflow-x: auto;
       padding: 12px;
       border: black solid 4px;
@@ -216,6 +210,7 @@
         -webkit-box-shadow: 6px 6px 1px -1px rgba(133,127,116,0.7);
         -moz-box-shadow: 6px 6px 1px -1px rgba(133,127,116,0.7);
         box-shadow: 6px 6px 1px -1px rgba(133,127,116,0.7);
+        @include flex(1 0 auto);
 
         .avatar-thumbnail {
           width: 150px;
@@ -229,9 +224,9 @@
     }
 
     .avatar-large {
-      display: flex;
-      justify-content: space-between;
-      height: 100%;
+      @include display(flex);
+      @include justify-content(space-between);
+      @include flex(1 0 auto);
       width: 100%;
       position: relative;
       background-color: whitesmoke;
@@ -254,10 +249,10 @@
 
       .current-checkbox {
         text-shadow: 4px 4px 8px rgba(150, 150, 150, 0.77);
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
-        align-items: flex-end;
+        @include display(flex);
+        @include flex-direction(column);
+        @include justify-content(space-around);
+        @include align-items(flex-end);
         height: 80px;
         position: absolute;
         right: 0;
@@ -269,10 +264,7 @@
         input[type=checkbox] {
           margin-right: 25px;
           border: 4px black solid;
-          -ms-transform: scale(3);
-          -moz-transform: scale(3);
-          -webkit-transform: scale(3);
-          -o-transform: scale(3);
+          @include transform(scale(3));
           padding: 10px;
 
           &::after {
@@ -313,11 +305,11 @@
   }
 
   ul {
-    display: flex;
-    flex-direction: column;
+    @include display(flex);
+    @include flex-direction(column);
 
     li {
-      display: flex;
+      @include display(flex);
       justify-content: center;
       text-align: center;
       margin: 3px 5px;
@@ -342,8 +334,8 @@
   }
 
   .buttons {
-    display: flex;
-    justify-content: space-around;
+    @include display(flex);
+    @include justify-content(space-around);
 
     button {
       margin: 7px;

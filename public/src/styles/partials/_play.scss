@@ -1,21 +1,21 @@
 #play-container {
   // Entire play container
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  width: 100%;
-  flex-direction: column;
+  @include display(flex);
+  @include align-items(center);
+  @include justify-content(center);
+  overflow: hidden;
+  padding-top: calc(1.5rem + 4px);
+  height: 100vh;
 
   .game-plate {
     padding: 50px 0;
     height: 80%;
     width: 75%;
     background-color: $medgrey;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+    @include display(flex);
+    @include justify-content(center);
+    @include align-items(center);
+    @include flex-direction(column);
     border: 4px solid black;
     -webkit-box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9) inset;
     -moz-box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9) inset;
@@ -37,7 +37,7 @@
 
   .game-area {
     background-color: $white;
-    display: flex;
+    @include display(flex);
     border: 4px black solid;
     -webkit-box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9);
     -moz-box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9);
@@ -45,24 +45,24 @@
   }
 
   .play-info {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+    @include display(flex);
+    @include justify-content(center);
+    @include align-items(center);
+    @include flex-direction(column);
     font-size: .75em;
     font-weight: bold;
     margin: 4px 0;
   }
 
   .game-window {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    @include display(flex);
+    @include flex-direction(column);
+    @include align-items(center);
     .game-screen {
       position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      @include display(flex);
+      @include justify-content(center);
+      @include align-items(center);
       .menu {
         z-index: 10;
         position: absolute;
@@ -75,12 +75,12 @@
         font-size: 15px;
         box-sizing: border-box;
         .options {
-          display: flex;
+          @include display(flex);
           list-style: none;
           height: 100%;
           .option {
-            display: flex;
-            align-items: center;
+            @include display(flex);
+            @include align-items(center);
             padding-left: 10px;
             height: 100%;
             font-family: PCSenior;
@@ -95,8 +95,8 @@
                 left: 0;
                 list-style: none;
                 li {
-                  display: flex;
-                  align-items: center;
+                  @include display(flex);
+                  @include align-items(center);
                   padding-left: 10px;
                   height: 30px;
                   background: white;

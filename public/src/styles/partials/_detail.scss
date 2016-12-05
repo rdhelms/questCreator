@@ -1,12 +1,12 @@
 #detail-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    width: 100%;
+    @include display(flex);
+    @include justify-content(center);
+    @include align-items(center);
+    padding-top: calc(1.5rem + 4px);
+    height: 100vh;
 
     .main-portal {
-      display: flex;
+      @include display(flex);
       background-color: $medgrey;
       padding: 30px;
       width: 93%;
@@ -18,14 +18,11 @@
 
     }
     .game-detail {
-      margin-left: 1%;
-      width: 50%;
-      height: 95%;
-      display: flex;
-      flex-direction: column;
+      @include display(flex);
+      @include flex-direction(column);
       background-color: $lightgrey;
-      justify-content: space-between;
-      align-items: center;
+      @include justify-content(space-between);
+      @include align-items(center);
       border: black solid 4px;
       -webkit-box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9);
       -moz-box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9);
@@ -41,10 +38,10 @@
       }
 
       .detail-info {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;;
-        align-items: center;
+        @include display(flex);
+        @include flex-direction(column);
+        @include justify-content(space-around);;
+        @include align-items(center);
 
           img {
             border: 4px black solid;
@@ -53,7 +50,7 @@
           }
 
           label {
-            display: flex;
+            @include display(flex);
             color: red;
             font-size: .75em;
             margin: 5px;
@@ -68,10 +65,10 @@
 
       .collab-button {
         margin: 25px 0 20px 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
+        @include display(flex);
+        @include flex-direction(column);
+        @include justify-content(center);
+        @include align-items(center);
         button {
           width: 150px;
           height: 55px;
@@ -83,10 +80,10 @@
     #play-splash {
         margin-left: 5%;
         width: 42%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
+        @include display(flex);
+        @include flex-direction(column);
+        @include justify-content(center);
+        @include align-items(center);
 
         .yazua {
             font-size: 3em;
@@ -116,7 +113,7 @@
         #leaderboards {
           font-size: .5em;
           tr {
-            display: flex;
+            @include display(flex);
           }
         }
     }
