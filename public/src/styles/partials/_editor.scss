@@ -1,8 +1,7 @@
-
-
 #editor {
   @include display(flex);
   @include flex-direction(column);
+  padding-top: calc(1.5rem + 4px);
   max-width: 1584px;
   min-width: 1286px;
 
@@ -37,6 +36,7 @@
   @include flex(1);
   @include display(flex);
   justify-content: center;
+  margin: 1rem;
 
   @include vertical {
     @include flex-direction(column);

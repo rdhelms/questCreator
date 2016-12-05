@@ -8,9 +8,7 @@
     .main-portal {
       @include display(flex);
       background-color: $medgrey;
-      padding: 30px;
-      width: 93%;
-      height: 87%;
+      padding: 1rem;
       border: 4px solid black;
       box-shadow: 8px 8px 0 rgba(133,127,116,0.9) inset;
     }
