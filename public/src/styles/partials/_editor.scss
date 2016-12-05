@@ -707,6 +707,10 @@
   }
 }
 
+#scene-tools {
+  width: 100%;
+}
+
 #editor-footer {
   margin-top: 2em;
   @include display(flex);
