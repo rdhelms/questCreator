@@ -1,15 +1,28 @@
 .yazua {
   display: inline-block;
   color: pink;
-  -webkit-text-stroke: 2px red;
+  text-shadow:
+   -3.5px -3.5px 0 red,
+    3.5px -3.5px 0 red,
+    -3.5px 3.5px 0 red,
+     3.5px 3.5px 0 red,
+   .05em .05em 0 $medgrey;
+   font-size: calc(1em - 6px);
+  @supports (-webkit-text-stroke: 2px red) {
+    color: pink;
+    -webkit-text-stroke: 2px red;
+    text-shadow: .05em .05em 0 $medgrey;
+    font-size: initial;
+  }
   font-style: italic;
-  text-shadow: .05em .05em 0 $medgrey;
-   position: relative;
-   z-index: 2;
+  position: relative;
+  z-index: 2;
 }
 
 .yazua:before {
-  -webkit-text-stroke: 1px $medgrey;
+  @supports (-webkit-text-stroke: 1p $medgrey) {
+    -webkit-text-stroke: 1px $medgrey;
+  }
   content: attr(data-shadow);
   position: absolute;
   top: -0.03em; left: -0.03em;
@@ -24,19 +37,21 @@
  top: .085em; left: .085em;
  z-index: -1;
  text-shadow: none;
- background-image:
+ @supports (-webkit-background-clip: text){
+   background-image:
    linear-gradient(
-     45deg,
-    transparent 45%,
-     red 45%,
-     pink 55%,
-     transparent 0
-     );
- background-size: .1em .1em;
- -webkit-background-clip: text;
- -webkit-text-fill-color: transparent;
+   45deg,
+   transparent 45%,
+   red 45%,
+   pink 55%,
+   transparent 0
+   );
+   background-size: .1em .1em;
+   -webkit-background-clip: text;
+   -webkit-text-fill-color: transparent;
 
- animation: shad-anim 15s ease infinite;
+   animation: shad-anim 15s ease infinite;
+ }
 }
 
 .dps {

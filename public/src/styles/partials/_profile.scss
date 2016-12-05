@@ -39,6 +39,15 @@
           -webkit-text-stroke: 1px red;
           font-size: 2em;
 
+          @supports not(-webkit-text-stroke: 1px red) {
+              text-shadow:
+               -1.5px -1.5px 0 red,
+                1.5px -1.5px 0 red,
+                -1.5px 1.5px 0 red,
+                 1.5px 1.5px 0 red,
+               .05em .05em 0 $medgrey;
+          }
+
           .edit {
             padding: 0;
             width: 20px;
@@ -241,6 +250,14 @@
         -webkit-text-stroke: 2px red;
         font-style: italic;
         text-shadow: 4px 4px 8px rgba(150, 150, 150, 0.77);
+        @supports not(-webkit-text-stroke: 1px red) {
+            text-shadow:
+             -1.5px -1.5px 0 red,
+              1.5px -1.5px 0 red,
+              -1.5px 1.5px 0 red,
+               1.5px 1.5px 0 red,
+             .05em .05em 0 $medgrey;
+        }
       }
 
       .current-checkbox {

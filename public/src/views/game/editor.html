@@ -131,18 +131,18 @@
             </ul>
           </div>
           <section class="editor-contents" id="asset">
-              <ui-view name="objects" ng-show="editor.currentSmallView === 'object'"></ui-view>
-              <ui-view name="entities" ng-show="editor.currentSmallView === 'entity'"></ui-view>
-              <ui-view name="events" ng-show="editor.currentSmallView === 'event'"></ui-view>
-              <ui-view name="scenes" ng-show="editor.currentSmallView === 'scene'"></ui-view>
-              <div ng-if="editor.currentSmallView === 'welcome'">
-                <div class="asset-container welcome">
-                  <div>
-                    <h1 class="yazua">Yazua DPS</h1>
-                    <p class="dps">Design.Play.Share.</p>
-                  </div>
+            <ui-view name="objects" ng-show="editor.currentSmallView === 'object'"></ui-view>
+            <ui-view name="entities" ng-show="editor.currentSmallView === 'entity'"></ui-view>
+            <ui-view name="events" ng-show="editor.currentSmallView === 'event'"></ui-view>
+            <ui-view name="scenes" ng-show="editor.currentSmallView === 'scene'"></ui-view>
+            <div ng-if="editor.currentSmallView === 'welcome'">
+              <div class="asset-container welcome">
+                <div>
+                  <h1 class="yazua">Yazua DPS</h1>
+                  <p class="dps">Design.Play.Share.</p>
                 </div>
               </div>
+            </div>
           </section>
         </aside>
 
