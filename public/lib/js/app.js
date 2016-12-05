@@ -1636,6 +1636,7 @@ angular.module('questCreator')
                     // console.log('success requests', response);
                 },
                 error: function(error) {
+                  console.clear();
                     PopupService.openTemp('fail-collab-load');
                 }
             });
@@ -1947,30 +1948,20 @@ angular.module('questCreator')
   }
 
   function drawGrid() {
+    self.draw.clearRect(0, 0, canvasWidth, canvasHeight);
+    drawBackgroundSquares();
+    drawCollisionSquares();
     var drawSize = $scope.editor.currentPixelSize;
     self.canvasPos = {    // Canvas top and left coordinates on page
       x: self.myCanvas.getBoundingClientRect().left,
       y: self.myCanvas.getBoundingClientRect().top
     };
-    var numSquaresX = 50;
+    var numSquaresX = 70;
     var numSquaresY = 50;
     var gridWidth = canvasWidth / numSquaresX;
     var gridHeight = canvasHeight / numSquaresY;
     var color = $scope.editor.drawingCollision ? 'rgba(100, 100, 100, 0.5)' : $scope.editor.currentColor;
     var type = $scope.editor.drawingCollision ? 'collision' : 'normal';
-    self.draw.clearRect(0, 0, canvasWidth, canvasHeight);
-    for (var index = 0; index <= canvasWidth; index += gridWidth) {
-      self.draw.moveTo(index, 0);
-      self.draw.lineTo(index, canvasHeight);
-    }
-    for (var index = 0; index <= canvasHeight; index += gridHeight) {
-      self.draw.moveTo(0, index);
-      self.draw.lineTo(canvasWidth, index);
-    }
-    self.draw.strokeStyle = 'rgba(200, 200, 200, 0.5)';
-    self.draw.stroke();
-    drawBackgroundSquares();
-    drawCollisionSquares();
     self.draw.fillStyle = color;
     for (var xIndex = -drawSize; xIndex <= drawSize; xIndex++) {
       for (var yIndex = -drawSize; yIndex <= drawSize; yIndex++) {
@@ -2018,6 +2009,18 @@ angular.module('questCreator')
         }
       }
     }
+    self.draw.beginPath();
+    for (var index = 0; index <= canvasWidth; index += gridWidth) {
+      self.draw.moveTo(index, 0);
+      self.draw.lineTo(index, canvasHeight);
+    }
+    for (var index = 0; index <= canvasHeight; index += gridHeight) {
+      self.draw.moveTo(0, index);
+      self.draw.lineTo(canvasWidth, index);
+    }
+    self.draw.strokeStyle = 'rgba(75, 75, 75, 0.8)';
+    self.draw.stroke();
+    self.draw.closePath();
     // console.log("Background array", self.allBackgroundSquares);
     // console.log("Collision array", self.allCollisionSquares);
     if (drawingBackground) {
@@ -2240,7 +2243,7 @@ angular.module('questCreator')
           3: "brown",
           4: "orange"
         };
-        this.currentPixelSize = 3;
+        this.currentPixelSize = 4;
         this.drawingCollision = false;
         this.erasing = false;
         this.selectingAssets = false;
@@ -2259,7 +2262,7 @@ angular.module('questCreator')
         this.selectColor = function(index) {
             // Convert hex color to rgb
             var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(self.inputColor);
-            console.log("color result: ", result);
+            // console.log("color result: ", result);
             var rgb = result ? {
                 r: parseInt(result[1], 16),
                 g: parseInt(result[2], 16),
@@ -2522,6 +2525,7 @@ angular.module('questCreator')
         };
 
         this.setThumbnail = function(asset) {
+          if (asset) {
             if (asset === undefined || !asset.thumbnail) {
                 return {
                     "background-image": "none"
@@ -2534,6 +2538,7 @@ angular.module('questCreator')
                     "background-repeat": "no-repeat"
                 };
             }
+          }
         };
 
         this.selectText = function($event) {
@@ -2623,7 +2628,6 @@ angular.module('questCreator')
             });
         };
     });
-    
 ;angular.module('questCreator').controller('entCtrl', function($state, $scope, EditorService) {
   var self = this;      // To help with scope issues
   var drawingEntity = false;
@@ -2724,6 +2728,9 @@ angular.module('questCreator')
   }
 
   function drawGrid() {
+    self.draw.clearRect(0, 0, canvasWidth, canvasHeight);
+    drawBackgroundSquares();
+    drawCollisionSquares();
     var drawSize = $scope.editor.currentPixelSize;
     self.canvasPos = {    // Canvas top and left coordinates on page
       x: self.myCanvas.getBoundingClientRect().left,
@@ -2735,19 +2742,6 @@ angular.module('questCreator')
     var gridHeight = canvasHeight / numSquaresY;
     var color = $scope.editor.drawingCollision ? 'rgba(100, 100, 100, 0.5)' : $scope.editor.currentColor;
     var type = $scope.editor.drawingCollision ? 'collision' : 'normal';
-    self.draw.clearRect(0, 0, canvasWidth, canvasHeight);
-    for (var index = 0; index <= canvasWidth; index += gridWidth) {
-      self.draw.moveTo(index, 0);
-      self.draw.lineTo(index, canvasHeight);
-    }
-    for (var index = 0; index <= canvasHeight; index += gridHeight) {
-      self.draw.moveTo(0, index);
-      self.draw.lineTo(canvasWidth, index);
-    }
-    self.draw.strokeStyle = 'rgba(200, 200, 200, 0.5)';
-    self.draw.stroke();
-    drawBackgroundSquares();
-    drawCollisionSquares();
     self.draw.fillStyle = color;
     for (var xIndex = -drawSize; xIndex <= drawSize; xIndex++) {
       for (var yIndex = -drawSize; yIndex <= drawSize; yIndex++) {
@@ -2795,6 +2789,18 @@ angular.module('questCreator')
         }
       }
     }
+    self.draw.beginPath();
+    for (var index = 0; index <= canvasWidth; index += gridWidth) {
+      self.draw.moveTo(index, 0);
+      self.draw.lineTo(index, canvasHeight);
+    }
+    for (var index = 0; index <= canvasHeight; index += gridHeight) {
+      self.draw.moveTo(0, index);
+      self.draw.lineTo(canvasWidth, index);
+    }
+    self.draw.strokeStyle = 'rgba(75, 75, 75, 0.8)';
+    self.draw.stroke();
+    self.draw.closePath();
     // console.log("Background array", self.allBackgroundSquares);
     // console.log("Collision array", self.allCollisionSquares);
     if (drawingEntity) {
@@ -3427,6 +3433,9 @@ angular.module('questCreator')
   }
 
   function drawGrid() {
+    self.draw.clearRect(0, 0, canvasWidth, canvasHeight);
+    drawBackgroundSquares();
+    drawCollisionSquares();
     var drawSize = $scope.editor.currentPixelSize;
     self.canvasPos = {    // Canvas top and left coordinates on page
       x: self.myCanvas.getBoundingClientRect().left,
@@ -3438,19 +3447,6 @@ angular.module('questCreator')
     var gridHeight = canvasHeight / numSquaresY;
     var color = $scope.editor.drawingCollision ? 'rgba(100, 100, 100, 0.5)' : $scope.editor.currentColor;
     var type = $scope.editor.drawingCollision ? 'collision' : 'normal';
-    self.draw.clearRect(0, 0, canvasWidth, canvasHeight);
-    for (var index = 0; index <= canvasWidth; index += gridWidth) {
-      self.draw.moveTo(index, 0);
-      self.draw.lineTo(index, canvasHeight);
-    }
-    for (var index = 0; index <= canvasHeight; index += gridHeight) {
-      self.draw.moveTo(0, index);
-      self.draw.lineTo(canvasWidth, index);
-    }
-    self.draw.strokeStyle = 'rgba(200, 200, 200, 0.5)';
-    self.draw.stroke();
-    drawBackgroundSquares();
-    drawCollisionSquares();
     self.draw.fillStyle = color;
     for (var xIndex = -drawSize; xIndex <= drawSize; xIndex++) {
       for (var yIndex = -drawSize; yIndex <= drawSize; yIndex++) {
@@ -3498,6 +3494,18 @@ angular.module('questCreator')
         }
       }
     }
+    self.draw.beginPath();
+    for (var index = 0; index <= canvasWidth; index += gridWidth) {
+      self.draw.moveTo(index, 0);
+      self.draw.lineTo(index, canvasHeight);
+    }
+    for (var index = 0; index <= canvasHeight; index += gridHeight) {
+      self.draw.moveTo(0, index);
+      self.draw.lineTo(canvasWidth, index);
+    }
+    self.draw.strokeStyle = 'rgba(75, 75, 75, 0.8)';
+    self.draw.stroke();
+    self.draw.closePath();
     // console.log("Background array", self.allBackgroundSquares);
     // console.log("Collision array", self.allCollisionSquares);
     if (drawingObject) {
