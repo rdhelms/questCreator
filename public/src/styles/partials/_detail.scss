@@ -12,11 +12,9 @@
       width: 93%;
       height: 87%;
       border: 4px solid black;
-      -webkit-box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9) inset;
-      -moz-box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9) inset;
-      box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9) inset;
-
+      box-shadow: 8px 8px 0 rgba(133,127,116,0.9) inset;
     }
+
     .game-detail {
       @include display(flex);
       @include flex-direction(column);
@@ -24,9 +22,8 @@
       @include justify-content(space-between);
       @include align-items(center);
       border: black solid 4px;
-      -webkit-box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9);
-      -moz-box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9);
-      box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9);
+      box-shadow: 8px 8px 0 rgba(133,127,116,0.9);
+      padding: 4rem;
 
       h2 {
         text-align: center;
@@ -34,7 +31,7 @@
         color: pink;
         -webkit-text-stroke: 2px red;
         margin: 20px 0;
-        text-shadow: 4px 4px 2px rgba(150, 150, 150, 0.8);
+        text-shadow: 8px 8px 2px rgba(150, 150, 150, 0.8);
       }
 
       .detail-info {
@@ -98,9 +95,7 @@
         button {
             font-size: 1.8em;
             height: 8em;
-            -webkit-box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9);
-            -moz-box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9);
-            box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.9),
+            box-shadow: 8px 8px 0 rgba(133,127,116,0.9),
             -.5em -.5em 0 0 $lightgrey inset;
 
 
