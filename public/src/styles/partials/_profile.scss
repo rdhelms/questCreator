@@ -2,14 +2,14 @@
     padding-top: 1.6rem;
     height: 100vh;
     width: 100vw;
-    display: flex;
-    justify-content: space-around;
+    @include display(flex);
+    @include justify-content(space-around);
 
     .user-container {
       margin: 1rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
+      @include display(flex);
+      @include flex-direction(column);
+      @include justify-content(flex-start);
       background-color: $lightgrey;
 
       img {
@@ -27,7 +27,7 @@
         padding: 0.5rem;
 
         label {
-          display: flex;
+          @include display(flex);
           font-size: 0.5em;
           padding: 10px 0;
           margin-left: 2%;
@@ -38,6 +38,15 @@
           color: pink;
           -webkit-text-stroke: 1px red;
           font-size: 2em;
+
+          @supports not(-webkit-text-stroke: 1px red) {
+              text-shadow:
+               -1.5px -1.5px 0 red,
+                1.5px -1.5px 0 red,
+                -1.5px 1.5px 0 red,
+                 1.5px 1.5px 0 red,
+               .05em .05em 0 $medgrey;
+          }
 
           .edit {
             padding: 0;
@@ -53,14 +62,14 @@
       }
 
       .collab-controls {
-        display: flex;
-        justify-content: space-between;
+        @include display(flex);
+        @include justify-content(space-between);
         border-bottom: 1px solid black;
-        align-items: center;
+        @include align-items(center);
         width: 100%;
 
         .collab-header {
-          display: flex;
+          @include display(flex);
         }
       }
 
@@ -96,18 +105,15 @@
             box-shadow: none;
             background-image: url('../images/pixel-arrow.png');
             background-size: cover;
-            -webkit-transition: 300ms ease all;
-            -moz-transition: 300ms ease all;
-            -o-transition: 300ms ease all;
             transition: 300ms ease all;
           }
 
           .requestArrow {
-            -webkit-transform: rotate(180deg);
+            @include transform(rotate(180deg));
           }
 
           .requestCounter {
-            -webkit-transform: rotate(0deg);
+            @include transform(rotate(0deg));
           }
         }
 
@@ -129,18 +135,15 @@
           box-shadow: none;
           background-image: url('../images/pixel-arrow.png');
           background-size: cover;
-          -webkit-transition: 300ms ease all;
-          -moz-transition: 300ms ease all;
-          -o-transition: 300ms ease all;
           transition: 300ms ease all;
         }
 
         .collabArrow {
-          -webkit-transform: rotate(0deg);
+          @include transform(rotate(0deg));
         }
 
         .collabCounter {
-          -webkit-transform: rotate(180deg);
+          @include transform(rotate(180deg));
         }
       }
 
@@ -155,10 +158,10 @@
     .avatar-container {
       margin: 1rem;
       width: 30%;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;;
-      align-items: center;
+      @include display(flex);
+      @include flex-direction(column);
+      @include justify-content(space-between);
+      @include align-items(center);
 
       h2 {
         color: $darkgrey;
@@ -195,8 +198,8 @@
     }
 
     .avatar-preview {
-      display: flex;
-      align-items: center;
+      @include display(flex);
+      @include align-items(center);
       overflow-x: auto;
       padding: 12px;
       border: black solid 4px;
@@ -204,8 +207,6 @@
       height: 300px;
       background-color: $medgrey;
       border-bottom: none;
-      -webkit-box-shadow: 6px 6px 1px -1px rgba(133,127,116,0.7) inset;
-      -moz-box-shadow: 6px 6px 1px -1px rgba(133,127,116,0.7) inset;
       box-shadow: 6px 6px 1px -1px rgba(133,127,116,0.7) inset;
 
       .avatar {
@@ -213,9 +214,8 @@
         border: 2px solid black;
         text-overflow: ellipsis;
         background-color: whitesmoke;
-        -webkit-box-shadow: 6px 6px 1px -1px rgba(133,127,116,0.7);
-        -moz-box-shadow: 6px 6px 1px -1px rgba(133,127,116,0.7);
         box-shadow: 6px 6px 1px -1px rgba(133,127,116,0.7);
+        @include flex(1 0 auto);
 
         .avatar-thumbnail {
           width: 150px;
@@ -229,9 +229,9 @@
     }
 
     .avatar-large {
-      display: flex;
-      justify-content: space-between;
-      height: 100%;
+      @include display(flex);
+      @include justify-content(space-between);
+      @include flex(1 0 auto);
       width: 100%;
       position: relative;
       background-color: whitesmoke;
@@ -250,14 +250,22 @@
         -webkit-text-stroke: 2px red;
         font-style: italic;
         text-shadow: 4px 4px 8px rgba(150, 150, 150, 0.77);
+        @supports not(-webkit-text-stroke: 1px red) {
+            text-shadow:
+             -1.5px -1.5px 0 red,
+              1.5px -1.5px 0 red,
+              -1.5px 1.5px 0 red,
+               1.5px 1.5px 0 red,
+             .05em .05em 0 $medgrey;
+        }
       }
 
       .current-checkbox {
         text-shadow: 4px 4px 8px rgba(150, 150, 150, 0.77);
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
-        align-items: flex-end;
+        @include display(flex);
+        @include flex-direction(column);
+        @include justify-content(space-around);
+        @include align-items(flex-end);
         height: 80px;
         position: absolute;
         right: 0;
@@ -269,10 +277,7 @@
         input[type=checkbox] {
           margin-right: 25px;
           border: 4px black solid;
-          -ms-transform: scale(3);
-          -moz-transform: scale(3);
-          -webkit-transform: scale(3);
-          -o-transform: scale(3);
+          @include transform(scale(3));
           padding: 10px;
 
           &::after {
@@ -289,8 +294,6 @@
       font-size: 1.3em;
       font-weight: bold;
       font-family: PCSenior;
-      -webkit-box-shadow: 0.25em 0.25rem 0 0 rgba(133,127,116,0.6), -.25rem -.25rem 0 0 $lightgrey inset;
-      -moz-box-shadow: 0.25rem 0.25rem 0 0 rgba(133,127,116,0.6), -.25rem -.25rem 0 0 $lightgrey inset;
       box-shadow: 0.25rem 0.25rem 0 0 rgba(133,127,116,0.6), -.25rem -.25rem 0 0 $lightgrey inset;
       // -.25rem -.25rem 0 0 $lightgrey inset;
     }
@@ -302,8 +305,6 @@
   background-color: $lightgrey;
   margin: 20px;
   min-width: 300px;
-  -webkit-box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.6);
-  -moz-box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.6);
   box-shadow: 12px 12px 2px -2px rgba(133,127,116,0.6);
 
   img {
@@ -313,11 +314,11 @@
   }
 
   ul {
-    display: flex;
-    flex-direction: column;
+    @include display(flex);
+    @include flex-direction(column);
 
     li {
-      display: flex;
+      @include display(flex);
       justify-content: center;
       text-align: center;
       margin: 3px 5px;
@@ -342,8 +343,8 @@
   }
 
   .buttons {
-    display: flex;
-    justify-content: space-around;
+    @include display(flex);
+    @include justify-content(space-around);
 
     button {
       margin: 7px;
