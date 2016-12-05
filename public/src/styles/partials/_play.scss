@@ -119,6 +119,9 @@
       }
       .playBtn {
         position: absolute;
+        @include transform(translate(-50%, -50%));
+        top: 50%;
+        left: 50%;
       }
       .typing, .dialog, .inventoryContainer, .saveMenu, .restoreMenu {
         min-width: 150px;

@@ -18,6 +18,7 @@
                         <li class="timeOption option">Time: {{play.displayTime}}</li>
                     </ul>
                 </header>
+                <button ng-show="!play.gameStarted && play.gameLoaded" ng-click="play.startGame()" class="playBtn">PLAY GAME</button>
                 <canvas id="play-canvas" width=700 height=500></canvas>
                 <div ng-show="play.typing.show" ng-click="play.typing.show = false" class="typing"> {{play.typing.phrase}} </div>
                 <div ng-show="play.responding.show" ng-click="play.responding.show = false" class="dialog"> {{play.responding.phrase}} </div>
@@ -44,7 +45,6 @@
                     </ul>
                     <button ng-click="play.restoringGame = false">Cancel</button>
                 </div>
-                <button ng-show="!play.gameStarted && play.gameLoaded" ng-click="play.startGame()" class="playBtn">PLAY GAME</button>
             </div>
             <section class="play-info">
             <p>Press "spacebar" to type command</p>
