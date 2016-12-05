@@ -76,6 +76,7 @@
                 <input type="button" class="search-button" title="Click to browse entities to add to your palette." ng-click="editor.goToPalette('entities')" disabled>
               </div>
               <ul id="assets">
+                {{editor.uiDrag()}}
                 <li class="viewer" id="backgrounds" ng-if="editor.assetsView === 'backgrounds'">
                   <ul>
                     <li ng-repeat="background in editor.availableBackgrounds | orderBy:'-'" ng-click="editor.editBackground(background); editor.currentLargeView = 'background'; editor.qState = {undo: 'undoBackground', redo: 'redoBackground', clear: 'clearBackground'}">
@@ -98,7 +99,6 @@
                       <div class="asset available {{entity.name | nospace}}" ng-style="editor.setThumbnail(entity)" ng-mousedown="editor.dragAvailableAsset(entity, 'entities')"></div>
                       <div class="asset-name">{{entity.name}}</div>
                     </li>
-                    {{editor.uiDrag()}}
                   </ul>
                 </li>
                 <li class="viewer" id="events" ng-if="editor.assetsView === 'events'">
@@ -111,41 +111,39 @@
                 </li>
               </ul>
             </div>
-            <span id="viewer-menu">
-              <ul>
-                <li class="menu-item" ng-class="{'active': editor.assetsView === 'backgrounds'}" ng-click="editor.assetsView='backgrounds'">
-                  <button>&lt-</button>
-                  <span>Backgrounds</span>
-                </li>
-                <li class="menu-item" ng-class="{'active': editor.assetsView === 'objects'}" ng-click="editor.assetsView='objects'">
-                  <button>&lt-</button>
-                  <span>Objects</span>
-                </li>
-                <li class="menu-item" ng-class="{'active': editor.assetsView === 'entities'}" ng-click="editor.assetsView='entities'">
-                  <button>&lt-</button>
-                  <span>Entities</span>
-                </li>
-                <li class="menu-item" ng-class="{'active': editor.assetsView === 'events'}" ng-click="editor.assetsView='events'">
-                  <button>&lt-</button>
-                  <span>Events</span>
-                </li>
-              </ul>
-            </span>
+            <ul id="viewer-menu">
+              <li class="menu-item" ng-class="{'active': editor.assetsView === 'backgrounds'}" ng-click="editor.assetsView='backgrounds'">
+                <button>&lt-</button>
+                <span>Backgrounds</span>
+              </li>
+              <li class="menu-item" ng-class="{'active': editor.assetsView === 'objects'}" ng-click="editor.assetsView='objects'">
+                <button>&lt-</button>
+                <span>Objects</span>
+              </li>
+              <li class="menu-item" ng-class="{'active': editor.assetsView === 'entities'}" ng-click="editor.assetsView='entities'">
+                <button>&lt-</button>
+                <span>Entities</span>
+              </li>
+              <li class="menu-item" ng-class="{'active': editor.assetsView === 'events'}" ng-click="editor.assetsView='events'">
+                <button>&lt-</button>
+                <span>Events</span>
+              </li>
+            </ul>
           </div>
-            <section class="editor-contents" id="asset">
-                <ui-view name="objects" ng-show="editor.currentSmallView === 'object'"></ui-view>
-                <ui-view name="entities" ng-show="editor.currentSmallView === 'entity'"></ui-view>
-                <ui-view name="events" ng-show="editor.currentSmallView === 'event'"></ui-view>
-                <ui-view name="scenes" ng-show="editor.currentSmallView === 'scene'"></ui-view>
-                <div ng-if="editor.currentSmallView === 'welcome'">
-                  <div class="asset-container welcome">
-                    <div>
-                      <h1 class="yazua">Yazua DPS</h1>
-                      <p class="dps">Design.Play.Share.</p>
-                    </div>
+          <section class="editor-contents" id="asset">
+              <ui-view name="objects" ng-show="editor.currentSmallView === 'object'"></ui-view>
+              <ui-view name="entities" ng-show="editor.currentSmallView === 'entity'"></ui-view>
+              <ui-view name="events" ng-show="editor.currentSmallView === 'event'"></ui-view>
+              <ui-view name="scenes" ng-show="editor.currentSmallView === 'scene'"></ui-view>
+              <div ng-if="editor.currentSmallView === 'welcome'">
+                <div class="asset-container welcome">
+                  <div>
+                    <h1 class="yazua">Yazua DPS</h1>
+                    <p class="dps">Design.Play.Share.</p>
                   </div>
                 </div>
-            </section>
+              </div>
+          </section>
         </aside>
 
     </div>

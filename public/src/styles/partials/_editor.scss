@@ -1,8 +1,8 @@
 
 
 #editor {
-  display: flex;
-  flex-direction: column;
+  @include display(flex);
+  @include flex-direction(column);
   max-width: 1584px;
   min-width: 1286px;
 
@@ -34,12 +34,12 @@
 
 #editor-view {
   box-shadow: 8px 8px 0 0 $medgrey;
-  flex: 1;
-  display: flex;
+  @include flex(1);
+  @include display(flex);
   justify-content: center;
 
   @include vertical {
-    flex-direction: column;
+    @include flex-direction(column);
     box-shadow: none;
   }
 
@@ -55,8 +55,8 @@
 
 .tab-nav {
   font-family: PCSenior;
-  display: flex;
-  justify-content: space-around;
+  @include display(flex);
+  @include justify-content(space-around);
   border-right: 4px solid black;
 
   @include vertical {
@@ -125,9 +125,9 @@
   padding: 1rem;
 
   .fullMap {
-    display: flex;
-    flex-direction: column;
-    align-items: baseline;
+    @include display(flex);
+    @include flex-direction(column);
+    @include align-items(baseline);
     margin: 10px 0;
 
     .mapName {
@@ -137,24 +137,24 @@
     }
 
     .mapRowWrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
+      @include display(flex);
+      @include flex-direction(column);
+      @include align-items(flex-start);
 
       .mapRow {
-        display: flex;
-        align-items: baseline;
+        @include display(flex);
+        @include align-items(baseline);
         margin: 10px 0;
 
         .mapColumnWrapper {
-          display: flex;
-          align-items: center;
+          @include display(flex);
+          @include align-items(center);
 
           .mapColumn {
             margin: 0 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            @include display(flex);
+            @include flex-direction(column);
+            @include align-items(center);
 
             .scene-button {
               height: 100px;
@@ -196,21 +196,22 @@
 
 #scene-editor {
   background: whitesmoke;
-  display: flex;
-  flex: 4;
-  flex-direction: column;
+  @include display(flex);
+  @include flex(4);
+  @include flex-direction(column);
 }
 
 .editor-contents {
   padding: 30px;
-  display: flex;
-  flex-direction: column;
-  position: relative;
+  @include display(flex);
 
   &#scene {
+    @include flex-direction(column);
+    position: relative;
     border-right: 4px solid black;
     border-left: 4px solid black;
-    align-items: center;
+    @include align-items(center);
+
     @include vertical {
       box-shadow: 8px 8px 0 0 $medgrey;
       z-index: 100;
@@ -219,11 +220,17 @@
   }
 
   &#asset {
-    flex: 1;
-    height: 100%;
+    @include flex(1 1 auto);
 
     > * {
-      height: 100%;
+      @include display(flex);
+      @include flex(1 1 auto);
+      @include flex-direction(column);
+
+      > * { // LOL
+        @include display(flex);
+        @include flex(1 1 auto);
+      }
     }
 
     .scene-assets {
@@ -234,9 +241,9 @@
       padding: .5rem;
 
       #scene-event-controls {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        @include display(flex);
+        @include justify-content(space-between);
+        @include align-items(center);
       }
 
       h4 {
@@ -250,7 +257,10 @@
       .scene-event {
         width: 100%;
         display: flex;
+        @include display(flex);
         justify-content: space-around;
+        @include justify-content(space-around);
+
         &:first-child {
           border-bottom: 2px solid dashed;
         }
@@ -277,9 +287,8 @@
     box-sizing: content-box;
     height: 508px;
     width: 708px;
-    flex: 1;
-    display: flex;
-    justify-content: center;
+    @include display(flex);
+    @include justify-content(center);
     border: 4px solid black;
 
     &.map {
@@ -308,10 +317,10 @@
 }
 
 .editor-controls {
-  display: flex;
-  justify-content: space-between;
+  @include display(flex);
+  @include justify-content(space-between);
   > * {
-    flex: 1;
+    @include flex(1);
     button {
       width: 100%;
       height: 100%;
@@ -321,7 +330,7 @@
 
 #tool-bar {
   height: 100%;
-  flex: 1;
+  @include flex(1);
   border: 4px black solid;
   padding: .5rem;
   z-index: 100;
@@ -332,10 +341,10 @@
   }
 
   #drawing-menu {
-    flex: 1;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
+    @include flex(1);
+    @include display(flex);
+    @include justify-content(space-around);
+    @include align-items(center);
 
     > * {
       height: 100px;
@@ -343,7 +352,7 @@
     }
 
     .tool {
-      display: flex;
+      @include display(flex);
       button {
         height: 100%;
         width: 100%;
@@ -375,10 +384,9 @@
     }
 
     .picker {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      vertical-align: middle;
+      @include display(flex);
+      @include flex-wrap(wrap);
+      @include justify-content(space-between);
 
       &.size {
         li {
@@ -386,9 +394,9 @@
           height: 40%;
           width: 40%;
           margin: 5%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          @include display(flex);
+          @include align-items(center);
+          @include justify-content(center);
           background-color: $lightgrey;
 
           &:hover {
@@ -461,10 +469,10 @@
   width: 40%;
   min-width: 500px;
   max-width: 800px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  flex: 3;
+  @include display(flex);
+  @include flex-direction(column);
+  @include justify-content(space-between);
+  @include flex(3);
   background: whitesmoke;
   border: 4px black solid;
   border-left: none;
@@ -477,22 +485,22 @@
     min-width: 0;
     max-width: 100%;
     width: 100%;
-    flex-direction: column-reverse;
+    @include flex-direction(column-reverse);
   }
 }
 
 #asset-editor {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+  @include flex(1);
+  @include display(flex);
+  @include flex-direction(column);
 }
 
 #asset-canvas {
-  flex: 1;
+  @include flex(1);
 }
 
 #viewer-selector {
-  display: flex;
+  @include display(flex);
   width: 100%;
   border-bottom: 4px black dashed;
 
@@ -503,15 +511,17 @@
 }
 
 #viewer-container {
-  overflow-x: auto;
   border-right: 4px black dashed;
-  flex: 5;
+  min-width: 70%;
+  @include display(flex);
+  @include flex-direction(column);
+  @include flex(1);
 }
 
 .viewer-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  @include display(flex);
+  @include align-items(center);
+  @include justify-content(space-between);
 
   button {
     border-top: none;
@@ -526,18 +536,13 @@
 }
 
 #viewer-menu {
-  flex: 1;
-
-  ul {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    height: 100%;
-  }
+  @include display(flex);
+  @include flex-direction(column);
+  @include justify-content(space-around);
 
   .menu-item {
-    height: 100%;
-    align-items: center;
+    @include align-items(center);
+    @include flex(1);
     padding: 5px;
 
     span {
@@ -547,27 +552,25 @@
 }
 
 #assets {
-  flex: 1;
   font-family: PCSenior;
-  display: flex;
-  justify-content: space-between;
+  @include flex(1);
+  @include display(flex);
+  @include justify-content(space-between);
   overflow-x: auto;
   padding: 16px 0;
 
   .viewer {
-    display: flex;
-    flex-direction: column;
-
+    min-height: calc(100px + 15px + 16px); // asset height + text size + scrollbar size
 
     ul {
-      overflow-x: auto;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      flex: 1;
+      @include display(flex);
+      @include flex-direction(row);
+      @include align-items(center);
+      @include flex(1);
       li {
         margin: 0 15px;
         position: relative;
+        @include flex(1 0 auto);
       }
     }
   }
@@ -575,9 +578,9 @@
 
 #events {
   .asset.available {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    @include display(flex);
+    @include justify-content(center);
+    @include align-items(center);
     > * {
       text-align: center;
       font-size: 3em;
@@ -607,9 +610,9 @@
   }
 
   &.new {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    @include display(flex);
+    @include justify-content(center);
+    @include align-items(center);
     position: relative;
     overflow: hidden;
 
@@ -621,7 +624,6 @@
 }
 
 .asset-in-scene {
-
 
   span {
     display: none;
@@ -675,10 +677,10 @@
 }
 
 .asset-header {
-  display: flex;
-  justify-content: space-between;
+  @include display(flex);
+  @include justify-content(space-between);
+  @include align-items(center);
   width: 100%;
-  align-items: center;
   margin: 0 0 10px;
 
   &.big {
@@ -687,34 +689,34 @@
   }
 
   &.map {
-    justify-content: flex-start;
+    @include justify-content(flex-start);
   }
 }
 
 .asset-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-around;
+  @include display(flex);
+  @include flex-direction(column);
+  @include align-items(center);
+  @include justify-content(space-around);
   height: 100%;
   border: 4px solid black;
   padding: 20px;
 
   &.welcome {
-    justify-content: center;
+    @include justify-content(center);
   }
 }
 
 #editor-footer {
   margin-top: 2em;
-  display: flex;
-  justify-content: flex-end;
+  @include display(flex);
+  @include justify-content(flex-end);
 
   ul {
     box-shadow: 8px 8px 0 0 $medgrey;
     background: whitesmoke;
     border: black 4px solid;
-    display: flex;
+    @include display(flex);
     padding: 2em;
     li {
       padding: 1em;
@@ -730,7 +732,7 @@
 
     @include vertical {
       width: 100%;
-      justify-content: space-around;
+      @include justify-content(space-around);
     }
   }
 
