@@ -114,30 +114,20 @@ angular.module('questCreator').controller('bgCtrl', function($state, $scope, Edi
   }
 
   function drawGrid() {
+    self.draw.clearRect(0, 0, canvasWidth, canvasHeight);
+    drawBackgroundSquares();
+    drawCollisionSquares();
     var drawSize = $scope.editor.currentPixelSize;
     self.canvasPos = {    // Canvas top and left coordinates on page
       x: self.myCanvas.getBoundingClientRect().left,
       y: self.myCanvas.getBoundingClientRect().top
     };
-    var numSquaresX = 50;
+    var numSquaresX = 70;
     var numSquaresY = 50;
     var gridWidth = canvasWidth / numSquaresX;
     var gridHeight = canvasHeight / numSquaresY;
     var color = $scope.editor.drawingCollision ? 'rgba(100, 100, 100, 0.5)' : $scope.editor.currentColor;
     var type = $scope.editor.drawingCollision ? 'collision' : 'normal';
-    self.draw.clearRect(0, 0, canvasWidth, canvasHeight);
-    for (var index = 0; index <= canvasWidth; index += gridWidth) {
-      self.draw.moveTo(index, 0);
-      self.draw.lineTo(index, canvasHeight);
-    }
-    for (var index = 0; index <= canvasHeight; index += gridHeight) {
-      self.draw.moveTo(0, index);
-      self.draw.lineTo(canvasWidth, index);
-    }
-    self.draw.strokeStyle = 'rgba(200, 200, 200, 0.5)';
-    self.draw.stroke();
-    drawBackgroundSquares();
-    drawCollisionSquares();
     self.draw.fillStyle = color;
     for (var xIndex = -drawSize; xIndex <= drawSize; xIndex++) {
       for (var yIndex = -drawSize; yIndex <= drawSize; yIndex++) {
@@ -185,6 +175,18 @@ angular.module('questCreator').controller('bgCtrl', function($state, $scope, Edi
         }
       }
     }
+    self.draw.beginPath();
+    for (var index = 0; index <= canvasWidth; index += gridWidth) {
+      self.draw.moveTo(index, 0);
+      self.draw.lineTo(index, canvasHeight);
+    }
+    for (var index = 0; index <= canvasHeight; index += gridHeight) {
+      self.draw.moveTo(0, index);
+      self.draw.lineTo(canvasWidth, index);
+    }
+    self.draw.strokeStyle = 'rgba(75, 75, 75, 0.8)';
+    self.draw.stroke();
+    self.draw.closePath();
     // console.log("Background array", self.allBackgroundSquares);
     // console.log("Collision array", self.allCollisionSquares);
     if (drawingBackground) {

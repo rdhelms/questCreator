@@ -65,7 +65,7 @@ angular.module('questCreator')
           3: "brown",
           4: "orange"
         };
-        this.currentPixelSize = 3;
+        this.currentPixelSize = 4;
         this.drawingCollision = false;
         this.erasing = false;
         this.selectingAssets = false;
@@ -84,7 +84,7 @@ angular.module('questCreator')
         this.selectColor = function(index) {
             // Convert hex color to rgb
             var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(self.inputColor);
-            console.log("color result: ", result);
+            // console.log("color result: ", result);
             var rgb = result ? {
                 r: parseInt(result[1], 16),
                 g: parseInt(result[2], 16),
@@ -347,6 +347,7 @@ angular.module('questCreator')
         };
 
         this.setThumbnail = function(asset) {
+          if (asset) {
             if (asset === undefined || !asset.thumbnail) {
                 return {
                     "background-image": "none"
@@ -359,6 +360,7 @@ angular.module('questCreator')
                     "background-repeat": "no-repeat"
                 };
             }
+          }
         };
 
         this.selectText = function($event) {
@@ -448,4 +450,3 @@ angular.module('questCreator')
             });
         };
     });
-    

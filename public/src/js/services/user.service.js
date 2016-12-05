@@ -256,6 +256,7 @@ angular.module('questCreator')
                     // console.log('success requests', response);
                 },
                 error: function(error) {
+                  console.clear();
                     PopupService.openTemp('fail-collab-load');
                 }
             });
