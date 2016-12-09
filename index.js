@@ -16,20 +16,20 @@ io.on('connection', function(socket){
       id: newPlayer.id,
       game: newPlayer.game
     };
-    newPlayer.socketId = socket.id;
+    // newPlayer.socketId = socket.id;
     io.to(newPlayer.game).emit('new player', playerBasic);  // includes self
-    socket.to(newPlayer.game).emit('draw new player', newPlayer); // only to others
+    // socket.to(newPlayer.game).emit('draw new player', newPlayer); // only to others
   });
-
-  socket.on('draw old player', function(response) {
-    var oldPlayer = response.data;
-    var newPlayer = response.dest;
-    socket.to(newPlayer).emit('draw old player', oldPlayer);
-  });
-
-  socket.on('update player', function(playerUpdate) {
-    socket.to(playerUpdate.game).emit('update player', playerUpdate);
-  });
+//
+//   socket.on('draw old player', function(response) {
+//     var oldPlayer = response.data;
+//     var newPlayer = response.dest;
+//     socket.to(newPlayer).emit('draw old player', oldPlayer);
+//   });
+//
+//   socket.on('update player', function(playerUpdate) {
+//     socket.to(playerUpdate.game).emit('update player', playerUpdate);
+//   });
 
   socket.on('game left', function(leavingPlayer) {
     console.log('Player ' + leavingPlayer.id + ' left ' + leavingPlayer.game);

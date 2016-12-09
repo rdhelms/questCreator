@@ -1,22 +1,22 @@
 angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, EditorService, GameService, $state, $scope, PopupService, StorageService) {
   var self = this;
   UserService.checkLogin().then(function(response) {
-    var socketDelay = 5; 
-    var socketIterator = 0;
+    // var socketDelay = 5;
+    // var socketIterator = 0;
     var fullPlayer = {
       id: null,
       game: null,
-      scenePos: null,
-      avatar: null,
+      // scenePos: null,
+      // avatar: null,
       socketId: null
     };
-    var playerUpdate = {
-      id: null,
-      game: null,
-      scenePos: null,
-      socketId: null
-    };
-    var allPlayers = [];
+    // var playerUpdate = {
+    //   id: null,
+    //   game: null,
+    //   scenePos: null,
+    //   socketId: null
+    // };
+    // var allPlayers = [];
     var playerInfo = {
         id: UserService.get().id,
     };
@@ -124,15 +124,15 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                 }
                 if (!self.pause) {
                   avatar.action = (avatar.action === 'walkLeft') ? 'stand' : 'walkLeft';
-                  playerUpdate = {
-                    id: angular.copy(fullPlayer.id),
-                    game: angular.copy(fullPlayer.game),
-                    scenePos: angular.copy(fullPlayer.scenePos),
-                    socketId: angular.copy(fullPlayer.socketId),
-                    action: angular.copy(avatar.action),
-                    pos: angular.copy(avatar.info.pos)
-                  };
-                  socket.emit('update player', playerUpdate);
+                  // playerUpdate = {
+                  //   id: angular.copy(fullPlayer.id),
+                  //   game: angular.copy(fullPlayer.game),
+                  //   scenePos: angular.copy(fullPlayer.scenePos),
+                  //   socketId: angular.copy(fullPlayer.socketId),
+                  //   action: angular.copy(avatar.action),
+                  //   pos: angular.copy(avatar.info.pos)
+                  // };
+                  // socket.emit('update player', playerUpdate);
                 }
             } else if (keyCode === 38) {
                 if (self.pause && $('.fileOption.active').length === 1 && $('.save.active').length === 0) {
@@ -140,15 +140,15 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                 }
                 if (!self.pause) {
                   avatar.action = (avatar.action === 'walkUp') ? 'stand' : 'walkUp';
-                  playerUpdate = {
-                    id: angular.copy(fullPlayer.id),
-                    game: angular.copy(fullPlayer.game),
-                    scenePos: angular.copy(fullPlayer.scenePos),
-                    socketId: angular.copy(fullPlayer.socketId),
-                    action: angular.copy(avatar.action),
-                    pos: angular.copy(avatar.info.pos)
-                  };
-                  socket.emit('update player', playerUpdate);
+                  // playerUpdate = {
+                  //   id: angular.copy(fullPlayer.id),
+                  //   game: angular.copy(fullPlayer.game),
+                  //   scenePos: angular.copy(fullPlayer.scenePos),
+                  //   socketId: angular.copy(fullPlayer.socketId),
+                  //   action: angular.copy(avatar.action),
+                  //   pos: angular.copy(avatar.info.pos)
+                  // };
+                  // socket.emit('update player', playerUpdate);
                 }
             } else if (keyCode === 39) {
                 if (self.pause && $('.timeOption.active').length === 0) {
@@ -156,15 +156,15 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                 }
                 if (!self.pause) {
                   avatar.action = (avatar.action === 'walkRight') ? 'stand' : 'walkRight';
-                  playerUpdate = {
-                    id: angular.copy(fullPlayer.id),
-                    game: angular.copy(fullPlayer.game),
-                    scenePos: angular.copy(fullPlayer.scenePos),
-                    socketId: angular.copy(fullPlayer.socketId),
-                    action: angular.copy(avatar.action),
-                    pos: angular.copy(avatar.info.pos)
-                  };
-                  socket.emit('update player', playerUpdate);
+                  // playerUpdate = {
+                  //   id: angular.copy(fullPlayer.id),
+                  //   game: angular.copy(fullPlayer.game),
+                  //   scenePos: angular.copy(fullPlayer.scenePos),
+                  //   socketId: angular.copy(fullPlayer.socketId),
+                  //   action: angular.copy(avatar.action),
+                  //   pos: angular.copy(avatar.info.pos)
+                  // };
+                  // socket.emit('update player', playerUpdate);
                 }
             } else if (keyCode === 40) {
                 if (self.pause && $('.fileOption.active').length === 1 && $('.restore.active').length === 0) {
@@ -172,15 +172,15 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                 }
                 if (!self.pause) {
                   avatar.action = (avatar.action === 'walkDown') ? 'stand' : 'walkDown';
-                  playerUpdate = {
-                    id: angular.copy(fullPlayer.id),
-                    game: angular.copy(fullPlayer.game),
-                    scenePos: angular.copy(fullPlayer.scenePos),
-                    socketId: angular.copy(fullPlayer.socketId),
-                    action: angular.copy(avatar.action),
-                    pos: angular.copy(avatar.info.pos)
-                  };
-                  socket.emit('update player', playerUpdate);
+                  // playerUpdate = {
+                  //   id: angular.copy(fullPlayer.id),
+                  //   game: angular.copy(fullPlayer.game),
+                  //   scenePos: angular.copy(fullPlayer.scenePos),
+                  //   socketId: angular.copy(fullPlayer.socketId),
+                  //   action: angular.copy(avatar.action),
+                  //   pos: angular.copy(avatar.info.pos)
+                  // };
+                  // socket.emit('update player', playerUpdate);
                 }
             } else if (keyCode === 191) {
               // Forward slash
@@ -212,19 +212,19 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                 } else if ($('.invOption.active').length === 1) {
                   self.showingInventory = true;
                   $('.option.active').removeClass('active');
-                  runGame(); // once
+                  runGame(); // runs once - game is still paused
                 } else if ($('.save.active').length === 1) {
                   self.savingGame = true;
                   $('.fileOption').removeClass('active');
                   $('.save.active').removeClass('active');
-                  runGame(); // once
+                  runGame(); // runs once - game is still paused
                 } else if ($('.restore.active').length === 1) {
                   self.restoringGame = true;
                   $('.fileOption').removeClass('active');
                   $('.restore.active').removeClass('active');
-                  runGame(); // once
+                  runGame(); // runs once - game is still paused
                 }
-                if (!self.responding.show && !self.showingInventory && $('.active').length === 0) { // Resume the game if all windows have been closed
+                if (!self.responding.show && !self.showingInventory && $('.active').length === 0 && self.pause === true) { // Resume the game if all windows have been closed and if it is not already running
                     self.pause = false;
                     runGame();
                 }
@@ -561,15 +561,15 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
             switch (collision.type) {
                 case 'wall':
                     avatar.collide(collision.direction);
-                    playerUpdate = {
-                      id: angular.copy(fullPlayer.id),
-                      game: angular.copy(fullPlayer.game),
-                      scenePos: angular.copy(fullPlayer.scenePos),
-                      socketId: angular.copy(fullPlayer.socketId),
-                      action: angular.copy(avatar.action),
-                      pos: angular.copy(avatar.info.pos)
-                    };
-                    socket.emit('update player', playerUpdate);
+                    // playerUpdate = {
+                    //   id: angular.copy(fullPlayer.id),
+                    //   game: angular.copy(fullPlayer.game),
+                    //   scenePos: angular.copy(fullPlayer.scenePos),
+                    //   socketId: angular.copy(fullPlayer.socketId),
+                    //   action: angular.copy(avatar.action),
+                    //   pos: angular.copy(avatar.info.pos)
+                    // };
+                    // socket.emit('update player', playerUpdate);
                     break;
             }
             collision = {
@@ -745,20 +745,20 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
     function updateLocation() {
         self.saveInfo.scenePos = self.currentScenePos;
-        fullPlayer.scenePos = self.currentScenePos;
+        // fullPlayer.scenePos = self.currentScenePos;
         self.currentMap = allMaps[self.currentScenePos[0]];
         self.allRows = self.currentMap.scenes;
         self.currentRow = self.allRows[self.currentScenePos[1]];
         self.currentScene = self.currentRow[self.currentScenePos[2]];
-        playerUpdate = {
-          id: angular.copy(fullPlayer.id),
-          game: angular.copy(fullPlayer.game),
-          scenePos: angular.copy(fullPlayer.scenePos),
-          socketId: angular.copy(fullPlayer.socketId),
-          action: angular.copy(avatar.action),
-          pos: angular.copy(avatar.info.pos)
-        };
-        socket.emit('update player', playerUpdate);
+        // playerUpdate = {
+        //   id: angular.copy(fullPlayer.id),
+        //   game: angular.copy(fullPlayer.game),
+        //   scenePos: angular.copy(fullPlayer.scenePos),
+        //   socketId: angular.copy(fullPlayer.socketId),
+        //   action: angular.copy(avatar.action),
+        //   pos: angular.copy(avatar.info.pos)
+        // };
+        // socket.emit('update player', playerUpdate);
         background = self.currentScene.background;
         events = self.currentScene.events;
         objects = self.currentScene.objects;
@@ -777,20 +777,20 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
     function updateAvatar() {
       avatar.updatePos();
-      fullPlayer.avatar = avatar;
-      playerUpdate = {
-        id: angular.copy(fullPlayer.id),
-        game: angular.copy(fullPlayer.game),
-        scenePos: angular.copy(fullPlayer.scenePos),
-        socketId: angular.copy(fullPlayer.socketId),
-        action: angular.copy(avatar.action),
-        pos: angular.copy(avatar.info.pos)
-      };
-      if (socketIterator > socketDelay) {
-        socket.emit('update player', playerUpdate);
-        socketIterator = 0;
-      }
-      socketIterator++;
+      // fullPlayer.avatar = avatar;
+      // playerUpdate = {
+      //   id: angular.copy(fullPlayer.id),
+      //   game: angular.copy(fullPlayer.game),
+      //   scenePos: angular.copy(fullPlayer.scenePos),
+      //   socketId: angular.copy(fullPlayer.socketId),
+      //   action: angular.copy(avatar.action),
+      //   pos: angular.copy(avatar.info.pos)
+      // };
+      // if (socketIterator > socketDelay) {
+      //   socket.emit('update player', playerUpdate);
+      //   socketIterator = 0;
+      // }
+      // socketIterator++;
     }
 
     function updateEntities() {
@@ -822,14 +822,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
         gameCtx.restore();
     }
 
-    function drawAllPlayers() {
-      allPlayers.forEach(function(player) {
-        // player.avatar.updatePos();
-        if (player.scenePos[0] === fullPlayer.scenePos[0] && player.scenePos[1] === fullPlayer.scenePos[1] && player.scenePos[2] === fullPlayer.scenePos[2]) {
-          drawAvatar(player.avatar);
-        }
-      });
-    }
+    // function drawAllPlayers() {
+    //   allPlayers.forEach(function(player) {
+    //     // player.avatar.updatePos();
+    //     if (player.scenePos[0] === fullPlayer.scenePos[0] && player.scenePos[1] === fullPlayer.scenePos[1] && player.scenePos[2] === fullPlayer.scenePos[2]) {
+    //       drawAvatar(player.avatar);
+    //     }
+    //   });
+    // }
 
     function drawBackground() {
         if (background) {
@@ -1052,19 +1052,19 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
           avatar.info.pos.y = startPos.y;
           avatar.info.currentFrame = avatar.info.animate.walkLeft[0];
           avatarLoaded = true;
-          fullPlayer.avatar = avatar;
+          // fullPlayer.avatar = avatar;
           updateLocation();
           initSocket();
+          // Tell the server that I joined this game
+          fullPlayer.id = playerInfo.id;
+          fullPlayer.game = self.gameName;
           socket.emit('game joined', fullPlayer);
         });
     }
 
     self.startGame = function() {
-        // Tell the server that I joined this game
-        fullPlayer.id = playerInfo.id;
-        fullPlayer.game = self.gameName;
         self.currentScenePos = [startPos.map, startPos.row, startPos.column];
-        fullPlayer.scenePos = self.currentScenePos;
+        // fullPlayer.scenePos = self.currentScenePos;
         loadMainCharacter();
         self.startTime = new Date();
         self.gameStarted = true;
@@ -1085,7 +1085,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                 drawEntities('background');
                 drawObjects('background');
                 drawAvatar(avatar);
-                drawAllPlayers();
+                // drawAllPlayers();
                 drawEntities('foreground');
                 drawObjects('foreground');
                 drawBackground();
@@ -1099,55 +1099,55 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
 
     function initSocket() {
-      // Socket functionality
-      // Get my own information
-      socket.off('self info');
-      socket.on('self info', function(id) {
-        fullPlayer.socketId = id;
-      });
-
+    //   // Socket functionality
+    //   // Get my own information
+    //   socket.off('self info');
+    //   socket.on('self info', function(id) {
+    //     fullPlayer.socketId = id;
+    //   });
+    //
       // Notify me in the chat window that another player joined the game.
       socket.off('new player');
       socket.on('new player', function(playerBasic) {
         var msg = "Player " + playerBasic.id + ' is playing ' + playerBasic.game;
         $('.chat-messages').append($('<li>').text(msg));
       });
-
-      socket.off('draw new player');
-      socket.on('draw new player', function(newPlayer) {
-        newPlayer.avatar = new Avatar(newPlayer.avatar);
-        allPlayers.push(newPlayer);
-        var response = {
-          data: fullPlayer,
-          dest: newPlayer.socketId
-        };
-        socket.emit('draw old player', response);
-      });
-
-      socket.off('draw old player');
-      socket.on('draw old player', function(oldPlayer) {
-        oldPlayer.avatar = new Avatar(oldPlayer.avatar);
-        allPlayers.push(oldPlayer);
-      });
-
-      socket.off('update player');
-      socket.on('update player', function(playerUpdate) {
-        // playerUpdate = {
-        //   id: angular.copy(fullPlayer.id),
-        //   game: angular.copy(fullPlayer.game),
-        //   scenePos: angular.copy(fullPlayer.scenePos),
-        //   socketId: angular.copy(fullPlayer.socketId),
-        //   action: avatar.action
-        // };
-        for (var index = 0; index < allPlayers.length; index++) {
-          if (allPlayers[index].id === playerUpdate.id) {
-            allPlayers[index].avatar.action = angular.copy(playerUpdate.action);
-            allPlayers[index].scenePos = angular.copy(playerUpdate.scenePos);
-            allPlayers[index].avatar.info.pos = angular.copy(playerUpdate.pos);
-          }
-        }
-      });
-
+    //
+    //   socket.off('draw new player');
+    //   socket.on('draw new player', function(newPlayer) {
+    //     newPlayer.avatar = new Avatar(newPlayer.avatar);
+    //     allPlayers.push(newPlayer);
+    //     var response = {
+    //       data: fullPlayer,
+    //       dest: newPlayer.socketId
+    //     };
+    //     socket.emit('draw old player', response);
+    //   });
+    //
+    //   socket.off('draw old player');
+    //   socket.on('draw old player', function(oldPlayer) {
+    //     oldPlayer.avatar = new Avatar(oldPlayer.avatar);
+    //     allPlayers.push(oldPlayer);
+    //   });
+    //
+    //   socket.off('update player');
+    //   socket.on('update player', function(playerUpdate) {
+    //     // playerUpdate = {
+    //     //   id: angular.copy(fullPlayer.id),
+    //     //   game: angular.copy(fullPlayer.game),
+    //     //   scenePos: angular.copy(fullPlayer.scenePos),
+    //     //   socketId: angular.copy(fullPlayer.socketId),
+    //     //   action: avatar.action
+    //     // };
+    //     for (var index = 0; index < allPlayers.length; index++) {
+    //       if (allPlayers[index].id === playerUpdate.id) {
+    //         allPlayers[index].avatar.action = angular.copy(playerUpdate.action);
+    //         allPlayers[index].scenePos = angular.copy(playerUpdate.scenePos);
+    //         allPlayers[index].avatar.info.pos = angular.copy(playerUpdate.pos);
+    //       }
+    //     }
+    //   });
+    //
       // When I submit a chat message, send it to the server along with the game I'm playing
       $('.chat-submit').submit(function(){
         var msgInfo = {
@@ -1170,15 +1170,15 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       socket.on('player left', function(leavingPlayer) {
         var msg = "Player " + leavingPlayer.id + ' left ' + leavingPlayer.game;
         $('.chat-messages').append($('<li>').text(msg));
-        var indexToRemove = null;
-        for (var index = 0; index < allPlayers.length; index++) {
-          if (allPlayers[index].id === leavingPlayer.id) {
-            indexToRemove = index;
-          }
-        }
-        if (indexToRemove !== null) {
-          allPlayers.splice(indexToRemove, 1);
-        }
+        // var indexToRemove = null;
+        // for (var index = 0; index < allPlayers.length; index++) {
+        //   if (allPlayers[index].id === leavingPlayer.id) {
+        //     indexToRemove = index;
+        //   }
+        // }
+        // if (indexToRemove !== null) {
+        //   allPlayers.splice(indexToRemove, 1);
+        // }
       });
 
       // Let others know that I left the game if the controller ceases (closing browser, etc)
