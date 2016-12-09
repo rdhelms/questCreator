@@ -154,9 +154,10 @@ angular.module('questCreator')
                 },
                 success: function(response) {
                     user.id = response.id;
-                    PopupService.open('user-register');
+                    PopupService.close();
                 },
                 error: function(error) {
+                  PopupService.close();
                   PopupService.openTemp('fail-user-load');
                     signOut();
                 }
