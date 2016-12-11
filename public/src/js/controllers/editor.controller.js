@@ -67,6 +67,7 @@ angular.module('questCreator')
         };
         this.currentPixelSize = 4;
         this.drawingCollision = false;
+        this.collisionType = 'wall';
         this.erasing = false;
         this.selectingAssets = false;
         this.currentFrameIndex = 0;
