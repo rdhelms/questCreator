@@ -4,6 +4,14 @@ angular.module('questCreator')
   var path = './src/views/popups/';
 
   var templates = {
+    'about': {
+      title: 'About:',
+      content: 'about.html'
+    },
+    'video': {
+      title: 'YazuaDPS:',
+      content: 'video.html'
+    },
     'welcome': {
       title: 'Welcome!',
       content: 'welcome.html'
