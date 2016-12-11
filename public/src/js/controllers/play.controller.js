@@ -1,22 +1,22 @@
 angular.module('questCreator').controller('playCtrl', function(socket, Avatar, Background, SceneObject, Entity, UserService, EditorService, GameService, $state, $scope, PopupService, StorageService) {
   var self = this;
   UserService.checkLogin().then(function(response) {
-    var socketDelay = 5; 
-    var socketIterator = 0;
+    // var socketDelay = 5;
+    // var socketIterator = 0;
     var fullPlayer = {
       id: null,
       game: null,
-      scenePos: null,
-      avatar: null,
+      // scenePos: null,
+      // avatar: null,
       socketId: null
     };
-    var playerUpdate = {
-      id: null,
-      game: null,
-      scenePos: null,
-      socketId: null
-    };
-    var allPlayers = [];
+    // var playerUpdate = {
+    //   id: null,
+    //   game: null,
+    //   scenePos: null,
+    //   socketId: null
+    // };
+    // var allPlayers = [];
     var playerInfo = {
         id: UserService.get().id,
     };
@@ -124,15 +124,15 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                 }
                 if (!self.pause) {
                   avatar.action = (avatar.action === 'walkLeft') ? 'stand' : 'walkLeft';
-                  playerUpdate = {
-                    id: angular.copy(fullPlayer.id),
-                    game: angular.copy(fullPlayer.game),
-                    scenePos: angular.copy(fullPlayer.scenePos),
-                    socketId: angular.copy(fullPlayer.socketId),
-                    action: angular.copy(avatar.action),
-                    pos: angular.copy(avatar.info.pos)
-                  };
-                  socket.emit('update player', playerUpdate);
+                  // playerUpdate = {
+                  //   id: angular.copy(fullPlayer.id),
+                  //   game: angular.copy(fullPlayer.game),
+                  //   scenePos: angular.copy(fullPlayer.scenePos),
+                  //   socketId: angular.copy(fullPlayer.socketId),
+                  //   action: angular.copy(avatar.action),
+                  //   pos: angular.copy(avatar.info.pos)
+                  // };
+                  // socket.emit('update player', playerUpdate);
                 }
             } else if (keyCode === 38) {
                 if (self.pause && $('.fileOption.active').length === 1 && $('.save.active').length === 0) {
@@ -140,15 +140,15 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                 }
                 if (!self.pause) {
                   avatar.action = (avatar.action === 'walkUp') ? 'stand' : 'walkUp';
-                  playerUpdate = {
-                    id: angular.copy(fullPlayer.id),
-                    game: angular.copy(fullPlayer.game),
-                    scenePos: angular.copy(fullPlayer.scenePos),
-                    socketId: angular.copy(fullPlayer.socketId),
-                    action: angular.copy(avatar.action),
-                    pos: angular.copy(avatar.info.pos)
-                  };
-                  socket.emit('update player', playerUpdate);
+                  // playerUpdate = {
+                  //   id: angular.copy(fullPlayer.id),
+                  //   game: angular.copy(fullPlayer.game),
+                  //   scenePos: angular.copy(fullPlayer.scenePos),
+                  //   socketId: angular.copy(fullPlayer.socketId),
+                  //   action: angular.copy(avatar.action),
+                  //   pos: angular.copy(avatar.info.pos)
+                  // };
+                  // socket.emit('update player', playerUpdate);
                 }
             } else if (keyCode === 39) {
                 if (self.pause && $('.timeOption.active').length === 0) {
@@ -156,15 +156,15 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                 }
                 if (!self.pause) {
                   avatar.action = (avatar.action === 'walkRight') ? 'stand' : 'walkRight';
-                  playerUpdate = {
-                    id: angular.copy(fullPlayer.id),
-                    game: angular.copy(fullPlayer.game),
-                    scenePos: angular.copy(fullPlayer.scenePos),
-                    socketId: angular.copy(fullPlayer.socketId),
-                    action: angular.copy(avatar.action),
-                    pos: angular.copy(avatar.info.pos)
-                  };
-                  socket.emit('update player', playerUpdate);
+                  // playerUpdate = {
+                  //   id: angular.copy(fullPlayer.id),
+                  //   game: angular.copy(fullPlayer.game),
+                  //   scenePos: angular.copy(fullPlayer.scenePos),
+                  //   socketId: angular.copy(fullPlayer.socketId),
+                  //   action: angular.copy(avatar.action),
+                  //   pos: angular.copy(avatar.info.pos)
+                  // };
+                  // socket.emit('update player', playerUpdate);
                 }
             } else if (keyCode === 40) {
                 if (self.pause && $('.fileOption.active').length === 1 && $('.restore.active').length === 0) {
@@ -172,15 +172,15 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                 }
                 if (!self.pause) {
                   avatar.action = (avatar.action === 'walkDown') ? 'stand' : 'walkDown';
-                  playerUpdate = {
-                    id: angular.copy(fullPlayer.id),
-                    game: angular.copy(fullPlayer.game),
-                    scenePos: angular.copy(fullPlayer.scenePos),
-                    socketId: angular.copy(fullPlayer.socketId),
-                    action: angular.copy(avatar.action),
-                    pos: angular.copy(avatar.info.pos)
-                  };
-                  socket.emit('update player', playerUpdate);
+                  // playerUpdate = {
+                  //   id: angular.copy(fullPlayer.id),
+                  //   game: angular.copy(fullPlayer.game),
+                  //   scenePos: angular.copy(fullPlayer.scenePos),
+                  //   socketId: angular.copy(fullPlayer.socketId),
+                  //   action: angular.copy(avatar.action),
+                  //   pos: angular.copy(avatar.info.pos)
+                  // };
+                  // socket.emit('update player', playerUpdate);
                 }
             } else if (keyCode === 191) {
               // Forward slash
@@ -212,19 +212,19 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                 } else if ($('.invOption.active').length === 1) {
                   self.showingInventory = true;
                   $('.option.active').removeClass('active');
-                  runGame(); // once
+                  runGame(); // runs once - game is still paused
                 } else if ($('.save.active').length === 1) {
                   self.savingGame = true;
                   $('.fileOption').removeClass('active');
                   $('.save.active').removeClass('active');
-                  runGame(); // once
+                  runGame(); // runs once - game is still paused
                 } else if ($('.restore.active').length === 1) {
                   self.restoringGame = true;
                   $('.fileOption').removeClass('active');
                   $('.restore.active').removeClass('active');
-                  runGame(); // once
+                  runGame(); // runs once - game is still paused
                 }
-                if (!self.responding.show && !self.showingInventory && $('.active').length === 0) { // Resume the game if all windows have been closed
+                if (!self.responding.show && !self.showingInventory && $('.active').length === 0 && self.pause === true) { // Resume the game if all windows have been closed and if it is not already running
                     self.pause = false;
                     runGame();
                 }
@@ -245,7 +245,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
               var requirementsMet = true;   // Assume that the requirements will be met
               if (typingEvent.requirements.achievements) {
                 typingEvent.requirements.achievements.forEach(function(achievement) {  // Loop through all the achievement requirements
-                  if (self.saveInfo.achievements.indexOf(achievement) === -1) { // If an achievement is required, check the player's past achievements
+                  if (self.saveInfo.achievements.indexOf(achievement.name) === -1) { // If an achievement is required, check the player's past achievements
                     requirementsMet = false;  // Requirements fail if achievement is not present
                   }
                 });
@@ -282,11 +282,19 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                       self.pause = true;
                   });
                   typingEvent.results.inventory.forEach(function(inventoryItem) {
+                    if (self.saveInfo.inventory.indexOf(inventoryItem) === -1) { // Check to see if the player has already gotten this item
                       self.saveInfo.inventory.push(inventoryItem);
+                    } else {
+                      self.responding.phrase = 'You already have that.';
+                    }
                   });
                   typingEvent.results.achievements.forEach(function(achievement) {
+                    if (self.saveInfo.achievements.indexOf(achievement.name) === -1) { // Check to see if the player has already gotten this achievement
                       self.saveInfo.achievements.push(achievement.name);
                       self.saveInfo.score += achievement.points;
+                    } else {
+                      self.responding.phrase = 'You already did that.';
+                    }
                   });
                   if (typingEvent.results.portal.scenePos) {
                       var location = typingEvent.results.portal;
@@ -306,7 +314,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       }
     }
 
-    function checkLocationEvents(avatarBounds) {
+    function checkLocationEvents(collisionType) {
       var foundEvent = false; // Whether a typing event has already been triggered
       if (events) {
         events.forEach(function(event) { // Loop through all the typing events
@@ -314,33 +322,51 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
             locationEvent = event.info;
             if (!foundEvent) {  // Only continue checking as long as another event has already not been triggered
               var requirementsMet = true;   // Assume that the requirements will be met
-              locationEvent.requirements.forEach(function(requirement) {  // Loop through all the requirements
-                if (requirement.type === 'achievement' && self.saveInfo.achievements.indexOf(requirement.value) === -1) { // If an achievement is required, check the player's past achievements
-                  requirementsMet = false;  // Requirements fail if achievement is not present
-                } else if (requirement.type === 'inventory' && self.saveInfo.inventory.indexOf(requirement.value) === -1) { // If an inventory item is required, check the player's inventory
-                  requirementsMet = false;  // Requirements fail if inventory does not contain necessary item
-                }
-              });
-              if (requirementsMet) {  // If all the requirements have been met, check the event's triggers
-                var triggerSatisfied = false;  // Assume that the trigger conditions will not be met
-                locationEvent.triggers.forEach(function(bounds) {  // Compare the avatar's bounds with the locationEvent's trigger bounds
-                  if (avatarBounds.left <= bounds.right && avatarBounds.right >= bounds.left && avatarBounds.top <= bounds.bottom && avatarBounds.bottom >= bounds.top) {
-                    triggerSatisfied = true;
+              var requirementsMet = true;   // Assume that the requirements will be met
+              if (locationEvent.requirements.achievements) {
+                locationEvent.requirements.achievements.forEach(function(achievement) {  // Loop through all the achievement requirements
+                  if (self.saveInfo.achievements.indexOf(achievement.name) === -1) { // If an achievement is required, check the player's past achievements
+                    requirementsMet = false;  // Requirements fail if achievement is not present
                   }
                 });
+              }
+              if (locationEvent.requirements.inventory) {
+                locationEvent.requirements.inventory.forEach(function(item) {  // Loop through all the inventory requirements
+                  if (self.saveInfo.inventory.indexOf(item) === -1) { // If an inventory item is required, check the player's inventory
+                    requirementsMet = false;  // Requirements fail if inventory does not contain necessary item
+                  }
+                });
+              }
+              if (requirementsMet) {  // If all the requirements have been met, check the event's triggers
+                var triggerSatisfied = true;  // Until actual triggers are made
+                // var triggerSatisfied = false;  // Assume that the trigger conditions will not be met
+                // locationEvent.triggers.forEach(function(collisionType) {  // For now, assume any present trigger means the custom collision map is present
+                //   triggerSatisfied = true;
+                // });
                 if (triggerSatisfied) {
                   foundEvent = true;
                   locationEvent.results.text.forEach(function(textResult) {
                       self.responding.phrase = textResult;
                       self.responding.show = true;
-                      self.pause = true;
+                      setTimeout(function() {
+                        self.responding.show = false;
+                      }, 2000);
+                      // self.pause = true;
                   });
                   locationEvent.results.inventory.forEach(function(inventoryItem) {
+                    if (self.saveInfo.inventory.indexOf(inventoryItem) === -1) { // Check to see if the player has already gotten this item
                       self.saveInfo.inventory.push(inventoryItem);
+                    } else {
+                      // Do nothing
+                    }
                   });
                   locationEvent.results.achievements.forEach(function(achievement) {
+                    if (self.saveInfo.achievements.indexOf(achievement.name) === -1) { // Check to see if the player has already gotten this achievement
                       self.saveInfo.achievements.push(achievement.name);
                       self.saveInfo.score += achievement.points;
+                    } else {
+                      // Do nothing
+                    }
                   });
                   if (locationEvent.results.portal.scenePos) {
                       var location = locationEvent.results.portal;
@@ -384,7 +410,6 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
             width: right - left,
             height: bottom - top
         };
-        checkLocationEvents(avatar.bounds);
         if (avatar.bounds.right < 0) { // Character moves to the left scene
             self.currentScenePos[2]--;
             if (self.currentScenePos[2] < 0) {
@@ -437,7 +462,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                     // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current bg square (in those exact orders).
                     if (avatarLeft <= bgRight && avatarRight >= bgLeft && avatarTop <= bgBottom && avatarBottom >= bgTop) {
                         collision.found = true;
-                        collision.type = 'wall';
+                        collision.type = bgSquare.type;
                         if (avatar.info.speed.x > 0) {
                             collision.direction = 'right';
                         } else if (avatar.info.speed.x < 0) {
@@ -489,7 +514,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                       // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current scene object square (in those exact orders).
                       if (avatarLeft <= objRight && avatarRight >= objLeft && avatarTop <= objBottom && avatarBottom >= objTop) {
                           collision.found = true;
-                          collision.type = 'wall';
+                          collision.type = objSquare.type;
                           if (avatar.info.speed.x > 0) {
                               collision.direction = 'right';
                           } else if (avatar.info.speed.x < 0) {
@@ -542,7 +567,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                     // Pattern: check the left, right, top, and bottom edges of the current avatar square against the right, left, bottom, and top edges of the current scene object square (in those exact orders).
                     if (avatarLeft <= entRight && avatarRight >= entLeft && avatarTop <= entBottom && avatarBottom >= entTop) {
                         collision.found = true;
-                        collision.type = 'wall';
+                        collision.type = entSquare.type;
                         if (avatar.info.speed.x > 0) {
                             collision.direction = 'right';
                         } else if (avatar.info.speed.x < 0) {
@@ -558,19 +583,19 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
             }
         });
         if (collision.found) {
-            switch (collision.type) {
-                case 'wall':
-                    avatar.collide(collision.direction);
-                    playerUpdate = {
-                      id: angular.copy(fullPlayer.id),
-                      game: angular.copy(fullPlayer.game),
-                      scenePos: angular.copy(fullPlayer.scenePos),
-                      socketId: angular.copy(fullPlayer.socketId),
-                      action: angular.copy(avatar.action),
-                      pos: angular.copy(avatar.info.pos)
-                    };
-                    socket.emit('update player', playerUpdate);
-                    break;
+            if (collision.type === 'wall' || collision.type === 'collision') {
+              avatar.collide(collision.direction);
+              // playerUpdate = {
+              //   id: angular.copy(fullPlayer.id),
+              //   game: angular.copy(fullPlayer.game),
+              //   scenePos: angular.copy(fullPlayer.scenePos),
+              //   socketId: angular.copy(fullPlayer.socketId),
+              //   action: angular.copy(avatar.action),
+              //   pos: angular.copy(avatar.info.pos)
+              // };
+              // socket.emit('update player', playerUpdate);
+            } else {
+              checkLocationEvents(collision.type);
             }
             collision = {
                 found: false,
@@ -745,20 +770,20 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
     function updateLocation() {
         self.saveInfo.scenePos = self.currentScenePos;
-        fullPlayer.scenePos = self.currentScenePos;
+        // fullPlayer.scenePos = self.currentScenePos;
         self.currentMap = allMaps[self.currentScenePos[0]];
         self.allRows = self.currentMap.scenes;
         self.currentRow = self.allRows[self.currentScenePos[1]];
         self.currentScene = self.currentRow[self.currentScenePos[2]];
-        playerUpdate = {
-          id: angular.copy(fullPlayer.id),
-          game: angular.copy(fullPlayer.game),
-          scenePos: angular.copy(fullPlayer.scenePos),
-          socketId: angular.copy(fullPlayer.socketId),
-          action: angular.copy(avatar.action),
-          pos: angular.copy(avatar.info.pos)
-        };
-        socket.emit('update player', playerUpdate);
+        // playerUpdate = {
+        //   id: angular.copy(fullPlayer.id),
+        //   game: angular.copy(fullPlayer.game),
+        //   scenePos: angular.copy(fullPlayer.scenePos),
+        //   socketId: angular.copy(fullPlayer.socketId),
+        //   action: angular.copy(avatar.action),
+        //   pos: angular.copy(avatar.info.pos)
+        // };
+        // socket.emit('update player', playerUpdate);
         background = self.currentScene.background;
         events = self.currentScene.events;
         objects = self.currentScene.objects;
@@ -777,20 +802,20 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
     function updateAvatar() {
       avatar.updatePos();
-      fullPlayer.avatar = avatar;
-      playerUpdate = {
-        id: angular.copy(fullPlayer.id),
-        game: angular.copy(fullPlayer.game),
-        scenePos: angular.copy(fullPlayer.scenePos),
-        socketId: angular.copy(fullPlayer.socketId),
-        action: angular.copy(avatar.action),
-        pos: angular.copy(avatar.info.pos)
-      };
-      if (socketIterator > socketDelay) {
-        socket.emit('update player', playerUpdate);
-        socketIterator = 0;
-      }
-      socketIterator++;
+      // fullPlayer.avatar = avatar;
+      // playerUpdate = {
+      //   id: angular.copy(fullPlayer.id),
+      //   game: angular.copy(fullPlayer.game),
+      //   scenePos: angular.copy(fullPlayer.scenePos),
+      //   socketId: angular.copy(fullPlayer.socketId),
+      //   action: angular.copy(avatar.action),
+      //   pos: angular.copy(avatar.info.pos)
+      // };
+      // if (socketIterator > socketDelay) {
+      //   socket.emit('update player', playerUpdate);
+      //   socketIterator = 0;
+      // }
+      // socketIterator++;
     }
 
     function updateEntities() {
@@ -822,14 +847,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
         gameCtx.restore();
     }
 
-    function drawAllPlayers() {
-      allPlayers.forEach(function(player) {
-        // player.avatar.updatePos();
-        if (player.scenePos[0] === fullPlayer.scenePos[0] && player.scenePos[1] === fullPlayer.scenePos[1] && player.scenePos[2] === fullPlayer.scenePos[2]) {
-          drawAvatar(player.avatar);
-        }
-      });
-    }
+    // function drawAllPlayers() {
+    //   allPlayers.forEach(function(player) {
+    //     // player.avatar.updatePos();
+    //     if (player.scenePos[0] === fullPlayer.scenePos[0] && player.scenePos[1] === fullPlayer.scenePos[1] && player.scenePos[2] === fullPlayer.scenePos[2]) {
+    //       drawAvatar(player.avatar);
+    //     }
+    //   });
+    // }
 
     function drawBackground() {
         if (background) {
@@ -1052,19 +1077,19 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
           avatar.info.pos.y = startPos.y;
           avatar.info.currentFrame = avatar.info.animate.walkLeft[0];
           avatarLoaded = true;
-          fullPlayer.avatar = avatar;
+          // fullPlayer.avatar = avatar;
           updateLocation();
           initSocket();
+          // Tell the server that I joined this game
+          fullPlayer.id = playerInfo.id;
+          fullPlayer.game = self.gameName;
           socket.emit('game joined', fullPlayer);
         });
     }
 
     self.startGame = function() {
-        // Tell the server that I joined this game
-        fullPlayer.id = playerInfo.id;
-        fullPlayer.game = self.gameName;
         self.currentScenePos = [startPos.map, startPos.row, startPos.column];
-        fullPlayer.scenePos = self.currentScenePos;
+        // fullPlayer.scenePos = self.currentScenePos;
         loadMainCharacter();
         self.startTime = new Date();
         self.gameStarted = true;
@@ -1085,7 +1110,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                 drawEntities('background');
                 drawObjects('background');
                 drawAvatar(avatar);
-                drawAllPlayers();
+                // drawAllPlayers();
                 drawEntities('foreground');
                 drawObjects('foreground');
                 drawBackground();
@@ -1099,55 +1124,55 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
 
 
     function initSocket() {
-      // Socket functionality
-      // Get my own information
-      socket.off('self info');
-      socket.on('self info', function(id) {
-        fullPlayer.socketId = id;
-      });
-
+    //   // Socket functionality
+    //   // Get my own information
+    //   socket.off('self info');
+    //   socket.on('self info', function(id) {
+    //     fullPlayer.socketId = id;
+    //   });
+    //
       // Notify me in the chat window that another player joined the game.
       socket.off('new player');
       socket.on('new player', function(playerBasic) {
         var msg = "Player " + playerBasic.id + ' is playing ' + playerBasic.game;
         $('.chat-messages').append($('<li>').text(msg));
       });
-
-      socket.off('draw new player');
-      socket.on('draw new player', function(newPlayer) {
-        newPlayer.avatar = new Avatar(newPlayer.avatar);
-        allPlayers.push(newPlayer);
-        var response = {
-          data: fullPlayer,
-          dest: newPlayer.socketId
-        };
-        socket.emit('draw old player', response);
-      });
-
-      socket.off('draw old player');
-      socket.on('draw old player', function(oldPlayer) {
-        oldPlayer.avatar = new Avatar(oldPlayer.avatar);
-        allPlayers.push(oldPlayer);
-      });
-
-      socket.off('update player');
-      socket.on('update player', function(playerUpdate) {
-        // playerUpdate = {
-        //   id: angular.copy(fullPlayer.id),
-        //   game: angular.copy(fullPlayer.game),
-        //   scenePos: angular.copy(fullPlayer.scenePos),
-        //   socketId: angular.copy(fullPlayer.socketId),
-        //   action: avatar.action
-        // };
-        for (var index = 0; index < allPlayers.length; index++) {
-          if (allPlayers[index].id === playerUpdate.id) {
-            allPlayers[index].avatar.action = angular.copy(playerUpdate.action);
-            allPlayers[index].scenePos = angular.copy(playerUpdate.scenePos);
-            allPlayers[index].avatar.info.pos = angular.copy(playerUpdate.pos);
-          }
-        }
-      });
-
+    //
+    //   socket.off('draw new player');
+    //   socket.on('draw new player', function(newPlayer) {
+    //     newPlayer.avatar = new Avatar(newPlayer.avatar);
+    //     allPlayers.push(newPlayer);
+    //     var response = {
+    //       data: fullPlayer,
+    //       dest: newPlayer.socketId
+    //     };
+    //     socket.emit('draw old player', response);
+    //   });
+    //
+    //   socket.off('draw old player');
+    //   socket.on('draw old player', function(oldPlayer) {
+    //     oldPlayer.avatar = new Avatar(oldPlayer.avatar);
+    //     allPlayers.push(oldPlayer);
+    //   });
+    //
+    //   socket.off('update player');
+    //   socket.on('update player', function(playerUpdate) {
+    //     // playerUpdate = {
+    //     //   id: angular.copy(fullPlayer.id),
+    //     //   game: angular.copy(fullPlayer.game),
+    //     //   scenePos: angular.copy(fullPlayer.scenePos),
+    //     //   socketId: angular.copy(fullPlayer.socketId),
+    //     //   action: avatar.action
+    //     // };
+    //     for (var index = 0; index < allPlayers.length; index++) {
+    //       if (allPlayers[index].id === playerUpdate.id) {
+    //         allPlayers[index].avatar.action = angular.copy(playerUpdate.action);
+    //         allPlayers[index].scenePos = angular.copy(playerUpdate.scenePos);
+    //         allPlayers[index].avatar.info.pos = angular.copy(playerUpdate.pos);
+    //       }
+    //     }
+    //   });
+    //
       // When I submit a chat message, send it to the server along with the game I'm playing
       $('.chat-submit').submit(function(){
         var msgInfo = {
@@ -1170,15 +1195,15 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
       socket.on('player left', function(leavingPlayer) {
         var msg = "Player " + leavingPlayer.id + ' left ' + leavingPlayer.game;
         $('.chat-messages').append($('<li>').text(msg));
-        var indexToRemove = null;
-        for (var index = 0; index < allPlayers.length; index++) {
-          if (allPlayers[index].id === leavingPlayer.id) {
-            indexToRemove = index;
-          }
-        }
-        if (indexToRemove !== null) {
-          allPlayers.splice(indexToRemove, 1);
-        }
+        // var indexToRemove = null;
+        // for (var index = 0; index < allPlayers.length; index++) {
+        //   if (allPlayers[index].id === leavingPlayer.id) {
+        //     indexToRemove = index;
+        //   }
+        // }
+        // if (indexToRemove !== null) {
+        //   allPlayers.splice(indexToRemove, 1);
+        // }
       });
 
       // Let others know that I left the game if the controller ceases (closing browser, etc)

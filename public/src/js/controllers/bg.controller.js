@@ -127,7 +127,10 @@ angular.module('questCreator').controller('bgCtrl', function($state, $scope, Edi
     var gridWidth = canvasWidth / numSquaresX;
     var gridHeight = canvasHeight / numSquaresY;
     var color = $scope.editor.drawingCollision ? 'rgba(100, 100, 100, 0.5)' : $scope.editor.currentColor;
-    var type = $scope.editor.drawingCollision ? 'collision' : 'normal';
+    if ($scope.editor.drawingCollision && $scope.editor.collisionType !== 'wall') {
+      color = 'rgba(0, 0, 255, 0.5)';
+    }
+    var type = $scope.editor.drawingCollision ? $scope.editor.collisionType : 'normal';
     self.draw.fillStyle = color;
     for (var xIndex = -drawSize; xIndex <= drawSize; xIndex++) {
       for (var yIndex = -drawSize; yIndex <= drawSize; yIndex++) {

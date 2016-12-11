@@ -370,6 +370,16 @@
           font-size: 12px;
         }
 
+        &.collision .label {
+          width: 50px;
+        }
+        &.collision:first-child{
+          border-right: none;
+        }
+        &.collision:last-child{
+          border-left: none;
+        }
+
         &.do .label {
           width: 50px;
         }

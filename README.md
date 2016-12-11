@@ -2,9 +2,9 @@
 
 # Quest Creator
 
-[Link to Heroku Page](https://quest-creator.herokuapp.com/#/)
+[Link to Site](http://www.yazuadps.com/#/)
 
-
+### To Run Locally
 1) Clone the repo: `git clone https://github.com/rdhelms/questCreator.git`
 
 2) Navigate into project directory: `cd questCreator`

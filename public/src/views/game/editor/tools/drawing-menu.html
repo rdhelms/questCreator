@@ -1,16 +1,22 @@
 <ul id="drawing-menu">
   <!-- COLLISION -->
     <li class="tool">
-        <button ng-show="editor.drawingCollision" ng-click="editor.drawingCollision = false" class="collision" ng-disabled="editor.erasing">
+        <button ng-show="editor.drawingCollision" ng-click="editor.drawingCollision = false" class="collision">
           <div class="icon">
             <div>[]</div>
             <span class="label">Cancel</span>
           </div>
         </button>
-        <button ng-show="!editor.drawingCollision" ng-click="editor.drawingCollision = true" class="collision" ng-disabled="editor.erasing">
+        <button ng-show="!editor.drawingCollision" ng-click="editor.drawingCollision = true; editor.collisionType = 'wall';" class="collision">
           <div class="icon">
             <div>[]</div>
-            <span class="label">Collision</span>
+            <span class="label">Wall</span>
+          </div>
+        </button>
+        <button ng-show="!editor.drawingCollision" ng-click="editor.drawingCollision = true; editor.collisionType = 'custom';" class="collision">
+          <div class="icon">
+            <div>[]</div>
+            <span class="label">Custom</span>
           </div>
         </button>
     </li>
