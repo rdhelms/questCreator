@@ -1,0 +1,34 @@
+<div id="about-container">
+  <h2 class="about-heading">Welcome to YazuaDPS</h2>
+  <button ng-click="main.okay()" type="button" name="button">Close This Window</button>
+  <br>
+  <br>
+  <p>YazuaDPS is a game templating app that allows you to create "classic" computer games of your own, share them with other users, and play the awesome games others have made.  Though we made the app with building 80's style graphical adventure games in mind, the only limit is your imagination.</p>
+  <br>
+  <button type="button" ng-click="main.watchVid()">Click here to watch our demo video!</button>
+  <br>
+  <br>
+  <h3>How does it work?</h3>
+  <h4 class="about-heading">Login:</h4>
+  <p>You can login or register easily using your Gmail account.</p>
+  <br>
+  <h4 class="about-heading">Design:</h4>
+  <p>From the landing page or your profile you can create new games.  This will take you to the <span>Game Editor</span> screen where all the magic happens.  After giving your game a name, begin by adding a scene to your map.</p>
+  <br>
+  <p><span>Maps</span> are a collection of <span>Scenes</span>, and players will be able to move from one scene to the next adjacent scene by "walking" off the edge of the current scene.  A scene is comprised of a background, game objects that will be collected or interacted with during game play, and entities, non-player sprites that wander around the scene and may or may not be interacted with.  You can easily draw your own <span>Backgrounds</span>, <span>Objects</span>, and <span>Entities</span> by using the canvas tools available in the editor, or choose from ones previously created by other users by pressing the magnifying glass next to the category names in the top right of the editor.  Backgrounds are drawn directly on the large canvas while objects and entities are created on the smaller canvas.  Notice that entity creation also allows you to make several "frames" so you can animate different actions for that entity.  Once an "asset" (background, object or entity) has been created or added to your palette, you can click and drag them into the scene and reposition them in the same way. Note that you must drag assets into the scene view; the background view only allows you to edit the background image.</p>
+  <br>
+  <p>Currently <span>Events</span> are text based interactions that you can define for a scene to add items to the player's inventory, get information about the scene and items in it, or increase the player's score. Events consists of <span>Requirements</span>, <span>Triggers</span>, and <span>Results</span>. Requirements are optional and will only be selectable after you create an event with an achievement or inventory result. For now, Triggers are limited to text commands the player inputs to trigger the event, but will later be updated to include location based triggers. The game ignores all user input except for the defined keywords. Each <span>Keyword</span> can be given <span>Aliases</span> that the user can type instead of the keyword; as long as each keyword is typed, or one of its aliases, the event will trigger. Example:  With the keywords "take" (aliases: "grab", "get", "acquire") and "Philosopher's Stone" (aliases: "relic", "item", "object") the player could type "take the Philospher's Stone", "grab the relic", "get the item", or "acquire that mystic object that I want so badly" to trigger the event.  The result of a correct input is defined in the aptly named "Results" tab.  These outcomes could be a text response, the addition of an item to the player's inventory, a scoring achievement, or any combination thereof. If you define an <span>Achievement</span> or <span>Inventory</span> result, then that result will be available as a Requirement for future events. In the case of the <span>Scoring Achievement</span>, giving it a name here will allow you to use it as a Requirement for another event.  Requirements for an event allow you to be sure players do things in the correct order, i.e. talk to the old man before being able to get the Philosopher's Stone, and go a long way towards the overall flow of your game.</p>
+  <br>
+  <p>Notice the <span>Collision</span> button in the bottom left of the editor below the large canvas.  This is a distinct drawing tool with which you can define what and where the player's avatar "bumps" into things in the scene.  So if you don't want them to be able to walk through a table, draw a line of collision on the edge of the table.  Also, entities should usually be given some collision around their feet so they can't walk through or over everything.  Players won't see the collisions you draw, just feel its effects. Be careful not to make places where players can get stuck by collision, unless that's part of your impish game design.</p>
+  <br>
+  <p>It is probably a good idea to <span>Save</span> often as you're creating a game and certainly do so before leaving the editor.  You can always come back to working on your game later by clicking "Edit" from the your profile page.  When you're done with your awesome game, click on the big <span>Publish</span> button to make it available to the rest of the world.</p>
+  <br>
+  <h4 class="about-heading">Play:</h4>
+  <p>You can play other users games' after starting to make a game of your own.  Don't worry the game doesn't have to be done or published.  When you create entities or pull entities others have created into your game (suggested if you just wanna be able to play), they will be available for you to select as your gameplay avatar from your profile page by choosing it as the "default".  Then click on any game to see details about that game on the landing screen, and if you want to play it, click "Play".  Simple as that.  The "Chat" will allow you to talk, socialize, and ask for hints from others playing the same game, and eventually you will see them running around in the same world as you (feature forthcoming).</p>
+  <br>
+  <h4 class="about-heading">Share:</h4>
+  <p>You can share games you have made with others to be played by publishing them as described above, but you can also have others share in the creation of your games or share in creating games that other users have started.  To begin this process, click on the <span>Send Request</span> button on the game detail page for the game you want to be a part of.  From the profile page, you will be able to manage your collaborations, approving those who have requested to work with you, tracking those who you've already approved and link to editing others' games for which you have been approved to collaborate.  Games that someone else has started that you are collaborating on will be at the bottom of the list of your games.</p>
+  <br>
+  <h3 class="about-heading">Thanks for using YazuaDPS</h3>
+  <br>
+<button ng-click="main.okay()" type="button" name="button">Close This Window</button></div>
