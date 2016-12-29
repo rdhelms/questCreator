@@ -74,12 +74,16 @@ angular.module('questCreator')
     };
 
     this.about = function () {
-      console.log('here');
       PopupService.open('about');
     };
 
     this.watchVid = function () {
       PopupService.close();
       PopupService.open('video');
+    };
+
+    this.return = function () {
+        PopupService.close();
+        PopupService.open('about');
     };
 });

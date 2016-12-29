@@ -1242,6 +1242,14 @@ angular.module('questCreator')
   var path = './src/views/popups/';
 
   var templates = {
+    'about': {
+      title: 'About:',
+      content: 'about.html'
+    },
+    'video': {
+      title: 'YazuaDPS:',
+      content: 'video.html'
+    },
     'welcome': {
       title: 'Welcome!',
       content: 'welcome.html'
@@ -3255,6 +3263,20 @@ angular.module('questCreator')
 
     this.okay = function () {
         PopupService.close();
+    };
+
+    this.about = function () {
+      PopupService.open('about');
+    };
+
+    this.watchVid = function () {
+      PopupService.close();
+      PopupService.open('video');
+    };
+
+    this.return = function () {
+        PopupService.close();
+        PopupService.open('about');
     };
 });
 ;angular.module('questCreator').controller('mapCtrl', function($state, $scope) {
