@@ -315,9 +315,9 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
     }
 
     function checkLocationEvents(collisionType) {
-      var foundEvent = false; // Whether a typing event has already been triggered
+      var foundEvent = false; // Whether a location event has already been triggered
       if (events) {
-        events.forEach(function(event) { // Loop through all the typing events
+        events.forEach(function(event) { // Loop through all the location events
           if (event.category === 'location') {
             locationEvent = event.info;
             if (!foundEvent) {  // Only continue checking as long as another event has already not been triggered
