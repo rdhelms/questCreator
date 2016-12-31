@@ -211,5 +211,22 @@ angular.module('questCreator').controller('eventsCtrl', function($state, $scope,
     $scope.editor.currentEvent.info.results.inventory.splice(index, 1);
   };
 
+  //RESULT:
+  ////PORTAL:
+
+  this.addPortal = function(){
+    $scope.editor.currentEvent.info.results.portal = {
+      scenePos: [1, 0, 0],
+      pos: {
+        x: 200,
+        y: 200
+      }
+    };
+    console.log("Portal Result made!", $scope.editor.currentEvent.info.results.portal);
+  };
+
+  this.removePortal = function() {
+    $scope.editor.currentEvent.info.results.portal = {};
+  };
 
 });

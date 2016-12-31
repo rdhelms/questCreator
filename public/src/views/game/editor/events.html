@@ -229,7 +229,7 @@
               </li>
               <li class="menu-item" ng-class="{'active': events.resultType === 'portal'}" ng-click="events.resultType='portal'">
                 <span>Portal:</span>
-                <button disabled>></button>
+                <button ng-click="events.addPortal()">+</button>
               </li>
             </ul>
           </span>
@@ -260,6 +260,8 @@
               </div>
             </div>
 
+            <!-- INVENTORY RESULTS -->
+
             <div class="result-value" ng-if="events.resultType==='inventory' && editor.currentEvent.info.results.inventory.length > 0">
               <div class="value item" ng-repeat="item in editor.currentEvent.info.results.inventory track by $index">
                 <input ng-model="editor.currentEvent.info.results.inventory[$index]" type="text" maxlength="50" class="word" placeholder="Item Name"></input>
@@ -267,8 +269,14 @@
               </div>
             </div>
 
-            <div class="result-value" ng-if="events.resultType==='portal' && Object.keys(editor.currentEvent.info.results.portal).length > 0">
-              p o r t
+            <!-- PORTAL RESULTS -->
+            <div class="result-value" ng-if="events.resultType==='portal' && editor.currentEvent.info.results.portal.scenePos">
+              <div class="value portal">
+                <div>Scene Coordinates: {{editor.currentEvent.info.results.portal.scenePos}}</div>
+                <div>X: {{editor.currentEvent.info.results.portal.pos.x}}</div>
+                <div>Y: {{editor.currentEvent.info.results.portal.pos.y}}</div>
+                <button ng-click="events.removePortal()">x</button>
+              </div>
             </div>
 
           </span>

@@ -3138,6 +3138,23 @@ angular.module('questCreator')
     $scope.editor.currentEvent.info.results.inventory.splice(index, 1);
   };
 
+  //RESULT:
+  ////PORTAL:
+
+  this.addPortal = function(){
+    $scope.editor.currentEvent.info.results.portal = {
+      scenePos: [1, 0, 0],
+      pos: {
+        x: 200,
+        y: 200
+      }
+    };
+    console.log("Portal Result made!", $scope.editor.currentEvent.info.results.portal);
+  };
+
+  this.removePortal = function() {
+    $scope.editor.currentEvent.info.results.portal = {};
+  };
 
 });
 ;angular.module('questCreator').controller('gameCtrl', function(socket, $state, $scope) {
@@ -4046,7 +4063,6 @@ angular.module('questCreator')
             locationEvent = event.info;
             if (!foundEvent) {  // Only continue checking as long as another event has already not been triggered
               var requirementsMet = true;   // Assume that the requirements will be met
-              var requirementsMet = true;   // Assume that the requirements will be met
               if (locationEvent.requirements.achievements) {
                 locationEvent.requirements.achievements.forEach(function(achievement) {  // Loop through all the achievement requirements
                   if (self.saveInfo.achievements.indexOf(achievement.name) === -1) { // If an achievement is required, check the player's past achievements
@@ -4062,11 +4078,16 @@ angular.module('questCreator')
                 });
               }
               if (requirementsMet) {  // If all the requirements have been met, check the event's triggers
-                var triggerSatisfied = true;  // Until actual triggers are made
-                // var triggerSatisfied = false;  // Assume that the trigger conditions will not be met
-                // locationEvent.triggers.forEach(function(collisionType) {  // For now, assume any present trigger means the custom collision map is present
-                //   triggerSatisfied = true;
-                // });
+                var triggerSatisfied = false;  // Assume that the trigger conditions will not be met
+                if (locationEvent.triggers.length > 0) {
+                  locationEvent.triggers.forEach(function(triggerCollisionType) {  // For now, assume any present trigger means the custom collision map is present
+                    if (collisionType === triggerCollisionType) {
+                      triggerSatisfied = true;
+                    }
+                  });
+                } else {
+                  triggerSatisfied = true;  // If there is a location event with no trigger conditions, assume that the event should be triggered
+                }
                 if (triggerSatisfied) {
                   foundEvent = true;
                   locationEvent.results.text.forEach(function(textResult) {
@@ -4075,7 +4096,6 @@ angular.module('questCreator')
                       setTimeout(function() {
                         self.responding.show = false;
                       }, 2000);
-                      // self.pause = true;
                   });
                   locationEvent.results.inventory.forEach(function(inventoryItem) {
                     if (self.saveInfo.inventory.indexOf(inventoryItem) === -1) { // Check to see if the player has already gotten this item
