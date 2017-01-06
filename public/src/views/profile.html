@@ -1,61 +1,61 @@
 <div class="profile-container">
     <div class="user-container">
-      <img src="{{ user.picture }}" alt="Google profile picture" />
-      <ul class="info">
-          <li class="profile-name">{{ user.username | capitalize }}<i class="edit" ng-click="openToEdit()"> </i></li>
-          <label for="joined">Joined:<li>{{ getJoinedDate(user.joined) | date:'MMM d, yyyy' }}</li></label>
-          <label>Games Created:<li>{{ games.length }}</li></label>
-      </ul>
+        <img src="{{ user.picture }}" alt="Google profile picture" />
+        <ul class="info">
+            <li class="profile-name">{{ user.username | capitalize }}<i class="edit" ng-click="openToEdit()"> </i></li>
+            <label for="joined">Joined:<li>{{ getJoinedDate(user.joined) | date:'MMM d, yyyy' }}</li></label>
+            <label>Games Created:<li>{{ games.length }}</li></label>
+        </ul>
 
-      <div ng-if="requests.length > 0" class="requests">
-          <section class="collab-controls">
-              <div class="collab-header">
-                  <h5>Requests to collaborate</h5>
-                  <p class="collab-number" ng-model="requests.length">[<span>{{ requests.length }}]</span></p>
-              </div>
-              <button ng-click="showRequests()" ng-animate="{enter: 'requestArrow', leave: 'requestCounter'}" ng-class="{true: 'requestArrow', false: 'requestCounter'}[requestActive]"></button>
-          </section>
+        <div ng-if="requests.length > 0" class="requests">
+            <section class="collab-controls">
+                <div class="collab-header">
+                    <h5>Requests to collaborate</h5>
+                    <p class="collab-number" ng-model="requests.length">[<span>{{ requests.length }}]</span></p>
+                </div>
+                <button ng-click="showRequests()" ng-animate="{enter: 'requestArrow', leave: 'requestCounter'}" ng-class="{true: 'requestArrow', false: 'requestCounter'}[requestActive]"></button>
+            </section>
 
-          <table class="collab-tables" ng-show="showReqs" ng-class="{'hidden': !showReqs}">
-              <tr>
-                  <th>Game:</th>
-                  <th>Requested By:</th>
-                  <th>Approved:</th>
-                  <th>Remove</th>
-              </tr>
-              <tr ng-repeat="request in requests">
-                  <td>{{ request.game_name | capitalize }}</td>
-                  <td>{{ request.username }}</td>
-                  <td><input ng-model="request.accepted" ng-change="toggleCollab(request)" type="checkbox"></td>
-                  <td><button ng-click="removeRequest(request, $index)" type="button" name="button" class="remove-button">X</button></td>
-              </tr>
-          </table>
-      </div>
+            <table class="collab-tables" ng-show="showReqs" ng-class="{'hidden': !showReqs}">
+                <tr>
+                    <th>Game:</th>
+                    <th>Requested By:</th>
+                    <th>Approved:</th>
+                    <th>Remove</th>
+                </tr>
+                <tr ng-repeat="request in requests">
+                    <td>{{ request.game_name | capitalize }}</td>
+                    <td>{{ request.username }}</td>
+                    <td><input ng-model="request.accepted" ng-change="toggleCollab(request)" type="checkbox"></td>
+                    <td><button ng-click="removeRequest(request, $index)" type="button" name="button" class="remove-button">X</button></td>
+                </tr>
+            </table>
+        </div>
 
-      <div ng-if="collaborators.length > 0" class="collaborators">
-          <section class="collab-controls">
-              <div class="collab-header">
-                  <h5>Current Collaborators</h5>
-                  <p class="collab-number" ng-model="collaborators.length">[<span>{{collaborators.length}}</span>]</p>
-              </div>
-              <button ng-click="showCollaborators()" ng-animate="{enter: 'collabArrow', leave: 'collabCounter'}" ng-class="{true: 'collabArrow', false: 'collabCounter'}[collabActive]"></button>
-          </section>
+        <div ng-if="collaborators.length > 0" class="collaborators">
+            <section class="collab-controls">
+                <div class="collab-header">
+                    <h5>Current Collaborators</h5>
+                    <p class="collab-number" ng-model="collaborators.length">[<span>{{collaborators.length}}</span>]</p>
+                </div>
+                <button ng-click="showCollaborators()" ng-animate="{enter: 'collabArrow', leave: 'collabCounter'}" ng-class="{true: 'collabArrow', false: 'collabCounter'}[collabActive]"></button>
+            </section>
 
-          <table class="collab-tables" ng-hide="!showCollabs" ng-animate>
-              <tr>
-                  <th>Game:</th>
-                  <th>Collaborator:</th>
-                  <th>Approved:</th>
-                  <th>Remove</th>
-              </tr>
-              <tr ng-repeat="collaborator in collaborators">
-                  <td>{{ collaborator.game_name | capitalize }}</td>
-                  <td>{{ collaborator.username }}</td>
-                  <td><input ng-model="collaborator.accepted" ng-change="toggleCollab(collaborator)" type="checkbox" value="{{ collaborator.accepted }}"></td>
-                  <td><button ng-click="removeCollaborator(collaborator, $index)" type="button" name="button" class="remove-button">X</button></td>
-              </tr>
-          </table>
-      </div>
+            <table class="collab-tables" ng-hide="!showCollabs" ng-animate>
+                <tr>
+                    <th>Game:</th>
+                    <th>Collaborator:</th>
+                    <th>Approved:</th>
+                    <th>Remove</th>
+                </tr>
+                <tr ng-repeat="collaborator in collaborators">
+                    <td>{{ collaborator.game_name | capitalize }}</td>
+                    <td>{{ collaborator.username }}</td>
+                    <td><input ng-model="collaborator.accepted" ng-change="toggleCollab(collaborator)" type="checkbox" value="{{ collaborator.accepted }}"></td>
+                    <td><button ng-click="removeCollaborator(collaborator, $index)" type="button" name="button" class="remove-button">X</button></td>
+                </tr>
+            </table>
+        </div>
     </div>
 
     <div class="avatar-container">
@@ -88,14 +88,14 @@
             <ul>
                 <li>
                     <h4>{{ game.name | capitalize }}</h4>
-                <li>
-                    <label for="published">Published: </label>
-                    <p>{{ game.published ? 'Yup!' : 'Not Yet' }}</p>
-                </li>
-                <li>
-                    <label for="created">Created:</label>
-                    <p>{{ game.created_at | date:'MMM d, yyyy' }}</p>
-                </li>
+                    <li>
+                        <label for="published">Published: </label>
+                        <p>{{ game.published ? 'Yup!' : 'Not Yet' }}</p>
+                    </li>
+                    <li>
+                        <label for="created">Created:</label>
+                        <p>{{ game.created_at | date:'MMM d, yyyy' }}</p>
+                    </li>
             </ul>
             <div class="buttons">
                 <button type="button" ng-click="editGame(game.name)">Edit</button>
@@ -116,9 +116,9 @@
                     <p> {{ collaboration.created_at | date:'MMM d, yyyy' }}</p>
                 </li>
                 <li>
-                  <label for="published">Published: </label>
-                  <p>{{ game.published ? 'Yup!' : 'Not Yet' }}
-                  </p>
+                    <label for="published">Published: </label>
+                    <p>{{ game.published ? 'Yup!' : 'Not Yet' }}
+                    </p>
                 </li>
             </ul>
             <div class="buttons">
