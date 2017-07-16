@@ -466,6 +466,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
                     if (avatarLeft <= bgRight && avatarRight >= bgLeft && avatarTop <= bgBottom && avatarBottom >= bgTop) {
                         collision.found = true;
                         collision.type = bgSquare.type;
+                        collision.square = bgSquare;
                         if (avatar.info.speed.x > 0) {
                             collision.direction = 'right';
                         } else if (avatar.info.speed.x < 0) {
@@ -586,7 +587,7 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
             }
         });
         if (collision.found) {
-            if (collision.type === 'wall' || collision.type === 'collision') {
+            if (collision.type === 'wall') {
               avatar.collide(collision.direction);
               // playerUpdate = {
               //   id: angular.copy(fullPlayer.id),
@@ -597,6 +598,14 @@ angular.module('questCreator').controller('playCtrl', function(socket, Avatar, B
               //   pos: angular.copy(avatar.info.pos)
               // };
               // socket.emit('update player', playerUpdate);
+            } else if (collision.type === 'teleport') {
+              console.log(collision);
+              var teleportTarget = collision.square.teleportTarget;
+              var scenePos = teleportTarget.scenePos;
+              var pos = teleportTarget.pos;
+              self.currentScenePos = scenePos;
+              updateLocation();
+              avatar.teleport(pos);
             } else {
               checkLocationEvents(collision.type);
             }

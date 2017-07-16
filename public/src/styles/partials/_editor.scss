@@ -353,6 +353,11 @@
 
     .tool {
       @include display(flex);
+
+      &.collisionTool {
+        flex-wrap: wrap;
+      }
+
       button {
         height: 100%;
         width: 100%;
@@ -370,13 +375,28 @@
           font-size: 12px;
         }
 
+        &.collision {
+          height: 50%;
+          width: 50%;
+        }
+
         &.collision .label {
           width: 50px;
         }
-        &.collision:first-child{
+        &.collision:nth-child(2){
+          border-right: none;
+          border-bottom: none;
+        }
+        &.collision:nth-child(3) {
+          border-left: none;
+          border-bottom: none;
+        }
+        &.collision:nth-child(4) {
+          border-top: none;
           border-right: none;
         }
         &.collision:last-child{
+          border-top: none;
           border-left: none;
         }
 

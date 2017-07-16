@@ -43,11 +43,8 @@ angular.module('questCreator')
         this.eventTypes = [{
             name: 'text',
             description: 'Events triggered by text input.',
-          },
-          {
+          }, {
             name: 'location',
-        }, {
-            name: 'collision',
             description: 'Events triggered by player position.'
         }];
         this.eventType = null;
@@ -68,6 +65,17 @@ angular.module('questCreator')
         this.currentPixelSize = 4;
         this.drawingCollision = false;
         this.collisionType = 'wall';
+        this.teleportTarget = {
+          map: {},
+          scene: {},
+          pos: {
+            x: 100,
+            y: 100
+          }
+        };
+        this.deathDescription = {
+          text: "Game Over! Thanks for playing."
+        };
         this.erasing = false;
         this.selectingAssets = false;
         this.currentFrameIndex = 0;

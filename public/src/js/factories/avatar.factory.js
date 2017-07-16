@@ -85,5 +85,9 @@ angular.module('questCreator').factory('Avatar', function() {
     }
   };
 
+  Avatar.prototype.teleport = function(pos) {
+    this.info.pos = pos;
+  };
+
   return Avatar;
 });

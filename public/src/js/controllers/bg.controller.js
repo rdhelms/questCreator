@@ -37,13 +37,20 @@ angular.module('questCreator').controller('bgCtrl', function($state, $scope, Edi
   *   @methods
   *     draw: draw the rectangle on the canvas using its position, size, and color.
   */
-  function Square(x, y, width, height, color, type) {
+  function Square(x, y, width, height, color, type, teleportTarget, deathDescription) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
     this.color = color;
     this.type = type;
+    var self = this;
+    if (teleportTarget) {
+      self.teleportTarget = teleportTarget;
+    }
+    if (deathDescription) {
+      self.deathDescription = deathDescription;
+    }
   }
 
   Square.prototype.draw = function() {
@@ -126,11 +133,14 @@ angular.module('questCreator').controller('bgCtrl', function($state, $scope, Edi
     var numSquaresY = 50;
     var gridWidth = canvasWidth / numSquaresX;
     var gridHeight = canvasHeight / numSquaresY;
-    var color = $scope.editor.drawingCollision ? 'rgba(100, 100, 100, 0.5)' : $scope.editor.currentColor;
-    if ($scope.editor.drawingCollision && $scope.editor.collisionType !== 'wall') {
+    var color = $scope.editor.drawingCollision ? 'rgba(100, 50, 0, 0.5)' : $scope.editor.currentColor;
+    if ($scope.editor.drawingCollision && $scope.editor.collisionType == 'teleport') {
       color = 'rgba(0, 0, 255, 0.5)';
+    } else if ($scope.editor.drawingCollision && $scope.editor.collisionType == 'swim') {
+      color = 'rgba(0, 100, 100, 0.5)'
+    } else if ($scope.editor.drawingCollision && $scope.editor.collisionType == 'death') {
+      color = 'rgba(0, 0, 0, 0.5)'
     }
-    var type = $scope.editor.drawingCollision ? $scope.editor.collisionType : 'normal';
     self.draw.fillStyle = color;
     for (var xIndex = -drawSize; xIndex <= drawSize; xIndex++) {
       for (var yIndex = -drawSize; yIndex <= drawSize; yIndex++) {
@@ -168,8 +178,15 @@ angular.module('questCreator').controller('bgCtrl', function($state, $scope, Edi
         }
         if (mouseIsDown && !$scope.editor.erasing) {
           // console.log("Drawing New Square!");
-          var newSquare = new Square(rectX, rectY, gridWidth, gridHeight, color, type);
-          // newSquare.draw();
+          var type = $scope.editor.drawingCollision ? $scope.editor.collisionType : 'normal';
+          var teleportTarget = $scope.editor.teleportTarget;
+          if ($scope.editor.collisionType == 'teleport') {
+            var newSquare = new Square(rectX, rectY, gridWidth, gridHeight, color, type, teleportTarget);
+          } else if ($scope.editor.collisionType == 'death') {
+            var newSquare = new Square(rectX, rectY, gridWidth, gridHeight, color, type, null, deathDescription);
+          } else {
+            var newSquare = new Square(rectX, rectY, gridWidth, gridHeight, color, type);
+          }
           if ($scope.editor.drawingCollision) {
             self.allCollisionSquares.push(newSquare);
           } else {

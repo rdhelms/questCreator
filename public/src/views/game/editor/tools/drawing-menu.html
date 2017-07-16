@@ -1,7 +1,7 @@
 <ul id="drawing-menu">
   <!-- COLLISION -->
-    <li class="tool">
-        <button ng-show="editor.drawingCollision" ng-click="editor.drawingCollision = false" class="collision">
+    <li class="tool collisionTool">
+        <button ng-show="editor.drawingCollision" ng-click="editor.drawingCollision = false; editor.collisionType = 'wall'">
           <div class="icon">
             <div>[]</div>
             <span class="label">Cancel</span>
@@ -13,10 +13,22 @@
             <span class="label">Wall</span>
           </div>
         </button>
-        <button ng-show="!editor.drawingCollision" ng-click="editor.drawingCollision = true; editor.collisionType = 'custom';" class="collision">
+        <button ng-show="!editor.drawingCollision" ng-click="editor.drawingCollision = true; editor.collisionType = 'teleport';" class="collision">
           <div class="icon">
             <div>[]</div>
-            <span class="label">Custom</span>
+            <span class="label">Teleport</span>
+          </div>
+        </button>
+        <button ng-show="!editor.drawingCollision" ng-click="editor.drawingCollision = true; editor.collisionType = 'swim';" class="collision">
+          <div class="icon">
+            <div>[]</div>
+            <span class="label">Swim</span>
+          </div>
+        </button>
+        <button ng-show="!editor.drawingCollision" ng-click="editor.drawingCollision = true; editor.collisionType = 'death';" class="collision">
+          <div class="icon">
+            <div>[]</div>
+            <span class="label">Death</span>
           </div>
         </button>
     </li>
@@ -90,3 +102,16 @@
         </li>
     </ul>
 </ul>
+<div ng-if="editor.collisionType == 'teleport'">
+  <label>Map</label>
+  <select ng-model="editor.teleportTarget.map" ng-options="map.name for map in editor.currentEditingGame.info.maps"></select>
+  <ul ng-if="editor.teleportTarget.map.name" ng-repeat="row in editor.teleportTarget.map.scenes track by $index">
+    <li class="menu-item" ng-repeat="scene in row track by $index" ng-click="editor.teleportTarget.scene = scene; editor.teleportTarget.scenePos = [editor.currentEditingGame.info.maps.indexOf(editor.teleportTarget.map), editor.teleportTarget.map.scenes.indexOf(row), row.indexOf(scene)]; console.log(editor.teleportTarget)">
+      <span>{{scene.name}}</span>
+    </li>
+  </ul>
+  <label ng-if="editor.teleportTarget.scene.name">X</label>
+  <input ng-if="editor.teleportTarget.scene.name" type="number" min="0" max="700">
+  <label ng-if="editor.teleportTarget.scene.name">Y</label>
+  <input ng-if="editor.teleportTarget.scene.name" type="number" min="0" max="500">
+</div>
